@@ -3298,7 +3298,7 @@
             }
         }
     },
-    "revision": "20210325",
+    "revision": "20220303",
     "rootUrl": "https://shoppingcontent.googleapis.com/",
     "schemas": {
         "Account": {
@@ -3417,6 +3417,10 @@
                 "customerService": {
                     "$ref": "AccountCustomerService",
                     "description": "The customer service information of the business."
+                },
+                "koreanBusinessRegistrationNumber": {
+                    "description": "The 10-digit [Korean business registration number](https://support.google.com/merchants/answer/9037766) separated with dashes in the format: XXX-XX-XXXXX. This field will only be updated if explicitly set.",
+                    "type": "string"
                 },
                 "phoneNumber": {
                     "description": "The phone number of the business.",
@@ -4205,6 +4209,32 @@
             },
             "type": "object"
         },
+        "Address": {
+            "id": "Address",
+            "properties": {
+                "administrativeArea": {
+                    "description": "Required. Top-level administrative subdivision of the country. For example, a state like California (\"CA\") or a province like Quebec (\"QC\").",
+                    "type": "string"
+                },
+                "city": {
+                    "description": "Required. City, town or commune. May also include dependent localities or sublocalities (e.g. neighborhoods or suburbs).",
+                    "type": "string"
+                },
+                "country": {
+                    "description": "Required. [CLDR country code](http://www.unicode.org/repos/cldr/tags/latest/common/main/en.xml)(e.g. \"US\").",
+                    "type": "string"
+                },
+                "postalCode": {
+                    "description": "Required. Postal code or ZIP (e.g. \"94043\"). Required.",
+                    "type": "string"
+                },
+                "streetAddress": {
+                    "description": "Street-level part of the address.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Amount": {
             "id": "Amount",
             "properties": {
@@ -4223,7 +4253,7 @@
             "id": "BusinessDayConfig",
             "properties": {
                 "businessDays": {
-                    "description": "Regular business days. May not be empty.",
+                    "description": "Regular business days, such as '\"monday\"'. May not be empty.",
                     "items": {
                         "type": "string"
                     },
@@ -4269,12 +4299,19 @@
                     "description": "The CLDR country code of the carrier (e.g., \"US\"). Always present.",
                     "type": "string"
                 },
+                "eddServices": {
+                    "description": "A list of services supported for EDD (Estimated Delivery Date) calculation. This is the list of valid values for WarehouseBasedDeliveryTime.carrierService.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "name": {
                     "description": "The name of the carrier (e.g., `\"UPS\"`). Always present.",
                     "type": "string"
                 },
                 "services": {
-                    "description": "A list of supported services (e.g., `\"ground\"`) for that carrier. Contains at least one service.",
+                    "description": "A list of supported services (e.g., `\"ground\"`) for that carrier. Contains at least one service. This is the list of valid values for CarrierRate.carrierService.",
                     "items": {
                         "type": "string"
                     },
@@ -4872,6 +4909,13 @@
                 "transitTimeTable": {
                     "$ref": "TransitTable",
                     "description": "Transit time table, number of business days spent in transit based on row and column dimensions. Either `{min,max}TransitTimeInDays` or `transitTimeTable` can be set, but not both."
+                },
+                "warehouseBasedDeliveryTimes": {
+                    "description": "Indicates that the delivery time should be calculated per warehouse (shipping origin location) based on the settings of the selected carrier. When set, no other transit time related field in DeliveryTime should be set.",
+                    "items": {
+                        "$ref": "WarehouseBasedDeliveryTime"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -8475,8 +8519,23 @@
             "description": "Store resource.",
             "id": "PosStore",
             "properties": {
+                "gcidCategory": {
+                    "description": "The business type of the store.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "kind": {
                     "description": "Identifies what kind of resource this is. Value: the fixed string \"`content#posStore`\"",
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "description": "The store phone number.",
+                    "type": "string"
+                },
+                "placeId": {
+                    "description": "The Google Place Id of the store location.",
                     "type": "string"
                 },
                 "storeAddress": {
@@ -8485,6 +8544,14 @@
                 },
                 "storeCode": {
                     "description": "Required. A store identifier that is unique for the given merchant.",
+                    "type": "string"
+                },
+                "storeName": {
+                    "description": "The merchant or store name.",
+                    "type": "string"
+                },
+                "websiteUrl": {
+                    "description": "The website url for the store or merchant.",
                     "type": "string"
                 }
             },
@@ -8540,7 +8607,7 @@
             "type": "object"
         },
         "Product": {
-            "description": " Required product attributes are primarily defined by the products data specification. See the Products Data Specification Help Center article for information. Some attributes are country-specific, so make sure you select the appropriate country in the drop-down selector at the top of the page. Product data. After inserting, updating, or deleting a product, it may take several minutes before changes take effect.",
+            "description": " Required product attributes are primarily defined by the products data specification. See the Products Data Specification Help Center article for information. Product data. After inserting, updating, or deleting a product, it may take several minutes before changes take effect.",
             "id": "Product",
             "properties": {
                 "additionalImageLinks": {
@@ -9703,6 +9770,13 @@
                         "$ref": "Service"
                     },
                     "type": "array"
+                },
+                "warehouses": {
+                    "description": "Optional. A list of warehouses which can be referred to in `services`.",
+                    "items": {
+                        "$ref": "Warehouse"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -10257,6 +10331,88 @@
             },
             "type": "object"
         },
+        "Warehouse": {
+            "description": "A fulfillment warehouse, which stores and handles inventory.",
+            "id": "Warehouse",
+            "properties": {
+                "businessDayConfig": {
+                    "$ref": "BusinessDayConfig",
+                    "description": "Business days of the warehouse. If not set, will be Monday to Friday by default."
+                },
+                "cutoffTime": {
+                    "$ref": "WarehouseCutoffTime",
+                    "description": "Required. The latest time of day that an order can be accepted and begin processing. Later orders will be processed in the next day. The time is based on the warehouse postal code."
+                },
+                "handlingDays": {
+                    "description": "Required. The number of days it takes for this warehouse to pack up and ship an item. This is on the warehouse level, but can be overridden on the offer level based on the attributes of an item.",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Required. The name of the warehouse. Must be unique within account.",
+                    "type": "string"
+                },
+                "shippingAddress": {
+                    "$ref": "Address",
+                    "description": "Required. Shipping address of the warehouse."
+                }
+            },
+            "type": "object"
+        },
+        "WarehouseBasedDeliveryTime": {
+            "id": "WarehouseBasedDeliveryTime",
+            "properties": {
+                "carrier": {
+                    "description": "Required. Carrier, such as `\"UPS\"` or `\"Fedex\"`. The list of supported carriers can be retrieved via the `listSupportedCarriers` method.",
+                    "type": "string"
+                },
+                "carrierService": {
+                    "description": "Required. Carrier service, such as `\"ground\"` or `\"2 days\"`. The list of supported services for a carrier can be retrieved via the `listSupportedCarriers` method. The name of the service must be in the eddSupportedServices list.",
+                    "type": "string"
+                },
+                "originAdministrativeArea": {
+                    "description": "Shipping origin's state.",
+                    "type": "string"
+                },
+                "originCity": {
+                    "description": "Shipping origin's city.",
+                    "type": "string"
+                },
+                "originCountry": {
+                    "description": "Shipping origin's country represented as a [CLDR territory code](http://www.unicode.org/repos/cldr/tags/latest/common/main/en.xml).",
+                    "type": "string"
+                },
+                "originPostalCode": {
+                    "description": "Shipping origin.",
+                    "type": "string"
+                },
+                "originStreetAddress": {
+                    "description": "Shipping origin's street address",
+                    "type": "string"
+                },
+                "warehouseName": {
+                    "description": "The name of the warehouse. Warehouse name need to be matched with name. If warehouseName is set, the below fields will be ignored. The warehouse info will be read from warehouse.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "WarehouseCutoffTime": {
+            "id": "WarehouseCutoffTime",
+            "properties": {
+                "hour": {
+                    "description": "Required. Hour (24-hour clock) of the cutoff time until which an order has to be placed to be processed in the same day by the warehouse. Hour is based on the timezone of warehouse.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "minute": {
+                    "description": "Required. Minute of the cutoff time until which an order has to be placed to be processed in the same day by the warehouse. Minute is based on the timezone of warehouse.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
         "Weight": {
             "id": "Weight",
             "properties": {
@@ -10265,7 +10421,7 @@
                     "type": "string"
                 },
                 "value": {
-                    "description": "Required. The weight represented as a number.",
+                    "description": "Required. The weight represented as a number. The weight can have a maximum precision of four decimal places.",
                     "type": "string"
                 }
             },

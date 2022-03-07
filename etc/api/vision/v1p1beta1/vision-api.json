@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "View and manage your data across Google Cloud Platform services"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/cloud-vision": {
                     "description": "Apply machine learning models to understand and label images"
@@ -449,7 +449,7 @@
             }
         }
     },
-    "revision": "20210319",
+    "revision": "20220225",
     "rootUrl": "https://vision.googleapis.com/",
     "schemas": {
         "AnnotateFileResponse": {
@@ -7570,7 +7570,7 @@
             "type": "object"
         },
         "LatLng": {
-            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this must conform to the WGS84 standard. Values must be within normalized ranges.",
+            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.",
             "id": "LatLng",
             "properties": {
                 "latitude": {

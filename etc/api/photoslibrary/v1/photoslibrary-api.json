@@ -641,7 +641,7 @@
             }
         }
     },
-    "revision": "20210331",
+    "revision": "20220303",
     "rootUrl": "https://photoslibrary.googleapis.com/",
     "schemas": {
         "AddEnrichmentToAlbumRequest": {
@@ -1141,7 +1141,7 @@
             "type": "object"
         },
         "LatLng": {
-            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this must conform to the WGS84 standard. Values must be within normalized ranges.",
+            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.",
             "id": "LatLng",
             "properties": {
                 "latitude": {
@@ -1279,7 +1279,7 @@
                 },
                 "contributorInfo": {
                     "$ref": "ContributorInfo",
-                    "description": "Information about the user who created this media item."
+                    "description": "Information about the user who added this media item. Note that this is only included when using mediaItems.search with the ID of a shared album. The album must be created by your app and you must have the sharing scope."
                 },
                 "description": {
                     "description": "Description of the media item. This is shown to the user in the item's info section in the Google Photos app.",
@@ -1302,7 +1302,7 @@
                     "type": "string"
                 },
                 "productUrl": {
-                    "description": "Google Photos URL for the media item. This link is available to the user only if they're signed in.",
+                    "description": "Google Photos URL for the media item. This link is available to the user only if they're signed in. When retrieved from an album search, the URL points to the item inside the album.",
                     "type": "string"
                 }
             },
@@ -1354,7 +1354,7 @@
             "type": "object"
         },
         "MediaTypeFilter": {
-            "description": "This filter defines the type of media items to be returned, for example, videos or photos. All the specified media types are treated as an OR when used together.",
+            "description": "This filter defines the type of media items to be returned, for example, videos or photos. Only one media type is supported.",
             "id": "MediaTypeFilter",
             "properties": {
                 "mediaTypes": {
@@ -1476,6 +1476,10 @@
                 "filters": {
                     "$ref": "Filters",
                     "description": "Filters to apply to the request. Can't be set in conjunction with an `albumId`."
+                },
+                "orderBy": {
+                    "description": "An optional field to specify the sort order of the search results. The `orderBy` field only works when a dateFilter is used. When this field is not specified, results are displayed newest first, oldest last by their creationTime. Providing `MediaMetadata.creation_time` displays search results in the opposite order, oldest first then newest last. To display results newest first then oldest last, include the `desc` argument as follows: `MediaMetadata.creation_time desc`. The only additional filters that can be used with this parameter are includeArchivedMedia and excludeNonAppCreatedData. No other filters are supported.",
+                    "type": "string"
                 },
                 "pageSize": {
                     "description": "Maximum number of media items to return in the response. Fewer media items might be returned than the specified number. The default `pageSize` is 25, the maximum is 100.",
@@ -1668,7 +1672,7 @@
                     "enumDescriptions": [
                         "Video processing status is unknown.",
                         "Video is being processed. The user sees an icon for this video in the Google Photos app; however, it isn't playable yet.",
-                        "Video processing is complete and it is now ready for viewing.",
+                        "Video processing is complete and it is now ready for viewing. Important: attempting to download a video not in the READY state may fail.",
                         "Something has gone wrong and the video has failed to process."
                     ],
                     "type": "string"

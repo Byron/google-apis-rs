@@ -115,12 +115,12 @@
                     "parameterOrder": [],
                     "parameters": {
                         "agreementAccepted": {
-                            "description": "This feature is not generally available yet. Whether the managed Google Play Agreement is presented and agreed.",
+                            "description": "Whether the enterprise admin has seen and agreed to the managed Google Play Agreement (https://www.android.com/enterprise/terms/). Always set this to true when creating an EMM-managed enterprise. Do not create the enterprise until the admin has viewed and accepted the agreement.",
                             "location": "query",
                             "type": "boolean"
                         },
                         "enterpriseToken": {
-                            "description": "The enterprise token appended to the callback URL.",
+                            "description": "The enterprise token appended to the callback URL. Only set this when creating a customer-managed enterprise.",
                             "location": "query",
                             "type": "string"
                         },
@@ -130,7 +130,7 @@
                             "type": "string"
                         },
                         "signupUrlName": {
-                            "description": "The name of the SignupUrl used to sign up for the enterprise.",
+                            "description": "The name of the SignupUrl used to sign up for the enterprise. Only set this when creating a customer-managed enterprise.",
                             "location": "query",
                             "type": "string"
                         }
@@ -147,7 +147,7 @@
                     ]
                 },
                 "delete": {
-                    "description": "This feature is not generally available yet. Deletes an enterprise.",
+                    "description": "Deletes an enterprise. Only available for EMM-managed enterprises.",
                     "flatPath": "v1/enterprises/{enterprisesId}",
                     "httpMethod": "DELETE",
                     "id": "androidmanagement.enterprises.delete",
@@ -156,7 +156,7 @@
                     ],
                     "parameters": {
                         "name": {
-                            "description": "This feature is not generally available yet. The name of the enterprise in the form enterprises/{enterpriseId}.",
+                            "description": "The name of the enterprise in the form enterprises/{enterpriseId}.",
                             "location": "path",
                             "pattern": "^enterprises/[^/]+$",
                             "required": true,
@@ -197,37 +197,37 @@
                     ]
                 },
                 "list": {
-                    "description": "This feature is not generally available yet. Lists enterprises that are managed by an EMM. Only partial views are returned.",
+                    "description": "Lists EMM-managed enterprises. Only BASIC fields are returned.",
                     "flatPath": "v1/enterprises",
                     "httpMethod": "GET",
                     "id": "androidmanagement.enterprises.list",
                     "parameterOrder": [],
                     "parameters": {
                         "pageSize": {
-                            "description": "This feature is not generally available yet. The requested page size. The actual page size may be fixed to a min or max value.",
+                            "description": "The requested page size. The actual page size may be fixed to a min or max value.",
                             "format": "int32",
                             "location": "query",
                             "type": "integer"
                         },
                         "pageToken": {
-                            "description": "This feature is not generally available yet. A token identifying a page of results returned by the server.",
+                            "description": "A token identifying a page of results returned by the server.",
                             "location": "query",
                             "type": "string"
                         },
                         "projectId": {
-                            "description": "Required. This feature is not generally available yet. The ID of the Cloud project of the EMM the enterprises belongs to.",
+                            "description": "Required. The Cloud project ID of the EMM managing the enterprises.",
                             "location": "query",
                             "type": "string"
                         },
                         "view": {
-                            "description": "This feature is not generally available yet. View that specify that partial response should be returned.",
+                            "description": "Specifies which Enterprise fields to return. This method only supports BASIC.",
                             "enum": [
                                 "ENTERPRISE_VIEW_UNSPECIFIED",
                                 "BASIC"
                             ],
                             "enumDescriptions": [
-                                "This feature is not generally available yet. The API will default to the BASIC view for the List method.",
-                                "This feature is not generally available yet. Includes name and enterprise_display_name fields."
+                                "The API will default to the BASIC view for the List method.",
+                                "Includes name and enterprise_display_name fields."
                             ],
                             "location": "query",
                             "type": "string"
@@ -877,7 +877,7 @@
                             ],
                             "parameters": {
                                 "pageSize": {
-                                    "description": "The requested page size. The actual page size may be fixed to a min or max value.",
+                                    "description": "The requested page size. This is a hint and the actual page size in the response may be different.",
                                     "format": "int32",
                                     "location": "query",
                                     "type": "integer"
@@ -1004,11 +1004,11 @@
             }
         }
     },
-    "revision": "20210322",
+    "revision": "20220302",
     "rootUrl": "https://androidmanagement.googleapis.com/",
     "schemas": {
         "AdvancedSecurityOverrides": {
-            "description": "Security policies set to the most secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values.",
+            "description": "Security policies set to secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values.",
             "id": "AdvancedSecurityOverrides",
             "properties": {
                 "commonCriteriaMode": {
@@ -1024,6 +1024,41 @@
                         "Enables Common Criteria Mode."
                     ],
                     "type": "string"
+                },
+                "developerSettings": {
+                    "description": "Controls access to developer settings: developer options and safe boot. Replaces safeBootDisabled (deprecated) and debuggingFeaturesAllowed (deprecated).",
+                    "enum": [
+                        "DEVELOPER_SETTINGS_UNSPECIFIED",
+                        "DEVELOPER_SETTINGS_DISABLED",
+                        "DEVELOPER_SETTINGS_ALLOWED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to DEVELOPER_SETTINGS_DISABLED.",
+                        "Default. Disables all developer settings and prevents the user from accessing them.",
+                        "Allows all developer settings. The user can access and optionally configure the settings."
+                    ],
+                    "type": "string"
+                },
+                "googlePlayProtectVerifyApps": {
+                    "description": "Whether Google Play Protect verification (https://support.google.com/accounts/answer/2812853) is enforced. Replaces ensureVerifyAppsEnabled (deprecated).",
+                    "enum": [
+                        "GOOGLE_PLAY_PROTECT_VERIFY_APPS_UNSPECIFIED",
+                        "VERIFY_APPS_ENFORCED",
+                        "VERIFY_APPS_USER_CHOICE"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to VERIFY_APPS_ENFORCED.",
+                        "Default. Force-enables app verification.",
+                        "Allows the user to choose whether to enable app verification."
+                    ],
+                    "type": "string"
+                },
+                "personalAppsThatCanReadWorkNotifications": {
+                    "description": "Personal apps that can read work profile notifications using a NotificationListenerService (https://developer.android.com/reference/android/service/notification/NotificationListenerService). By default, no personal apps (aside from system apps) can read work notifications. Each value in the list must be a package name.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "untrustedAppsPolicy": {
                     "description": "The policy for untrusted apps (apps from unknown sources) enforced on the device. Replaces install_unknown_sources_allowed (deprecated).",
@@ -1086,16 +1121,144 @@
             },
             "type": "object"
         },
+        "AppVersion": {
+            "description": "This represents a single version of the app.",
+            "id": "AppVersion",
+            "properties": {
+                "production": {
+                    "description": "True if this version is a production track.",
+                    "type": "boolean"
+                },
+                "trackIds": {
+                    "description": "Track ids that the app version is published in. This doesn't include the production track (see production instead).",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "versionCode": {
+                    "description": "Unique increasing identifier for the app version.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "versionString": {
+                    "description": "The string used in the Play store by the app developer to identify the version. The string is not necessarily unique or localized (for example, the string could be \"1.4\").",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Application": {
             "description": "Information about an app.",
             "id": "Application",
             "properties": {
+                "appPricing": {
+                    "description": "Whether this app is free, free with in-app purchases, or paid. If the pricing is unspecified, this means the app is not generally available anymore (even though it might still be available to people who own it).",
+                    "enum": [
+                        "APP_PRICING_UNSPECIFIED",
+                        "FREE",
+                        "FREE_WITH_IN_APP_PURCHASE",
+                        "PAID"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown pricing, used to denote an approved app that is not generally available.",
+                        "The app is free.",
+                        "The app is free, but offers in-app purchases.",
+                        "The app is paid."
+                    ],
+                    "type": "string"
+                },
                 "appTracks": {
                     "description": "Application tracks visible to the enterprise.",
                     "items": {
                         "$ref": "AppTrackInfo"
                     },
                     "type": "array"
+                },
+                "appVersions": {
+                    "description": "Versions currently available for this app.",
+                    "items": {
+                        "$ref": "AppVersion"
+                    },
+                    "type": "array"
+                },
+                "author": {
+                    "description": "The name of the author of the apps (for example, the app developer).",
+                    "type": "string"
+                },
+                "availableCountries": {
+                    "description": "The countries which this app is available in as per ISO 3166-1 alpha-2.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "category": {
+                    "description": "The app category (e.g. RACING, SOCIAL, etc.)",
+                    "type": "string"
+                },
+                "contentRating": {
+                    "description": "The content rating for this app.",
+                    "enum": [
+                        "CONTENT_RATING_UNSPECIFIED",
+                        "THREE_YEARS",
+                        "SEVEN_YEARS",
+                        "TWELVE_YEARS",
+                        "SIXTEEN_YEARS",
+                        "EIGHTEEN_YEARS"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Content suitable for ages 3 and above only.",
+                        "Content suitable for ages 7 and above only.",
+                        "Content suitable for ages 12 and above only.",
+                        "Content suitable for ages 16 and above only.",
+                        "Content suitable for ages 18 and above only."
+                    ],
+                    "type": "string"
+                },
+                "description": {
+                    "description": "The localized promotional description, if available.",
+                    "type": "string"
+                },
+                "distributionChannel": {
+                    "description": "How and to whom the package is made available.",
+                    "enum": [
+                        "DISTRIBUTION_CHANNEL_UNSPECIFIED",
+                        "PUBLIC_GOOGLE_HOSTED",
+                        "PRIVATE_GOOGLE_HOSTED",
+                        "PRIVATE_SELF_HOSTED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Package is available through the Play store and not restricted to a specific enterprise.",
+                        "Package is a private app (restricted to an enterprise) but hosted by Google.",
+                        "Private app (restricted to an enterprise) and is privately hosted."
+                    ],
+                    "type": "string"
+                },
+                "features": {
+                    "description": "Noteworthy features (if any) of this app.",
+                    "items": {
+                        "enum": [
+                            "APP_FEATURE_UNSPECIFIED",
+                            "VPN_APP"
+                        ],
+                        "enumDescriptions": [
+                            "Unspecified.",
+                            "The app is a VPN."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "fullDescription": {
+                    "description": "Full app description, if available.",
+                    "type": "string"
+                },
+                "iconUrl": {
+                    "description": "A link to an image that can be used as an icon for the app. This image is suitable for use at up to 512px x 512px",
+                    "type": "string"
                 },
                 "managedProperties": {
                     "description": "The set of managed properties available to be pre-configured for the app.",
@@ -1104,8 +1267,13 @@
                     },
                     "type": "array"
                 },
+                "minAndroidSdkVersion": {
+                    "description": "The minimum Android SDK necessary to run the app.",
+                    "format": "int32",
+                    "type": "integer"
+                },
                 "name": {
-                    "description": "The name of the app in the form enterprises/{enterpriseId}/applications/{package_name}.",
+                    "description": "The name of the app in the form enterprises/{enterprise}/applications/{package_name}.",
                     "type": "string"
                 },
                 "permissions": {
@@ -1115,8 +1283,33 @@
                     },
                     "type": "array"
                 },
+                "playStoreUrl": {
+                    "description": "A link to the (consumer) Google Play details page for the app.",
+                    "type": "string"
+                },
+                "recentChanges": {
+                    "description": "A localised description of the recent changes made to the app.",
+                    "type": "string"
+                },
+                "screenshotUrls": {
+                    "description": "A list of screenshot links representing the app.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "smallIconUrl": {
+                    "description": "A link to a smaller image that can be used as an icon for the app. This image is suitable for use at up to 128px x 128px.",
+                    "type": "string"
+                },
                 "title": {
                     "description": "The title of the app. Localized.",
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The approximate time (within 7 days) the app was last published.",
+                    "format": "google-datetime",
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -1191,7 +1384,7 @@
                     "type": "array"
                 },
                 "autoUpdateMode": {
-                    "description": "This feature is not generally available yet.",
+                    "description": "Controls the auto-update mode for the app.",
                     "enum": [
                         "AUTO_UPDATE_MODE_UNSPECIFIED",
                         "AUTO_UPDATE_DEFAULT",
@@ -1199,10 +1392,10 @@
                         "AUTO_UPDATE_HIGH_PRIORITY"
                     ],
                     "enumDescriptions": [
-                        "This feature is not generally available yet.",
-                        "This feature is not generally available yet.",
-                        "This feature is not generally available yet.",
-                        "This feature is not generally available yet."
+                        "Unspecified. Defaults to AUTO_UPDATE_DEFAULT.",
+                        "The app is automatically updated with low priority to minimize the impact on the user.The app is updated when all of the following constraints are met: The device is not actively used. The device is connected to an unmetered network. The device is charging.The device is notified about a new update within 24 hours after it is published by the developer, after which the app is updated the next time the constraints above are met.",
+                        "The app is not automatically updated for a maximum of 90 days after the app becomes out of date.90 days after the app becomes out of date, the latest available version is installed automatically with low priority (see AUTO_UPDATE_DEFAULT). After the app is updated it is not automatically updated again until 90 days after it becomes out of date again.The user can still manually update the app from the Play Store at any time.",
+                        "The app is updated as soon as possible. No constraints are applied.The device is notified immediately about a new update after it becomes available."
                     ],
                     "type": "string"
                 },
@@ -1264,6 +1457,10 @@
                 "disabled": {
                     "description": "Whether the app is disabled. When disabled, the app data is still preserved.",
                     "type": "boolean"
+                },
+                "extensionConfig": {
+                    "$ref": "ExtensionConfig",
+                    "description": "Configuration to enable this app as an extension app, with the capability of interacting with Android Device Policy offline.This field can be set for at most one app."
                 },
                 "installType": {
                     "description": "The type of installation to perform.",
@@ -1594,7 +1791,7 @@
             "type": "object"
         },
         "ContactInfo": {
-            "description": "Contact details for LaForge enterprises.",
+            "description": "Contact details for managed Google Play enterprises.",
             "id": "ContactInfo",
             "properties": {
                 "contactEmail": {
@@ -1650,8 +1847,59 @@
             },
             "type": "object"
         },
+        "CrossProfilePolicies": {
+            "description": "Cross-profile policies applied on the device.",
+            "id": "CrossProfilePolicies",
+            "properties": {
+                "crossProfileCopyPaste": {
+                    "description": "Whether text copied from one profile (personal or work) can be pasted in the other profile.",
+                    "enum": [
+                        "CROSS_PROFILE_COPY_PASTE_UNSPECIFIED",
+                        "COPY_FROM_WORK_TO_PERSONAL_DISALLOWED",
+                        "CROSS_PROFILE_COPY_PASTE_ALLOWED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to COPY_FROM_WORK_TO_PERSONAL_DISALLOWED",
+                        "Default. Prevents users from pasting into the personal profile text copied from the work profile. Text copied from the personal profile can be pasted into the work profile, and text copied from the work profile can be pasted into the work profile.",
+                        "Text copied in either profile can be pasted in the other profile."
+                    ],
+                    "type": "string"
+                },
+                "crossProfileDataSharing": {
+                    "description": "Whether data from one profile (personal or work) can be shared with apps in the other profile. Specifically controls simple data sharing via intents. Management of other cross-profile communication channels, such as contact search, copy/paste, or connected work & personal apps, are configured separately.",
+                    "enum": [
+                        "CROSS_PROFILE_DATA_SHARING_UNSPECIFIED",
+                        "CROSS_PROFILE_DATA_SHARING_DISALLOWED",
+                        "DATA_SHARING_FROM_WORK_TO_PERSONAL_DISALLOWED",
+                        "CROSS_PROFILE_DATA_SHARING_ALLOWED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to DATA_SHARING_FROM_WORK_TO_PERSONAL_DISALLOWED.",
+                        "Prevents data from being shared from both the personal profile to the work profile and the work profile to the personal profile.",
+                        "Default. Prevents users from sharing data from the work profile to apps in the personal profile. Personal data can be shared with work apps.",
+                        "Data from either profile can be shared with the other profile."
+                    ],
+                    "type": "string"
+                },
+                "showWorkContactsInPersonalProfile": {
+                    "description": "Whether contacts stored in the work profile can be shown in personal profile contact searches and incoming calls.",
+                    "enum": [
+                        "SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_UNSPECIFIED",
+                        "SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED",
+                        "SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_ALLOWED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_ALLOWED.",
+                        "Prevents work profile contacts from appearing in personal profile contact searches and incoming calls",
+                        "Default. Allows work profile contacts to appear in personal profile contact searches and incoming calls"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Date": {
-            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: A full date, with non-zero year, month, and day values A month and day value, with a zero year, such as an anniversary A year on its own, with zero month and day values A year and month value, with a zero day, such as a credit card expiration dateRelated types are google.type.TimeOfDay and google.protobuf.Timestamp.",
+            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: A full date, with non-zero year, month, and day values A month and day, with a zero year (e.g., an anniversary) A year on its own, with a zero month and a zero day A year and month, with a zero day (e.g., a credit card expiration date)Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
             "id": "Date",
             "properties": {
                 "day": {
@@ -1688,6 +1936,13 @@
                     },
                     "type": "array"
                 },
+                "appliedPasswordPolicies": {
+                    "description": "The password requirements currently applied to the device. The applied requirements may be slightly different from those specified in passwordPolicies in some cases. fieldPath is set based on passwordPolicies.",
+                    "items": {
+                        "$ref": "PasswordRequirements"
+                    },
+                    "type": "array"
+                },
                 "appliedPolicyName": {
                     "description": "The name of the policy currently applied to the device.",
                     "type": "string"
@@ -1710,7 +1965,7 @@
                         "This value is disallowed.",
                         "The device is active.",
                         "The device is disabled.",
-                        "The device was deleted. This state will never be returned by an API call, but is used in the final status report published to Cloud Pub/Sub when the device acknowledges the deletion.",
+                        "The device was deleted. This state is never returned by an API call, but is used in the final status report when the device acknowledges the deletion. If the device is deleted via the API call, this state is published to Pub/Sub. If the user deletes the work profile or resets the device, the device state will remain unknown to the server.",
                         "The device is being provisioned. Newly enrolled devices are in this state until they have a policy applied."
                     ],
                     "type": "string"
@@ -1796,7 +2051,7 @@
                 },
                 "memoryInfo": {
                     "$ref": "MemoryInfo",
-                    "description": "Memory information. This information is only available if memoryInfoEnabled is true in the device's policy."
+                    "description": "Memory information: contains information about device memory and storage."
                 },
                 "name": {
                     "description": "The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}.",
@@ -1870,7 +2125,7 @@
                         "This value is disallowed.",
                         "The device is active.",
                         "The device is disabled.",
-                        "The device was deleted. This state will never be returned by an API call, but is used in the final status report published to Cloud Pub/Sub when the device acknowledges the deletion.",
+                        "The device was deleted. This state is never returned by an API call, but is used in the final status report when the device acknowledges the deletion. If the device is deleted via the API call, this state is published to Pub/Sub. If the user deletes the work profile or resets the device, the device state will remain unknown to the server.",
                         "The device is being provisioned. Newly enrolled devices are in this state until they have a policy applied."
                     ],
                     "type": "string"
@@ -1940,7 +2195,7 @@
                     "type": "boolean"
                 },
                 "verifyAppsEnabled": {
-                    "description": "Whether Verify Apps (Google Play Protect (https://support.google.com/googleplay/answer/2812853)) is enabled on the device.",
+                    "description": "Whether Google Play Protect verification (https://support.google.com/accounts/answer/2812853) is enforced on the device.",
                     "type": "boolean"
                 }
             },
@@ -2075,7 +2330,7 @@
                 },
                 "contactInfo": {
                     "$ref": "ContactInfo",
-                    "description": "This feature is not generally available yet. The enterprise contact info of an EMM owned enterprise"
+                    "description": "The enterprise contact info of an EMM-managed enterprise."
                 },
                 "enabledNotificationTypes": {
                     "description": "The types of Google Pub/Sub notifications enabled for the enterprise.",
@@ -2130,6 +2385,24 @@
                     "description": "Terms and conditions that must be accepted when provisioning a device for this enterprise. A page of terms is generated for each value in this list.",
                     "items": {
                         "$ref": "TermsAndConditions"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ExtensionConfig": {
+            "description": "Configuration to enable an app as an extension app, with the capability of interacting with Android Device Policy offline.",
+            "id": "ExtensionConfig",
+            "properties": {
+                "notificationReceiver": {
+                    "description": "Fully qualified class name of the receiver service class for Android Device Policy to notify the extension app of any local command status updates.",
+                    "type": "string"
+                },
+                "signingKeyFingerprintsSha256": {
+                    "description": "Hex-encoded SHA256 hash of the signing certificate of the extension app. Only hexadecimal string representations of 64 characters are valid.If not specified, the signature for the corresponding package name is obtained from the Play Store instead.If this list is empty, the signature of the extension app on the device must match the signature obtained from the Play Store for the app to be able to communicate with Android Device Policy.If this list is not empty, the signature of the extension app on the device must match one of the entries in this list for the app to be able to communicate with Android Device Policy.In production use cases, it is recommended to leave this empty.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -2208,6 +2481,11 @@
                 },
                 "deviceBasebandVersion": {
                     "description": "Baseband version. For example, MDM9625_104662.22.05.34p.",
+                    "type": "string"
+                },
+                "enterpriseSpecificId": {
+                    "description": "Output only. ID that uniquely identifies a personally-owned device in a particular organization. On the same physical device when enrolled with the same organization, this ID persists across setups and even factory resets. This ID is available on personally-owned devices with a work profile on devices running Android 12 and above.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "gpuShutdownTemperatures": {
@@ -2319,6 +2597,12 @@
                     "type": "array"
                 }
             },
+            "type": "object"
+        },
+        "IssueCommandResponse": {
+            "description": "Response on issuing a command. This is currently empty as a placeholder.",
+            "id": "IssueCommandResponse",
+            "properties": {},
             "type": "object"
         },
         "KeyedAppState": {
@@ -2475,18 +2759,18 @@
             "type": "object"
         },
         "ListEnterprisesResponse": {
-            "description": "This feature is not generally available yet. Response to a request to list enterprises.",
+            "description": "Response to a request to list enterprises.",
             "id": "ListEnterprisesResponse",
             "properties": {
                 "enterprises": {
-                    "description": "This feature is not generally available yet. The list of enterprises.",
+                    "description": "The list of enterprises.",
                     "items": {
                         "$ref": "Enterprise"
                     },
                     "type": "array"
                 },
                 "nextPageToken": {
-                    "description": "This feature is not generally available yet. If there are more results, a token to retrieve next page of results.",
+                    "description": "If there are more results, a token to retrieve next page of results.",
                     "type": "string"
                 }
             },
@@ -2985,17 +3269,23 @@
                         "NUMERIC_COMPLEX",
                         "ALPHABETIC",
                         "ALPHANUMERIC",
-                        "COMPLEX"
+                        "COMPLEX",
+                        "COMPLEXITY_LOW",
+                        "COMPLEXITY_MEDIUM",
+                        "COMPLEXITY_HIGH"
                     ],
                     "enumDescriptions": [
                         "There are no password requirements.",
-                        "The device must be secured with a low-security biometric recognition technology, at minimum. This includes technologies that can recognize the identity of an individual that are roughly equivalent to a 3-digit PIN (false detection is less than 1 in 1,000).",
-                        "A password is required, but there are no restrictions on what the password must contain.",
-                        "The password must contain numeric characters.",
-                        "The password must contain numeric characters with no repeating (4444) or ordered (1234, 4321, 2468) sequences.",
-                        "The password must contain alphabetic (or symbol) characters.",
-                        "The password must contain both numeric and alphabetic (or symbol) characters.",
-                        "The password must meet the minimum requirements specified in passwordMinimumLength, passwordMinimumLetters, passwordMinimumSymbols, etc. For example, if passwordMinimumSymbols is 2, the password must contain at least two symbols."
+                        "The device must be secured with a low-security biometric recognition technology, at minimum. This includes technologies that can recognize the identity of an individual that are roughly equivalent to a 3-digit PIN (false detection is less than 1 in 1,000).This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_LOW for application. See PasswordQuality for details.",
+                        "A password is required, but there are no restrictions on what the password must contain.This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_LOW for application. See PasswordQuality for details.",
+                        "The password must contain numeric characters.This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_MEDIUM for application. See PasswordQuality for details.",
+                        "The password must contain numeric characters with no repeating (4444) or ordered (1234, 4321, 2468) sequences.This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_MEDIUM for application. See PasswordQuality for details.",
+                        "The password must contain alphabetic (or symbol) characters.This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_HIGH for application. See PasswordQuality for details.",
+                        "The password must contain both numeric and alphabetic (or symbol) characters.This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_HIGH for application. See PasswordQuality for details.",
+                        "The password must meet the minimum requirements specified in passwordMinimumLength, passwordMinimumLetters, passwordMinimumSymbols, etc. For example, if passwordMinimumSymbols is 2, the password must contain at least two symbols.This, when applied on personally owned work profile devices on Android 12 device-scoped, will be treated as COMPLEXITY_HIGH for application. In this case, the requirements in passwordMinimumLength, passwordMinimumLetters, passwordMinimumSymbols, etc are not applied. See PasswordQuality for details.",
+                        "Define the low password complexity band as: pattern PIN with repeating (4444) or ordered (1234, 4321, 2468) sequencesThis sets the minimum complexity band which the password must meet.Enforcement varies among different Android versions, management modes and password scopes. See PasswordQuality for details.",
+                        "Define the medium password complexity band as: PIN with no repeating (4444) or ordered (1234, 4321, 2468) sequences, length at least 4 alphabetic, length at least 4 alphanumeric, length at least 4This sets the minimum complexity band which the password must meet.Enforcement varies among different Android versions, management modes and password scopes. See PasswordQuality for details.",
+                        "Define the high password complexity band as:On Android 12 and above: PIN with no repeating (4444) or ordered (1234, 4321, 2468) sequences, length at least 8 alphabetic, length at least 6 alphanumeric, length at least 6This sets the minimum complexity band which the password must meet.Enforcement varies among different Android versions, management modes and password scopes. See PasswordQuality for details."
                     ],
                     "type": "string"
                 },
@@ -3024,6 +3314,20 @@
                         "Unspecified. Defaults to USE_DEFAULT_DEVICE_TIMEOUT.",
                         "The timeout period is set to the device\u2019s default.",
                         "The timeout period is set to 24 hours."
+                    ],
+                    "type": "string"
+                },
+                "unifiedLockSettings": {
+                    "description": "Controls whether a unified lock is allowed for the device and the work profile, on devices running Android 9 and above with a work profile. This has no effect on other devices. This can be set only if password_scope is set to SCOPE_PROFILE, the policy will be rejected otherwise. If user has not set a separate work lock and this field is set to REQUIRE_SEPARATE_WORK_LOCK, a NonComplianceDetail is reported with nonComplianceReason set to USER_ACTION.",
+                    "enum": [
+                        "UNIFIED_LOCK_SETTINGS_UNSPECIFIED",
+                        "ALLOW_UNIFIED_WORK_AND_PERSONAL_LOCK",
+                        "REQUIRE_SEPARATE_WORK_LOCK"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to ALLOW_UNIFIED_WORK_AND_PERSONAL_LOCK.",
+                        "A common lock for the device and the work profile is allowed.",
+                        "A separate lock for the work profile is required."
                     ],
                     "type": "string"
                 }
@@ -3178,7 +3482,7 @@
                 },
                 "advancedSecurityOverrides": {
                     "$ref": "AdvancedSecurityOverrides",
-                    "description": "Security policies set to the most secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values."
+                    "description": "Security policies set to secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values."
                 },
                 "alwaysOnVpnPackage": {
                     "$ref": "AlwaysOnVpnPackage",
@@ -3202,7 +3506,7 @@
                     "type": "array"
                 },
                 "appAutoUpdatePolicy": {
-                    "description": "The app auto update policy, which controls when automatic app updates can be applied.",
+                    "description": "Deprecated. Use autoUpdateMode instead.When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect.The app auto update policy, which controls when automatic app updates can be applied.",
                     "enum": [
                         "APP_AUTO_UPDATE_POLICY_UNSPECIFIED",
                         "CHOICE_TO_THE_USER",
@@ -3260,8 +3564,24 @@
                     "description": "Whether bluetooth is disabled. Prefer this setting over bluetooth_config_disabled because bluetooth_config_disabled can be bypassed by the user.",
                     "type": "boolean"
                 },
+                "cameraAccess": {
+                    "description": "Controls the use of the camera and whether the user has access to the camera access toggle.",
+                    "enum": [
+                        "CAMERA_ACCESS_UNSPECIFIED",
+                        "CAMERA_ACCESS_USER_CHOICE",
+                        "CAMERA_ACCESS_DISABLED",
+                        "CAMERA_ACCESS_ENFORCED"
+                    ],
+                    "enumDescriptions": [
+                        "If camera_disabled is true, this is equivalent to CAMERA_ACCESS_DISABLED. Otherwise, this is equivalent to CAMERA_ACCESS_USER_CHOICE.",
+                        "The field camera_disabled is ignored. This is the default device behaviour: all cameras on the device are available. On Android 12 and above, the user can use the camera access toggle.",
+                        "The field camera_disabled is ignored. All cameras on the device are disabled (for fully managed devices, this applies device-wide and for work profiles this applies only to the work profile).There are no explicit restrictions placed on the camera access toggle on Android 12 and above: on fully managed devices, the camera access toggle has no effect as all cameras are disabled. On devices with a work profile, this toggle has no effect on apps in the work profile, but it affects apps outside the work profile.",
+                        "The field camera_disabled is ignored. All cameras on the device are available. On fully managed devices running Android 12 and above, the user is unable to use the camera access toggle. On devices which are not fully managed or which run Android 11 or below, this is equivalent to CAMERA_ACCESS_USER_CHOICE."
+                    ],
+                    "type": "string"
+                },
                 "cameraDisabled": {
-                    "description": "Whether all cameras on the device are disabled.",
+                    "description": "If camera_access is set to any value other than CAMERA_ACCESS_UNSPECIFIED, this has no effect. Otherwise this field controls whether cameras are disabled: If true, all cameras are disabled, otherwise they are available. For fully managed devices this field applies for all apps on the device. For work profiles, this field applies only to apps in the work profile, and the camera access of apps outside the work profile is unaffected.",
                     "type": "boolean"
                 },
                 "cellBroadcastsConfigDisabled": {
@@ -3289,6 +3609,10 @@
                 "credentialsConfigDisabled": {
                     "description": "Whether configuring user credentials is disabled.",
                     "type": "boolean"
+                },
+                "crossProfilePolicies": {
+                    "$ref": "CrossProfilePolicies",
+                    "description": "Cross-profile policies applied on the device."
                 },
                 "dataRoamingDisabled": {
                     "description": "Whether roaming data services are disabled.",
@@ -3386,7 +3710,7 @@
                             "Disable unredacted notifications on secure keyguard screens.",
                             "Ignore trust agent state on secure keyguard screens.",
                             "Disable fingerprint sensor on secure keyguard screens.",
-                            "Disable text entry into notifications on secure keyguard screens.",
+                            "On devices running Android 6 and below, disables text entry into notifications on secure keyguard screens. Has no effect on Android 7 and above.",
                             "Disable face authentication on secure keyguard screens.",
                             "Disable iris authentication on secure keyguard screens.",
                             "Disable all biometric authentication on secure keyguard screens.",
@@ -3437,6 +3761,22 @@
                     "format": "int64",
                     "type": "string"
                 },
+                "microphoneAccess": {
+                    "description": "Controls the use of the microphone and whether the user has access to the microphone access toggle. This applies only on fully managed devices.",
+                    "enum": [
+                        "MICROPHONE_ACCESS_UNSPECIFIED",
+                        "MICROPHONE_ACCESS_USER_CHOICE",
+                        "MICROPHONE_ACCESS_DISABLED",
+                        "MICROPHONE_ACCESS_ENFORCED"
+                    ],
+                    "enumDescriptions": [
+                        "If unmute_microphone_disabled is true, this is equivalent to MICROPHONE_ACCESS_DISABLED. Otherwise, this is equivalent to MICROPHONE_ACCESS_USER_CHOICE.",
+                        "The field unmute_microphone_disabled is ignored. This is the default device behaviour: the microphone on the device is available. On Android 12 and above, the user can use the microphone access toggle.",
+                        "The field unmute_microphone_disabled is ignored. The microphone on the device is disabled (for fully managed devices, this applies device-wide).The microphone access toggle has no effect as the microphone is disabled.",
+                        "The field unmute_microphone_disabled is ignored. The microphone on the device is available. On devices running Android 12 and above, the user is unable to use the microphone access toggle. On devices which run Android 11 or below, this is equivalent to MICROPHONE_ACCESS_USER_CHOICE."
+                    ],
+                    "type": "string"
+                },
                 "minimumApiLevel": {
                     "description": "The minimum allowed Android API level.",
                     "format": "int32",
@@ -3459,7 +3799,7 @@
                     "type": "string"
                 },
                 "networkEscapeHatchEnabled": {
-                    "description": "Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.",
+                    "description": "Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.Note: Setting wifiConfigDisabled to true will override this setting under specific circumstances. Please see wifiConfigDisabled for further details.",
                     "type": "boolean"
                 },
                 "networkResetDisabled": {
@@ -3498,7 +3838,7 @@
                 },
                 "passwordRequirements": {
                     "$ref": "PasswordRequirements",
-                    "description": "Password requirements. The field password_requirements.require_password_unlock must not be set. DEPRECATED - Use password_policies.Note:Complexity-based values of PasswordQuality, that is, COMPLEXITY_LOW, COMPLEXITY_MEDIUM, and COMPLEXITY_HIGH, cannot be used here."
+                    "description": "Password requirements. The field password_requirements.require_password_unlock must not be set. DEPRECATED - Use passwordPolicies.Note:Complexity-based values of PasswordQuality, that is, COMPLEXITY_LOW, COMPLEXITY_MEDIUM, and COMPLEXITY_HIGH, cannot be used here. unified_lock_settings cannot be used here"
                 },
                 "permissionGrants": {
                     "description": "Explicit permission or group grants or denials for all apps. These values override the default_permission_policy.",
@@ -3547,6 +3887,20 @@
                     },
                     "type": "array"
                 },
+                "preferentialNetworkService": {
+                    "description": "Controls whether preferential network service is enabled on the work profile. For example, an organization may have an agreement with a carrier that all of the work data from its employees' devices will be sent via a network service dedicated for enterprise use. An example of a supported preferential network service is the enterprise slice on 5G networks. This has no effect on fully managed devices.",
+                    "enum": [
+                        "PREFERENTIAL_NETWORK_SERVICE_UNSPECIFIED",
+                        "PREFERENTIAL_NETWORK_SERVICE_DISABLED",
+                        "PREFERENTIAL_NETWORK_SERVICE_ENABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. Defaults to PREFERENTIAL_NETWORK_SERVICES_DISABLED.",
+                        "Preferential network service is disabled on the work profile.",
+                        "Preferential network service is enabled on the work profile."
+                    ],
+                    "type": "string"
+                },
                 "privateKeySelectionEnabled": {
                     "description": "Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.",
                     "type": "boolean"
@@ -3576,7 +3930,7 @@
                     "type": "boolean"
                 },
                 "setupActions": {
-                    "description": "Actions to take during the setup process.",
+                    "description": "Action to take during the setup process. At most one action may be specified.",
                     "items": {
                         "$ref": "SetupAction"
                     },
@@ -3638,7 +3992,7 @@
                     "type": "boolean"
                 },
                 "unmuteMicrophoneDisabled": {
-                    "description": "Whether the microphone is muted and adjusting microphone volume is disabled.",
+                    "description": "If microphone_access is set to any value other than MICROPHONE_ACCESS_UNSPECIFIED, this has no effect. Otherwise this field controls whether microphones are disabled: If true, all microphones are disabled, otherwise they are available. This is available only on fully managed devices.",
                     "type": "boolean"
                 },
                 "usbFileTransferDisabled": {
@@ -3659,7 +4013,7 @@
                     "type": "boolean"
                 },
                 "wifiConfigDisabled": {
-                    "description": "Whether configuring Wi-Fi access points is disabled.",
+                    "description": "Whether configuring Wi-Fi access points is disabled.Note: If a network connection can't be made at boot time and configuring Wi-Fi is disabled then network escape hatch will be shown in order to refresh the device policy (see networkEscapeHatchEnabled).",
                     "type": "boolean"
                 },
                 "wifiConfigsLockdownEnabled": {
@@ -3824,7 +4178,7 @@
                 },
                 "launchApp": {
                     "$ref": "LaunchAppAction",
-                    "description": "An action to launch an app."
+                    "description": "An action to launch an app. The app will be launched with an intent containing an extra with key com.google.android.apps.work.clouddpc.EXTRA_LAUNCHED_AS_SETUP_ACTION set to the boolean value true to indicate that this is a setup action flow."
                 },
                 "title": {
                     "$ref": "UserFacingMessage",
@@ -3990,7 +4344,7 @@
                     "type": "boolean"
                 },
                 "memoryInfoEnabled": {
-                    "description": "Whether memory reporting is enabled.",
+                    "description": "Whether memory event reporting is enabled.",
                     "type": "boolean"
                 },
                 "networkInfoEnabled": {
@@ -4044,7 +4398,7 @@
                     "enumDescriptions": [
                         "Follow the default update behavior for the device, which typically requires the user to accept system updates.",
                         "Install automatically as soon as an update is available.",
-                        "Install automatically within a daily maintenance window. This also configures Play apps to be updated within the window. This is strongly recommended for kiosk devices because this is the only way apps persistently pinned to the foreground can be updated by Play.",
+                        "Install automatically within a daily maintenance window. This also configures Play apps to be updated within the window. This is strongly recommended for kiosk devices because this is the only way apps persistently pinned to the foreground can be updated by Play.If autoUpdateMode is set to AUTO_UPDATE_HIGH_PRIORITY for an app, then the maintenance window is ignored for that app and it is updated as soon as possible even outside of the maintenance window.",
                         "Postpone automatic install up to a maximum of 30 days."
                     ],
                     "type": "string"
@@ -4212,7 +4566,8 @@
                             "PRIVATE_APPS",
                             "WEB_APPS",
                             "STORE_BUILDER",
-                            "MANAGED_CONFIGURATIONS"
+                            "MANAGED_CONFIGURATIONS",
+                            "ZERO_TOUCH_CUSTOMER_MANAGEMENT"
                         ],
                         "enumDescriptions": [
                             "Unspecified feature.",
@@ -4220,7 +4575,8 @@
                             "The private apps page (https://developers.google.com/android/management/apps#private-apps).",
                             "The Web Apps page (https://developers.google.com/android/management/apps#web-apps).",
                             "The organize apps page (https://developers.google.com/android/management/apps#organize-apps).",
-                            "The managed configurations page (https://developers.google.com/android/management/managed-configurations-iframe)."
+                            "The managed configurations page (https://developers.google.com/android/management/managed-configurations-iframe).",
+                            "The zero-touch iframe (https://developers.google.com/android/management/zero-touch-iframe)."
                         ],
                         "type": "string"
                     },

@@ -29,6 +29,7 @@ api:
     - v1
     adsense:
     - v1.4
+    - v2
     adsensehost:
     - v4.1
     alertcenter:
@@ -54,6 +55,8 @@ api:
     - v1
     apigee:
     - v1
+    apikeys:
+    - v2
     appengine:
     - v1
     - v1beta4
@@ -69,8 +72,12 @@ api:
     - v1beta1
     assuredworkloads:
     - v1
+    authorizedbuyersmarketplace:
+    - v1
     autoscaler:
     - v1beta2
+    baremetalsolution:
+    - v2
     bigquery:
     - v2
     bigqueryconnection:
@@ -93,6 +100,8 @@ api:
     - v1
     calendar:
     - v3
+    certificatemanager:
+    - v1
     chat:
     - v1
     chromemanagement:
@@ -116,6 +125,8 @@ api:
     - v1
     clouddebugger:
     - v2
+    clouddeploy:
+    - v1
     clouderrorreporting:
     - v1beta1
     cloudfunctions:
@@ -149,6 +160,8 @@ api:
     - v1
     cloudshell:
     - v1
+    cloudsupport:
+    - v2beta
     cloudtasks:
     - v2
     - v2beta2
@@ -164,12 +177,17 @@ api:
     - v1
     compute:
     - v1
+    connectors:
+    - v1
     consumersurveys:
     - v2
+    contactcenterinsights:
+    - v1
     container:
     - v1
     containeranalysis:
     - v1beta1
+    - v1
     content:
     - v2
     - v2sandbox
@@ -179,6 +197,7 @@ api:
     - v1
     datacatalog:
     - v1beta1
+    - v1
     dataflow:
     - v1b4
     - v1b3
@@ -189,11 +208,17 @@ api:
     - v1beta1
     datamigration:
     - v1
+    datapipelines:
+    - v1
+    dataplex:
+    - v1
     dataproc:
     - v1
     datastore:
     - v1
     - v1beta3
+    datastream:
+    - v1
     deploymentmanager:
     - v2
     - v2beta2
@@ -203,6 +228,7 @@ api:
     - v3.2
     - v3.3
     - v3.4
+    - v3.5
     dialogflow:
     - v2
     - v2beta1
@@ -218,6 +244,7 @@ api:
     - v2beta1
     dns:
     - v1
+    - v2
     docs:
     - v1
     documentai:
@@ -225,6 +252,7 @@ api:
     - v1beta2
     domains:
     - v1beta1
+    - v1
     domainsrdap:
     - v1
     doubleclickbidmanager:
@@ -237,17 +265,23 @@ api:
     - v3
     driveactivity:
     - v2
+    essentialcontacts:
+    - v1
     eventarc:
     - v1
     factchecktools:
     - v1alpha1
     fcm:
     - v1
+    fcmdata:
+    - v1beta1
     file:
     - v1
     - v1beta1
     firebase:
     - v1beta1
+    firebaseappcheck:
+    - v1beta
     firebasedatabase:
     - v1beta
     firebasedynamiclinks:
@@ -305,13 +339,19 @@ api:
     iap:
     - v1
     - v1beta1
+    ideahub:
+    - v1beta
     identitytoolkit:
     - v3
+    ids:
+    - v1
     indexing:
     - v3
     jobs:
     - v3
     - v4
+    keep:
+    - v1
     kgsearch:
     - v1
     language:
@@ -349,9 +389,28 @@ api:
     - v4
     mybusinessaccountmanagement:
     - v1
+    mybusinessbusinesscalls:
+    - v1
+    mybusinessbusinessinformation:
+    - v1
+    mybusinesslodging:
+    - v1
+    mybusinessnotifications:
+    - v1
+    mybusinessplaceactions:
+    - v1
+    mybusinessqanda:
+    - v1
+    mybusinessverifications:
+    - v1
     networkconnectivity:
     - v1alpha1
+    - v1
     networkmanagement:
+    - v1
+    networksecurity:
+    - v1
+    networkservices:
     - v1
     notebooks:
     - v1
@@ -374,6 +433,8 @@ api:
     - v5
     partners:
     - v2
+    paymentsresellersubscription:
+    - v1
     people:
     - v1
     photoslibrary:
@@ -382,11 +443,15 @@ api:
     - v3
     playcustomapp:
     - v1
+    playintegrity:
+    - v1
     playmoviespartner:
     - v1
     plus:
     - v1
     plusdomains:
+    - v1
+    policyanalyzer:
     - v1
     policysimulator:
     - v1
@@ -398,6 +463,7 @@ api:
     - v1.6
     privateca:
     - v1beta1
+    - v1
     prod_tt_sasportal:
     - v1alpha1
     proximitybeacon:
@@ -410,6 +476,8 @@ api:
     qpxexpress:
     - v1
     realtimebidding:
+    - v1
+    recaptchaenterprise:
     - v1
     recommendationengine:
     - v1beta1
@@ -426,12 +494,15 @@ api:
     - v1beta1
     reseller:
     - v1sandbox
+    resourcesettings:
+    - v1
     resourceviews:
     - v1beta2
     retail:
     - v2
     run:
     - v1
+    - v2
     runtimeconfig:
     - v1
     - v1beta1
@@ -490,6 +561,7 @@ api:
     - v1beta4
     sqladmin:
     - v1beta4
+    - v1
     storage:
     - v1
     storagetransfer:
@@ -521,6 +593,7 @@ api:
     - v2
     transcoder:
     - v1beta1
+    - v1
     translate:
     - v2
     - v3
@@ -532,10 +605,14 @@ api:
     - v1
     verifiedaccess:
     - v1
+    versionhistory:
+    - v1
     videointelligence:
     - v1
     - v1beta1
     vision:
+    - v1
+    vmmigration:
     - v1
     webfonts:
     - v1

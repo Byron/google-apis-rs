@@ -3,10 +3,10 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/cloud-platform.read-only": {
-                    "description": "View your data across Google Cloud Platform services"
+                    "description": "View your data across Google Cloud services and see the email address of your Google Account"
                 },
                 "https://www.googleapis.com/auth/ndev.clouddns.readonly": {
                     "description": "View your DNS records hosted by Google Cloud DNS"
@@ -975,215 +975,151 @@
                         "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
                     ]
                 }
-            },
-            "resources": {
-                "managedZones": {
-                    "resources": {
-                        "rrsets": {
-                            "methods": {
-                                "create": {
-                                    "description": "Creates a new ResourceRecordSet.",
-                                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets",
-                                    "httpMethod": "POST",
-                                    "id": "dns.projects.managedZones.rrsets.create",
-                                    "parameterOrder": [
-                                        "project",
-                                        "managedZone"
-                                    ],
-                                    "parameters": {
-                                        "clientOperationId": {
-                                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
-                                            "location": "query",
-                                            "type": "string"
-                                        },
-                                        "managedZone": {
-                                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "project": {
-                                            "description": "Identifies the project addressed by this request.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        }
-                                    },
-                                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets",
-                                    "request": {
-                                        "$ref": "ResourceRecordSet"
-                                    },
-                                    "response": {
-                                        "$ref": "ResourceRecordSet"
-                                    },
-                                    "scopes": [
-                                        "https://www.googleapis.com/auth/cloud-platform",
-                                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
-                                    ]
-                                },
-                                "delete": {
-                                    "description": "Deletes a previously created ResourceRecordSet.",
-                                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
-                                    "httpMethod": "DELETE",
-                                    "id": "dns.projects.managedZones.rrsets.delete",
-                                    "parameterOrder": [
-                                        "project",
-                                        "managedZone",
-                                        "name",
-                                        "type"
-                                    ],
-                                    "parameters": {
-                                        "clientOperationId": {
-                                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
-                                            "location": "query",
-                                            "type": "string"
-                                        },
-                                        "managedZone": {
-                                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "description": "Fully qualified domain name.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "project": {
-                                            "description": "Identifies the project addressed by this request.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "type": {
-                                            "description": "RRSet type.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        }
-                                    },
-                                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
-                                    "scopes": [
-                                        "https://www.googleapis.com/auth/cloud-platform",
-                                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
-                                    ]
-                                },
-                                "get": {
-                                    "description": "Fetches the representation of an existing ResourceRecordSet.",
-                                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
-                                    "httpMethod": "GET",
-                                    "id": "dns.projects.managedZones.rrsets.get",
-                                    "parameterOrder": [
-                                        "project",
-                                        "managedZone",
-                                        "name",
-                                        "type"
-                                    ],
-                                    "parameters": {
-                                        "clientOperationId": {
-                                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
-                                            "location": "query",
-                                            "type": "string"
-                                        },
-                                        "managedZone": {
-                                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "description": "Fully qualified domain name.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "project": {
-                                            "description": "Identifies the project addressed by this request.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "type": {
-                                            "description": "RRSet type.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        }
-                                    },
-                                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
-                                    "response": {
-                                        "$ref": "ResourceRecordSet"
-                                    },
-                                    "scopes": [
-                                        "https://www.googleapis.com/auth/cloud-platform",
-                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
-                                        "https://www.googleapis.com/auth/ndev.clouddns.readonly",
-                                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
-                                    ]
-                                },
-                                "patch": {
-                                    "description": "Applies a partial update to an existing ResourceRecordSet.",
-                                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
-                                    "httpMethod": "PATCH",
-                                    "id": "dns.projects.managedZones.rrsets.patch",
-                                    "parameterOrder": [
-                                        "project",
-                                        "managedZone",
-                                        "name",
-                                        "type"
-                                    ],
-                                    "parameters": {
-                                        "clientOperationId": {
-                                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
-                                            "location": "query",
-                                            "type": "string"
-                                        },
-                                        "managedZone": {
-                                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "description": "Fully qualified domain name.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "project": {
-                                            "description": "Identifies the project addressed by this request.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        },
-                                        "type": {
-                                            "description": "RRSet type.",
-                                            "location": "path",
-                                            "required": true,
-                                            "type": "string"
-                                        }
-                                    },
-                                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
-                                    "request": {
-                                        "$ref": "ResourceRecordSet"
-                                    },
-                                    "response": {
-                                        "$ref": "ResourceRecordSet"
-                                    },
-                                    "scopes": [
-                                        "https://www.googleapis.com/auth/cloud-platform",
-                                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "resourceRecordSets": {
             "methods": {
+                "create": {
+                    "description": "Creates a new ResourceRecordSet.",
+                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets",
+                    "httpMethod": "POST",
+                    "id": "dns.resourceRecordSets.create",
+                    "parameterOrder": [
+                        "project",
+                        "managedZone"
+                    ],
+                    "parameters": {
+                        "clientOperationId": {
+                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
+                            "location": "query",
+                            "type": "string"
+                        },
+                        "managedZone": {
+                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "project": {
+                            "description": "Identifies the project addressed by this request.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets",
+                    "request": {
+                        "$ref": "ResourceRecordSet"
+                    },
+                    "response": {
+                        "$ref": "ResourceRecordSet"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
+                    ]
+                },
+                "delete": {
+                    "description": "Deletes a previously created ResourceRecordSet.",
+                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
+                    "httpMethod": "DELETE",
+                    "id": "dns.resourceRecordSets.delete",
+                    "parameterOrder": [
+                        "project",
+                        "managedZone",
+                        "name",
+                        "type"
+                    ],
+                    "parameters": {
+                        "clientOperationId": {
+                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
+                            "location": "query",
+                            "type": "string"
+                        },
+                        "managedZone": {
+                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "name": {
+                            "description": "Fully qualified domain name.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "project": {
+                            "description": "Identifies the project addressed by this request.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "type": {
+                            "description": "RRSet type.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
+                    ]
+                },
+                "get": {
+                    "description": "Fetches the representation of an existing ResourceRecordSet.",
+                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
+                    "httpMethod": "GET",
+                    "id": "dns.resourceRecordSets.get",
+                    "parameterOrder": [
+                        "project",
+                        "managedZone",
+                        "name",
+                        "type"
+                    ],
+                    "parameters": {
+                        "clientOperationId": {
+                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
+                            "location": "query",
+                            "type": "string"
+                        },
+                        "managedZone": {
+                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "name": {
+                            "description": "Fully qualified domain name.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "project": {
+                            "description": "Identifies the project addressed by this request.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "type": {
+                            "description": "RRSet type.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
+                    "response": {
+                        "$ref": "ResourceRecordSet"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                        "https://www.googleapis.com/auth/ndev.clouddns.readonly",
+                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
+                    ]
+                },
                 "list": {
                     "description": "Enumerates ResourceRecordSets that you have created but not yet deleted.",
                     "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets",
@@ -1236,6 +1172,60 @@
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only",
                         "https://www.googleapis.com/auth/ndev.clouddns.readonly",
+                        "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
+                    ]
+                },
+                "patch": {
+                    "description": "Applies a partial update to an existing ResourceRecordSet.",
+                    "flatPath": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
+                    "httpMethod": "PATCH",
+                    "id": "dns.resourceRecordSets.patch",
+                    "parameterOrder": [
+                        "project",
+                        "managedZone",
+                        "name",
+                        "type"
+                    ],
+                    "parameters": {
+                        "clientOperationId": {
+                            "description": "For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.",
+                            "location": "query",
+                            "type": "string"
+                        },
+                        "managedZone": {
+                            "description": "Identifies the managed zone addressed by this request. Can be the managed zone name or ID.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "name": {
+                            "description": "Fully qualified domain name.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "project": {
+                            "description": "Identifies the project addressed by this request.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "type": {
+                            "description": "RRSet type.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "dns/v1beta2/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}",
+                    "request": {
+                        "$ref": "ResourceRecordSet"
+                    },
+                    "response": {
+                        "$ref": "ResourceRecordSet"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
                     ]
                 }
@@ -1740,7 +1730,7 @@
             }
         }
     },
-    "revision": "20210319",
+    "revision": "20220217",
     "rootUrl": "https://dns.googleapis.com/",
     "schemas": {
         "Change": {
@@ -1996,6 +1986,9 @@
             "description": "A zone is a subtree of the DNS namespace under one administrative responsibility. A ManagedZone is a resource that represents a DNS zone hosted by the Cloud DNS service.",
             "id": "ManagedZone",
             "properties": {
+                "cloudLoggingConfig": {
+                    "$ref": "ManagedZoneCloudLoggingConfig"
+                },
                 "creationTime": {
                     "description": "The time that this resource was created on the server. This is in RFC3339 text format. Output only.",
                     "type": "string"
@@ -2073,6 +2066,21 @@
                         "",
                         ""
                     ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ManagedZoneCloudLoggingConfig": {
+            "description": "Cloud Logging configurations for publicly visible zones.",
+            "id": "ManagedZoneCloudLoggingConfig",
+            "properties": {
+                "enableLogging": {
+                    "description": "If set, enable query logging for this ManagedZone. False by default, making logging opt-in.",
+                    "type": "boolean"
+                },
+                "kind": {
+                    "default": "dns#managedZoneCloudLoggingConfig",
                     "type": "string"
                 }
             },
@@ -2176,6 +2184,7 @@
                 },
                 "kind": {
                     "default": "dns#managedZoneOperationsListResponse",
+                    "description": "Type of resource.",
                     "type": "string"
                 },
                 "nextPageToken": {
@@ -2227,6 +2236,13 @@
         "ManagedZonePrivateVisibilityConfig": {
             "id": "ManagedZonePrivateVisibilityConfig",
             "properties": {
+                "gkeClusters": {
+                    "description": "The list of Google Kubernetes Engine clusters that can see this zone.",
+                    "items": {
+                        "$ref": "ManagedZonePrivateVisibilityConfigGKECluster"
+                    },
+                    "type": "array"
+                },
                 "kind": {
                     "default": "dns#managedZonePrivateVisibilityConfig",
                     "type": "string"
@@ -2237,6 +2253,20 @@
                         "$ref": "ManagedZonePrivateVisibilityConfigNetwork"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ManagedZonePrivateVisibilityConfigGKECluster": {
+            "id": "ManagedZonePrivateVisibilityConfigGKECluster",
+            "properties": {
+                "gkeClusterName": {
+                    "description": "The resource name of the cluster to bind this ManagedZone to. This should be specified in the format like: projects/*/locations/*/clusters/*. This is referenced from GKE projects.locations.clusters.get API: https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/get",
+                    "type": "string"
+                },
+                "kind": {
+                    "default": "dns#managedZonePrivateVisibilityConfigGKECluster",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2584,12 +2614,32 @@
                     "format": "int32",
                     "type": "integer"
                 },
+                "gkeClustersPerManagedZone": {
+                    "description": "Maximum allowed number of GKE clusters to which a privately scoped zone can be attached.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "gkeClustersPerResponsePolicy": {
+                    "description": "Maximum allowed number of GKE clusters per response policy.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "itemsPerRoutingPolicy": {
+                    "description": "Maximum allowed number of items per routing policy.",
+                    "format": "int32",
+                    "type": "integer"
+                },
                 "kind": {
                     "default": "dns#quota",
                     "type": "string"
                 },
                 "managedZones": {
                     "description": "Maximum allowed number of managed zones in the project.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "managedZonesPerGkeCluster": {
+                    "description": "Maximum allowed number of managed zones which can be attached to a GKE cluster.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -2605,6 +2655,11 @@
                 },
                 "networksPerPolicy": {
                     "description": "Maximum allowed number of networks per policy.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "peeringZonesPerTargetNetwork": {
+                    "description": "Maximum allowed number of consumer peering zones per target network owned by this producer project",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -2663,6 +2718,121 @@
             },
             "type": "object"
         },
+        "RRSetRoutingPolicy": {
+            "description": "A RRSetRoutingPolicy represents ResourceRecordSet data that is returned dynamically with the response varying based on configured properties such as geolocation or by weighted random selection.",
+            "id": "RRSetRoutingPolicy",
+            "properties": {
+                "geo": {
+                    "$ref": "RRSetRoutingPolicyGeoPolicy"
+                },
+                "geoPolicy": {
+                    "$ref": "RRSetRoutingPolicyGeoPolicy"
+                },
+                "kind": {
+                    "default": "dns#rRSetRoutingPolicy",
+                    "type": "string"
+                },
+                "wrr": {
+                    "$ref": "RRSetRoutingPolicyWrrPolicy"
+                },
+                "wrrPolicy": {
+                    "$ref": "RRSetRoutingPolicyWrrPolicy"
+                }
+            },
+            "type": "object"
+        },
+        "RRSetRoutingPolicyGeoPolicy": {
+            "description": "Configures a RRSetRoutingPolicy that routes based on the geo location of the querying user.",
+            "id": "RRSetRoutingPolicyGeoPolicy",
+            "properties": {
+                "items": {
+                    "description": "The primary geo routing configuration. If there are multiple items with the same location, an error is returned instead.",
+                    "items": {
+                        "$ref": "RRSetRoutingPolicyGeoPolicyGeoPolicyItem"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "default": "dns#rRSetRoutingPolicyGeoPolicy",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "RRSetRoutingPolicyGeoPolicyGeoPolicyItem": {
+            "description": "ResourceRecordSet data for one geo location.",
+            "id": "RRSetRoutingPolicyGeoPolicyGeoPolicyItem",
+            "properties": {
+                "kind": {
+                    "default": "dns#rRSetRoutingPolicyGeoPolicyGeoPolicyItem",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "The geo-location granularity is a GCP region. This location string should correspond to a GCP region. e.g. \"us-east1\", \"southamerica-east1\", \"asia-east1\", etc.",
+                    "type": "string"
+                },
+                "rrdatas": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "signatureRrdatas": {
+                    "description": "DNSSEC generated signatures for all the rrdata within this item. Note that if health checked targets are provided for DNSSEC enabled zones, there's a restriction of 1 ip per item. .",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "RRSetRoutingPolicyWrrPolicy": {
+            "description": "Configures a RRSetRoutingPolicy that routes in a weighted round robin fashion.",
+            "id": "RRSetRoutingPolicyWrrPolicy",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "RRSetRoutingPolicyWrrPolicyWrrPolicyItem"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "default": "dns#rRSetRoutingPolicyWrrPolicy",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "RRSetRoutingPolicyWrrPolicyWrrPolicyItem": {
+            "description": "A routing block which contains the routing information for one WRR item.",
+            "id": "RRSetRoutingPolicyWrrPolicyWrrPolicyItem",
+            "properties": {
+                "kind": {
+                    "default": "dns#rRSetRoutingPolicyWrrPolicyWrrPolicyItem",
+                    "type": "string"
+                },
+                "rrdatas": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "signatureRrdatas": {
+                    "description": "DNSSEC generated signatures for all the rrdata within this item. Note that if health checked targets are provided for DNSSEC enabled zones, there's a restriction of 1 ip per item. .",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "weight": {
+                    "description": "The weight corresponding to this subset of rrdata. When multiple WeightedRoundRobinPolicyItems are configured, the probability of returning an rrset is proportional to its weight relative to the sum of weights configured for all items. This weight should be non-negative.",
+                    "format": "double",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
         "ResourceRecordSet": {
             "description": "A unit of data that is returned by the DNS servers.",
             "id": "ResourceRecordSet",
@@ -2674,6 +2844,10 @@
                 "name": {
                     "description": "For example, www.example.com.",
                     "type": "string"
+                },
+                "routingPolicy": {
+                    "$ref": "RRSetRoutingPolicy",
+                    "description": "Configures dynamic query responses based on geo location of querying user or a weighted round robin based routing policy. A ResourceRecordSet should only have either rrdata (static) or routing_policy (dynamic). An error is returned otherwise."
                 },
                 "rrdatas": {
                     "description": "As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1) -- see examples.",
@@ -2789,6 +2963,13 @@
                     "description": "User-provided description for this Response Policy.",
                     "type": "string"
                 },
+                "gkeClusters": {
+                    "description": "The list of Google Kubernetes Engine clusters to which this response policy is applied.",
+                    "items": {
+                        "$ref": "ResponsePolicyGKECluster"
+                    },
+                    "type": "array"
+                },
                 "id": {
                     "description": "Unique identifier for the resource; defined by the server (output only).",
                     "format": "int64",
@@ -2807,6 +2988,20 @@
                 },
                 "responsePolicyName": {
                     "description": "User assigned name for this Response Policy.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ResponsePolicyGKECluster": {
+            "id": "ResponsePolicyGKECluster",
+            "properties": {
+                "gkeClusterName": {
+                    "description": "The resource name of the cluster to bind this response policy to. This should be specified in the format like: projects/*/locations/*/clusters/*. This is referenced from GKE projects.locations.clusters.get API: https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/get",
+                    "type": "string"
+                },
+                "kind": {
+                    "default": "dns#responsePolicyGKECluster",
                     "type": "string"
                 }
             },

@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 }
             }
         }
@@ -182,6 +182,31 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                     ]
                 },
+                "getVirtualMachineThreatDetectionSettings": {
+                    "description": "Get the VirtualMachineThreatDetectionSettings resource.",
+                    "flatPath": "v1beta2/folders/{foldersId}/virtualMachineThreatDetectionSettings",
+                    "httpMethod": "GET",
+                    "id": "securitycenter.folders.getVirtualMachineThreatDetectionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the VirtualMachineThreatDetectionSettings to retrieve. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                            "location": "path",
+                            "pattern": "^folders/[^/]+/virtualMachineThreatDetectionSettings$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1beta2/{+name}",
+                    "response": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
                 "getWebSecurityScannerSettings": {
                     "description": "Get the WebSecurityScannerSettings resource.",
                     "flatPath": "v1beta2/folders/{foldersId}/webSecurityScannerSettings",
@@ -309,6 +334,40 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                     ]
                 },
+                "updateVirtualMachineThreatDetectionSettings": {
+                    "description": "Update the VirtualMachineThreatDetectionSettings resource.",
+                    "flatPath": "v1beta2/folders/{foldersId}/virtualMachineThreatDetectionSettings",
+                    "httpMethod": "PATCH",
+                    "id": "securitycenter.folders.updateVirtualMachineThreatDetectionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "The resource name of the VirtualMachineThreatDetectionSettings. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                            "location": "path",
+                            "pattern": "^folders/[^/]+/virtualMachineThreatDetectionSettings$",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "The list of fields to be updated.",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1beta2/{+name}",
+                    "request": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
+                    },
+                    "response": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
                 "updateWebSecurityScannerSettings": {
                     "description": "Update the WebSecurityScannerSettings resource.",
                     "flatPath": "v1beta2/folders/{foldersId}/webSecurityScannerSettings",
@@ -425,6 +484,35 @@
                             "path": "v1beta2/{+name}:calculate",
                             "response": {
                                 "$ref": "SecurityHealthAnalyticsSettings"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        }
+                    }
+                },
+                "virtualMachineThreatDetectionSettings": {
+                    "methods": {
+                        "calculate": {
+                            "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings.",
+                            "flatPath": "v1beta2/folders/{foldersId}/virtualMachineThreatDetectionSettings:calculate",
+                            "httpMethod": "GET",
+                            "id": "securitycenter.folders.virtualMachineThreatDetectionSettings.calculate",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the VirtualMachineThreatDetectionSettings to calculate. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                                    "location": "path",
+                                    "pattern": "^folders/[^/]+/virtualMachineThreatDetectionSettings$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1beta2/{+name}:calculate",
+                            "response": {
+                                "$ref": "VirtualMachineThreatDetectionSettings"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/cloud-platform"
@@ -590,6 +678,31 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                     ]
                 },
+                "getVirtualMachineThreatDetectionSettings": {
+                    "description": "Get the VirtualMachineThreatDetectionSettings resource.",
+                    "flatPath": "v1beta2/organizations/{organizationsId}/virtualMachineThreatDetectionSettings",
+                    "httpMethod": "GET",
+                    "id": "securitycenter.organizations.getVirtualMachineThreatDetectionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the VirtualMachineThreatDetectionSettings to retrieve. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                            "location": "path",
+                            "pattern": "^organizations/[^/]+/virtualMachineThreatDetectionSettings$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1beta2/{+name}",
+                    "response": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
                 "getWebSecurityScannerSettings": {
                     "description": "Get the WebSecurityScannerSettings resource.",
                     "flatPath": "v1beta2/organizations/{organizationsId}/webSecurityScannerSettings",
@@ -712,6 +825,40 @@
                     },
                     "response": {
                         "$ref": "SecurityHealthAnalyticsSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
+                "updateVirtualMachineThreatDetectionSettings": {
+                    "description": "Update the VirtualMachineThreatDetectionSettings resource.",
+                    "flatPath": "v1beta2/organizations/{organizationsId}/virtualMachineThreatDetectionSettings",
+                    "httpMethod": "PATCH",
+                    "id": "securitycenter.organizations.updateVirtualMachineThreatDetectionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "The resource name of the VirtualMachineThreatDetectionSettings. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                            "location": "path",
+                            "pattern": "^organizations/[^/]+/virtualMachineThreatDetectionSettings$",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "The list of fields to be updated.",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1beta2/{+name}",
+                    "request": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
+                    },
+                    "response": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform"
@@ -840,6 +987,35 @@
                         }
                     }
                 },
+                "virtualMachineThreatDetectionSettings": {
+                    "methods": {
+                        "calculate": {
+                            "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings.",
+                            "flatPath": "v1beta2/organizations/{organizationsId}/virtualMachineThreatDetectionSettings:calculate",
+                            "httpMethod": "GET",
+                            "id": "securitycenter.organizations.virtualMachineThreatDetectionSettings.calculate",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the VirtualMachineThreatDetectionSettings to calculate. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                                    "location": "path",
+                                    "pattern": "^organizations/[^/]+/virtualMachineThreatDetectionSettings$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1beta2/{+name}:calculate",
+                            "response": {
+                                "$ref": "VirtualMachineThreatDetectionSettings"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        }
+                    }
+                },
                 "webSecurityScannerSettings": {
                     "methods": {
                         "calculate": {
@@ -943,6 +1119,31 @@
                     "path": "v1beta2/{+name}",
                     "response": {
                         "$ref": "SecurityHealthAnalyticsSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
+                "getVirtualMachineThreatDetectionSettings": {
+                    "description": "Get the VirtualMachineThreatDetectionSettings resource.",
+                    "flatPath": "v1beta2/projects/{projectsId}/virtualMachineThreatDetectionSettings",
+                    "httpMethod": "GET",
+                    "id": "securitycenter.projects.getVirtualMachineThreatDetectionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the VirtualMachineThreatDetectionSettings to retrieve. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                            "location": "path",
+                            "pattern": "^projects/[^/]+/virtualMachineThreatDetectionSettings$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1beta2/{+name}",
+                    "response": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform"
@@ -1070,6 +1271,40 @@
                     },
                     "response": {
                         "$ref": "SecurityHealthAnalyticsSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
+                "updateVirtualMachineThreatDetectionSettings": {
+                    "description": "Update the VirtualMachineThreatDetectionSettings resource.",
+                    "flatPath": "v1beta2/projects/{projectsId}/virtualMachineThreatDetectionSettings",
+                    "httpMethod": "PATCH",
+                    "id": "securitycenter.projects.updateVirtualMachineThreatDetectionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "The resource name of the VirtualMachineThreatDetectionSettings. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                            "location": "path",
+                            "pattern": "^projects/[^/]+/virtualMachineThreatDetectionSettings$",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "The list of fields to be updated.",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1beta2/{+name}",
+                    "request": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
+                    },
+                    "response": {
+                        "$ref": "VirtualMachineThreatDetectionSettings"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform"
@@ -1296,6 +1531,35 @@
                         }
                     }
                 },
+                "virtualMachineThreatDetectionSettings": {
+                    "methods": {
+                        "calculate": {
+                            "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings.",
+                            "flatPath": "v1beta2/projects/{projectsId}/virtualMachineThreatDetectionSettings:calculate",
+                            "httpMethod": "GET",
+                            "id": "securitycenter.projects.virtualMachineThreatDetectionSettings.calculate",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the VirtualMachineThreatDetectionSettings to calculate. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/virtualMachineThreatDetectionSettings$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1beta2/{+name}:calculate",
+                            "response": {
+                                "$ref": "VirtualMachineThreatDetectionSettings"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        }
+                    }
+                },
                 "webSecurityScannerSettings": {
                     "methods": {
                         "calculate": {
@@ -1328,9 +1592,40 @@
             }
         }
     },
-    "revision": "20210326",
+    "revision": "20220224",
     "rootUrl": "https://securitycenter.googleapis.com/",
     "schemas": {
+        "Access": {
+            "description": "Represents an access event.",
+            "id": "Access",
+            "properties": {
+                "callerIp": {
+                    "description": "Caller's IP address, such as \"1.1.1.1\".",
+                    "type": "string"
+                },
+                "callerIpGeo": {
+                    "$ref": "Geolocation",
+                    "description": "The caller IP's geolocation, which identifies where the call came from."
+                },
+                "methodName": {
+                    "description": "The method that the service account called, e.g. \"SetIamPolicy\".",
+                    "type": "string"
+                },
+                "principalEmail": {
+                    "description": "Associated email, such as \"foo@google.com\".",
+                    "type": "string"
+                },
+                "serviceName": {
+                    "description": "This is the API service that the service account made a call to, e.g. \"iam.googleapis.com\"",
+                    "type": "string"
+                },
+                "userAgentFamily": {
+                    "description": "What kind of user agent is associated, e.g. operating system shells, embedded or stand-alone applications, etc.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Config": {
             "description": "Configuration of a module.",
             "id": "Config",
@@ -1407,6 +1702,168 @@
             },
             "type": "object"
         },
+        "Cve": {
+            "description": "CVE stands for Common Vulnerabilities and Exposures. More information: https://cve.mitre.org",
+            "id": "Cve",
+            "properties": {
+                "cvssv3": {
+                    "$ref": "Cvssv3",
+                    "description": "Describe Common Vulnerability Scoring System specified at https://www.first.org/cvss/v3.1/specification-document"
+                },
+                "id": {
+                    "description": "The unique identifier for the vulnerability. e.g. CVE-2021-34527",
+                    "type": "string"
+                },
+                "references": {
+                    "description": "Additional information about the CVE. e.g. https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-34527",
+                    "items": {
+                        "$ref": "Reference"
+                    },
+                    "type": "array"
+                },
+                "upstreamFixAvailable": {
+                    "description": "Whether upstream fix is available for the CVE.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "Cvssv3": {
+            "description": "Common Vulnerability Scoring System version 3.",
+            "id": "Cvssv3",
+            "properties": {
+                "attackComplexity": {
+                    "description": "This metric describes the conditions beyond the attacker's control that must exist in order to exploit the vulnerability.",
+                    "enum": [
+                        "ATTACK_COMPLEXITY_UNSPECIFIED",
+                        "ATTACK_COMPLEXITY_LOW",
+                        "ATTACK_COMPLEXITY_HIGH"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "Specialized access conditions or extenuating circumstances do not exist. An attacker can expect repeatable success when attacking the vulnerable component.",
+                        "A successful attack depends on conditions beyond the attacker's control. That is, a successful attack cannot be accomplished at will, but requires the attacker to invest in some measurable amount of effort in preparation or execution against the vulnerable component before a successful attack can be expected."
+                    ],
+                    "type": "string"
+                },
+                "attackVector": {
+                    "description": "Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments. This metric reflects the context by which vulnerability exploitation is possible.",
+                    "enum": [
+                        "ATTACK_VECTOR_UNSPECIFIED",
+                        "ATTACK_VECTOR_NETWORK",
+                        "ATTACK_VECTOR_ADJACENT",
+                        "ATTACK_VECTOR_LOCAL",
+                        "ATTACK_VECTOR_PHYSICAL"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "The vulnerable component is bound to the network stack and the set of possible attackers extends beyond the other options listed below, up to and including the entire Internet.",
+                        "The vulnerable component is bound to the network stack, but the attack is limited at the protocol level to a logically adjacent topology.",
+                        "The vulnerable component is not bound to the network stack and the attacker's path is via read/write/execute capabilities.",
+                        "The attack requires the attacker to physically touch or manipulate the vulnerable component."
+                    ],
+                    "type": "string"
+                },
+                "availabilityImpact": {
+                    "description": "This metric measures the impact to the availability of the impacted component resulting from a successfully exploited vulnerability.",
+                    "enum": [
+                        "IMPACT_UNSPECIFIED",
+                        "IMPACT_HIGH",
+                        "IMPACT_LOW",
+                        "IMPACT_NONE"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "High impact.",
+                        "Low impact.",
+                        "No impact."
+                    ],
+                    "type": "string"
+                },
+                "baseScore": {
+                    "description": "The base score is a function of the base metric scores.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "confidentialityImpact": {
+                    "description": "This metric measures the impact to the confidentiality of the information resources managed by a software component due to a successfully exploited vulnerability.",
+                    "enum": [
+                        "IMPACT_UNSPECIFIED",
+                        "IMPACT_HIGH",
+                        "IMPACT_LOW",
+                        "IMPACT_NONE"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "High impact.",
+                        "Low impact.",
+                        "No impact."
+                    ],
+                    "type": "string"
+                },
+                "integrityImpact": {
+                    "description": "This metric measures the impact to integrity of a successfully exploited vulnerability.",
+                    "enum": [
+                        "IMPACT_UNSPECIFIED",
+                        "IMPACT_HIGH",
+                        "IMPACT_LOW",
+                        "IMPACT_NONE"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "High impact.",
+                        "Low impact.",
+                        "No impact."
+                    ],
+                    "type": "string"
+                },
+                "privilegesRequired": {
+                    "description": "This metric describes the level of privileges an attacker must possess before successfully exploiting the vulnerability.",
+                    "enum": [
+                        "PRIVILEGES_REQUIRED_UNSPECIFIED",
+                        "PRIVILEGES_REQUIRED_NONE",
+                        "PRIVILEGES_REQUIRED_LOW",
+                        "PRIVILEGES_REQUIRED_HIGH"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "The attacker is unauthorized prior to attack, and therefore does not require any access to settings or files of the vulnerable system to carry out an attack.",
+                        "The attacker requires privileges that provide basic user capabilities that could normally affect only settings and files owned by a user. Alternatively, an attacker with Low privileges has the ability to access only non-sensitive resources.",
+                        "The attacker requires privileges that provide significant (e.g., administrative) control over the vulnerable component allowing access to component-wide settings and files."
+                    ],
+                    "type": "string"
+                },
+                "scope": {
+                    "description": "The Scope metric captures whether a vulnerability in one vulnerable component impacts resources in components beyond its security scope.",
+                    "enum": [
+                        "SCOPE_UNSPECIFIED",
+                        "SCOPE_UNCHANGED",
+                        "SCOPE_CHANGED"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "An exploited vulnerability can only affect resources managed by the same security authority.",
+                        "An exploited vulnerability can affect resources beyond the security scope managed by the security authority of the vulnerable component."
+                    ],
+                    "type": "string"
+                },
+                "userInteraction": {
+                    "description": "This metric captures the requirement for a human user, other than the attacker, to participate in the successful compromise of the vulnerable component.",
+                    "enum": [
+                        "USER_INTERACTION_UNSPECIFIED",
+                        "USER_INTERACTION_NONE",
+                        "USER_INTERACTION_REQUIRED"
+                    ],
+                    "enumDescriptions": [
+                        "Invalid value.",
+                        "The vulnerable system can be exploited without interaction from any user.",
+                        "Successful exploitation of this vulnerability requires a user to take some action before the vulnerability can be exploited."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Details": {
             "description": "Details of a subscription.",
             "id": "Details",
@@ -1427,13 +1884,15 @@
                         "TYPE_UNSPECIFIED",
                         "STANDARD",
                         "TRIAL",
-                        "ALPHA"
+                        "ALPHA",
+                        "DEMO"
                     ],
                     "enumDescriptions": [
                         "Default value. This value is unused.",
                         "The standard subscription.",
                         "The trial subscription.",
-                        "The alpha subscription."
+                        "The alpha subscription.",
+                        "The demo subscription for channel partners."
                     ],
                     "type": "string"
                 }
@@ -1484,6 +1943,10 @@
             "description": "Security Command Center finding. A finding is a record of assessment data like security, risk, health, or privacy, that is ingested into Security Command Center for presentation, notification, analysis, policy testing, and enforcement. For example, a cross-site scripting (XSS) vulnerability in an App Engine application is a finding.",
             "id": "Finding",
             "properties": {
+                "access": {
+                    "$ref": "Access",
+                    "description": "Access details associated to the Finding, such as more information on the caller, which method was accessed, from where, etc."
+                },
                 "canonicalName": {
                     "description": "The canonical name of the finding. It's either \"organizations/{organization_id}/sources/{source_id}/findings/{finding_id}\", \"folders/{folder_id}/sources/{source_id}/findings/{finding_id}\" or \"projects/{project_number}/sources/{source_id}/findings/{finding_id}\", depending on the closest CRM ancestor of the resource associated with the finding.",
                     "type": "string"
@@ -1498,12 +1961,74 @@
                     "type": "string"
                 },
                 "eventTime": {
-                    "description": "The time at which the event took place, or when an update to the finding occurred. For example, if the finding represents an open firewall it would capture the time the detector believes the firewall became open. The accuracy is determined by the detector. If the finding were to be resolved afterward, this time would reflect when the finding was resolved. Must not be set to a value greater than the current timestamp.",
+                    "description": "The time the finding was first detected. If an existing finding is updated, then this is the time the update occurred. For example, if the finding represents an open firewall, this property captures the time the detector believes the firewall became open. The accuracy is determined by the detector. If the finding is later resolved, then this time reflects when the finding was resolved. This must not be set to a value greater than the current timestamp.",
                     "format": "google-datetime",
                     "type": "string"
                 },
+                "externalSystems": {
+                    "additionalProperties": {
+                        "$ref": "GoogleCloudSecuritycenterV1ExternalSystem"
+                    },
+                    "description": "Output only. Third party SIEM/SOAR fields within SCC, contains external system information and external system finding fields.",
+                    "readOnly": true,
+                    "type": "object"
+                },
                 "externalUri": {
                     "description": "The URI that, if available, points to a web page outside of Security Command Center where additional information about the finding can be found. This field is guaranteed to be either empty or a well formed URL.",
+                    "type": "string"
+                },
+                "findingClass": {
+                    "description": "The class of the finding.",
+                    "enum": [
+                        "FINDING_CLASS_UNSPECIFIED",
+                        "THREAT",
+                        "VULNERABILITY",
+                        "MISCONFIGURATION",
+                        "OBSERVATION",
+                        "SCC_ERROR"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified finding class.",
+                        "Describes unwanted or malicious activity.",
+                        "Describes a potential weakness in software that increases risk to Confidentiality & Integrity & Availability.",
+                        "Describes a potential weakness in cloud resource/asset configuration that increases risk.",
+                        "Describes a security observation that is for informational purposes.",
+                        "Describes an error that prevents some SCC functionality."
+                    ],
+                    "type": "string"
+                },
+                "indicator": {
+                    "$ref": "Indicator",
+                    "description": "Represents what's commonly known as an Indicator of compromise (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. Reference: https://en.wikipedia.org/wiki/Indicator_of_compromise"
+                },
+                "mitreAttack": {
+                    "$ref": "MitreAttack",
+                    "description": "MITRE ATT&CK tactics and techniques related to this finding. See: https://attack.mitre.org"
+                },
+                "mute": {
+                    "description": "Indicates the mute state of a finding (either unspecified, muted, unmuted or undefined). Unlike other attributes of a finding, a finding provider shouldn't set the value of mute.",
+                    "enum": [
+                        "MUTE_UNSPECIFIED",
+                        "MUTED",
+                        "UNMUTED",
+                        "UNDEFINED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Finding has been muted.",
+                        "Finding has been unmuted.",
+                        "Finding has never been muted/unmuted."
+                    ],
+                    "type": "string"
+                },
+                "muteInitiator": {
+                    "description": "First known as mute_annotation. Records additional information about the mute operation e.g. mute config that muted the finding, user who muted the finding, etc. Unlike other attributes of a finding, a finding provider shouldn't set the value of mute.",
+                    "type": "string"
+                },
+                "muteUpdateTime": {
+                    "description": "Output only. The most recent time this finding was muted or unmuted.",
+                    "format": "google-datetime",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "name": {
@@ -1561,6 +2086,10 @@
                         "The finding has been fixed, triaged as a non-issue or otherwise addressed and is no longer active."
                     ],
                     "type": "string"
+                },
+                "vulnerability": {
+                    "$ref": "Vulnerability",
+                    "description": "Represents vulnerability specific fields like cve, cvss scores etc. CVE stands for Common Vulnerabilities and Exposures (https://cve.mitre.org/about/)"
                 }
             },
             "type": "object"
@@ -1575,6 +2104,139 @@
                 },
                 "resourceFolderDisplayName": {
                     "description": "The user defined display name for this folder.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Geolocation": {
+            "description": "Represents a geographical location for a given access.",
+            "id": "Geolocation",
+            "properties": {
+                "regionCode": {
+                    "description": "A CLDR.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudSecuritycenterV1BigQueryExport": {
+            "description": "Configures how to deliver Findings to BigQuery Instance.",
+            "id": "GoogleCloudSecuritycenterV1BigQueryExport",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. The time at which the big query export was created. This field is set by the server and will be ignored if provided on export on creation.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "dataset": {
+                    "description": "The dataset to write findings' updates to. Its format is \"projects/[project_id]/datasets/[bigquery_dataset_id]\". BigQuery Dataset unique ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_).",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "The description of the export (max of 1024 characters).",
+                    "type": "string"
+                },
+                "filter": {
+                    "description": "Expression that defines the filter to apply across create/update events of findings. The expression is a list of zero or more restrictions combined via logical operators `AND` and `OR`. Parentheses are supported, and `OR` has higher precedence than `AND`. Restrictions have the form ` ` and may have a `-` character in front of them to indicate negation. The fields map to those defined in the corresponding resource. The supported operators are: * `=` for all value types. * `>`, `<`, `>=`, `<=` for integer values. * `:`, meaning substring matching, for strings. The supported value types are: * string literals in quotes. * integer literals without quotes. * boolean literals `true` and `false` without quotes. Please see the proto documentation in the finding (https://source.corp.google.com/piper///depot/google3/google/cloud/securitycenter/v1/finding.proto) and in the ListFindingsRequest for valid filter syntax. (https://source.corp.google.com/piper///depot/google3/google/cloud/securitycenter/v1/securitycenter_service.proto).",
+                    "type": "string"
+                },
+                "mostRecentEditor": {
+                    "description": "Output only. Email address of the user who last edited the big query export. This field is set by the server and will be ignored if provided on export creation or update.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "name": {
+                    "description": "The relative resource name of this export. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name. Example format: \"organizations/{organization_id}/bigQueryExports/{export_id}\" Example format: \"folders/{folder_id}/bigQueryExports/{export_id}\" Example format: \"projects/{project_id}/bigQueryExports/{export_id}\" This field is provided in responses, and is ignored when provided in create requests.",
+                    "type": "string"
+                },
+                "principal": {
+                    "description": "Output only. The service account that needs permission to create table, upload data to the big query dataset.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The most recent time at which the big export was updated. This field is set by the server and will be ignored if provided on export creation or update.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudSecuritycenterV1BulkMuteFindingsResponse": {
+            "description": "The response to a BulkMute request. Contains the LRO information.",
+            "id": "GoogleCloudSecuritycenterV1BulkMuteFindingsResponse",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleCloudSecuritycenterV1ExternalSystem": {
+            "description": "Representation of third party SIEM/SOAR fields within SCC.",
+            "id": "GoogleCloudSecuritycenterV1ExternalSystem",
+            "properties": {
+                "assignees": {
+                    "description": "References primary/secondary etc assignees in the external system.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "externalSystemUpdateTime": {
+                    "description": "The most recent time when the corresponding finding's ticket/tracker was updated in the external system.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "externalUid": {
+                    "description": "Identifier that's used to track the given finding in the external system.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "External System Name e.g. jira, demisto, etc. e.g.: organizations/1234/sources/5678/findings/123456/externalSystems/jira folders/1234/sources/5678/findings/123456/externalSystems/jira projects/1234/sources/5678/findings/123456/externalSystems/jira",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Most recent status of the corresponding finding's ticket/tracker in the external system.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudSecuritycenterV1MuteConfig": {
+            "description": "A mute config is a Cloud SCC resource that contains the configuration to mute create/update events of findings.",
+            "id": "GoogleCloudSecuritycenterV1MuteConfig",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. The time at which the mute config was created. This field is set by the server and will be ignored if provided on config creation.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "description": {
+                    "description": "A description of the mute config.",
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "The human readable name to be displayed for the mute config.",
+                    "type": "string"
+                },
+                "filter": {
+                    "description": "Required. An expression that defines the filter to apply across create/update events of findings. While creating a filter string, be mindful of the scope in which the mute configuration is being created. E.g., If a filter contains project = X but is created under the project = Y scope, it might not match any findings. The following field and operator combinations are supported: * severity: `=`, `:` * category: `=`, `:` * resource.name: `=`, `:` * resource.project_name: `=`, `:` * resource.project_display_name: `=`, `:` * resource.folders.resource_folder: `=`, `:` * resource.parent_name: `=`, `:` * resource.parent_display_name: `=`, `:` * resource.type: `=`, `:` * finding_class: `=`, `:` * indicator.ip_addresses: `=`, `:` * indicator.domains: `=`, `:`",
+                    "type": "string"
+                },
+                "mostRecentEditor": {
+                    "description": "Output only. Email address of the user who last edited the mute config. This field is set by the server and will be ignored if provided on config creation or update.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "name": {
+                    "description": "This field will be ignored if provided on config creation. Format \"organizations/{organization}/muteConfigs/{mute_config}\" \"folders/{folder}/muteConfigs/{mute_config}\" \"projects/{project}/muteConfigs/{mute_config}\"",
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The most recent time at which the mute config was updated. This field is set by the server and will be ignored if provided on config creation or update.",
+                    "format": "google-datetime",
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -1603,6 +2265,10 @@
             "description": "Information related to the Google Cloud resource.",
             "id": "GoogleCloudSecuritycenterV1Resource",
             "properties": {
+                "displayName": {
+                    "description": "The human readable name of the resource.",
+                    "type": "string"
+                },
                 "folders": {
                     "description": "Output only. Contains a Folder message for each folder in the assets ancestry. The first folder is the deepest nested folder, and the last folder is the folder directly under the Organization.",
                     "items": {
@@ -1628,7 +2294,11 @@
                     "type": "string"
                 },
                 "projectDisplayName": {
-                    "description": "The human readable name of project that the resource belongs to.",
+                    "description": "The project id that the resource belongs to.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The full resource type of the resource.",
                     "type": "string"
                 }
             },
@@ -1838,7 +2508,7 @@
                     "type": "string"
                 },
                 "projectDisplayName": {
-                    "description": "The human readable name of project that the resource belongs to.",
+                    "description": "The project id that the resource belongs to.",
                     "type": "string"
                 }
             },
@@ -1889,6 +2559,270 @@
                 },
                 "name": {
                     "description": "The relative resource name of the SecurityMarks. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Examples: \"organizations/{organization_id}/assets/{asset_id}/securityMarks\" \"organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks\".",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Indicator": {
+            "description": "Represents what's commonly known as an Indicator of compromise (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. Reference: https://en.wikipedia.org/wiki/Indicator_of_compromise",
+            "id": "Indicator",
+            "properties": {
+                "domains": {
+                    "description": "List of domains associated to the Finding.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "ipAddresses": {
+                    "description": "List of ip addresses associated to the Finding.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "MitreAttack": {
+            "description": "MITRE ATT&CK tactics and techniques related to this finding. See: https://attack.mitre.org",
+            "id": "MitreAttack",
+            "properties": {
+                "additionalTactics": {
+                    "description": "Additional MITRE ATT&CK tactics related to this finding, if any.",
+                    "items": {
+                        "enum": [
+                            "TACTIC_UNSPECIFIED",
+                            "RECONNAISSANCE",
+                            "RESOURCE_DEVELOPMENT",
+                            "INITIAL_ACCESS",
+                            "EXECUTION",
+                            "PERSISTENCE",
+                            "PRIVILEGE_ESCALATION",
+                            "DEFENSE_EVASION",
+                            "CREDENTIAL_ACCESS",
+                            "DISCOVERY",
+                            "LATERAL_MOVEMENT",
+                            "COLLECTION",
+                            "COMMAND_AND_CONTROL",
+                            "EXFILTRATION",
+                            "IMPACT"
+                        ],
+                        "enumDescriptions": [
+                            "Unspecified value.",
+                            "TA0043",
+                            "TA0042",
+                            "TA0001",
+                            "TA0002",
+                            "TA0003",
+                            "TA0004",
+                            "TA0005",
+                            "TA0006",
+                            "TA0007",
+                            "TA0008",
+                            "TA0009",
+                            "TA0011",
+                            "TA0010",
+                            "TA0040"
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "additionalTechniques": {
+                    "description": "Additional MITRE ATT&CK techniques related to this finding, if any, along with any of their respective parent techniques.",
+                    "items": {
+                        "enum": [
+                            "TECHNIQUE_UNSPECIFIED",
+                            "ACTIVE_SCANNING",
+                            "SCANNING_IP_BLOCKS",
+                            "INGRESS_TOOL_TRANSFER",
+                            "NATIVE_API",
+                            "SHARED_MODULES",
+                            "COMMAND_AND_SCRIPTING_INTERPRETER",
+                            "UNIX_SHELL",
+                            "RESOURCE_HIJACKING",
+                            "PROXY",
+                            "EXTERNAL_PROXY",
+                            "MULTI_HOP_PROXY",
+                            "DYNAMIC_RESOLUTION",
+                            "UNSECURED_CREDENTIALS",
+                            "VALID_ACCOUNTS",
+                            "LOCAL_ACCOUNTS",
+                            "CLOUD_ACCOUNTS",
+                            "NETWORK_DENIAL_OF_SERVICE",
+                            "PERMISSION_GROUPS_DISCOVERY",
+                            "CLOUD_GROUPS",
+                            "EXFILTRATION_OVER_WEB_SERVICE",
+                            "EXFILTRATION_TO_CLOUD_STORAGE",
+                            "ACCOUNT_MANIPULATION",
+                            "SSH_AUTHORIZED_KEYS",
+                            "CREATE_OR_MODIFY_SYSTEM_PROCESS",
+                            "STEAL_WEB_SESSION_COOKIE",
+                            "MODIFY_CLOUD_COMPUTE_INFRASTRUCTURE",
+                            "EXPLOIT_PUBLIC_FACING_APPLICATION",
+                            "MODIFY_AUTHENTICATION_PROCESS"
+                        ],
+                        "enumDescriptions": [
+                            "Unspecified value.",
+                            "T1595",
+                            "T1595.001",
+                            "T1105",
+                            "T1106",
+                            "T1129",
+                            "T1059",
+                            "T1059.004",
+                            "T1496",
+                            "T1090",
+                            "T1090.002",
+                            "T1090.003",
+                            "T1568",
+                            "T1552",
+                            "T1078",
+                            "T1078.003",
+                            "T1078.004",
+                            "T1498",
+                            "T1069",
+                            "T1069.003",
+                            "T1567",
+                            "T1567.002",
+                            "T1098",
+                            "T1098.004",
+                            "T1543",
+                            "T1539",
+                            "T1578",
+                            "T1190",
+                            "T1556"
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "primaryTactic": {
+                    "description": "The MITRE ATT&CK tactic most closely represented by this finding, if any.",
+                    "enum": [
+                        "TACTIC_UNSPECIFIED",
+                        "RECONNAISSANCE",
+                        "RESOURCE_DEVELOPMENT",
+                        "INITIAL_ACCESS",
+                        "EXECUTION",
+                        "PERSISTENCE",
+                        "PRIVILEGE_ESCALATION",
+                        "DEFENSE_EVASION",
+                        "CREDENTIAL_ACCESS",
+                        "DISCOVERY",
+                        "LATERAL_MOVEMENT",
+                        "COLLECTION",
+                        "COMMAND_AND_CONTROL",
+                        "EXFILTRATION",
+                        "IMPACT"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified value.",
+                        "TA0043",
+                        "TA0042",
+                        "TA0001",
+                        "TA0002",
+                        "TA0003",
+                        "TA0004",
+                        "TA0005",
+                        "TA0006",
+                        "TA0007",
+                        "TA0008",
+                        "TA0009",
+                        "TA0011",
+                        "TA0010",
+                        "TA0040"
+                    ],
+                    "type": "string"
+                },
+                "primaryTechniques": {
+                    "description": "The MITRE ATT&CK technique most closely represented by this finding, if any. primary_techniques is a repeated field because there are multiple levels of MITRE ATT&CK techniques. If the technique most closely represented by this finding is a sub-technique (e.g. SCANNING_IP_BLOCKS), both the sub-technique and its parent technique(s) will be listed (e.g. SCANNING_IP_BLOCKS, ACTIVE_SCANNING).",
+                    "items": {
+                        "enum": [
+                            "TECHNIQUE_UNSPECIFIED",
+                            "ACTIVE_SCANNING",
+                            "SCANNING_IP_BLOCKS",
+                            "INGRESS_TOOL_TRANSFER",
+                            "NATIVE_API",
+                            "SHARED_MODULES",
+                            "COMMAND_AND_SCRIPTING_INTERPRETER",
+                            "UNIX_SHELL",
+                            "RESOURCE_HIJACKING",
+                            "PROXY",
+                            "EXTERNAL_PROXY",
+                            "MULTI_HOP_PROXY",
+                            "DYNAMIC_RESOLUTION",
+                            "UNSECURED_CREDENTIALS",
+                            "VALID_ACCOUNTS",
+                            "LOCAL_ACCOUNTS",
+                            "CLOUD_ACCOUNTS",
+                            "NETWORK_DENIAL_OF_SERVICE",
+                            "PERMISSION_GROUPS_DISCOVERY",
+                            "CLOUD_GROUPS",
+                            "EXFILTRATION_OVER_WEB_SERVICE",
+                            "EXFILTRATION_TO_CLOUD_STORAGE",
+                            "ACCOUNT_MANIPULATION",
+                            "SSH_AUTHORIZED_KEYS",
+                            "CREATE_OR_MODIFY_SYSTEM_PROCESS",
+                            "STEAL_WEB_SESSION_COOKIE",
+                            "MODIFY_CLOUD_COMPUTE_INFRASTRUCTURE",
+                            "EXPLOIT_PUBLIC_FACING_APPLICATION",
+                            "MODIFY_AUTHENTICATION_PROCESS"
+                        ],
+                        "enumDescriptions": [
+                            "Unspecified value.",
+                            "T1595",
+                            "T1595.001",
+                            "T1105",
+                            "T1106",
+                            "T1129",
+                            "T1059",
+                            "T1059.004",
+                            "T1496",
+                            "T1090",
+                            "T1090.002",
+                            "T1090.003",
+                            "T1568",
+                            "T1552",
+                            "T1078",
+                            "T1078.003",
+                            "T1078.004",
+                            "T1498",
+                            "T1069",
+                            "T1069.003",
+                            "T1567",
+                            "T1567.002",
+                            "T1098",
+                            "T1098.004",
+                            "T1543",
+                            "T1539",
+                            "T1578",
+                            "T1190",
+                            "T1556"
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "version": {
+                    "description": "The MITRE ATT&CK version referenced by the above fields. E.g. \"8\".",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Reference": {
+            "description": "Additional Links",
+            "id": "Reference",
+            "properties": {
+                "source": {
+                    "description": "Source of the reference e.g. NVD",
+                    "type": "string"
+                },
+                "uri": {
+                    "description": "Uri for the mentioned source e.g. https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-34527.",
                     "type": "string"
                 }
             },
@@ -2005,6 +2939,62 @@
                         "The premium tier."
                     ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VirtualMachineThreatDetectionSettings": {
+            "description": "Resource capturing the settings for the Virtual Machine Threat Detection service.",
+            "id": "VirtualMachineThreatDetectionSettings",
+            "properties": {
+                "modules": {
+                    "additionalProperties": {
+                        "$ref": "Config"
+                    },
+                    "description": "The configurations including the state of enablement for the service's different modules. The absence of a module in the map implies its configuration is inherited from its parent's.",
+                    "type": "object"
+                },
+                "name": {
+                    "description": "The resource name of the VirtualMachineThreatDetectionSettings. Formats: * organizations/{organization}/virtualMachineThreatDetectionSettings * folders/{folder}/virtualMachineThreatDetectionSettings * projects/{project}/virtualMachineThreatDetectionSettings",
+                    "type": "string"
+                },
+                "serviceAccount": {
+                    "description": "Output only. The service account used by Virtual Machine Threat Detection detectors.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "serviceEnablementState": {
+                    "description": "The state of enablement for the service at its level of the resource hierarchy. A DISABLED state will override all module enablement_states to DISABLED.",
+                    "enum": [
+                        "ENABLEMENT_STATE_UNSPECIFIED",
+                        "INHERITED",
+                        "ENABLED",
+                        "DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. This value is unused.",
+                        "State is inherited from the parent resource.",
+                        "State is enabled.",
+                        "State is disabled."
+                    ],
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The time the settings were last updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Vulnerability": {
+            "description": "Refers to common vulnerability fields e.g. cve, cvss, cwe etc.",
+            "id": "Vulnerability",
+            "properties": {
+                "cve": {
+                    "$ref": "Cve",
+                    "description": "CVE stands for Common Vulnerabilities and Exposures (https://cve.mitre.org/about/)"
                 }
             },
             "type": "object"

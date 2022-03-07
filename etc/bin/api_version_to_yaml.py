@@ -25,7 +25,7 @@ if not isdir(api_base):
 
 yaml_path = sys.argv[2]
 if isfile(yaml_path):
-    api_data = yaml.load(open(yaml_path, 'r'))['api']['list']
+    api_data = yaml.load(open(yaml_path, 'r'), Loader=yaml.FullLoader)['api']['list']
 else:
     api_data = dict()
 
@@ -37,7 +37,10 @@ for api_name in sorted(os.listdir(api_base)):
     all_versions = sorted((v for v in os.listdir(api_path) if isdir(
         join(api_path, v)) and isfile(join(api_path, v, "%s-api.json" % api_name))), reverse=True)
     if not all_versions:
-        del api_data[api_name]
+        try:
+            del api_data[api_name]
+        except:
+            continue
         continue
     last_version = None
     for v in all_versions:

@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "View and manage your data across Google Cloud Platform services"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/datastore": {
                     "description": "View and manage your Google Cloud Datastore data"
@@ -17,6 +17,7 @@
     "description": "Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application. ",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/datastore/",
+    "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
         "x32": "http://www.google.com/images/icons/product/search-32.gif"
@@ -307,7 +308,7 @@
             }
         }
     },
-    "revision": "20210317",
+    "revision": "20220221",
     "rootUrl": "https://datastore.googleapis.com/",
     "schemas": {
         "AllocateIdsRequest": {
@@ -573,6 +574,53 @@
             },
             "type": "object"
         },
+        "GoogleDatastoreAdminV1DatastoreFirestoreMigrationMetadata": {
+            "description": "Metadata for Datastore to Firestore migration operations. The DatastoreFirestoreMigration operation is not started by the end-user via an explicit \"creation\" method. This is an intentional deviation from the LRO design pattern. This singleton resource can be accessed at: \"projects/{project_id}/operations/datastore-firestore-migration\"",
+            "id": "GoogleDatastoreAdminV1DatastoreFirestoreMigrationMetadata",
+            "properties": {
+                "migrationState": {
+                    "description": "The current state of migration from Cloud Datastore to Cloud Firestore in Datastore mode.",
+                    "enum": [
+                        "MIGRATION_STATE_UNSPECIFIED",
+                        "RUNNING",
+                        "PAUSED",
+                        "COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "The migration is running.",
+                        "The migration is paused.",
+                        "The migration is complete."
+                    ],
+                    "type": "string"
+                },
+                "migrationStep": {
+                    "description": "The current step of migration from Cloud Datastore to Cloud Firestore in Datastore mode.",
+                    "enum": [
+                        "MIGRATION_STEP_UNSPECIFIED",
+                        "PREPARE",
+                        "START",
+                        "APPLY_WRITES_SYNCHRONOUSLY",
+                        "COPY_AND_VERIFY",
+                        "REDIRECT_EVENTUALLY_CONSISTENT_READS",
+                        "REDIRECT_STRONGLY_CONSISTENT_READS",
+                        "REDIRECT_WRITES"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Pre-migration: the database is prepared for migration.",
+                        "Start of migration.",
+                        "Writes are applied synchronously to at least one replica.",
+                        "Data is copied to Cloud Firestore and then verified to match the data in Cloud Datastore.",
+                        "Eventually-consistent reads are redirected to Cloud Firestore.",
+                        "Strongly-consistent reads are redirected to Cloud Firestore.",
+                        "Writes are redirected to Cloud Firestore."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleDatastoreAdminV1EntityFilter": {
             "description": "Identifies a subset of entities in a project. This is specified as combinations of kinds and namespaces (either or both of which may be all, as described in the following examples). Example usage: Entire project: kinds=[], namespace_ids=[] Kinds Foo and Bar in all namespaces: kinds=['Foo', 'Bar'], namespace_ids=[] Kinds Foo and Bar only in the default namespace: kinds=['Foo', 'Bar'], namespace_ids=[''] Kinds Foo and Bar in both the default and Baz namespaces: kinds=['Foo', 'Bar'], namespace_ids=['', 'Baz'] The entire Baz namespace: kinds=[], namespace_ids=['Baz']",
             "id": "GoogleDatastoreAdminV1EntityFilter",
@@ -678,6 +726,91 @@
             },
             "type": "object"
         },
+        "GoogleDatastoreAdminV1MigrationProgressEvent": {
+            "description": "An event signifying the start of a new step in a [migration from Cloud Datastore to Cloud Firestore in Datastore mode](https://cloud.google.com/datastore/docs/upgrade-to-firestore).",
+            "id": "GoogleDatastoreAdminV1MigrationProgressEvent",
+            "properties": {
+                "prepareStepDetails": {
+                    "$ref": "GoogleDatastoreAdminV1PrepareStepDetails",
+                    "description": "Details for the `PREPARE` step."
+                },
+                "redirectWritesStepDetails": {
+                    "$ref": "GoogleDatastoreAdminV1RedirectWritesStepDetails",
+                    "description": "Details for the `REDIRECT_WRITES` step."
+                },
+                "step": {
+                    "description": "The step that is starting. An event with step set to `START` indicates that the migration has been reverted back to the initial pre-migration state.",
+                    "enum": [
+                        "MIGRATION_STEP_UNSPECIFIED",
+                        "PREPARE",
+                        "START",
+                        "APPLY_WRITES_SYNCHRONOUSLY",
+                        "COPY_AND_VERIFY",
+                        "REDIRECT_EVENTUALLY_CONSISTENT_READS",
+                        "REDIRECT_STRONGLY_CONSISTENT_READS",
+                        "REDIRECT_WRITES"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Pre-migration: the database is prepared for migration.",
+                        "Start of migration.",
+                        "Writes are applied synchronously to at least one replica.",
+                        "Data is copied to Cloud Firestore and then verified to match the data in Cloud Datastore.",
+                        "Eventually-consistent reads are redirected to Cloud Firestore.",
+                        "Strongly-consistent reads are redirected to Cloud Firestore.",
+                        "Writes are redirected to Cloud Firestore."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleDatastoreAdminV1MigrationStateEvent": {
+            "description": "An event signifying a change in state of a [migration from Cloud Datastore to Cloud Firestore in Datastore mode](https://cloud.google.com/datastore/docs/upgrade-to-firestore).",
+            "id": "GoogleDatastoreAdminV1MigrationStateEvent",
+            "properties": {
+                "state": {
+                    "description": "The new state of the migration.",
+                    "enum": [
+                        "MIGRATION_STATE_UNSPECIFIED",
+                        "RUNNING",
+                        "PAUSED",
+                        "COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "The migration is running.",
+                        "The migration is paused.",
+                        "The migration is complete."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleDatastoreAdminV1PrepareStepDetails": {
+            "description": "Details for the `PREPARE` step.",
+            "id": "GoogleDatastoreAdminV1PrepareStepDetails",
+            "properties": {
+                "concurrencyMode": {
+                    "description": "The concurrency mode this database will use when it reaches the `REDIRECT_WRITES` step.",
+                    "enum": [
+                        "CONCURRENCY_MODE_UNSPECIFIED",
+                        "PESSIMISTIC",
+                        "OPTIMISTIC",
+                        "OPTIMISTIC_WITH_ENTITY_GROUPS"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Pessimistic concurrency.",
+                        "Optimistic concurrency.",
+                        "Optimistic concurrency with entity groups."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleDatastoreAdminV1Progress": {
             "description": "Measures the progress of a particular metric.",
             "id": "GoogleDatastoreAdminV1Progress",
@@ -690,6 +823,29 @@
                 "workEstimated": {
                     "description": "An estimate of how much work needs to be performed. May be zero if the work estimate is unavailable.",
                     "format": "int64",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleDatastoreAdminV1RedirectWritesStepDetails": {
+            "description": "Details for the `REDIRECT_WRITES` step.",
+            "id": "GoogleDatastoreAdminV1RedirectWritesStepDetails",
+            "properties": {
+                "concurrencyMode": {
+                    "description": "Ths concurrency mode for this database.",
+                    "enum": [
+                        "CONCURRENCY_MODE_UNSPECIFIED",
+                        "PESSIMISTIC",
+                        "OPTIMISTIC",
+                        "OPTIMISTIC_WITH_ENTITY_GROUPS"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Pessimistic concurrency.",
+                        "Optimistic concurrency.",
+                        "Optimistic concurrency with entity groups."
+                    ],
                     "type": "string"
                 }
             },
@@ -935,7 +1091,7 @@
             "type": "object"
         },
         "LatLng": {
-            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this must conform to the WGS84 standard. Values must be within normalized ranges.",
+            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.",
             "id": "LatLng",
             "properties": {
                 "latitude": {
@@ -1108,12 +1264,12 @@
                     ],
                     "enumDescriptions": [
                         "Unspecified. This value must not be used.",
-                        "Less than.",
-                        "Less than or equal.",
-                        "Greater than.",
-                        "Greater than or equal.",
-                        "Equal.",
-                        "Has ancestor."
+                        "The given `property` is less than the given `value`. Requires: * That `property` comes first in `order_by`.",
+                        "The given `property` is less than or equal to the given `value`. Requires: * That `property` comes first in `order_by`.",
+                        "The given `property` is greater than the given `value`. Requires: * That `property` comes first in `order_by`.",
+                        "The given `property` is greater than or equal to the given `value`. Requires: * That `property` comes first in `order_by`.",
+                        "The given `property` is equal to the given `value`.",
+                        "Limit the result set to the given entity and its descendants. Requires: * That `value` is an entity key."
                     ],
                     "type": "string"
                 },

@@ -3,10 +3,16 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "View and manage your data across Google Cloud Platform services"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
+                },
+                "https://www.googleapis.com/auth/cloud-platform.read-only": {
+                    "description": "View your data across Google Cloud services and see the email address of your Google Account"
                 },
                 "https://www.googleapis.com/auth/compute": {
                     "description": "View and manage your Google Compute Engine resources"
+                },
+                "https://www.googleapis.com/auth/compute.readonly": {
+                    "description": "View your Google Compute Engine resources"
                 }
             }
         }
@@ -143,7 +149,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform",
-                        "https://www.googleapis.com/auth/compute"
+                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                        "https://www.googleapis.com/auth/compute",
+                        "https://www.googleapis.com/auth/compute.readonly"
                     ]
                 },
                 "importSshPublicKey": {
@@ -214,6 +222,35 @@
                 },
                 "sshPublicKeys": {
                     "methods": {
+                        "create": {
+                            "description": "Create an SSH public key",
+                            "flatPath": "v1/users/{usersId}/sshPublicKeys",
+                            "httpMethod": "POST",
+                            "id": "oslogin.users.sshPublicKeys.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. The unique ID for the user in format `users/{user}`.",
+                                    "location": "path",
+                                    "pattern": "^users/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+parent}/sshPublicKeys",
+                            "request": {
+                                "$ref": "SshPublicKey"
+                            },
+                            "response": {
+                                "$ref": "SshPublicKey"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform",
+                                "https://www.googleapis.com/auth/compute"
+                            ]
+                        },
                         "delete": {
                             "description": "Deletes an SSH public key.",
                             "flatPath": "v1/users/{usersId}/sshPublicKeys/{sshPublicKeysId}",
@@ -306,7 +343,7 @@
             }
         }
     },
-    "revision": "20210316",
+    "revision": "20220228",
     "rootUrl": "https://oslogin.googleapis.com/",
     "schemas": {
         "Empty": {

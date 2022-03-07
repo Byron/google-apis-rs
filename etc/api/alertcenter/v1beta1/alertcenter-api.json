@@ -243,7 +243,7 @@
                             "type": "string"
                         },
                         "filter": {
-                            "description": "Optional. A query string for filtering alert results. For more details, see [Query filters](/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](/admin-sdk/alertcenter/reference/filter-fields#alerts.list).",
+                            "description": "Optional. A query string for filtering alert results. For more details, see [Query filters](https://developers.google.com/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](https://developers.google.com/admin-sdk/alertcenter/reference/filter-fields#alerts.list).",
                             "location": "query",
                             "type": "string"
                         },
@@ -356,7 +356,7 @@
                                     "type": "string"
                                 },
                                 "filter": {
-                                    "description": "Optional. A query string for filtering alert feedback results. For more details, see [Query filters](/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](/admin-sdk/alertcenter/reference/filter-fields#alerts.feedback.list).",
+                                    "description": "Optional. A query string for filtering alert feedback results. For more details, see [Query filters](https://developers.google.com/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](https://developers.google.com/admin-sdk/alertcenter/reference/filter-fields#alerts.feedback.list).",
                                     "location": "query",
                                     "type": "string"
                                 }
@@ -423,9 +423,83 @@
             }
         }
     },
-    "revision": "20210323",
+    "revision": "20220221",
     "rootUrl": "https://alertcenter.googleapis.com/",
     "schemas": {
+        "AccountSuspensionDetails": {
+            "description": "Details about why an account is receiving an account suspension warning.",
+            "id": "AccountSuspensionDetails",
+            "properties": {
+                "abuseReason": {
+                    "description": "The reason why this account is receiving an account suspension warning.",
+                    "enum": [
+                        "ACCOUNT_SUSPENSION_ABUSE_REASON_UNSPECIFIED",
+                        "TOS_VIOLATION",
+                        "SPAM",
+                        "PHISHING",
+                        "TRAFFIC_PUMPING",
+                        "FRAUD",
+                        "NUMBER_HARVESTING",
+                        "PAYMENTS_FRAUD",
+                        "UNWANTED_CONTENT"
+                    ],
+                    "enumDescriptions": [
+                        "Abuse reason is unspecified.",
+                        "This account is being suspended for a Terms of Service violation.",
+                        "This account is being suspended for spam.",
+                        "This account is being suspended for phishing.",
+                        "This account is being suspended for artificially boosting traffic to a website.",
+                        "This account is being suspended for fraud.",
+                        "This account is being suspended for number harvesting.",
+                        "This account is being suspended for payments fraud.",
+                        "This account is being suspended for unwanted content."
+                    ],
+                    "type": "string"
+                },
+                "productName": {
+                    "description": "The name of the product being abused. This is restricted to only the following values: \"Gmail\" \"Google Workspace\" \"Payments\" \"Voice\" \"YouTube\" \"Other\"",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AccountSuspensionWarning": {
+            "description": "A warning that the customer's account is about to be suspended.",
+            "id": "AccountSuspensionWarning",
+            "properties": {
+                "appealWindow": {
+                    "description": "The amount of time remaining to appeal an imminent suspension. After this window has elapsed, the account will be suspended. Only populated if the account suspension is in WARNING state.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Account suspension warning state.",
+                    "enum": [
+                        "ACCOUNT_SUSPENSION_WARNING_STATE_UNSPECIFIED",
+                        "WARNING",
+                        "SUSPENDED",
+                        "APPEAL_APPROVED",
+                        "APPEAL_SUBMITTED"
+                    ],
+                    "enumDescriptions": [
+                        "State is unspecified.",
+                        "Customer is receiving a warning about imminent suspension.",
+                        "Customer is being notified that their account has been suspended.",
+                        "Customer is being notified that their suspension appeal was approved.",
+                        "Customer has submitted their appeal, which is pending review."
+                    ],
+                    "type": "string"
+                },
+                "suspensionDetails": {
+                    "description": "Details about why an account is being suspended.",
+                    "items": {
+                        "$ref": "AccountSuspensionDetails"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "AccountWarning": {
             "description": "Alerts for user account warning events.",
             "id": "AccountWarning",
@@ -558,7 +632,7 @@
                     "type": "string"
                 },
                 "source": {
-                    "description": "Required. A unique identifier for the system that reported the alert. This is output only after alert is created. Supported sources are any of the following: * Google Operations * Mobile device management * Gmail phishing * Domain wide takeout * State sponsored attack * Google identity",
+                    "description": "Required. A unique identifier for the system that reported the alert. This is output only after alert is created. Supported sources are any of the following: * Google Operations * Mobile device management * Gmail phishing * Data Loss Prevention * Domain wide takeout * State sponsored attack * Google identity * Apps outage",
                     "type": "string"
                 },
                 "startTime": {
@@ -567,7 +641,7 @@
                     "type": "string"
                 },
                 "type": {
-                    "description": "Required. The type of the alert. This is output only after alert is created. For a list of available alert types see [Google Workspace Alert types](/admin-sdk/alertcenter/reference/alert-types).",
+                    "description": "Required. The type of the alert. This is output only after alert is created. For a list of available alert types see [Google Workspace Alert types](https://developers.google.com/admin-sdk/alertcenter/reference/alert-types).",
                     "type": "string"
                 },
                 "updateTime": {
@@ -639,7 +713,7 @@
                     "type": "string"
                 },
                 "etag": {
-                    "description": "Optional. `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of an alert metadata from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform metatdata updates in order to avoid race conditions: An `etag` is returned in the response which contains alert metadata, and systems are expected to put that etag in the request to update alert metadata to ensure that their change will be applied to the same version of the alert metadata. If no `etag` is provided in the call to update alert metadata, then the existing alert metadata is overwritten blindly.",
+                    "description": "Optional. `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of an alert metadata from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform metadata updates in order to avoid race conditions: An `etag` is returned in the response which contains alert metadata, and systems are expected to put that etag in the request to update alert metadata to ensure that their change will be applied to the same version of the alert metadata. If no `etag` is provided in the call to update alert metadata, then the existing alert metadata is overwritten blindly.",
                     "type": "string"
                 },
                 "severity": {
@@ -668,6 +742,82 @@
                         "$ref": "RequestInfo"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "AppSettingsChanged": {
+            "description": "Alerts from AppSettingsChanged bucket Rules configured by Admin which contain the below rules. Calendar settings changed Drive settings changed Email settings changed Mobile settings changed",
+            "id": "AppSettingsChanged",
+            "properties": {
+                "alertDetails": {
+                    "description": "Any other associated alert details, for example, AlertConfiguration.",
+                    "format": "byte",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Rule name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AppsOutage": {
+            "description": "An outage incident reported for a Google Workspace service.",
+            "id": "AppsOutage",
+            "properties": {
+                "dashboardUri": {
+                    "description": "Link to the outage event in Google Workspace Status Dashboard",
+                    "type": "string"
+                },
+                "incidentTrackingId": {
+                    "description": "Incident tracking ID.",
+                    "type": "string"
+                },
+                "mergeInfo": {
+                    "$ref": "MergeInfo",
+                    "description": "Indicates new alert details under which the outage is communicated. Only populated when Status is MERGED."
+                },
+                "nextUpdateTime": {
+                    "description": "Timestamp by which the next update is expected to arrive.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "products": {
+                    "description": "List of products impacted by the outage.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "resolutionTime": {
+                    "description": "Timestamp when the outage is expected to be resolved, or has confirmed resolution. Provided only when known.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Current outage status.",
+                    "enum": [
+                        "STATUS_UNSPECIFIED",
+                        "NEW",
+                        "ONGOING",
+                        "RESOLVED",
+                        "FALSE_POSITIVE",
+                        "PARTIALLY_RESOLVED",
+                        "MERGED",
+                        "DOWNGRADED"
+                    ],
+                    "enumDescriptions": [
+                        "Status is unspecified.",
+                        "The incident has just been reported.",
+                        "The incident is ongoing.",
+                        "The incident has been resolved.",
+                        "Further assessment indicated no customer impact.",
+                        "The incident has been partially resolved.",
+                        "The incident was merged into a parent.",
+                        "The incident has lower impact than initially anticipated."
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -953,7 +1103,7 @@
                     "type": "array"
                 },
                 "date": {
-                    "description": "The date the malicious email was sent.",
+                    "description": "The date of the event related to this email.",
                     "format": "google-datetime",
                     "type": "string"
                 },
@@ -1001,6 +1151,10 @@
                 },
                 "description": {
                     "description": "A detailed, freeform incident description.",
+                    "type": "string"
+                },
+                "domain": {
+                    "description": "Customer domain for email template personalization.",
                     "type": "string"
                 },
                 "header": {
@@ -1136,8 +1290,23 @@
             },
             "type": "object"
         },
+        "MergeInfo": {
+            "description": "New alert tracking numbers.",
+            "id": "MergeInfo",
+            "properties": {
+                "newAlertId": {
+                    "description": "Optional. New alert ID. Reference the [google.apps.alertcenter.Alert] with this ID for the current state.",
+                    "type": "string"
+                },
+                "newIncidentTrackingId": {
+                    "description": "The new tracking ID from the parent incident.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Notification": {
-            "description": "Settings for callback notifications. For more details see [Google Workspace Alert Notification](/admin-sdk/alertcenter/guides/notifications).",
+            "description": "Settings for callback notifications. For more details see [Google Workspace Alert Notification](https://developers.google.com/admin-sdk/alertcenter/guides/notifications).",
             "id": "Notification",
             "properties": {
                 "cloudPubsubTopic": {
@@ -1179,6 +1348,27 @@
             "properties": {
                 "detectorName": {
                     "description": "Name that uniquely identifies the detector.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ReportingRule": {
+            "description": "Alerts from Reporting Rules configured by Admin.",
+            "id": "ReportingRule",
+            "properties": {
+                "alertDetails": {
+                    "description": "Any other associated alert details, for example, AlertConfiguration.",
+                    "format": "byte",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Rule name",
+                    "type": "string"
+                },
+                "query": {
+                    "description": "Alert Rule query Sample Query query { condition { filter { expected_application_id: 777491262838 expected_event_name: \"indexable_content_change\" filter_op: IN } } conjunction_operator: OR }",
+                    "format": "byte",
                     "type": "string"
                 }
             },
@@ -1481,6 +1671,17 @@
                 },
                 "emailAddress": {
                     "description": "Email address of the user.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UserChanges": {
+            "description": "Alerts from UserChanges bucket Rules for predefined rules which contain the below rules. Suspended user made active New user Added User suspended (by admin) User granted admin privileges User admin privileges revoked User deleted Users password changed",
+            "id": "UserChanges",
+            "properties": {
+                "name": {
+                    "description": "Rule name",
                     "type": "string"
                 }
             },

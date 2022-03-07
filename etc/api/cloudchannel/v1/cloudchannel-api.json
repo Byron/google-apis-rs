@@ -12,7 +12,7 @@
     "baseUrl": "https://cloudchannel.googleapis.com/",
     "batchPath": "batch",
     "canonicalName": "Cloudchannel",
-    "description": "",
+    "description": "The Cloud Channel API enables Google Cloud partners to have a single unified resale platform and APIs across all of Google Cloud including GCP, Workspace, Maps and Chrome.",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/channel",
     "fullyEncodeReservedExpansion": true,
@@ -316,7 +316,7 @@
                             ]
                         },
                         "get": {
-                            "description": "Returns a requested ChannelPartnerLink resource. You must be a distributor to call this method. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: ChannelPartnerLink resource not found because of an invalid channel partner link name. Return value: The ChannelPartnerLink resource.",
+                            "description": "Returns the requested ChannelPartnerLink resource. You must be a distributor to call this method. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: ChannelPartnerLink resource not found because of an invalid channel partner link name. Return value: The ChannelPartnerLink resource.",
                             "flatPath": "v1/accounts/{accountsId}/channelPartnerLinks/{channelPartnerLinksId}",
                             "httpMethod": "GET",
                             "id": "cloudchannel.accounts.channelPartnerLinks.get",
@@ -467,7 +467,7 @@
                                     ]
                                 },
                                 "delete": {
-                                    "description": "Deletes the given Customer permanently and irreversibly. Possible error codes: * PERMISSION_DENIED: The account making the request does not own this customer. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * FAILED_PRECONDITION: The customer has existing entitlements. * NOT_FOUND: No Customer resource found for the name in the request.",
+                                    "description": "Deletes the given Customer permanently. Possible error codes: * PERMISSION_DENIED: The account making the request does not own this customer. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * FAILED_PRECONDITION: The customer has existing entitlements. * NOT_FOUND: No Customer resource found for the name in the request.",
                                     "flatPath": "v1/accounts/{accountsId}/channelPartnerLinks/{channelPartnerLinksId}/customers/{customersId}",
                                     "httpMethod": "DELETE",
                                     "id": "cloudchannel.accounts.channelPartnerLinks.customers.delete",
@@ -492,7 +492,7 @@
                                     ]
                                 },
                                 "get": {
-                                    "description": "Returns a requested Customer resource. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer resource doesn't exist. Usually the result of an invalid name parameter. Return value: The Customer resource.",
+                                    "description": "Returns the requested Customer resource. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer resource doesn't exist. Usually the result of an invalid name parameter. Return value: The Customer resource.",
                                     "flatPath": "v1/accounts/{accountsId}/channelPartnerLinks/{channelPartnerLinksId}/customers/{customersId}",
                                     "httpMethod": "GET",
                                     "id": "cloudchannel.accounts.channelPartnerLinks.customers.get",
@@ -516,6 +516,34 @@
                                         "https://www.googleapis.com/auth/apps.order"
                                     ]
                                 },
+                                "import": {
+                                    "description": "Imports a Customer from the Cloud Identity associated with the provided Cloud Identity ID or domain before a TransferEntitlements call. If a linked Customer already exists and overwrite_if_exists is true, it will update that Customer's data. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * NOT_FOUND: Cloud Identity doesn't exist or was deleted. * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is expired or invalid. * ALREADY_EXISTS: A customer already exists and has conflicting critical fields. Requires an overwrite. Return value: The Customer.",
+                                    "flatPath": "v1/accounts/{accountsId}/channelPartnerLinks/{channelPartnerLinksId}/customers:import",
+                                    "httpMethod": "POST",
+                                    "id": "cloudchannel.accounts.channelPartnerLinks.customers.import",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "parent": {
+                                            "description": "Required. The resource name of the reseller's account. Parent takes the format: accounts/{account_id} or accounts/{account_id}/channelPartnerLinks/{channel_partner_id}",
+                                            "location": "path",
+                                            "pattern": "^accounts/[^/]+/channelPartnerLinks/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+parent}/customers:import",
+                                    "request": {
+                                        "$ref": "GoogleCloudChannelV1ImportCustomerRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleCloudChannelV1Customer"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/apps.order"
+                                    ]
+                                },
                                 "list": {
                                     "description": "List Customers. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. Return value: List of Customers, or an empty list if there are no customers.",
                                     "flatPath": "v1/accounts/{accountsId}/channelPartnerLinks/{channelPartnerLinksId}/customers",
@@ -525,6 +553,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Filters applied to the [CloudChannelService.ListCustomers] results. See https://cloud.google.com/channel/docs/concepts/google-cloud/filter-customers for more information.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of customers to return. The service may return fewer than this value. If unspecified, returns at most 10 customers. The maximum value is 50.",
                                             "format": "int32",
@@ -621,7 +654,7 @@
                             ]
                         },
                         "delete": {
-                            "description": "Deletes the given Customer permanently and irreversibly. Possible error codes: * PERMISSION_DENIED: The account making the request does not own this customer. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * FAILED_PRECONDITION: The customer has existing entitlements. * NOT_FOUND: No Customer resource found for the name in the request.",
+                            "description": "Deletes the given Customer permanently. Possible error codes: * PERMISSION_DENIED: The account making the request does not own this customer. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * FAILED_PRECONDITION: The customer has existing entitlements. * NOT_FOUND: No Customer resource found for the name in the request.",
                             "flatPath": "v1/accounts/{accountsId}/customers/{customersId}",
                             "httpMethod": "DELETE",
                             "id": "cloudchannel.accounts.customers.delete",
@@ -646,7 +679,7 @@
                             ]
                         },
                         "get": {
-                            "description": "Returns a requested Customer resource. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer resource doesn't exist. Usually the result of an invalid name parameter. Return value: The Customer resource.",
+                            "description": "Returns the requested Customer resource. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer resource doesn't exist. Usually the result of an invalid name parameter. Return value: The Customer resource.",
                             "flatPath": "v1/accounts/{accountsId}/customers/{customersId}",
                             "httpMethod": "GET",
                             "id": "cloudchannel.accounts.customers.get",
@@ -670,6 +703,34 @@
                                 "https://www.googleapis.com/auth/apps.order"
                             ]
                         },
+                        "import": {
+                            "description": "Imports a Customer from the Cloud Identity associated with the provided Cloud Identity ID or domain before a TransferEntitlements call. If a linked Customer already exists and overwrite_if_exists is true, it will update that Customer's data. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * NOT_FOUND: Cloud Identity doesn't exist or was deleted. * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is expired or invalid. * ALREADY_EXISTS: A customer already exists and has conflicting critical fields. Requires an overwrite. Return value: The Customer.",
+                            "flatPath": "v1/accounts/{accountsId}/customers:import",
+                            "httpMethod": "POST",
+                            "id": "cloudchannel.accounts.customers.import",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. The resource name of the reseller's account. Parent takes the format: accounts/{account_id} or accounts/{account_id}/channelPartnerLinks/{channel_partner_id}",
+                                    "location": "path",
+                                    "pattern": "^accounts/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+parent}/customers:import",
+                            "request": {
+                                "$ref": "GoogleCloudChannelV1ImportCustomerRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleCloudChannelV1Customer"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/apps.order"
+                            ]
+                        },
                         "list": {
                             "description": "List Customers. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: Required request parameters are missing or invalid. Return value: List of Customers, or an empty list if there are no customers.",
                             "flatPath": "v1/accounts/{accountsId}/customers",
@@ -679,6 +740,11 @@
                                 "parent"
                             ],
                             "parameters": {
+                                "filter": {
+                                    "description": "Optional. Filters applied to the [CloudChannelService.ListCustomers] results. See https://cloud.google.com/channel/docs/concepts/google-cloud/filter-customers for more information.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
                                 "pageSize": {
                                     "description": "Optional. The maximum number of customers to return. The service may return fewer than this value. If unspecified, returns at most 10 customers. The maximum value is 50.",
                                     "format": "int32",
@@ -1119,7 +1185,7 @@
                                     ]
                                 },
                                 "get": {
-                                    "description": "Returns a requested Entitlement resource. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer entitlement was not found. Return value: The requested Entitlement resource.",
+                                    "description": "Returns the requested Entitlement resource. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer entitlement was not found. Return value: The requested Entitlement resource.",
                                     "flatPath": "v1/accounts/{accountsId}/customers/{customersId}/entitlements/{entitlementsId}",
                                     "httpMethod": "GET",
                                     "id": "cloudchannel.accounts.customers.entitlements.get",
@@ -1174,6 +1240,31 @@
                                     "path": "v1/{+parent}/entitlements",
                                     "response": {
                                         "$ref": "GoogleCloudChannelV1ListEntitlementsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/apps.order"
+                                    ]
+                                },
+                                "lookupOffer": {
+                                    "description": "Returns the requested Offer resource. Possible error codes: * PERMISSION_DENIED: The entitlement doesn't belong to the reseller. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: Entitlement or offer was not found. Return value: The Offer resource.",
+                                    "flatPath": "v1/accounts/{accountsId}/customers/{customersId}/entitlements/{entitlementsId}:lookupOffer",
+                                    "httpMethod": "GET",
+                                    "id": "cloudchannel.accounts.customers.entitlements.lookupOffer",
+                                    "parameterOrder": [
+                                        "entitlement"
+                                    ],
+                                    "parameters": {
+                                        "entitlement": {
+                                            "description": "Required. The resource name of the entitlement to retrieve the Offer. Entitlement uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}",
+                                            "location": "path",
+                                            "pattern": "^accounts/[^/]+/customers/[^/]+/entitlements/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+entitlement}:lookupOffer",
+                                    "response": {
+                                        "$ref": "GoogleCloudChannelV1Offer"
                                     },
                                     "scopes": [
                                         "https://www.googleapis.com/auth/apps.order"
@@ -1508,7 +1599,7 @@
             }
         }
     },
-    "revision": "20210326",
+    "revision": "20220303",
     "rootUrl": "https://cloudchannel.googleapis.com/",
     "schemas": {
         "GoogleCloudChannelV1ActivateEntitlementRequest": {
@@ -1572,7 +1663,7 @@
                     "type": "string"
                 },
                 "parameters": {
-                    "description": "Optional. Parameters needed to purchase the Offer.",
+                    "description": "Optional. Parameters needed to purchase the Offer. To view the available Parameters refer to the Offer.parameter_definitions from the desired offer.",
                     "items": {
                         "$ref": "GoogleCloudChannelV1Parameter"
                     },
@@ -1594,7 +1685,7 @@
             "id": "GoogleCloudChannelV1ChangeParametersRequest",
             "properties": {
                 "parameters": {
-                    "description": "Required. Entitlement parameters to update. You can only change editable parameters.",
+                    "description": "Required. Entitlement parameters to update. You can only change editable parameters. To view the available Parameters for a request, refer to the Offer.parameter_definitions from the desired offer.",
                     "items": {
                         "$ref": "GoogleCloudChannelV1Parameter"
                     },
@@ -1656,7 +1747,7 @@
                         "SUSPENDED"
                     ],
                     "enumDescriptions": [
-                        "The state is not specified.",
+                        "Not used.",
                         "An invitation has been sent to the reseller to create a channel partner link.",
                         "Status when the reseller is active.",
                         "Status when the reseller has been revoked by the distributor.",
@@ -1756,7 +1847,7 @@
                         "TEAM"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Domain-owning customer which needs domain verification to use services.",
                         "Team customer which needs email verification to use services."
                     ],
@@ -1826,28 +1917,28 @@
             "id": "GoogleCloudChannelV1ContactInfo",
             "properties": {
                 "displayName": {
-                    "description": "Output only. Display name of the contact in the customer account. Populated by combining customer first name and last name.",
+                    "description": "Output only. The customer account contact's display name, formatted as a combination of the customer's first and last name.",
                     "readOnly": true,
                     "type": "string"
                 },
                 "email": {
-                    "description": "Email of the contact in the customer account. Email is required for entitlements that need creation of admin.google.com accounts. The email will be the username used in credentials to access the admin.google.com account.",
+                    "description": "The customer account's contact email. Required for entitlements that create admin.google.com accounts, and serves as the customer's username for those accounts. Use this email to invite Team customers.",
                     "type": "string"
                 },
                 "firstName": {
-                    "description": "First name of the contact in the customer account.",
+                    "description": "The customer account contact's first name. Optional for Team customers.",
                     "type": "string"
                 },
                 "lastName": {
-                    "description": "Last name of the contact in the customer account.",
+                    "description": "The customer account contact's last name. Optional for Team customers.",
                     "type": "string"
                 },
                 "phone": {
-                    "description": "Phone number of the contact in the customer account.",
+                    "description": "The customer account's contact phone number.",
                     "type": "string"
                 },
                 "title": {
-                    "description": "Optional. Job title of the contact in the customer account.",
+                    "description": "Optional. The customer account contact's job title.",
                     "type": "string"
                 }
             },
@@ -1873,7 +1964,7 @@
             "id": "GoogleCloudChannelV1Customer",
             "properties": {
                 "alternateEmail": {
-                    "description": "Secondary contact email. Alternate email and primary contact email are required to have different domains if primary contact email is present. When creating admin.google.com accounts, users get notified credentials at this email. This email address is also used as a recovery email.",
+                    "description": "Secondary contact email. You need to provide an alternate email to create different domains if a primary contact email already exists. Users will receive a notification with credentials when you create an admin.google.com account. Secondary emails are also recovery email addresses. Alternate emails are optional when you create Team customers.",
                     "type": "string"
                 },
                 "channelPartnerId": {
@@ -1881,7 +1972,7 @@
                     "type": "string"
                 },
                 "cloudIdentityId": {
-                    "description": "Output only. Customer's cloud_identity_id. Populated only if a Cloud Identity resource exists for this customer.",
+                    "description": "Output only. The customer's Cloud Identity ID if the customer has a Cloud Identity resource.",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -1891,13 +1982,13 @@
                     "readOnly": true
                 },
                 "createTime": {
-                    "description": "Output only. The time at which the customer is created.",
+                    "description": "Output only. Time when the customer was created.",
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
                 },
                 "domain": {
-                    "description": "Required. Primary domain used by the customer. Domain of primary contact email is required to be same as the provided domain.",
+                    "description": "Required. The customer's primary domain. Must match the primary contact email's domain.",
                     "type": "string"
                 },
                 "languageCode": {
@@ -1915,14 +2006,14 @@
                 },
                 "orgPostalAddress": {
                     "$ref": "GoogleTypePostalAddress",
-                    "description": "Required. Address of the organization of the customer entity. Region and zip codes are required to enforce US laws and embargoes. Valid address lines are required for all customers. Language code is discarded. Use the Customer-level language code to set the customer's language."
+                    "description": "Required. The organization address for the customer. To enforce US laws and embargoes, we require a region and zip code. You must provide valid addresses for every customer. To set the customer's language, use the Customer-level language code."
                 },
                 "primaryContactInfo": {
                     "$ref": "GoogleCloudChannelV1ContactInfo",
                     "description": "Primary contact info."
                 },
                 "updateTime": {
-                    "description": "Output only. The time at which the customer is updated.",
+                    "description": "Output only. Time when the customer was updated.",
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
@@ -1943,7 +2034,7 @@
                             "TEAM"
                         ],
                         "enumDescriptions": [
-                            "Default value. This state doesn't show unless an error occurs.",
+                            "Not used.",
                             "Domain-owning customer which needs domain verification to use services.",
                             "Team customer which needs email verification to use services."
                         ],
@@ -1996,7 +2087,7 @@
                         "PRIMARY_DOMAIN_VERIFIED"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Primary domain for customer was changed.",
                         "Primary domain of the customer has been verified."
                     ],
@@ -2022,7 +2113,7 @@
                         "SIZE_10001_OR_MORE"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "1 - 100",
                         "101 - 500",
                         "501 - 1,000",
@@ -2041,7 +2132,7 @@
                         "UNIVERSITY"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Elementary/Secondary Schools & Districts",
                         "Higher Education Universities & Colleges"
                     ],
@@ -2082,7 +2173,7 @@
                     "type": "string"
                 },
                 "parameters": {
-                    "description": "Extended entitlement parameters. When creating an entitlement, valid parameters' names and values are defined in the offer's parameter definitions.",
+                    "description": "Extended entitlement parameters. When creating an entitlement, valid parameter names and values are defined in the Offer.parameter_definitions. The response may include the following output-only Parameters: - assigned_units: The number of licenses assigned to users. - max_units: The maximum assignable units for a flexible offer. - num_units: The total commitment for commitment-based offers.",
                     "items": {
                         "$ref": "GoogleCloudChannelV1Parameter"
                     },
@@ -2101,7 +2192,7 @@
                         "SUSPENDED"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "The entitlement is currently active.",
                         "The entitlement is currently suspended."
                     ],
@@ -2124,7 +2215,7 @@
                             "OTHER"
                         ],
                         "enumDescriptions": [
-                            "Default value. This state doesn't show unless an error occurs.",
+                            "Not used.",
                             "Entitlement was manually suspended by the Reseller.",
                             "Trial ended.",
                             "Entitlement renewal was canceled.",
@@ -2172,10 +2263,11 @@
                         "SKU_CHANGED",
                         "RENEWAL_SETTING_CHANGED",
                         "PAID_SERVICE_STARTED",
-                        "LICENSE_ASSIGNMENT_CHANGED"
+                        "LICENSE_ASSIGNMENT_CHANGED",
+                        "LICENSE_CAP_CHANGED"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "A new entitlement was created.",
                         "The offer type associated with an entitlement was changed. This is not triggered if an entitlement converts from a commit offer to a flexible offer as part of a renewal.",
                         "Annual commitment for a commit plan was changed.",
@@ -2186,9 +2278,41 @@
                         "Entitlement was upgraded or downgraded (e.g. from Google Workspace Business Standard to Google Workspace Business Plus).",
                         "The renewal settings of an entitlement has changed.",
                         "Paid service has started on trial entitlement.",
-                        "License was assigned to or revoked from a user."
+                        "License was assigned to or revoked from a user.",
+                        "License cap was changed for the entitlement."
                     ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudChannelV1ImportCustomerRequest": {
+            "description": "Request message for CloudChannelService.ImportCustomer",
+            "id": "GoogleCloudChannelV1ImportCustomerRequest",
+            "properties": {
+                "authToken": {
+                    "description": "Optional. The super admin of the resold customer generates this token to authorize a reseller to access their Cloud Identity and purchase entitlements on their behalf. You can omit this token after authorization. See https://support.google.com/a/answer/7643790 for more details.",
+                    "type": "string"
+                },
+                "channelPartnerId": {
+                    "description": "Optional. Cloud Identity ID of a channel partner who will be the direct reseller for the customer's order. This field is required for 2-tier transfer scenarios and can be provided via the request Parent binding as well.",
+                    "type": "string"
+                },
+                "cloudIdentityId": {
+                    "description": "Required. Customer's Cloud Identity ID",
+                    "type": "string"
+                },
+                "customer": {
+                    "description": "Optional. Specifies the customer that will receive imported Cloud Identity information. Format: accounts/{account_id}/customers/{customer_id}",
+                    "type": "string"
+                },
+                "domain": {
+                    "description": "Required. Customer domain.",
+                    "type": "string"
+                },
+                "overwriteIfExists": {
+                    "description": "Required. Choose to overwrite an existing customer if found. This must be set to true if there is an existing customer with a conflicting region code or domain.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -2578,7 +2702,7 @@
                         "PROVISION_CLOUD_IDENTITY"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Long Running Operation was triggered by CreateEntitlement.",
                         "Long Running Operation was triggered by ChangeRenewalSettings.",
                         "Long Running Operation was triggered by StartPaidService.",
@@ -2918,7 +3042,7 @@
                     "type": "string"
                 },
                 "provisioningId": {
-                    "description": "Output only. Provisioning ID of the entitlement. For Google Workspace, this would be the underlying Subscription ID.",
+                    "description": "Output only. Provisioning ID of the entitlement. For Google Workspace, this is the underlying Subscription ID. For Google Cloud Platform, this is the Billing Account ID of the billing subaccount.\"",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -3044,16 +3168,16 @@
             "type": "object"
         },
         "GoogleCloudChannelV1SubscriberEvent": {
-            "description": "Represents information which resellers will get as part of notification from Cloud Pub/Sub.",
+            "description": "Represents information which resellers will get as part of notification from Pub/Sub.",
             "id": "GoogleCloudChannelV1SubscriberEvent",
             "properties": {
                 "customerEvent": {
                     "$ref": "GoogleCloudChannelV1CustomerEvent",
-                    "description": "Customer event send as part of Pub/Sub event to partners."
+                    "description": "Customer event sent as part of Pub/Sub event to partners."
                 },
                 "entitlementEvent": {
                     "$ref": "GoogleCloudChannelV1EntitlementEvent",
-                    "description": "Entitlement event send as part of Pub/Sub event to partners."
+                    "description": "Entitlement event sent as part of Pub/Sub event to partners."
                 }
             },
             "type": "object"
@@ -3086,7 +3210,7 @@
                         "SKU_SUSPENDED"
                     ],
                     "enumDescriptions": [
-                        "Reason is not available.",
+                        "Not used.",
                         "Reseller needs to accept TOS before transferring the SKU.",
                         "Reseller not eligible to sell the SKU.",
                         "SKU subscription is suspended"
@@ -3321,7 +3445,7 @@
                         "PRIMARY_DOMAIN_VERIFIED"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Primary domain for customer was changed.",
                         "Primary domain of the customer has been verified."
                     ],
@@ -3377,7 +3501,7 @@
                     "type": "string"
                 },
                 "parameters": {
-                    "description": "Extended entitlement parameters. When creating an entitlement, valid parameters' names and values are defined in the offer's parameter definitions.",
+                    "description": "Extended entitlement parameters. When creating an entitlement, valid parameter names and values are defined in the Offer.parameter_definitions. The response may include the following output-only Parameters: - assigned_units: The number of licenses assigned to users. - max_units: The maximum assignable units for a flexible offer. - num_units: The total commitment for commitment-based offers.",
                     "items": {
                         "$ref": "GoogleCloudChannelV1alpha1Parameter"
                     },
@@ -3399,7 +3523,7 @@
                         "SUSPENDED"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "The entitlement is currently active.",
                         "The entitlement was canceled. After an entitlement is `CANCELED`, its status will not change. Deprecated: Canceled entitlements will no longer be visible.",
                         "The entitlement reached end of term and was not renewed. After an entitlement is `COMPLETE`, its status will not change. Deprecated: This is represented as ProvisioningState=SUSPENDED and suspensionReason in (TRIAL_ENDED, RENEWAL_WITH_TYPE_CANCEL)",
@@ -3425,7 +3549,7 @@
                             "OTHER"
                         ],
                         "enumDescriptions": [
-                            "Default value. This state doesn't show unless an error occurs.",
+                            "Not used.",
                             "Entitlement was manually suspended by the Reseller.",
                             "Trial ended.",
                             "Entitlement renewal was canceled.",
@@ -3473,10 +3597,11 @@
                         "SKU_CHANGED",
                         "RENEWAL_SETTING_CHANGED",
                         "PAID_SERVICE_STARTED",
-                        "LICENSE_ASSIGNMENT_CHANGED"
+                        "LICENSE_ASSIGNMENT_CHANGED",
+                        "LICENSE_CAP_CHANGED"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "A new entitlement was created.",
                         "The offer type associated with an entitlement was changed. This is not triggered if an entitlement converts from a commit offer to a flexible offer as part of a renewal.",
                         "Annual commitment for a commit plan was changed.",
@@ -3487,7 +3612,8 @@
                         "Entitlement was upgraded or downgraded (e.g. from Google Workspace Business Standard to Google Workspace Business Plus).",
                         "The renewal settings of an entitlement has changed.",
                         "Paid service has started on trial entitlement.",
-                        "License was assigned to or revoked from a user."
+                        "License was assigned to or revoked from a user.",
+                        "License cap was changed for the entitlement."
                     ],
                     "type": "string"
                 }
@@ -3518,7 +3644,7 @@
                         "PROVISION_CLOUD_IDENTITY"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Long Running Operation was triggered by CreateEntitlement.",
                         "Long Running Operation was triggered by ChangeQuantity.",
                         "Long Running Operation was triggered by ChangeRenewalSettings.",
@@ -3597,7 +3723,7 @@
                     "type": "string"
                 },
                 "provisioningId": {
-                    "description": "Output only. Provisioning ID of the entitlement. For Google Workspace, this would be the underlying Subscription ID.",
+                    "description": "Output only. Provisioning ID of the entitlement. For Google Workspace, this is the underlying Subscription ID. For Google Cloud Platform, this is the Billing Account ID of the billing subaccount.\"",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -3633,7 +3759,7 @@
                         "MONTHLY"
                     ],
                     "enumDescriptions": [
-                        "Default value. This state doesn't show unless an error occurs.",
+                        "Not used.",
                         "Paid in yearly installments.",
                         "Paid in monthly installments."
                     ],
@@ -3667,16 +3793,16 @@
             "type": "object"
         },
         "GoogleCloudChannelV1alpha1SubscriberEvent": {
-            "description": "Represents information which resellers will get as part of notification from Cloud Pub/Sub.",
+            "description": "Represents information which resellers will get as part of notification from Pub/Sub.",
             "id": "GoogleCloudChannelV1alpha1SubscriberEvent",
             "properties": {
                 "customerEvent": {
                     "$ref": "GoogleCloudChannelV1alpha1CustomerEvent",
-                    "description": "Customer event send as part of Pub/Sub event to partners."
+                    "description": "Customer event sent as part of Pub/Sub event to partners."
                 },
                 "entitlementEvent": {
                     "$ref": "GoogleCloudChannelV1alpha1EntitlementEvent",
-                    "description": "Entitlement event send as part of Pub/Sub event to partners."
+                    "description": "Entitlement event sent as part of Pub/Sub event to partners."
                 }
             },
             "type": "object"
@@ -3896,7 +4022,7 @@
                     "type": "array"
                 },
                 "regionCode": {
-                    "description": "Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: \"CH\" for Switzerland.",
+                    "description": "Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: \"CH\" for Switzerland.",
                     "type": "string"
                 },
                 "revision": {

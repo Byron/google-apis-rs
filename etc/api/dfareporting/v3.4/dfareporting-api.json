@@ -21,6 +21,7 @@
     "description": "Build applications to efficiently manage large or complex trafficking, reporting, and attribution workflows for Campaign Manager 360.",
     "discoveryVersion": "v1",
     "documentationLink": "https://developers.google.com/doubleclick-advertisers/",
+    "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
         "x32": "http://www.google.com/images/icons/product/search-32.gif"
@@ -6839,9 +6840,11 @@
                                 "PLACEMENT_TAG_JAVASCRIPT_LEGACY",
                                 "PLACEMENT_TAG_INTERSTITIAL_IFRAME_JAVASCRIPT_LEGACY",
                                 "PLACEMENT_TAG_INTERSTITIAL_JAVASCRIPT_LEGACY",
-                                "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4"
+                                "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4",
+                                "PLACEMENT_TAG_TRACKING_THIRD_PARTY_MEASUREMENT"
                             ],
                             "enumDescriptions": [
+                                "",
                                 "",
                                 "",
                                 "",
@@ -9670,7 +9673,7 @@
             }
         }
     },
-    "revision": "20210210",
+    "revision": "20220104",
     "rootUrl": "https://dfareporting.googleapis.com/",
     "schemas": {
         "Account": {
@@ -11385,7 +11388,7 @@
                     "type": "boolean"
                 },
                 "customVariables": {
-                    "description": "Custom floodlight variables.",
+                    "description": "Custom floodlight variables. This field may only be used when calling batchinsert; it is not supported by batchupdate.",
                     "items": {
                         "$ref": "CustomFloodlightVariable"
                     },
@@ -12972,9 +12975,11 @@
                             "HTML5_FEATURE_UNSUPPORTED",
                             "CLICK_TAG_IN_GWD",
                             "CLICK_TAG_HARD_CODED",
-                            "SVG_INVALID"
+                            "SVG_INVALID",
+                            "CLICK_TAG_IN_RICH_MEDIA"
                         ],
                         "enumDescriptions": [
+                            "",
                             "",
                             "",
                             "",
@@ -13786,7 +13791,7 @@
             "type": "object"
         },
         "CustomFloodlightVariable": {
-            "description": "A custom floodlight variable.",
+            "description": "A custom floodlight variable. This field may only be used when calling batchinsert; it is not supported by batchupdate.",
             "id": "CustomFloodlightVariable",
             "properties": {
                 "kind": {
@@ -17337,9 +17342,11 @@
                             "PLACEMENT_TAG_JAVASCRIPT_LEGACY",
                             "PLACEMENT_TAG_INTERSTITIAL_IFRAME_JAVASCRIPT_LEGACY",
                             "PLACEMENT_TAG_INTERSTITIAL_JAVASCRIPT_LEGACY",
-                            "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4"
+                            "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4",
+                            "PLACEMENT_TAG_TRACKING_THIRD_PARTY_MEASUREMENT"
                         ],
                         "enumDescriptions": [
+                            "",
                             "",
                             "",
                             "",
@@ -19656,9 +19663,11 @@
                         "PLACEMENT_TAG_JAVASCRIPT_LEGACY",
                         "PLACEMENT_TAG_INTERSTITIAL_IFRAME_JAVASCRIPT_LEGACY",
                         "PLACEMENT_TAG_INTERSTITIAL_JAVASCRIPT_LEGACY",
-                        "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4"
+                        "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4",
+                        "PLACEMENT_TAG_TRACKING_THIRD_PARTY_MEASUREMENT"
                     ],
                     "enumDescriptions": [
+                        "",
                         "",
                         "",
                         "",
@@ -20474,9 +20483,11 @@
                         "ACCOUNT_BY_DEFAULT",
                         "SUBACCOUNT_AND_ACCOUNT_BY_DEFAULT",
                         "ACCOUNT_ALWAYS",
-                        "SUBACCOUNT_AND_ACCOUNT_ALWAYS"
+                        "SUBACCOUNT_AND_ACCOUNT_ALWAYS",
+                        "USER_PROFILE_ONLY"
                     ],
                     "enumDescriptions": [
+                        "",
                         "",
                         "",
                         "",

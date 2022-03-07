@@ -618,7 +618,7 @@
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Example format: properties/1234/userLinks/5678",
+                                    "description": "Output only. Example format: properties/1234/userLinks/5678",
                                     "location": "path",
                                     "pattern": "^accounts/[^/]+/userLinks/[^/]+$",
                                     "required": true,
@@ -642,6 +642,34 @@
         },
         "properties": {
             "methods": {
+                "acknowledgeUserDataCollection": {
+                    "description": "Acknowledges the terms of user data collection for the specified property. This acknowledgement must be completed (either in the Google Analytics UI or via this API) before MeasurementProtocolSecret resources may be created.",
+                    "flatPath": "v1alpha/properties/{propertiesId}:acknowledgeUserDataCollection",
+                    "httpMethod": "POST",
+                    "id": "analyticsadmin.properties.acknowledgeUserDataCollection",
+                    "parameterOrder": [
+                        "property"
+                    ],
+                    "parameters": {
+                        "property": {
+                            "description": "Required. The property for which to acknowledge user data collection.",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+property}:acknowledgeUserDataCollection",
+                    "request": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest"
+                    },
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionResponse"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit"
+                    ]
+                },
                 "create": {
                     "description": "Creates an \"GA4\" property with the specified location and attributes.",
                     "flatPath": "v1alpha/properties",
@@ -679,7 +707,7 @@
                     },
                     "path": "v1alpha/{+name}",
                     "response": {
-                        "$ref": "GoogleProtobufEmpty"
+                        "$ref": "GoogleAnalyticsAdminV1alphaProperty"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/analytics.edit"
@@ -711,6 +739,58 @@
                         "https://www.googleapis.com/auth/analytics.readonly"
                     ]
                 },
+                "getDataRetentionSettings": {
+                    "description": "Returns the singleton data retention settings for this property.",
+                    "flatPath": "v1alpha/properties/{propertiesId}/dataRetentionSettings",
+                    "httpMethod": "GET",
+                    "id": "analyticsadmin.properties.getDataRetentionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the settings to lookup. Format: properties/{property}/dataRetentionSettings Example: \"properties/1000/dataRetentionSettings\"",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+/dataRetentionSettings$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+name}",
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaDataRetentionSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit",
+                        "https://www.googleapis.com/auth/analytics.readonly"
+                    ]
+                },
+                "getGoogleSignalsSettings": {
+                    "description": "Lookup for Google Signals settings for a property.",
+                    "flatPath": "v1alpha/properties/{propertiesId}/googleSignalsSettings",
+                    "httpMethod": "GET",
+                    "id": "analyticsadmin.properties.getGoogleSignalsSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the google signals settings to retrieve. Format: properties/{property}/googleSignalsSettings",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+/googleSignalsSettings$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+name}",
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit",
+                        "https://www.googleapis.com/auth/analytics.readonly"
+                    ]
+                },
                 "list": {
                     "description": "Returns child Properties under the specified parent Account. Only \"GA4\" properties will be returned. Properties will be excluded if the caller does not have access. Soft-deleted (ie: \"trashed\") properties are excluded by default. Returns an empty list if no relevant properties are found.",
                     "flatPath": "v1alpha/properties",
@@ -719,7 +799,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "filter": {
-                            "description": "Required. An expression for filtering the results of the request. Fields eligible for filtering are: `parent:`(The resource name of the parent account) or `firebase_project:`(The id or number of the linked firebase project). Some examples of filters: ``` | Filter | Description | |-----------------------------|-------------------------------------------| | parent:accounts/123 | The account with account id: 123. | | firebase_project:project-id | The firebase project with id: project-id. | | firebase_project:123 | The firebase project with number: 123. | ```",
+                            "description": "Required. An expression for filtering the results of the request. Fields eligible for filtering are: `parent:`(The resource name of the parent account/property) or `ancestor:`(The resource name of the parent account) or `firebase_project:`(The id or number of the linked firebase project). Some examples of filters: ``` | Filter | Description | |-----------------------------|-------------------------------------------| | parent:accounts/123 | The account with account id: 123. | | parent:properties/123 | The property with property id: 123. | | ancestor:accounts/123 | The account with account id: 123. | | firebase_project:project-id | The firebase project with id: project-id. | | firebase_project:123 | The firebase project with number: 123. | ```",
                             "location": "query",
                             "type": "string"
                         },
@@ -782,52 +862,120 @@
                     "scopes": [
                         "https://www.googleapis.com/auth/analytics.edit"
                     ]
+                },
+                "updateDataRetentionSettings": {
+                    "description": "Updates the singleton data retention settings for this property.",
+                    "flatPath": "v1alpha/properties/{propertiesId}/dataRetentionSettings",
+                    "httpMethod": "PATCH",
+                    "id": "analyticsadmin.properties.updateDataRetentionSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Output only. Resource name for this DataRetentionSetting resource. Format: properties/{property}/dataRetentionSettings",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+/dataRetentionSettings$",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+name}",
+                    "request": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaDataRetentionSettings"
+                    },
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaDataRetentionSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit"
+                    ]
+                },
+                "updateGoogleSignalsSettings": {
+                    "description": "Updates Google Signals settings for a property.",
+                    "flatPath": "v1alpha/properties/{propertiesId}/googleSignalsSettings",
+                    "httpMethod": "PATCH",
+                    "id": "analyticsadmin.properties.updateGoogleSignalsSettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Output only. Resource name of this setting. Format: properties/{property_id}/googleSignalsSettings Example: \"properties/1000/googleSignalsSettings\"",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+/googleSignalsSettings$",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+name}",
+                    "request": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings"
+                    },
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit"
+                    ]
                 }
             },
             "resources": {
-                "androidAppDataStreams": {
+                "conversionEvents": {
                     "methods": {
                         "create": {
-                            "description": "Creates an Android app stream with the specified location and attributes. Note that an Android app stream must be linked to a Firebase app to receive traffic. To create a working app stream, make sure your property is linked to a Firebase project. Then, use the Firebase API to create a Firebase app, which will also create an appropriate data stream in Analytics (may take up to 24 hours).",
-                            "flatPath": "v1alpha/properties/{propertiesId}/androidAppDataStreams",
+                            "description": "Creates a conversion event with the specified attributes.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents",
                             "httpMethod": "POST",
-                            "id": "analyticsadmin.properties.androidAppDataStreams.create",
+                            "id": "analyticsadmin.properties.conversionEvents.create",
                             "parameterOrder": [
                                 "parent"
                             ],
                             "parameters": {
                                 "parent": {
-                                    "description": "Required. The parent resource where this android app data stream will be created. Format: properties/123",
+                                    "description": "Required. The resource name of the parent property where this conversion event will be created. Format: properties/123",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+$",
                                     "required": true,
                                     "type": "string"
                                 }
                             },
-                            "path": "v1alpha/{+parent}/androidAppDataStreams",
+                            "path": "v1alpha/{+parent}/conversionEvents",
                             "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream"
+                                "$ref": "GoogleAnalyticsAdminV1alphaConversionEvent"
                             },
                             "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream"
+                                "$ref": "GoogleAnalyticsAdminV1alphaConversionEvent"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit"
                             ]
                         },
                         "delete": {
-                            "description": "Deletes an android app stream on a property.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/androidAppDataStreams/{androidAppDataStreamsId}",
+                            "description": "Deletes a conversion event in a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents/{conversionEventsId}",
                             "httpMethod": "DELETE",
-                            "id": "analyticsadmin.properties.androidAppDataStreams.delete",
+                            "id": "analyticsadmin.properties.conversionEvents.delete",
                             "parameterOrder": [
                                 "name"
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Required. The name of the android app data stream to delete. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: \"properties/123/androidAppDataStreams/456\"",
+                                    "description": "Required. The resource name of the conversion event to delete. Format: properties/{property}/conversionEvents/{conversion_event} Example: \"properties/123/conversionEvents/456\"",
                                     "location": "path",
-                                    "pattern": "^properties/[^/]+/androidAppDataStreams/[^/]+$",
+                                    "pattern": "^properties/[^/]+/conversionEvents/[^/]+$",
                                     "required": true,
                                     "type": "string"
                                 }
@@ -841,25 +989,25 @@
                             ]
                         },
                         "get": {
-                            "description": "Lookup for a single AndroidAppDataStream",
-                            "flatPath": "v1alpha/properties/{propertiesId}/androidAppDataStreams/{androidAppDataStreamsId}",
+                            "description": "Retrieve a single conversion event.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents/{conversionEventsId}",
                             "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.androidAppDataStreams.get",
+                            "id": "analyticsadmin.properties.conversionEvents.get",
                             "parameterOrder": [
                                 "name"
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Required. The name of the android app data stream to lookup. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: \"properties/123/androidAppDataStreams/456\"",
+                                    "description": "Required. The resource name of the conversion event to retrieve. Format: properties/{property}/conversionEvents/{conversion_event} Example: \"properties/123/conversionEvents/456\"",
                                     "location": "path",
-                                    "pattern": "^properties/[^/]+/androidAppDataStreams/[^/]+$",
+                                    "pattern": "^properties/[^/]+/conversionEvents/[^/]+$",
                                     "required": true,
                                     "type": "string"
                                 }
                             },
                             "path": "v1alpha/{+name}",
                             "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream"
+                                "$ref": "GoogleAnalyticsAdminV1alphaConversionEvent"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit",
@@ -867,10 +1015,10 @@
                             ]
                         },
                         "list": {
-                            "description": "Returns child android app streams under the specified parent property. Android app streams will be excluded if the caller does not have access. Returns an empty list if no relevant android app streams are found.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/androidAppDataStreams",
+                            "description": "Returns a list of conversion events in the specified parent property. Returns an empty list if no conversion events are found.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents",
                             "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.androidAppDataStreams.list",
+                            "id": "analyticsadmin.properties.conversionEvents.list",
                             "parameterOrder": [
                                 "parent"
                             ],
@@ -882,21 +1030,144 @@
                                     "type": "integer"
                                 },
                                 "pageToken": {
-                                    "description": "A page token, received from a previous call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAndroidAppDataStreams` must match the call that provided the page token.",
+                                    "description": "A page token, received from a previous `ListConversionEvents` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListConversionEvents` must match the call that provided the page token.",
                                     "location": "query",
                                     "type": "string"
                                 },
                                 "parent": {
-                                    "description": "Required. The name of the parent property. For example, to limit results to app streams under the property with Id 123: \"properties/123\"",
+                                    "description": "Required. The resource name of the parent property. Example: 'properties/123'",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+$",
                                     "required": true,
                                     "type": "string"
                                 }
                             },
-                            "path": "v1alpha/{+parent}/androidAppDataStreams",
+                            "path": "v1alpha/{+parent}/conversionEvents",
                             "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaListAndroidAppDataStreamsResponse"
+                                "$ref": "GoogleAnalyticsAdminV1alphaListConversionEventsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        }
+                    }
+                },
+                "customDimensions": {
+                    "methods": {
+                        "archive": {
+                            "description": "Archives a CustomDimension on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customDimensions/{customDimensionsId}:archive",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.customDimensions.archive",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the CustomDimension to archive. Example format: properties/1234/customDimensions/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/customDimensions/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}:archive",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "create": {
+                            "description": "Creates a CustomDimension.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customDimensions",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.customDimensions.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/customDimensions",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "get": {
+                            "description": "Lookup for a single CustomDimension.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customDimensions/{customDimensionsId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.customDimensions.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the CustomDimension to get. Example format: properties/1234/customDimensions/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/customDimensions/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "Lists CustomDimensions on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customDimensions",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.customDimensions.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A page token, received from a previous `ListCustomDimensions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCustomDimensions` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/customDimensions",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListCustomDimensionsResponse"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit",
@@ -904,23 +1175,23 @@
                             ]
                         },
                         "patch": {
-                            "description": "Updates an android app stream on a property.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/androidAppDataStreams/{androidAppDataStreamsId}",
+                            "description": "Updates a CustomDimension on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customDimensions/{customDimensionsId}",
                             "httpMethod": "PATCH",
-                            "id": "analyticsadmin.properties.androidAppDataStreams.patch",
+                            "id": "analyticsadmin.properties.customDimensions.patch",
                             "parameterOrder": [
                                 "name"
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: \"properties/1000/androidAppDataStreams/2000\"",
+                                    "description": "Output only. Resource name for this CustomDimension resource. Format: properties/{property}/customDimensions/{customDimension}",
                                     "location": "path",
-                                    "pattern": "^properties/[^/]+/androidAppDataStreams/[^/]+$",
+                                    "pattern": "^properties/[^/]+/customDimensions/[^/]+$",
                                     "required": true,
                                     "type": "string"
                                 },
                                 "updateMask": {
-                                    "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "description": "Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
                                     "format": "google-fieldmask",
                                     "location": "query",
                                     "type": "string"
@@ -928,10 +1199,833 @@
                             },
                             "path": "v1alpha/{+name}",
                             "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream"
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension"
                             },
                             "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream"
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        }
+                    }
+                },
+                "customMetrics": {
+                    "methods": {
+                        "archive": {
+                            "description": "Archives a CustomMetric on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customMetrics/{customMetricsId}:archive",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.customMetrics.archive",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the CustomMetric to archive. Example format: properties/1234/customMetrics/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/customMetrics/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}:archive",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "create": {
+                            "description": "Creates a CustomMetric.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customMetrics",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.customMetrics.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/customMetrics",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "get": {
+                            "description": "Lookup for a single CustomMetric.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customMetrics/{customMetricsId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.customMetrics.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the CustomMetric to get. Example format: properties/1234/customMetrics/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/customMetrics/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "Lists CustomMetrics on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customMetrics",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.customMetrics.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A page token, received from a previous `ListCustomMetrics` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCustomMetrics` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/customMetrics",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListCustomMetricsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a CustomMetric on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/customMetrics/{customMetricsId}",
+                            "httpMethod": "PATCH",
+                            "id": "analyticsadmin.properties.customMetrics.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Output only. Resource name for this CustomMetric resource. Format: properties/{property}/customMetrics/{customMetric}",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/customMetrics/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        }
+                    }
+                },
+                "dataStreams": {
+                    "methods": {
+                        "create": {
+                            "description": "Creates a DataStream.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/dataStreams",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.dataStreams.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/dataStreams",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDataStream"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDataStream"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "delete": {
+                            "description": "Deletes a DataStream on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}",
+                            "httpMethod": "DELETE",
+                            "id": "analyticsadmin.properties.dataStreams.delete",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DataStream to delete. Example format: properties/1234/dataStreams/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "get": {
+                            "description": "Lookup for a single DataStream.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.dataStreams.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DataStream to get. Example format: properties/1234/dataStreams/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDataStream"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "getGlobalSiteTag": {
+                            "description": "Returns the Site Tag for the specified web stream. Site Tags are immutable singletons.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/globalSiteTag",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.dataStreams.getGlobalSiteTag",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the site tag to lookup. Note that site tags are singletons and do not have unique IDs. Format: properties/{property_id}/dataStreams/{stream_id}/globalSiteTag Example: \"properties/123/dataStreams/456/globalSiteTag\"",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/dataStreams/[^/]+/globalSiteTag$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaGlobalSiteTag"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "Lists DataStreams on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/dataStreams",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.dataStreams.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A page token, received from a previous `ListDataStreams` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDataStreams` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/dataStreams",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListDataStreamsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a DataStream on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}",
+                            "httpMethod": "PATCH",
+                            "id": "analyticsadmin.properties.dataStreams.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/dataStreams/{stream_id} Example: \"properties/1000/dataStreams/2000\"",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDataStream"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDataStream"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        }
+                    },
+                    "resources": {
+                        "measurementProtocolSecrets": {
+                            "methods": {
+                                "create": {
+                                    "description": "Creates a measurement protocol secret.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/measurementProtocolSecrets",
+                                    "httpMethod": "POST",
+                                    "id": "analyticsadmin.properties.dataStreams.measurementProtocolSecrets.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "parent": {
+                                            "description": "Required. The parent resource where this secret will be created. Format: properties/{property}/dataStreams/{dataStream}",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+parent}/measurementProtocolSecrets",
+                                    "request": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes target MeasurementProtocolSecret.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/measurementProtocolSecrets/{measurementProtocolSecretsId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "analyticsadmin.properties.dataStreams.measurementProtocolSecrets.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the MeasurementProtocolSecret to delete. Format: properties/{property}/dataStreams/{dataStream}/measurementProtocolSecrets/{measurementProtocolSecret}",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+/measurementProtocolSecrets/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+name}",
+                                    "response": {
+                                        "$ref": "GoogleProtobufEmpty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Lookup for a single \"GA4\" MeasurementProtocolSecret.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/measurementProtocolSecrets/{measurementProtocolSecretsId}",
+                                    "httpMethod": "GET",
+                                    "id": "analyticsadmin.properties.dataStreams.measurementProtocolSecrets.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the measurement protocol secret to lookup. Format: properties/{property}/dataStreams/{dataStream}/measurementProtocolSecrets/{measurementProtocolSecret}",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+/measurementProtocolSecrets/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+name}",
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit",
+                                        "https://www.googleapis.com/auth/analytics.readonly"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Returns child MeasurementProtocolSecrets under the specified parent Property.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/measurementProtocolSecrets",
+                                    "httpMethod": "GET",
+                                    "id": "analyticsadmin.properties.dataStreams.measurementProtocolSecrets.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "pageSize": {
+                                            "description": "The maximum number of resources to return. If unspecified, at most 10 resources will be returned. The maximum value is 10. Higher values will be coerced to the maximum.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "A page token, received from a previous `ListMeasurementProtocolSecrets` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListMeasurementProtocolSecrets` must match the call that provided the page token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The resource name of the parent stream. Format: properties/{property}/dataStreams/{dataStream}/measurementProtocolSecrets",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+parent}/measurementProtocolSecrets",
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaListMeasurementProtocolSecretsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit",
+                                        "https://www.googleapis.com/auth/analytics.readonly"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a measurement protocol secret.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/measurementProtocolSecrets/{measurementProtocolSecretsId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "analyticsadmin.properties.dataStreams.measurementProtocolSecrets.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. Resource name of this secret. This secret may be a child of any type of stream. Format: properties/{property}/webDataStreams/{webDataStream}/measurementProtocolSecrets/{measurementProtocolSecret}",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+/measurementProtocolSecrets/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "The list of fields to be updated. Omitted fields will not be updated.",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+name}",
+                                    "request": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "displayVideo360AdvertiserLinkProposals": {
+                    "methods": {
+                        "approve": {
+                            "description": "Approves a DisplayVideo360AdvertiserLinkProposal. The DisplayVideo360AdvertiserLinkProposal will be deleted and a new DisplayVideo360AdvertiserLink will be created.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinkProposals/{displayVideo360AdvertiserLinkProposalsId}:approve",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinkProposals.approve",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DisplayVideo360AdvertiserLinkProposal to approve. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinkProposals/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}:approve",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "cancel": {
+                            "description": "Cancels a DisplayVideo360AdvertiserLinkProposal. Cancelling can mean either: - Declining a proposal initiated from Display & Video 360 - Withdrawing a proposal initiated from Google Analytics After being cancelled, a proposal will eventually be deleted automatically.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinkProposals/{displayVideo360AdvertiserLinkProposalsId}:cancel",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinkProposals.cancel",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DisplayVideo360AdvertiserLinkProposal to cancel. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinkProposals/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}:cancel",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "create": {
+                            "description": "Creates a DisplayVideo360AdvertiserLinkProposal.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinkProposals",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinkProposals.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/displayVideo360AdvertiserLinkProposals",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "delete": {
+                            "description": "Deletes a DisplayVideo360AdvertiserLinkProposal on a property. This can only be used on cancelled proposals.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinkProposals/{displayVideo360AdvertiserLinkProposalsId}",
+                            "httpMethod": "DELETE",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinkProposals.delete",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DisplayVideo360AdvertiserLinkProposal to delete. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinkProposals/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "get": {
+                            "description": "Lookup for a single DisplayVideo360AdvertiserLinkProposal.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinkProposals/{displayVideo360AdvertiserLinkProposalsId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinkProposals.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DisplayVideo360AdvertiserLinkProposal to get. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinkProposals/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "Lists DisplayVideo360AdvertiserLinkProposals on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinkProposals",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinkProposals.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A page token, received from a previous `ListDisplayVideo360AdvertiserLinkProposals` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDisplayVideo360AdvertiserLinkProposals` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/displayVideo360AdvertiserLinkProposals",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListDisplayVideo360AdvertiserLinkProposalsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        }
+                    }
+                },
+                "displayVideo360AdvertiserLinks": {
+                    "methods": {
+                        "create": {
+                            "description": "Creates a DisplayVideo360AdvertiserLink. This can only be utilized by users who have proper authorization both on the Google Analytics property and on the Display & Video 360 advertiser. Users who do not have access to the Display & Video 360 advertiser should instead seek to create a DisplayVideo360LinkProposal.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinks",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinks.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/displayVideo360AdvertiserLinks",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "delete": {
+                            "description": "Deletes a DisplayVideo360AdvertiserLink on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinks/{displayVideo360AdvertiserLinksId}",
+                            "httpMethod": "DELETE",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinks.delete",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DisplayVideo360AdvertiserLink to delete. Example format: properties/1234/displayVideo360AdvertiserLinks/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinks/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "get": {
+                            "description": "Look up a single DisplayVideo360AdvertiserLink",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinks/{displayVideo360AdvertiserLinksId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinks.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the DisplayVideo360AdvertiserLink to get. Example format: properties/1234/displayVideo360AdvertiserLink/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinks/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "Lists all DisplayVideo360AdvertiserLinks on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinks",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinks.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A page token, received from a previous `ListDisplayVideo360AdvertiserLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDisplayVideo360AdvertiserLinks` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/displayVideo360AdvertiserLinks",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListDisplayVideo360AdvertiserLinksResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a DisplayVideo360AdvertiserLink on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/displayVideo360AdvertiserLinks/{displayVideo360AdvertiserLinksId}",
+                            "httpMethod": "PATCH",
+                            "id": "analyticsadmin.properties.displayVideo360AdvertiserLinks.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Output only. The resource name for this DisplayVideo360AdvertiserLink resource. Format: properties/{propertyId}/displayVideo360AdvertiserLinks/{linkId} Note: linkId is not the Display & Video 360 Advertiser ID",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/displayVideo360AdvertiserLinks/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit"
@@ -1029,40 +2123,6 @@
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit",
                                 "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "patch": {
-                            "description": "Updates a FirebaseLink on a property",
-                            "flatPath": "v1alpha/properties/{propertiesId}/firebaseLinks/{firebaseLinksId}",
-                            "httpMethod": "PATCH",
-                            "id": "analyticsadmin.properties.firebaseLinks.patch",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Output only. Example format: properties/1234/firebaseLinks/5678",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/firebaseLinks/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                },
-                                "updateMask": {
-                                    "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
-                                    "format": "google-fieldmask",
-                                    "location": "query",
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaFirebaseLink"
-                            },
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaFirebaseLink"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
                             ]
                         }
                     }
@@ -1188,160 +2248,6 @@
                             },
                             "response": {
                                 "$ref": "GoogleAnalyticsAdminV1alphaGoogleAdsLink"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        }
-                    }
-                },
-                "iosAppDataStreams": {
-                    "methods": {
-                        "create": {
-                            "description": "Creates an iOS app stream with the specified location and attributes. Note that an iOS app stream must be linked to a Firebase app to receive traffic. To create a working app stream, make sure your property is linked to a Firebase project. Then, use the Firebase API to create a Firebase app, which will also create an appropriate data stream in Analytics (may take up to 24 hours).",
-                            "flatPath": "v1alpha/properties/{propertiesId}/iosAppDataStreams",
-                            "httpMethod": "POST",
-                            "id": "analyticsadmin.properties.iosAppDataStreams.create",
-                            "parameterOrder": [
-                                "parent"
-                            ],
-                            "parameters": {
-                                "parent": {
-                                    "description": "Required. The parent resource where this ios app data stream will be created. Format: properties/123",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+parent}/iosAppDataStreams",
-                            "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream"
-                            },
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        },
-                        "delete": {
-                            "description": "Deletes an iOS app stream on a property.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/iosAppDataStreams/{iosAppDataStreamsId}",
-                            "httpMethod": "DELETE",
-                            "id": "analyticsadmin.properties.iosAppDataStreams.delete",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the iOS app data stream to delete. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: \"properties/123/iosAppDataStreams/456\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/iosAppDataStreams/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "response": {
-                                "$ref": "GoogleProtobufEmpty"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        },
-                        "get": {
-                            "description": "Lookup for a single IosAppDataStream",
-                            "flatPath": "v1alpha/properties/{propertiesId}/iosAppDataStreams/{iosAppDataStreamsId}",
-                            "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.iosAppDataStreams.get",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the iOS app data stream to lookup. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: \"properties/123/iosAppDataStreams/456\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/iosAppDataStreams/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit",
-                                "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "list": {
-                            "description": "Returns child iOS app data streams under the specified parent property. iOS app data streams will be excluded if the caller does not have access. Returns an empty list if no relevant iOS app data streams are found.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/iosAppDataStreams",
-                            "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.iosAppDataStreams.list",
-                            "parameterOrder": [
-                                "parent"
-                            ],
-                            "parameters": {
-                                "pageSize": {
-                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)",
-                                    "format": "int32",
-                                    "location": "query",
-                                    "type": "integer"
-                                },
-                                "pageToken": {
-                                    "description": "A page token, received from a previous `ListIosAppDataStreams` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListIosAppDataStreams` must match the call that provided the page token.",
-                                    "location": "query",
-                                    "type": "string"
-                                },
-                                "parent": {
-                                    "description": "Required. The name of the parent property. For example, to list results of app streams under the property with Id 123: \"properties/123\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+parent}/iosAppDataStreams",
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaListIosAppDataStreamsResponse"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit",
-                                "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "patch": {
-                            "description": "Updates an iOS app stream on a property.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/iosAppDataStreams/{iosAppDataStreamsId}",
-                            "httpMethod": "PATCH",
-                            "id": "analyticsadmin.properties.iosAppDataStreams.patch",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: \"properties/1000/iosAppDataStreams/2000\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/iosAppDataStreams/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                },
-                                "updateMask": {
-                                    "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
-                                    "format": "google-fieldmask",
-                                    "location": "query",
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream"
-                            },
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit"
@@ -1627,7 +2533,7 @@
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Example format: properties/1234/userLinks/5678",
+                                    "description": "Output only. Example format: properties/1234/userLinks/5678",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+/userLinks/[^/]+$",
                                     "required": true,
@@ -1646,251 +2552,11 @@
                             ]
                         }
                     }
-                },
-                "webDataStreams": {
-                    "methods": {
-                        "create": {
-                            "description": "Creates a web stream with the specified location and attributes.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams",
-                            "httpMethod": "POST",
-                            "id": "analyticsadmin.properties.webDataStreams.create",
-                            "parameterOrder": [
-                                "parent"
-                            ],
-                            "parameters": {
-                                "parent": {
-                                    "description": "Required. The parent resource where this web data stream will be created. Format: properties/123",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+parent}/webDataStreams",
-                            "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream"
-                            },
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        },
-                        "delete": {
-                            "description": "Deletes a web stream on a property.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams/{webDataStreamsId}",
-                            "httpMethod": "DELETE",
-                            "id": "analyticsadmin.properties.webDataStreams.delete",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the web data stream to delete. Format: properties/{property_id}/webDataStreams/{stream_id} Example: \"properties/123/webDataStreams/456\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/webDataStreams/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "response": {
-                                "$ref": "GoogleProtobufEmpty"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        },
-                        "get": {
-                            "description": "Lookup for a single WebDataStream",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams/{webDataStreamsId}",
-                            "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.webDataStreams.get",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the web data stream to lookup. Format: properties/{property_id}/webDataStreams/{stream_id} Example: \"properties/123/webDataStreams/456\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/webDataStreams/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit",
-                                "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "getEnhancedMeasurementSettings": {
-                            "description": "Returns the singleton enhanced measurement settings for this web stream. Note that the stream must enable enhanced measurement for these settings to take effect.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams/{webDataStreamsId}/enhancedMeasurementSettings",
-                            "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.webDataStreams.getEnhancedMeasurementSettings",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the settings to lookup. Format: properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings Example: \"properties/1000/webDataStreams/2000/enhancedMeasurementSettings\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/webDataStreams/[^/]+/enhancedMeasurementSettings$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit",
-                                "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "getGlobalSiteTag": {
-                            "description": "Returns the Site Tag for the specified web stream. Site Tags are immutable singletons.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams/{webDataStreamsId}/globalSiteTag",
-                            "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.webDataStreams.getGlobalSiteTag",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the site tag to lookup. Note that site tags are singletons and do not have unique IDs. Format: properties/{property_id}/webDataStreams/{stream_id}/globalSiteTag Example: \"properties/123/webDataStreams/456/globalSiteTag\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/webDataStreams/[^/]+/globalSiteTag$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaGlobalSiteTag"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit",
-                                "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "list": {
-                            "description": "Returns child web data streams under the specified parent property. Web data streams will be excluded if the caller does not have access. Returns an empty list if no relevant web data streams are found.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams",
-                            "httpMethod": "GET",
-                            "id": "analyticsadmin.properties.webDataStreams.list",
-                            "parameterOrder": [
-                                "parent"
-                            ],
-                            "parameters": {
-                                "pageSize": {
-                                    "description": "The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)",
-                                    "format": "int32",
-                                    "location": "query",
-                                    "type": "integer"
-                                },
-                                "pageToken": {
-                                    "description": "A page token, received from a previous `ListWebDataStreams` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListWebDataStreams` must match the call that provided the page token.",
-                                    "location": "query",
-                                    "type": "string"
-                                },
-                                "parent": {
-                                    "description": "Required. The name of the parent property. For example, to list results of web streams under the property with Id 123: \"properties/123\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+parent}/webDataStreams",
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaListWebDataStreamsResponse"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit",
-                                "https://www.googleapis.com/auth/analytics.readonly"
-                            ]
-                        },
-                        "patch": {
-                            "description": "Updates a web stream on a property.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams/{webDataStreamsId}",
-                            "httpMethod": "PATCH",
-                            "id": "analyticsadmin.properties.webDataStreams.patch",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/webDataStreams/{stream_id} Example: \"properties/1000/webDataStreams/2000\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/webDataStreams/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                },
-                                "updateMask": {
-                                    "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
-                                    "format": "google-fieldmask",
-                                    "location": "query",
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream"
-                            },
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        },
-                        "updateEnhancedMeasurementSettings": {
-                            "description": "Updates the singleton enhanced measurement settings for this web stream. Note that the stream must enable enhanced measurement for these settings to take effect.",
-                            "flatPath": "v1alpha/properties/{propertiesId}/webDataStreams/{webDataStreamsId}/enhancedMeasurementSettings",
-                            "httpMethod": "PATCH",
-                            "id": "analyticsadmin.properties.webDataStreams.updateEnhancedMeasurementSettings",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings Example: \"properties/1000/webDataStreams/2000/enhancedMeasurementSettings\"",
-                                    "location": "path",
-                                    "pattern": "^properties/[^/]+/webDataStreams/[^/]+/enhancedMeasurementSettings$",
-                                    "required": true,
-                                    "type": "string"
-                                },
-                                "updateMask": {
-                                    "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
-                                    "format": "google-fieldmask",
-                                    "location": "query",
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1alpha/{+name}",
-                            "request": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings"
-                            },
-                            "response": {
-                                "$ref": "GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/analytics.edit"
-                            ]
-                        }
-                    }
                 }
             }
         }
     },
-    "revision": "20210331",
+    "revision": "20220307",
     "rootUrl": "https://analyticsadmin.googleapis.com/",
     "schemas": {
         "GoogleAnalyticsAdminV1alphaAccount": {
@@ -1956,41 +2622,50 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaAndroidAppDataStream": {
-            "description": "A resource message representing a Google Analytics Android app stream.",
-            "id": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream",
+        "GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest": {
+            "description": "Request message for AcknowledgeUserDataCollection RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest",
             "properties": {
-                "createTime": {
-                    "description": "Output only. Time when this stream was originally created.",
-                    "format": "google-datetime",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "displayName": {
-                    "description": "Human-readable display name for the Data Stream. The max allowed display name length is 255 UTF-16 code units.",
-                    "type": "string"
-                },
-                "firebaseAppId": {
-                    "description": "Output only. ID of the corresponding Android app in Firebase, if any. This ID can change if the Android app is deleted and recreated.",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "name": {
-                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: \"properties/1000/androidAppDataStreams/2000\"",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "packageName": {
-                    "description": "Immutable. The package name for the app being measured. Example: \"com.example.myandroidapp\"",
-                    "type": "string"
-                },
-                "updateTime": {
-                    "description": "Output only. Time when stream payload fields were last updated.",
-                    "format": "google-datetime",
-                    "readOnly": true,
+                "acknowledgement": {
+                    "description": "Required. An acknowledgement that the caller of this method understands the terms of user data collection. This field must contain the exact value: \"I acknowledge that I have the necessary privacy disclosures and rights from my end users for the collection and processing of their data, including the association of such data with the visitation information Google Analytics collects from my site and/or app property.\"",
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionResponse": {
+            "description": "Response message for AcknowledgeUserDataCollection RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionResponse",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest": {
+            "description": "Request message for ApproveDisplayVideo360AdvertiserLinkProposal RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalResponse": {
+            "description": "Response message for ApproveDisplayVideo360AdvertiserLinkProposal RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalResponse",
+            "properties": {
+                "displayVideo360AdvertiserLink": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink",
+                    "description": "The DisplayVideo360AdvertiserLink created as a result of approving the proposal."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest": {
+            "description": "Request message for ArchiveCustomDimension RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest": {
+            "description": "Request message for ArchiveCustomMetric RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest",
+            "properties": {},
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaAuditUserLink": {
@@ -1998,14 +2673,14 @@
             "id": "GoogleAnalyticsAdminV1alphaAuditUserLink",
             "properties": {
                 "directRoles": {
-                    "description": "Roles directly assigned to this user for this entity. Format: predefinedRoles/read Excludes roles that are inherited from an account (if this is for a property), group, or organization admin role.",
+                    "description": "Roles directly assigned to this user for this entity. Format: predefinedRoles/viewer Excludes roles that are inherited from an account (if this is for a property), group, or organization admin role.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "effectiveRoles": {
-                    "description": "Union of all permissions a user has at this account or property (includes direct permissions, group-inherited permissions, etc.). Format: predefinedRoles/read",
+                    "description": "Union of all permissions a user has at this account or property (includes direct permissions, group-inherited permissions, etc.). Format: predefinedRoles/viewer",
                     "items": {
                         "type": "string"
                     },
@@ -2144,6 +2819,12 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest": {
+            "description": "Request message for CancelDisplayVideo360AdvertiserLinkProposal RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest",
+            "properties": {},
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaChangeHistoryChange": {
             "description": "A description of a change to a single Google Analytics resource.",
             "id": "GoogleAnalyticsAdminV1alphaChangeHistoryChange",
@@ -2187,9 +2868,33 @@
                     "$ref": "GoogleAnalyticsAdminV1alphaAccount",
                     "description": "A snapshot of an Account resource in change history."
                 },
-                "androidAppDataStream": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream",
-                    "description": "A snapshot of an AndroidAppDataStream resource in change history."
+                "conversionEvent": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaConversionEvent",
+                    "description": "A snapshot of a ConversionEvent resource in change history."
+                },
+                "customDimension": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension",
+                    "description": "A snapshot of a CustomDimension resource in change history."
+                },
+                "customMetric": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric",
+                    "description": "A snapshot of a CustomMetric resource in change history."
+                },
+                "dataRetentionSettings": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDataRetentionSettings",
+                    "description": "A snapshot of a data retention settings resource in change history."
+                },
+                "dataStream": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDataStream",
+                    "description": "A snapshot of a DataStream resource in change history."
+                },
+                "displayVideo360AdvertiserLink": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink",
+                    "description": "A snapshot of a DisplayVideo360AdvertiserLink resource in change history."
+                },
+                "displayVideo360AdvertiserLinkProposal": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal",
+                    "description": "A snapshot of a DisplayVideo360AdvertiserLinkProposal resource in change history."
                 },
                 "firebaseLink": {
                     "$ref": "GoogleAnalyticsAdminV1alphaFirebaseLink",
@@ -2199,17 +2904,17 @@
                     "$ref": "GoogleAnalyticsAdminV1alphaGoogleAdsLink",
                     "description": "A snapshot of a GoogleAdsLink resource in change history."
                 },
-                "iosAppDataStream": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream",
-                    "description": "A snapshot of an IosAppDataStream resource in change history."
+                "googleSignalsSettings": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings",
+                    "description": "A snapshot of a GoogleSignalsSettings resource in change history."
+                },
+                "measurementProtocolSecret": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret",
+                    "description": "A snapshot of a MeasurementProtocolSecret resource in change history."
                 },
                 "property": {
                     "$ref": "GoogleAnalyticsAdminV1alphaProperty",
                     "description": "A snapshot of a Property resource in change history."
-                },
-                "webDataStream": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream",
-                    "description": "A snapshot of a WebDataStream resource in change history."
                 }
             },
             "type": "object"
@@ -2261,6 +2966,38 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaConversionEvent": {
+            "description": "A conversion event in a Google Analytics property.",
+            "id": "GoogleAnalyticsAdminV1alphaConversionEvent",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. Time when this conversion event was created in the property.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "custom": {
+                    "description": "Output only. If set to true, this conversion event refers to a custom event. If set to false, this conversion event refers to a default event in GA. Default events typically have special meaning in GA. Default events are usually created for you by the GA system, but in some cases can be created by property admins. Custom events count towards the maximum number of custom conversion events that may be created per property.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "deletable": {
+                    "description": "Output only. If set, this event can currently be deleted via DeleteConversionEvent.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "eventName": {
+                    "description": "Immutable. The event name for this conversion event. Examples: 'click', 'purchase'",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. Resource name of this conversion event. Format: properties/{property}/conversionEvents/{conversion_event}",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaCreateUserLinkRequest": {
             "description": "Request message for CreateUserLink RPC. Users can have multiple email addresses associated with their Google account, and one of these email addresses is the \"primary\" email address. Any of the email addresses associated with a Google account may be used for a new UserLink, but the returned UserLink will always contain the \"primary\" email address. As a result, the input and output email address for this request may differ.",
             "id": "GoogleAnalyticsAdminV1alphaCreateUserLinkRequest",
@@ -2276,6 +3013,167 @@
                 "userLink": {
                     "$ref": "GoogleAnalyticsAdminV1alphaUserLink",
                     "description": "Required. The user link to create."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaCustomDimension": {
+            "description": "A definition for a CustomDimension.",
+            "id": "GoogleAnalyticsAdminV1alphaCustomDimension",
+            "properties": {
+                "description": {
+                    "description": "Optional. Description for this custom dimension. Max length of 150 characters.",
+                    "type": "string"
+                },
+                "disallowAdsPersonalization": {
+                    "description": "Optional. If set to true, sets this dimension as NPA and excludes it from ads personalization. This is currently only supported by user-scoped custom dimensions.",
+                    "type": "boolean"
+                },
+                "displayName": {
+                    "description": "Required. Display name for this custom dimension as shown in the Analytics UI. Max length of 82 characters, alphanumeric plus space and underscore starting with a letter. Legacy system-generated display names may contain square brackets, but updates to this field will never permit square brackets.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. Resource name for this CustomDimension resource. Format: properties/{property}/customDimensions/{customDimension}",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "parameterName": {
+                    "description": "Required. Immutable. Tagging parameter name for this custom dimension. If this is a user-scoped dimension, then this is the user property name. If this is an event-scoped dimension, then this is the event parameter name. May only contain alphanumeric and underscore characters, starting with a letter. Max length of 24 characters for user-scoped dimensions, 40 characters for event-scoped dimensions.",
+                    "type": "string"
+                },
+                "scope": {
+                    "description": "Required. Immutable. The scope of this dimension.",
+                    "enum": [
+                        "DIMENSION_SCOPE_UNSPECIFIED",
+                        "EVENT",
+                        "USER"
+                    ],
+                    "enumDescriptions": [
+                        "Scope unknown or not specified.",
+                        "Dimension scoped to an event.",
+                        "Dimension scoped to a user."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaCustomMetric": {
+            "description": "A definition for a custom metric.",
+            "id": "GoogleAnalyticsAdminV1alphaCustomMetric",
+            "properties": {
+                "description": {
+                    "description": "Optional. Description for this custom dimension. Max length of 150 characters.",
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "Required. Display name for this custom metric as shown in the Analytics UI. Max length of 82 characters, alphanumeric plus space and underscore starting with a letter. Legacy system-generated display names may contain square brackets, but updates to this field will never permit square brackets.",
+                    "type": "string"
+                },
+                "measurementUnit": {
+                    "description": "Required. The type for the custom metric's value.",
+                    "enum": [
+                        "MEASUREMENT_UNIT_UNSPECIFIED",
+                        "STANDARD",
+                        "CURRENCY",
+                        "FEET",
+                        "METERS",
+                        "KILOMETERS",
+                        "MILES",
+                        "MILLISECONDS",
+                        "SECONDS",
+                        "MINUTES",
+                        "HOURS"
+                    ],
+                    "enumDescriptions": [
+                        "MeasurementUnit unspecified or missing.",
+                        "This metric uses default units.",
+                        "This metric measures a currency.",
+                        "This metric measures feet.",
+                        "This metric measures meters.",
+                        "This metric measures kilometers.",
+                        "This metric measures miles.",
+                        "This metric measures milliseconds.",
+                        "This metric measures seconds.",
+                        "This metric measures minutes.",
+                        "This metric measures hours."
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. Resource name for this CustomMetric resource. Format: properties/{property}/customMetrics/{customMetric}",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "parameterName": {
+                    "description": "Required. Immutable. Tagging name for this custom metric. If this is an event-scoped metric, then this is the event parameter name. May only contain alphanumeric and underscore charactes, starting with a letter. Max length of 40 characters for event-scoped metrics.",
+                    "type": "string"
+                },
+                "restrictedMetricType": {
+                    "description": "Optional. Types of restricted data that this metric may contain. Required for metrics with CURRENCY measurement unit. Must be empty for metrics with a non-CURRENCY measurement unit.",
+                    "items": {
+                        "enum": [
+                            "RESTRICTED_METRIC_TYPE_UNSPECIFIED",
+                            "COST_DATA",
+                            "REVENUE_DATA"
+                        ],
+                        "enumDescriptions": [
+                            "Type unknown or unspecified.",
+                            "Metric reports cost data.",
+                            "Metric reports revenue data."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "scope": {
+                    "description": "Required. Immutable. The scope of this custom metric.",
+                    "enum": [
+                        "METRIC_SCOPE_UNSPECIFIED",
+                        "EVENT"
+                    ],
+                    "enumDescriptions": [
+                        "Scope unknown or not specified.",
+                        "Metric scoped to an event."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaDataRetentionSettings": {
+            "description": "Settings values for data retention. This is a singleton resource.",
+            "id": "GoogleAnalyticsAdminV1alphaDataRetentionSettings",
+            "properties": {
+                "eventDataRetention": {
+                    "description": "The length of time that event-level data is retained.",
+                    "enum": [
+                        "RETENTION_DURATION_UNSPECIFIED",
+                        "TWO_MONTHS",
+                        "FOURTEEN_MONTHS",
+                        "TWENTY_SIX_MONTHS",
+                        "THIRTY_EIGHT_MONTHS",
+                        "FIFTY_MONTHS"
+                    ],
+                    "enumDescriptions": [
+                        "Data retention time duration is not specified.",
+                        "The data retention time duration is 2 months.",
+                        "The data retention time duration is 14 months.",
+                        "The data retention time duration is 26 months. Available to 360 properties only.",
+                        "The data retention time duration is 38 months. Available to 360 properties only.",
+                        "The data retention time duration is 50 months. Available to 360 properties only."
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. Resource name for this DataRetentionSetting resource. Format: properties/{property}/dataRetentionSettings",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "resetUserDataOnNewActivity": {
+                    "description": "If true, reset the retention period for the user identifier with every event from that user.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -2312,6 +3210,115 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaDataStream": {
+            "description": "A resource message representing a data stream.",
+            "id": "GoogleAnalyticsAdminV1alphaDataStream",
+            "properties": {
+                "androidAppStreamData": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDataStreamAndroidAppStreamData",
+                    "description": "Data specific to Android app streams. Must be populated if type is ANDROID_APP_DATA_STREAM."
+                },
+                "createTime": {
+                    "description": "Output only. Time when this stream was originally created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "Human-readable display name for the Data Stream. Required for web data streams. The max allowed display name length is 255 UTF-16 code units.",
+                    "type": "string"
+                },
+                "iosAppStreamData": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDataStreamIosAppStreamData",
+                    "description": "Data specific to iOS app streams. Must be populated if type is IOS_APP_DATA_STREAM."
+                },
+                "name": {
+                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/dataStreams/{stream_id} Example: \"properties/1000/dataStreams/2000\"",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Required. Immutable. The type of this DataStream resource.",
+                    "enum": [
+                        "DATA_STREAM_TYPE_UNSPECIFIED",
+                        "WEB_DATA_STREAM",
+                        "ANDROID_APP_DATA_STREAM",
+                        "IOS_APP_DATA_STREAM"
+                    ],
+                    "enumDescriptions": [
+                        "Type unknown or not specified.",
+                        "Web data stream.",
+                        "Android app data stream.",
+                        "iOS app data stream."
+                    ],
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. Time when stream payload fields were last updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "webStreamData": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaDataStreamWebStreamData",
+                    "description": "Data specific to web streams. Must be populated if type is WEB_DATA_STREAM."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaDataStreamAndroidAppStreamData": {
+            "description": "Data specific to Android app streams.",
+            "id": "GoogleAnalyticsAdminV1alphaDataStreamAndroidAppStreamData",
+            "properties": {
+                "firebaseAppId": {
+                    "description": "Output only. ID of the corresponding Android app in Firebase, if any. This ID can change if the Android app is deleted and recreated.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "packageName": {
+                    "description": "Immutable. The package name for the app being measured. Example: \"com.example.myandroidapp\"",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaDataStreamIosAppStreamData": {
+            "description": "Data specific to iOS app streams.",
+            "id": "GoogleAnalyticsAdminV1alphaDataStreamIosAppStreamData",
+            "properties": {
+                "bundleId": {
+                    "description": "Required. Immutable. The Apple App Store Bundle ID for the app Example: \"com.example.myiosapp\"",
+                    "type": "string"
+                },
+                "firebaseAppId": {
+                    "description": "Output only. ID of the corresponding iOS app in Firebase, if any. This ID can change if the iOS app is deleted and recreated.",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaDataStreamWebStreamData": {
+            "description": "Data specific to web streams.",
+            "id": "GoogleAnalyticsAdminV1alphaDataStreamWebStreamData",
+            "properties": {
+                "defaultUri": {
+                    "description": "Immutable. Domain name of the web app being measured, or empty. Example: \"http://www.google.com\", \"https://www.google.com\"",
+                    "type": "string"
+                },
+                "firebaseAppId": {
+                    "description": "Output only. ID of the corresponding web app in Firebase, if any. This ID can change if the web app is deleted and recreated.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "measurementId": {
+                    "description": "Output only. Analytics \"Measurement ID\", without the \"G-\" prefix. Example: \"G-1A2BCD345E\" would just be \"1A2BCD345E\"",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaDeleteUserLinkRequest": {
             "description": "Request message for DeleteUserLink RPC.",
             "id": "GoogleAnalyticsAdminV1alphaDeleteUserLinkRequest",
@@ -2323,90 +3330,89 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings": {
-            "description": "Singleton resource under a WebDataStream, configuring measurement of additional site interactions and content.",
-            "id": "GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings",
+        "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink": {
+            "description": "A link between a GA4 property and a Display & Video 360 advertiser.",
+            "id": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink",
             "properties": {
-                "fileDownloadsEnabled": {
-                    "description": "If enabled, capture a file download event each time a link is clicked with a common document, compressed file, application, video, or audio extension.",
+                "adsPersonalizationEnabled": {
+                    "description": "Enables personalized advertising features with this integration. If this field is not set on create/update, it will be defaulted to true.",
+                    "type": "boolean"
+                },
+                "advertiserDisplayName": {
+                    "description": "Output only. The display name of the Display & Video 360 Advertiser.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "advertiserId": {
+                    "description": "Immutable. The Display & Video 360 Advertiser's advertiser ID.",
+                    "type": "string"
+                },
+                "campaignDataSharingEnabled": {
+                    "description": "Immutable. Enables the import of campaign data from Display & Video 360 into the GA4 property. After link creation, this can only be updated from the Display & Video 360 product. If this field is not set on create, it will be defaulted to true.",
+                    "type": "boolean"
+                },
+                "costDataSharingEnabled": {
+                    "description": "Immutable. Enables the import of cost data from Display & Video 360 into the GA4 property. This can only be enabled if campaign_data_sharing_enabled is enabled. After link creation, this can only be updated from the Display & Video 360 product. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
                 "name": {
-                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings Example: \"properties/1000/webDataStreams/2000/enhancedMeasurementSettings\"",
+                    "description": "Output only. The resource name for this DisplayVideo360AdvertiserLink resource. Format: properties/{propertyId}/displayVideo360AdvertiserLinks/{linkId} Note: linkId is not the Display & Video 360 Advertiser ID",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal": {
+            "description": "A proposal for a link between a GA4 property and a Display & Video 360 advertiser. A proposal is converted to a DisplayVideo360AdvertiserLink once approved. Google Analytics admins approve inbound proposals while Display & Video 360 admins approve outbound proposals.",
+            "id": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal",
+            "properties": {
+                "adsPersonalizationEnabled": {
+                    "description": "Immutable. Enables personalized advertising features with this integration. If this field is not set on create, it will be defaulted to true.",
+                    "type": "boolean"
+                },
+                "advertiserDisplayName": {
+                    "description": "Output only. The display name of the Display & Video Advertiser. Only populated for proposals that originated from Display & Video 360.",
                     "readOnly": true,
                     "type": "string"
                 },
-                "outboundClicksEnabled": {
-                    "description": "If enabled, capture an outbound click event each time a visitor clicks a link that leads them away from your domain.",
-                    "type": "boolean"
-                },
-                "pageChangesEnabled": {
-                    "description": "If enabled, capture a page view event each time the website changes the browser history state.",
-                    "type": "boolean"
-                },
-                "pageLoadsEnabled": {
-                    "description": "Output only. If enabled, capture a page view event each time a page loads.",
-                    "readOnly": true,
-                    "type": "boolean"
-                },
-                "pageViewsEnabled": {
-                    "description": "Output only. If enabled, capture a page view event each time a page loads or the website changes the browser history state.",
-                    "readOnly": true,
-                    "type": "boolean"
-                },
-                "scrollsEnabled": {
-                    "description": "If enabled, capture scroll events each time a visitor gets to the bottom of a page.",
-                    "type": "boolean"
-                },
-                "searchQueryParameter": {
-                    "description": "Required. URL query parameters to interpret as site search parameters. Max length is 1024 characters. Must not be empty.",
+                "advertiserId": {
+                    "description": "Immutable. The Display & Video 360 Advertiser's advertiser ID.",
                     "type": "string"
                 },
-                "siteSearchEnabled": {
-                    "description": "If enabled, capture a view search results event each time a visitor performs a search on your site (based on a query parameter).",
+                "campaignDataSharingEnabled": {
+                    "description": "Immutable. Enables the import of campaign data from Display & Video 360. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
-                "streamEnabled": {
-                    "description": "Indicates whether Enhanced Measurement Settings will be used to automatically measure interactions and content on this web stream. Changing this value does not affect the settings themselves, but determines whether they are respected.",
+                "costDataSharingEnabled": {
+                    "description": "Immutable. Enables the import of cost data from Display & Video 360. This can only be enabled if campaign_data_sharing_enabled is enabled. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
-                "uriQueryParameter": {
-                    "description": "Additional URL query parameters. Max length is 1024 characters.",
+                "linkProposalStatusDetails": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaLinkProposalStatusDetails",
+                    "description": "Output only. The status information for this link proposal.",
+                    "readOnly": true
+                },
+                "name": {
+                    "description": "Output only. The resource name for this DisplayVideo360AdvertiserLinkProposal resource. Format: properties/{propertyId}/displayVideo360AdvertiserLinkProposals/{proposalId} Note: proposalId is not the Display & Video 360 Advertiser ID",
+                    "readOnly": true,
                     "type": "string"
                 },
-                "videoEngagementEnabled": {
-                    "description": "If enabled, capture video play, progress, and complete events as visitors view embedded videos on your site.",
-                    "type": "boolean"
+                "validationEmail": {
+                    "description": "Input only. On a proposal being sent to Display & Video 360, this field must be set to the email address of an admin on the target advertiser. This is used to verify that the Google Analytics admin is aware of at least one admin on the Display & Video 360 Advertiser. This does not restrict approval of the proposal to a single user. Any admin on the Display & Video 360 Advertiser may approve the proposal.",
+                    "type": "string"
                 }
             },
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaFirebaseLink": {
-            "description": "A link between an GA4 property and a Firebase project.",
+            "description": "A link between a GA4 property and a Firebase project.",
             "id": "GoogleAnalyticsAdminV1alphaFirebaseLink",
             "properties": {
                 "createTime": {
                     "description": "Output only. Time when this FirebaseLink was originally created.",
                     "format": "google-datetime",
                     "readOnly": true,
-                    "type": "string"
-                },
-                "maximumUserAccess": {
-                    "description": "Maximum user access to the GA4 property allowed to admins of the linked Firebase project.",
-                    "enum": [
-                        "MAXIMUM_USER_ACCESS_UNSPECIFIED",
-                        "NO_ACCESS",
-                        "READ_AND_ANALYZE",
-                        "EDITOR_WITHOUT_LINK_MANAGEMENT",
-                        "EDITOR_INCLUDING_LINK_MANAGEMENT"
-                    ],
-                    "enumDescriptions": [
-                        "Unspecified maximum user access.",
-                        "Firebase users have no access to the Analytics property.",
-                        "Firebase users have Read & Analyze access to the Analytics property.",
-                        "Firebase users have edit access to the Analytics property, but may not manage the Firebase link.",
-                        "Firebase users have edit access to the Analytics property and may manage the Firebase link."
-                    ],
                     "type": "string"
                 },
                 "name": {
@@ -2422,11 +3428,11 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaGlobalSiteTag": {
-            "description": "Read-only resource with the tag for sending data from a website to a WebDataStream.",
+            "description": "Read-only resource with the tag for sending data from a website to a DataStream. Only present for web DataStream resources.",
             "id": "GoogleAnalyticsAdminV1alphaGlobalSiteTag",
             "properties": {
                 "name": {
-                    "description": "Output only. Resource name for this GlobalSiteTag resource. Format: properties/{propertyId}/globalSiteTag",
+                    "description": "Output only. Resource name for this GlobalSiteTag resource. Format: properties/{property_id}/dataStreams/{stream_id}/globalSiteTag Example: \"properties/123/dataStreams/456/globalSiteTag\"",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -2438,11 +3444,11 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaGoogleAdsLink": {
-            "description": "A link between an GA4 property and a Google Ads account.",
+            "description": "A link between a GA4 property and a Google Ads account.",
             "id": "GoogleAnalyticsAdminV1alphaGoogleAdsLink",
             "properties": {
                 "adsPersonalizationEnabled": {
-                    "description": "Enable personalized advertising features with this integration. Automatically publish my Google Analytics audience lists and Google Analytics remarketing events/parameters to the linked Google Ads account. If this field is not set on create/update it will be defaulted to true.",
+                    "description": "Enable personalized advertising features with this integration. Automatically publish my Google Analytics audience lists and Google Analytics remarketing events/parameters to the linked Google Ads account. If this field is not set on create/update, it will be defaulted to true.",
                     "type": "boolean"
                 },
                 "canManageClients": {
@@ -2456,13 +3462,13 @@
                     "readOnly": true,
                     "type": "string"
                 },
-                "customerId": {
-                    "description": "Immutable. Google Ads customer ID.",
-                    "type": "string"
-                },
-                "emailAddress": {
+                "creatorEmailAddress": {
                     "description": "Output only. Email address of the user that created the link. An empty string will be returned if the email address can't be retrieved.",
                     "readOnly": true,
+                    "type": "string"
+                },
+                "customerId": {
+                    "description": "Immutable. Google Ads customer ID.",
                     "type": "string"
                 },
                 "name": {
@@ -2479,37 +3485,91 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaIosAppDataStream": {
-            "description": "A resource message representing a Google Analytics IOS app stream.",
-            "id": "GoogleAnalyticsAdminV1alphaIosAppDataStream",
+        "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings": {
+            "description": "Settings values for Google Signals. This is a singleton resource.",
+            "id": "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings",
             "properties": {
-                "bundleId": {
-                    "description": "Required. Immutable. The Apple App Store Bundle ID for the app Example: \"com.example.myiosapp\"",
-                    "type": "string"
-                },
-                "createTime": {
-                    "description": "Output only. Time when this stream was originally created.",
-                    "format": "google-datetime",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "displayName": {
-                    "description": "Human-readable display name for the Data Stream. The max allowed display name length is 255 UTF-16 code units.",
-                    "type": "string"
-                },
-                "firebaseAppId": {
-                    "description": "Output only. ID of the corresponding iOS app in Firebase, if any. This ID can change if the iOS app is deleted and recreated.",
+                "consent": {
+                    "description": "Output only. Terms of Service acceptance.",
+                    "enum": [
+                        "GOOGLE_SIGNALS_CONSENT_UNSPECIFIED",
+                        "GOOGLE_SIGNALS_CONSENT_CONSENTED",
+                        "GOOGLE_SIGNALS_CONSENT_NOT_CONSENTED"
+                    ],
+                    "enumDescriptions": [
+                        "Google Signals consent value defaults to GOOGLE_SIGNALS_CONSENT_UNSPECIFIED. This will be treated as GOOGLE_SIGNALS_CONSENT_NOT_CONSENTED.",
+                        "Terms of service have been accepted",
+                        "Terms of service have not been accepted"
+                    ],
                     "readOnly": true,
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: \"properties/1000/iosAppDataStreams/2000\"",
+                    "description": "Output only. Resource name of this setting. Format: properties/{property_id}/googleSignalsSettings Example: \"properties/1000/googleSignalsSettings\"",
                     "readOnly": true,
                     "type": "string"
                 },
-                "updateTime": {
-                    "description": "Output only. Time when stream payload fields were last updated.",
-                    "format": "google-datetime",
+                "state": {
+                    "description": "Status of this setting.",
+                    "enum": [
+                        "GOOGLE_SIGNALS_STATE_UNSPECIFIED",
+                        "GOOGLE_SIGNALS_ENABLED",
+                        "GOOGLE_SIGNALS_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Google Signals status defaults to GOOGLE_SIGNALS_STATE_UNSPECIFIED to represent that the user has not made an explicit choice.",
+                        "Google Signals is enabled.",
+                        "Google Signals is disabled."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaLinkProposalStatusDetails": {
+            "description": "Status information for a link proposal.",
+            "id": "GoogleAnalyticsAdminV1alphaLinkProposalStatusDetails",
+            "properties": {
+                "linkProposalInitiatingProduct": {
+                    "description": "Output only. The source of this proposal.",
+                    "enum": [
+                        "LINK_PROPOSAL_INITIATING_PRODUCT_UNSPECIFIED",
+                        "GOOGLE_ANALYTICS",
+                        "LINKED_PRODUCT"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified product.",
+                        "This proposal was created by a user from Google Analytics.",
+                        "This proposal was created by a user from a linked product (not Google Analytics)."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "linkProposalState": {
+                    "description": "Output only. The state of this proposal.",
+                    "enum": [
+                        "LINK_PROPOSAL_STATE_UNSPECIFIED",
+                        "AWAITING_REVIEW_FROM_GOOGLE_ANALYTICS",
+                        "AWAITING_REVIEW_FROM_LINKED_PRODUCT",
+                        "WITHDRAWN",
+                        "DECLINED",
+                        "EXPIRED",
+                        "OBSOLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified state",
+                        "This proposal is awaiting review from a Google Analytics user. This proposal will automatically expire after some time.",
+                        "This proposal is awaiting review from a user of a linked product. This proposal will automatically expire after some time.",
+                        "This proposal has been withdrawn by an admin on the initiating product. This proposal will be automatically deleted after some time.",
+                        "This proposal has been declined by an admin on the receiving product. This proposal will be automatically deleted after some time.",
+                        "This proposal expired due to lack of response from an admin on the receiving product. This proposal will be automatically deleted after some time.",
+                        "This proposal has become obsolete because a link was directly created to the same external product resource that this proposal specifies. This proposal will be automatically deleted after some time."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "requestorEmail": {
+                    "description": "Output only. The email address of the user that proposed this linkage.",
                     "readOnly": true,
                     "type": "string"
                 }
@@ -2552,14 +3612,104 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaListAndroidAppDataStreamsResponse": {
-            "description": "Request message for ListAndroidDataStreams RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaListAndroidAppDataStreamsResponse",
+        "GoogleAnalyticsAdminV1alphaListConversionEventsResponse": {
+            "description": "Response message for ListConversionEvents RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListConversionEventsResponse",
             "properties": {
-                "androidAppDataStreams": {
-                    "description": "Results that matched the filter criteria and were accessible to the caller.",
+                "conversionEvents": {
+                    "description": "The requested conversion events",
                     "items": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaAndroidAppDataStream"
+                        "$ref": "GoogleAnalyticsAdminV1alphaConversionEvent"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaListCustomDimensionsResponse": {
+            "description": "Response message for ListCustomDimensions RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListCustomDimensionsResponse",
+            "properties": {
+                "customDimensions": {
+                    "description": "List of CustomDimensions.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaCustomDimension"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaListCustomMetricsResponse": {
+            "description": "Response message for ListCustomMetrics RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListCustomMetricsResponse",
+            "properties": {
+                "customMetrics": {
+                    "description": "List of CustomMetrics.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaCustomMetric"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaListDataStreamsResponse": {
+            "description": "Response message for ListDataStreams RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListDataStreamsResponse",
+            "properties": {
+                "dataStreams": {
+                    "description": "List of DataStreams.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaDataStream"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaListDisplayVideo360AdvertiserLinkProposalsResponse": {
+            "description": "Response message for ListDisplayVideo360AdvertiserLinkProposals RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListDisplayVideo360AdvertiserLinkProposalsResponse",
+            "properties": {
+                "displayVideo360AdvertiserLinkProposals": {
+                    "description": "List of DisplayVideo360AdvertiserLinkProposals.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaListDisplayVideo360AdvertiserLinksResponse": {
+            "description": "Response message for ListDisplayVideo360AdvertiserLinks RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListDisplayVideo360AdvertiserLinksResponse",
+            "properties": {
+                "displayVideo360AdvertiserLinks": {
+                    "description": "List of DisplayVideo360AdvertiserLinks.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink"
                     },
                     "type": "array"
                 },
@@ -2606,14 +3756,14 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaListIosAppDataStreamsResponse": {
-            "description": "Request message for ListIosAppDataStreams RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaListIosAppDataStreamsResponse",
+        "GoogleAnalyticsAdminV1alphaListMeasurementProtocolSecretsResponse": {
+            "description": "Response message for ListMeasurementProtocolSecret RPC",
+            "id": "GoogleAnalyticsAdminV1alphaListMeasurementProtocolSecretsResponse",
             "properties": {
-                "iosAppDataStreams": {
-                    "description": "Results that matched the filter criteria and were accessible to the caller.",
+                "measurementProtocolSecrets": {
+                    "description": "A list of secrets for the parent stream specified in the request.",
                     "items": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaIosAppDataStream"
+                        "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret"
                     },
                     "type": "array"
                 },
@@ -2660,20 +3810,23 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaListWebDataStreamsResponse": {
-            "description": "Request message for ListWebDataStreams RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaListWebDataStreamsResponse",
+        "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret": {
+            "description": "A secret value used for sending hits to Measurement Protocol.",
+            "id": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret",
             "properties": {
-                "nextPageToken": {
-                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                "displayName": {
+                    "description": "Required. Human-readable display name for this secret.",
                     "type": "string"
                 },
-                "webDataStreams": {
-                    "description": "Results that matched the filter criteria and were accessible to the caller.",
-                    "items": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaWebDataStream"
-                    },
-                    "type": "array"
+                "name": {
+                    "description": "Output only. Resource name of this secret. This secret may be a child of any type of stream. Format: properties/{property}/webDataStreams/{webDataStream}/measurementProtocolSecrets/{measurementProtocolSecret}",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "secretValue": {
+                    "description": "Output only. The measurement protocol secret value. Pass this value to the api_secret field of the Measurement Protocol API when sending hits to this secret's parent property.",
+                    "readOnly": true,
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2682,6 +3835,10 @@
             "description": "A resource message representing a Google Analytics GA4 property.",
             "id": "GoogleAnalyticsAdminV1alphaProperty",
             "properties": {
+                "account": {
+                    "description": "Immutable. The resource name of the parent account Format: accounts/{account_id} Example: \"accounts/123\"",
+                    "type": "string"
+                },
                 "createTime": {
                     "description": "Output only. Time when the entity was originally created.",
                     "format": "google-datetime",
@@ -2692,13 +3849,20 @@
                     "description": "The currency type used in reports involving monetary values. Format: https://en.wikipedia.org/wiki/ISO_4217 Examples: \"USD\", \"EUR\", \"JPY\"",
                     "type": "string"
                 },
-                "deleted": {
-                    "description": "Output only. Indicates whether this Property is soft-deleted or not. Deleted properties are excluded from List results unless specifically requested.",
+                "deleteTime": {
+                    "description": "Output only. If set, the time at which this property was trashed. If not set, then this property is not currently in the trash can.",
+                    "format": "google-datetime",
                     "readOnly": true,
-                    "type": "boolean"
+                    "type": "string"
                 },
                 "displayName": {
                     "description": "Required. Human-readable display name for this property. The max allowed display name length is 100 UTF-16 code units.",
+                    "type": "string"
+                },
+                "expireTime": {
+                    "description": "Output only. If set, the time at which this trashed property will be permanently deleted. If not set, then this property is not currently in the trash can and is not slated to be deleted.",
+                    "format": "google-datetime",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "industryCategory": {
@@ -2772,6 +3936,21 @@
                     "description": "Immutable. Resource name of this property's logical parent. Note: The Property-Moving UI can be used to change the parent. Format: accounts/{account} Example: \"accounts/100\"",
                     "type": "string"
                 },
+                "serviceLevel": {
+                    "description": "Output only. The Google Analytics service level that applies to this property.",
+                    "enum": [
+                        "SERVICE_LEVEL_UNSPECIFIED",
+                        "GOOGLE_ANALYTICS_STANDARD",
+                        "GOOGLE_ANALYTICS_360"
+                    ],
+                    "enumDescriptions": [
+                        "Service level not specified or invalid.",
+                        "The standard version of Google Analytics.",
+                        "The paid, premium version of Google Analytics."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "timeZone": {
                     "description": "Required. Reporting Time Zone, used as the day boundary for reports, regardless of where the data originates. If the time zone honors DST, Analytics will automatically adjust for the changes. NOTE: Changing the time zone only affects data going forward, and is not applied retroactively. Format: https://www.iana.org/time-zones Example: \"America/Los_Angeles\"",
                     "type": "string"
@@ -2786,11 +3965,11 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaPropertySummary": {
-            "description": "A virtual resource representing metadata for an GA4 property.",
+            "description": "A virtual resource representing metadata for a GA4 property.",
             "id": "GoogleAnalyticsAdminV1alphaPropertySummary",
             "properties": {
                 "displayName": {
-                    "description": "Display name for the property referred to in this account summary.",
+                    "description": "Display name for the property referred to in this property summary.",
                     "type": "string"
                 },
                 "property": {
@@ -2886,21 +4065,33 @@
                             "CHANGE_HISTORY_RESOURCE_TYPE_UNSPECIFIED",
                             "ACCOUNT",
                             "PROPERTY",
-                            "WEB_DATA_STREAM",
-                            "ANDROID_APP_DATA_STREAM",
-                            "IOS_APP_DATA_STREAM",
                             "FIREBASE_LINK",
-                            "GOOGLE_ADS_LINK"
+                            "GOOGLE_ADS_LINK",
+                            "GOOGLE_SIGNALS_SETTINGS",
+                            "CONVERSION_EVENT",
+                            "MEASUREMENT_PROTOCOL_SECRET",
+                            "CUSTOM_DIMENSION",
+                            "CUSTOM_METRIC",
+                            "DATA_RETENTION_SETTINGS",
+                            "DISPLAY_VIDEO_360_ADVERTISER_LINK",
+                            "DISPLAY_VIDEO_360_ADVERTISER_LINK_PROPOSAL",
+                            "DATA_STREAM"
                         ],
                         "enumDescriptions": [
                             "Resource type unknown or not specified.",
                             "Account resource",
                             "Property resource",
-                            "WebDataStream resource",
-                            "AndroidAppDataStream resource",
-                            "IosAppDataStream resource",
                             "FirebaseLink resource",
-                            "GoogleAdsLink resource"
+                            "GoogleAdsLink resource",
+                            "GoogleSignalsSettings resource",
+                            "ConversionEvent resource",
+                            "MeasurementProtocolSecret resource",
+                            "CustomDimension resource",
+                            "CustomMetric resource",
+                            "DataRetentionSettings resource",
+                            "DisplayVideo360AdvertiserLink resource",
+                            "DisplayVideo360AdvertiserLinkProposal resource",
+                            "DataStream resource"
                         ],
                         "type": "string"
                     },
@@ -2943,59 +4134,18 @@
             "id": "GoogleAnalyticsAdminV1alphaUserLink",
             "properties": {
                 "directRoles": {
-                    "description": "Roles directly assigned to this user for this account or property. Valid values: predefinedRoles/read predefinedRoles/collaborate predefinedRoles/edit predefinedRoles/manage-users Excludes roles that are inherited from a higher-level entity, group, or organization admin role. A UserLink that is updated to have an empty list of direct_roles will be deleted.",
+                    "description": "Roles directly assigned to this user for this account or property. Valid values: predefinedRoles/viewer predefinedRoles/analyst predefinedRoles/editor predefinedRoles/admin predefinedRoles/no-cost-data predefinedRoles/no-revenue-data Excludes roles that are inherited from a higher-level entity, group, or organization admin role. A UserLink that is updated to have an empty list of direct_roles will be deleted.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "emailAddress": {
-                    "description": "Email address of the user to link",
+                    "description": "Immutable. Email address of the user to link",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Example format: properties/1234/userLinks/5678",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaWebDataStream": {
-            "description": "A resource message representing a Google Analytics web stream.",
-            "id": "GoogleAnalyticsAdminV1alphaWebDataStream",
-            "properties": {
-                "createTime": {
-                    "description": "Output only. Time when this stream was originally created.",
-                    "format": "google-datetime",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "defaultUri": {
-                    "description": "Immutable. Domain name of the web app being measured, or empty. Example: \"http://www.google.com\", \"https://www.google.com\"",
-                    "type": "string"
-                },
-                "displayName": {
-                    "description": "Required. Human-readable display name for the Data Stream. The max allowed display name length is 100 UTF-16 code units.",
-                    "type": "string"
-                },
-                "firebaseAppId": {
-                    "description": "Output only. ID of the corresponding web app in Firebase, if any. This ID can change if the web app is deleted and recreated.",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "measurementId": {
-                    "description": "Output only. Analytics \"Measurement ID\", without the \"G-\" prefix. Example: \"G-1A2BCD345E\" would just be \"1A2BCD345E\"",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "name": {
-                    "description": "Output only. Resource name of this Data Stream. Format: properties/{property_id}/webDataStreams/{stream_id} Example: \"properties/1000/webDataStreams/2000\"",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "updateTime": {
-                    "description": "Output only. Time when stream payload fields were last updated.",
-                    "format": "google-datetime",
+                    "description": "Output only. Example format: properties/1234/userLinks/5678",
                     "readOnly": true,
                     "type": "string"
                 }

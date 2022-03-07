@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/compute": {
                     "description": "View and manage your Google Compute Engine resources"
@@ -12,7 +12,7 @@
                     "description": "View your Google Compute Engine resources"
                 },
                 "https://www.googleapis.com/auth/userinfo.email": {
-                    "description": "View your email address"
+                    "description": "See your primary Google Account email address"
                 }
             }
         }
@@ -2225,7 +2225,7 @@
             }
         }
     },
-    "revision": "20210324",
+    "revision": "20220218",
     "rootUrl": "https://dataflow.googleapis.com/",
     "schemas": {
         "ApproximateProgress": {
@@ -2336,7 +2336,7 @@
                     "type": "string"
                 },
                 "workerPool": {
-                    "description": "A short and friendly name for the worker pool this event refers to, populated from the value of PoolStageRelation::user_pool_name.",
+                    "description": "A short and friendly name for the worker pool this event refers to.",
                     "type": "string"
                 }
             },
@@ -2392,7 +2392,7 @@
             "type": "object"
         },
         "BigTableIODetails": {
-            "description": "Metadata for a Cloud BigTable connector used by the job.",
+            "description": "Metadata for a Cloud Bigtable connector used by the job.",
             "id": "BigTableIODetails",
             "properties": {
                 "instanceId": {
@@ -3030,7 +3030,7 @@
                     "description": "Any debugging options to be supplied to the job."
                 },
                 "experiments": {
-                    "description": "The list of experiments to enable. This field should be used for SDK related experiments and not for service related experiments. The proper field for service related experiments is service_options. For more details see the rationale at go/user-specified-service-options.",
+                    "description": "The list of experiments to enable. This field should be used for SDK related experiments and not for service related experiments. The proper field for service related experiments is service_options.",
                     "items": {
                         "type": "string"
                     },
@@ -3075,7 +3075,7 @@
                     "type": "string"
                 },
                 "serviceOptions": {
-                    "description": "The list of service options to enable. This field should be used for service related experiments only. These experiments, when graduating to GA, should be replaced by dedicated fields or become default (i.e. always on). For more details see the rationale at go/user-specified-service-options.",
+                    "description": "The list of service options to enable. This field should be used for service related experiments only. These experiments, when graduating to GA, should be replaced by dedicated fields or become default (i.e. always on).",
                     "items": {
                         "type": "string"
                     },
@@ -3314,6 +3314,29 @@
                     "description": "Additional user labels to be specified for the job. Keys and values must follow the restrictions specified in the [labeling restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions) page. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1kg\", \"count\": \"3\" }.",
                     "type": "object"
                 },
+                "autoscalingAlgorithm": {
+                    "description": "The algorithm to use for autoscaling",
+                    "enum": [
+                        "AUTOSCALING_ALGORITHM_UNKNOWN",
+                        "AUTOSCALING_ALGORITHM_NONE",
+                        "AUTOSCALING_ALGORITHM_BASIC"
+                    ],
+                    "enumDescriptions": [
+                        "The algorithm is unknown, or unspecified.",
+                        "Disable autoscaling.",
+                        "Increase worker count over time to reduce job execution time."
+                    ],
+                    "type": "string"
+                },
+                "diskSizeGb": {
+                    "description": "Worker disk size, in gigabytes.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "dumpHeapOnOom": {
+                    "description": "If true, save a heap dump before killing a thread or process which is GC thrashing or out of memory. The location of the heap file will either be echoed back to the user, or the user will be given the opportunity to download the heap file.",
+                    "type": "boolean"
+                },
                 "enableStreamingEngine": {
                     "description": "Whether to enable Streaming Engine for the job.",
                     "type": "boolean"
@@ -3350,6 +3373,10 @@
                     "description": "Name for the Cloud KMS key for the job. Key format is: projects//locations//keyRings//cryptoKeys/",
                     "type": "string"
                 },
+                "launcherMachineType": {
+                    "description": "The machine type to use for launching the job. The default is n1-standard-1.",
+                    "type": "string"
+                },
                 "machineType": {
                     "description": "The machine type to use for the job. Defaults to the value from the template if not specified.",
                     "type": "string"
@@ -3368,8 +3395,20 @@
                     "format": "int32",
                     "type": "integer"
                 },
+                "saveHeapDumpsToGcsPath": {
+                    "description": "Cloud Storage bucket (directory) to upload heap dumps to the given location. Enabling this implies that heap dumps should be generated on OOM (dump_heap_on_oom is set to true).",
+                    "type": "string"
+                },
+                "sdkContainerImage": {
+                    "description": "Docker registry location of container image to use for the 'worker harness. Default is the container for the version of the SDK. Note this field is only valid for portable pipelines.",
+                    "type": "string"
+                },
                 "serviceAccountEmail": {
                     "description": "The email address of the service account to run the job as.",
+                    "type": "string"
+                },
+                "stagingLocation": {
+                    "description": "The Cloud Storage path for staging local files. Must be a valid Cloud Storage URL, beginning with `gs://`.",
                     "type": "string"
                 },
                 "subnetwork": {
@@ -3627,7 +3666,7 @@
             "type": "object"
         },
         "Job": {
-            "description": "Defines a job to be run by the Cloud Dataflow service. nextID: 26",
+            "description": "Defines a job to be run by the Cloud Dataflow service.",
             "id": "Job",
             "properties": {
                 "clientRequestId": {
@@ -3912,7 +3951,7 @@
             "id": "JobMetadata",
             "properties": {
                 "bigTableDetails": {
-                    "description": "Identification of a Cloud BigTable source used in the Dataflow job.",
+                    "description": "Identification of a Cloud Bigtable source used in the Dataflow job.",
                     "items": {
                         "$ref": "BigTableIODetails"
                     },
@@ -3940,7 +3979,7 @@
                     "type": "array"
                 },
                 "pubsubDetails": {
-                    "description": "Identification of a PubSub source used in the Dataflow job.",
+                    "description": "Identification of a Pub/Sub source used in the Dataflow job.",
                     "items": {
                         "$ref": "PubSubIODetails"
                     },
@@ -4311,6 +4350,11 @@
                     "format": "uint64",
                     "type": "string"
                 },
+                "currentOoms": {
+                    "description": "Number of Out of Memory (OOM) events recorded since the previous measurement.",
+                    "format": "int64",
+                    "type": "string"
+                },
                 "currentRssBytes": {
                     "description": "Instantenous memory (RSS) size in bytes.",
                     "format": "uint64",
@@ -4599,6 +4643,13 @@
             "description": "Metadata for a specific parameter.",
             "id": "ParameterMetadata",
             "properties": {
+                "customMetadata": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Additional metadata for describing this parameter.",
+                    "type": "object"
+                },
                 "helpText": {
                     "description": "Required. The help text to display for the parameter.",
                     "type": "string"
@@ -5007,7 +5058,7 @@
             "id": "RuntimeEnvironment",
             "properties": {
                 "additionalExperiments": {
-                    "description": "Additional experiment flags for the job.",
+                    "description": "Additional experiment flags for the job, specified with the `--experiments` option.",
                     "items": {
                         "type": "string"
                     },
@@ -5170,7 +5221,7 @@
                         "Cloud Dataflow is unaware of this version.",
                         "This is a known version of an SDK, and is supported.",
                         "A newer version of the SDK family exists, and an update is recommended.",
-                        "This version of the SDK is deprecated and will eventually be no longer supported.",
+                        "This version of the SDK is deprecated and will eventually be unsupported.",
                         "Support for this SDK version has ended and it should no longer be used."
                     ],
                     "type": "string"
@@ -5395,11 +5446,15 @@
                     "type": "string"
                 },
                 "pubsubMetadata": {
-                    "description": "PubSub snapshot metadata.",
+                    "description": "Pub/Sub snapshot metadata.",
                     "items": {
                         "$ref": "PubsubSnapshotMetadata"
                     },
                     "type": "array"
+                },
+                "region": {
+                    "description": "Cloud region where this snapshot lives in, e.g., \"us-central1\".",
+                    "type": "string"
                 },
                 "sourceJobId": {
                     "description": "The job this snapshot was created from.",
@@ -6865,7 +6920,7 @@
                         "The default set of packages to stage is unknown, or unspecified.",
                         "Indicates that no packages should be staged at the worker unless explicitly specified by the job.",
                         "Stage packages typically useful to workers written in Java.",
-                        "Stage pacakges typically useful to workers written in Python."
+                        "Stage packages typically useful to workers written in Python."
                     ],
                     "type": "string"
                 },

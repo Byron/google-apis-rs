@@ -30,7 +30,7 @@
                     "description": "View your email message metadata such as labels and headers, but not the email body"
                 },
                 "https://www.googleapis.com/auth/gmail.modify": {
-                    "description": "View and modify but not delete your email"
+                    "description": "Read, compose, and send emails from your Gmail account"
                 },
                 "https://www.googleapis.com/auth/gmail.readonly": {
                     "description": "View your email messages and settings"
@@ -384,7 +384,7 @@
                                 },
                                 "maxResults": {
                                     "default": "100",
-                                    "description": "Maximum number of drafts to return.",
+                                    "description": "Maximum number of drafts to return. This field defaults to 100. The maximum allowed value for this field is 500.",
                                     "format": "uint32",
                                     "location": "query",
                                     "type": "integer"
@@ -559,7 +559,7 @@
                                 },
                                 "maxResults": {
                                     "default": "100",
-                                    "description": "The maximum number of history records to return.",
+                                    "description": "Maximum number of history records to return. This field defaults to 100. The maximum allowed value for this field is 500.",
                                     "format": "uint32",
                                     "location": "query",
                                     "type": "integer"
@@ -945,7 +945,7 @@
                             ]
                         },
                         "import": {
-                            "description": "Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. Does not send a message. Note: This function doesn't trigger forwarding rules or filters set up by the user.",
+                            "description": "Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message. Note: This function doesn't trigger forwarding rules or filters set up by the user.",
                             "flatPath": "gmail/v1/users/{userId}/messages/import",
                             "httpMethod": "POST",
                             "id": "gmail.users.messages.import",
@@ -1113,7 +1113,7 @@
                                 },
                                 "maxResults": {
                                     "default": "100",
-                                    "description": "Maximum number of messages to return.",
+                                    "description": "Maximum number of messages to return. This field defaults to 100. The maximum allowed value for this field is 500.",
                                     "format": "uint32",
                                     "location": "query",
                                     "type": "integer"
@@ -2541,7 +2541,7 @@
                                 },
                                 "maxResults": {
                                     "default": "100",
-                                    "description": "Maximum number of threads to return.",
+                                    "description": "Maximum number of threads to return. This field defaults to 100. The maximum allowed value for this field is 500.",
                                     "format": "uint32",
                                     "location": "query",
                                     "type": "integer"
@@ -2682,7 +2682,7 @@
             }
         }
     },
-    "revision": "20210322",
+    "revision": "20220228",
     "rootUrl": "https://gmail.googleapis.com/",
     "schemas": {
         "AutoForwarding": {
@@ -3064,7 +3064,7 @@
             "type": "object"
         },
         "Label": {
-            "description": "Labels are used to categorize messages and threads within the user's mailbox.",
+            "description": "Labels are used to categorize messages and threads within the user's mailbox. The maximum number of labels supported for a user's mailbox is 10,000.",
             "id": "Label",
             "properties": {
                 "color": {

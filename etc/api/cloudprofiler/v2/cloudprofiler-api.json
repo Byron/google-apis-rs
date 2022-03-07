@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/monitoring": {
                     "description": "View and write monitoring data for all of your Google and third-party Cloud and API projects"
@@ -116,7 +116,7 @@
                 "profiles": {
                     "methods": {
                         "create": {
-                            "description": "CreateProfile creates a new profile resource in the online mode. The server ensures that the new profiles are created at a constant rate per deployment, so the creation request may hang for some time until the next profile session is available. The request may fail with ABORTED error if the creation is not available within ~1m, the response will indicate the duration of the backoff the client should take before attempting creating a profile again. The backoff duration is returned in google.rpc.RetryInfo extension on the response status. To a gRPC client, the extension will be return as a binary-serialized proto in the trailing metadata item named \"google.rpc.retryinfo-bin\".",
+                            "description": "CreateProfile creates a new profile resource in the online mode. The server ensures that the new profiles are created at a constant rate per deployment, so the creation request may hang for some time until the next profile session is available. The request may fail with ABORTED error if the creation is not available within ~1m, the response will indicate the duration of the backoff the client should take before attempting creating a profile again. The backoff duration is returned in google.rpc.RetryInfo extension on the response status. To a gRPC client, the extension will be return as a binary-serialized proto in the trailing metadata item named \"google.rpc.retryinfo-bin\". ",
                             "flatPath": "v2/projects/{projectsId}/profiles",
                             "httpMethod": "POST",
                             "id": "cloudprofiler.projects.profiles.create",
@@ -216,19 +216,19 @@
             }
         }
     },
-    "revision": "20210326",
+    "revision": "20220228",
     "rootUrl": "https://cloudprofiler.googleapis.com/",
     "schemas": {
         "CreateProfileRequest": {
-            "description": "CreateProfileRequest describes a profile resource online creation request. The deployment field must be populated. The profile_type specifies the list of profile types supported by the agent. The creation call will hang until a profile of one of these types needs to be collected.",
+            "description": "CreateProfileRequest describes a profile resource online creation request. The deployment field must be populated. The profile_type specifies the list of profile types supported by the agent. The creation call will hang until a profile of one of these types needs to be collected. ",
             "id": "CreateProfileRequest",
             "properties": {
                 "deployment": {
                     "$ref": "Deployment",
-                    "description": "Deployment details."
+                    "description": "Required. Deployment details."
                 },
                 "profileType": {
-                    "description": "One or more profile types that the agent is capable of providing.",
+                    "description": "Required. One or more profile types that the agent is capable of providing.",
                     "items": {
                         "enum": [
                             "PROFILE_TYPE_UNSPECIFIED",
@@ -273,7 +273,7 @@
                     "type": "string"
                 },
                 "target": {
-                    "description": "Target is the service name used to group related deployments: * Service name for GAE Flex / Standard. * Cluster and container name for GKE. * User-specified string for direct GCE profiling (e.g. Java). * Job name for Dataflow. Validation regex: `^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$`.",
+                    "description": "Target is the service name used to group related deployments: * Service name for App Engine Flex / Standard. * Cluster and container name for GKE. * User-specified string for direct Compute Engine profiling (e.g. Java). * Job name for Dataflow. Validation regex: `^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$`.",
                     "type": "string"
                 }
             },
@@ -301,6 +301,7 @@
                 },
                 "name": {
                     "description": "Output only. Opaque, server-assigned, unique ID for this profile.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "profileBytes": {

@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 }
             }
         }
@@ -717,7 +717,7 @@
                                                 "RISK_ANALYSIS_JOB"
                                             ],
                                             "enumDescriptions": [
-                                                "Unused",
+                                                "Defaults to INSPECT_JOB.",
                                                 "The job inspected Google Cloud for sensitive data.",
                                                 "The job executed a Risk Analysis computation."
                                             ],
@@ -1011,6 +1011,21 @@
                                             "location": "path",
                                             "pattern": "^organizations/[^/]+/locations/[^/]+$",
                                             "required": true,
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "description": "The type of jobs. Will use `DlpJobType.INSPECT` if not set.",
+                                            "enum": [
+                                                "DLP_JOB_TYPE_UNSPECIFIED",
+                                                "INSPECT_JOB",
+                                                "RISK_ANALYSIS_JOB"
+                                            ],
+                                            "enumDescriptions": [
+                                                "Defaults to INSPECT_JOB.",
+                                                "The job inspected Google Cloud for sensitive data.",
+                                                "The job executed a Risk Analysis computation."
+                                            ],
+                                            "location": "query",
                                             "type": "string"
                                         }
                                     },
@@ -1772,7 +1787,7 @@
                                         "RISK_ANALYSIS_JOB"
                                     ],
                                     "enumDescriptions": [
-                                        "Unused",
+                                        "Defaults to INSPECT_JOB.",
                                         "The job inspected Google Cloud for sensitive data.",
                                         "The job executed a Risk Analysis computation."
                                     ],
@@ -2126,6 +2141,21 @@
                                     "location": "path",
                                     "pattern": "^projects/[^/]+$",
                                     "required": true,
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "description": "The type of jobs. Will use `DlpJobType.INSPECT` if not set.",
+                                    "enum": [
+                                        "DLP_JOB_TYPE_UNSPECIFIED",
+                                        "INSPECT_JOB",
+                                        "RISK_ANALYSIS_JOB"
+                                    ],
+                                    "enumDescriptions": [
+                                        "Defaults to INSPECT_JOB.",
+                                        "The job inspected Google Cloud for sensitive data.",
+                                        "The job executed a Risk Analysis computation."
+                                    ],
+                                    "location": "query",
                                     "type": "string"
                                 }
                             },
@@ -2627,7 +2657,7 @@
                                                 "RISK_ANALYSIS_JOB"
                                             ],
                                             "enumDescriptions": [
-                                                "Unused",
+                                                "Defaults to INSPECT_JOB.",
                                                 "The job inspected Google Cloud for sensitive data.",
                                                 "The job executed a Risk Analysis computation."
                                             ],
@@ -3010,6 +3040,21 @@
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
                                             "type": "string"
+                                        },
+                                        "type": {
+                                            "description": "The type of jobs. Will use `DlpJobType.INSPECT` if not set.",
+                                            "enum": [
+                                                "DLP_JOB_TYPE_UNSPECIFIED",
+                                                "INSPECT_JOB",
+                                                "RISK_ANALYSIS_JOB"
+                                            ],
+                                            "enumDescriptions": [
+                                                "Defaults to INSPECT_JOB.",
+                                                "The job inspected Google Cloud for sensitive data.",
+                                                "The job executed a Risk Analysis computation."
+                                            ],
+                                            "location": "query",
+                                            "type": "string"
                                         }
                                     },
                                     "path": "v2/{+parent}/jobTriggers",
@@ -3367,7 +3412,7 @@
             }
         }
     },
-    "revision": "20210326",
+    "revision": "20220227",
     "rootUrl": "https://dlp.googleapis.com/",
     "schemas": {
         "GooglePrivacyDlpV2Action": {
@@ -3516,6 +3561,13 @@
                 },
                 "identifyingFields": {
                     "description": "Table fields that may uniquely identify a row within the table. When `actions.saveFindings.outputConfig.table` is specified, the values of columns specified here are available in the output table under `location.content_locations.record_location.record_key.id_values`. Nested fields such as `person.birthdate.year` are allowed.",
+                    "items": {
+                        "$ref": "GooglePrivacyDlpV2FieldId"
+                    },
+                    "type": "array"
+                },
+                "includedFields": {
+                    "description": "Limit scanning only to these fields.",
                     "items": {
                         "$ref": "GooglePrivacyDlpV2FieldId"
                     },
@@ -4208,12 +4260,12 @@
             "type": "object"
         },
         "GooglePrivacyDlpV2CryptoKey": {
-            "description": "This is a data encryption key (DEK) (as opposed to a key encryption key (KEK) stored by KMS). When using KMS to wrap/unwrap DEKs, be sure to set an appropriate IAM policy on the KMS CryptoKey (KEK) to ensure an attacker cannot unwrap the data crypto key.",
+            "description": "This is a data encryption key (DEK) (as opposed to a key encryption key (KEK) stored by Cloud Key Management Service (Cloud KMS). When using Cloud KMS to wrap or unwrap a DEK, be sure to set an appropriate IAM policy on the KEK to ensure an attacker cannot unwrap the DEK.",
             "id": "GooglePrivacyDlpV2CryptoKey",
             "properties": {
                 "kmsWrapped": {
                     "$ref": "GooglePrivacyDlpV2KmsWrappedCryptoKey",
-                    "description": "Kms wrapped key"
+                    "description": "Key wrapped using Cloud KMS"
                 },
                 "transient": {
                     "$ref": "GooglePrivacyDlpV2TransientCryptoKey",
@@ -4723,7 +4775,7 @@
                         "RISK_ANALYSIS_JOB"
                     ],
                     "enumDescriptions": [
-                        "Unused",
+                        "Defaults to INSPECT_JOB.",
                         "The job inspected Google Cloud for sensitive data.",
                         "The job executed a Risk Analysis computation."
                     ],
@@ -4866,7 +4918,7 @@
                     "description": "Only apply the transformation if the condition evaluates to true for the given `RecordCondition`. The conditions are allowed to reference fields that are not used in the actual transformation. Example Use Cases: - Apply a different bucket transformation to an age column if the zip code column for the same record is within a specific range. - Redact a field if the date of birth field is greater than 85."
                 },
                 "fields": {
-                    "description": "Required. Input field(s) to apply the transformation to.",
+                    "description": "Required. Input field(s) to apply the transformation to. When you have columns that reference their position within a list, omit the index from the FieldId. FieldId name matching ignores the index. For example, instead of \"contact.nums[0].type\", use \"contact.nums.type\".",
                     "items": {
                         "$ref": "GooglePrivacyDlpV2FieldId"
                     },
@@ -4979,7 +5031,7 @@
             "type": "object"
         },
         "GooglePrivacyDlpV2FindingLimits": {
-            "description": "Configuration to control the number of findings returned. Cannot be set if de-identification is requested.",
+            "description": "Configuration to control the number of findings returned for inspection. This is not used for de-identification or data profiling.",
             "id": "GooglePrivacyDlpV2FindingLimits",
             "properties": {
                 "maxFindingsPerInfoType": {
@@ -5009,7 +5061,7 @@
             "type": "object"
         },
         "GooglePrivacyDlpV2FixedSizeBucketingConfig": {
-            "description": "Buckets values based on fixed size ranges. The Bucketing transformation can provide all of this functionality, but requires more configuration. This message is provided as a convenience to the user for simple bucketing strategies. The transformed value will be a hyphenated string of {lower_bound}-{upper_bound}, i.e if lower_bound = 10 and upper_bound = 20 all values that are within this bucket will be replaced with \"10-20\". This can be used on data of type: double, long. If the bound Value type differs from the type of data being transformed, we will first attempt converting the type of the data to be transformed to match the type of the bound before comparing. See https://cloud.google.com/dlp/docs/concepts-bucketing to learn more.",
+            "description": "Buckets values based on fixed size ranges. The Bucketing transformation can provide all of this functionality, but requires more configuration. This message is provided as a convenience to the user for simple bucketing strategies. The transformed value will be a hyphenated string of {lower_bound}-{upper_bound}. For example, if lower_bound = 10 and upper_bound = 20, all values that are within this bucket will be replaced with \"10-20\". This can be used on data of type: double, long. If the bound Value type differs from the type of data being transformed, we will first attempt converting the type of the data to be transformed to match the type of the bound before comparing. See https://cloud.google.com/dlp/docs/concepts-bucketing to learn more.",
             "id": "GooglePrivacyDlpV2FixedSizeBucketingConfig",
             "properties": {
                 "bucketSize": {
@@ -5213,6 +5265,10 @@
                 "name": {
                     "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed at https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type. When sending Cloud DLP results to Data Catalog, infoType names should conform to the pattern `[A-Za-z0-9$-_]{1,64}`.",
                     "type": "string"
+                },
+                "version": {
+                    "description": "Optional version name for this InfoType.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -5322,7 +5378,7 @@
             "id": "GooglePrivacyDlpV2InspectConfig",
             "properties": {
                 "contentOptions": {
-                    "description": "List of options defining data content to scan. If empty, text, images, and other content will be included.",
+                    "description": "Deprecated and unused.",
                     "items": {
                         "enum": [
                             "CONTENT_UNSPECIFIED",
@@ -5346,11 +5402,11 @@
                     "type": "array"
                 },
                 "excludeInfoTypes": {
-                    "description": "When true, excludes type information of the findings.",
+                    "description": "When true, excludes type information of the findings. This is not used for data profiling.",
                     "type": "boolean"
                 },
                 "includeQuote": {
-                    "description": "When true, a contextual quote from the data that triggered a finding is included in the response; see Finding.quote.",
+                    "description": "When true, a contextual quote from the data that triggered a finding is included in the response; see Finding.quote. This is not used for data profiling.",
                     "type": "boolean"
                 },
                 "infoTypes": {
@@ -5362,7 +5418,7 @@
                 },
                 "limits": {
                     "$ref": "GooglePrivacyDlpV2FindingLimits",
-                    "description": "Configuration to control the number of findings returned."
+                    "description": "Configuration to control the number of findings returned. This is not used for data profiling."
                 },
                 "minLikelihood": {
                     "description": "Only returns findings equal or above this threshold. The default is POSSIBLE. See https://cloud.google.com/dlp/docs/likelihood to learn more.",
@@ -5844,7 +5900,7 @@
             "type": "object"
         },
         "GooglePrivacyDlpV2KmsWrappedCryptoKey": {
-            "description": "Include to use an existing data crypto key wrapped by KMS. The wrapped key must be a 128/192/256 bit key. Authorization requires the following IAM permissions when sending a request to perform a crypto transformation using a kms-wrapped crypto key: dlp.kms.encrypt",
+            "description": "Include to use an existing data crypto key wrapped by KMS. The wrapped key must be a 128-, 192-, or 256-bit key. Authorization requires the following IAM permissions when sending a request to perform a crypto transformation using a KMS-wrapped crypto key: dlp.kms.encrypt For more information, see [Creating a wrapped key] (https://cloud.google.com/dlp/docs/create-wrapped-key). Note: When you use Cloud KMS for cryptographic operations, [charges apply](https://cloud.google.com/kms/pricing).",
             "id": "GooglePrivacyDlpV2KmsWrappedCryptoKey",
             "properties": {
                 "cryptoKeyName": {
@@ -6321,7 +6377,11 @@
                 },
                 "replaceConfig": {
                     "$ref": "GooglePrivacyDlpV2ReplaceValueConfig",
-                    "description": "Replace"
+                    "description": "Replace with a specified value."
+                },
+                "replaceDictionaryConfig": {
+                    "$ref": "GooglePrivacyDlpV2ReplaceDictionaryConfig",
+                    "description": "Replace with a value randomly drawn (with replacement) from a dictionary."
                 },
                 "replaceWithInfoTypeConfig": {
                     "$ref": "GooglePrivacyDlpV2ReplaceWithInfoTypeConfig",
@@ -6383,7 +6443,7 @@
             "type": "object"
         },
         "GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog": {
-            "description": "Publish findings of a DlpJob to Cloud Data Catalog. Labels summarizing the results of the DlpJob will be applied to the entry for the resource scanned in Cloud Data Catalog. Any labels previously written by another DlpJob will be deleted. InfoType naming patterns are strictly enforced when using this feature. Note that the findings will be persisted in Cloud Data Catalog storage and are governed by Data Catalog service-specific policy, see https://cloud.google.com/terms/service-terms Only a single instance of this action can be specified and only allowed if all resources being scanned are BigQuery tables. Compatible with: Inspect",
+            "description": "Publish findings of a DlpJob to Data Catalog. Labels summarizing the results of the DlpJob will be applied to the entry for the resource scanned in Data Catalog. Any labels previously written by another DlpJob will be deleted. InfoType naming patterns are strictly enforced when using this feature. Note that the findings will be persisted in Data Catalog storage and are governed by Data Catalog service-specific policy, see https://cloud.google.com/terms/service-terms Only a single instance of this action can be specified and only allowed if all resources being scanned are BigQuery tables. Compatible with: Inspect",
             "id": "GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog",
             "properties": {},
             "type": "object"
@@ -6691,6 +6751,17 @@
                 "overview": {
                     "$ref": "GooglePrivacyDlpV2TransformationOverview",
                     "description": "An overview of the changes that were made to the `item`."
+                }
+            },
+            "type": "object"
+        },
+        "GooglePrivacyDlpV2ReplaceDictionaryConfig": {
+            "description": "Replace each input value with a value randomly selected from the dictionary.",
+            "id": "GooglePrivacyDlpV2ReplaceDictionaryConfig",
+            "properties": {
+                "wordList": {
+                    "$ref": "GooglePrivacyDlpV2WordList",
+                    "description": "A list of words to select from for random replacement. The [limits](https://cloud.google.com/dlp/limits) page contains details about the size limits of dictionaries."
                 }
             },
             "type": "object"
@@ -7041,7 +7112,7 @@
             "type": "object"
         },
         "GooglePrivacyDlpV2Table": {
-            "description": "Structured content to inspect. Up to 50,000 `Value`s per request allowed. See https://cloud.google.com/dlp/docs/inspecting-text#inspecting_a_table to learn more.",
+            "description": "Structured content to inspect. Up to 50,000 `Value`s per request allowed. See https://cloud.google.com/dlp/docs/inspecting-structured-text#inspecting_a_table to learn more.",
             "id": "GooglePrivacyDlpV2Table",
             "properties": {
                 "headers": {
@@ -7486,7 +7557,7 @@
             "type": "object"
         },
         "GoogleTypeDate": {
-            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day value, with a zero year, such as an anniversary * A year on its own, with zero month and day values * A year and month value, with a zero day, such as a credit card expiration date Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.",
+            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day, with a zero year (e.g., an anniversary) * A year on its own, with a zero month and a zero day * A year and month, with a zero day (e.g., a credit card expiration date) Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
             "id": "GoogleTypeDate",
             "properties": {
                 "day": {

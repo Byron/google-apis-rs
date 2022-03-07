@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "View and manage your data across Google Cloud Platform services"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/datastore": {
                     "description": "View and manage your Google Cloud Datastore data"
@@ -141,6 +141,32 @@
                                 "https://www.googleapis.com/auth/datastore"
                             ]
                         },
+                        "get": {
+                            "description": "Gets information about a database.",
+                            "flatPath": "v1/projects/{projectsId}/databases/{databasesId}",
+                            "httpMethod": "GET",
+                            "id": "firestore.projects.databases.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. A name of the form `projects/{project_id}/databases/{database_id}`",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/databases/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}",
+                            "response": {
+                                "$ref": "GoogleFirestoreAdminV1Database"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform",
+                                "https://www.googleapis.com/auth/datastore"
+                            ]
+                        },
                         "importDocuments": {
                             "description": "Imports documents into Google Cloud Firestore. Existing documents with the same name are overwritten. The import occurs in the background and its progress can be monitored and managed via the Operation resource that is created. If an ImportDocuments operation is cancelled, it is possible that a subset of the data has already been imported to Cloud Firestore.",
                             "flatPath": "v1/projects/{projectsId}/databases/{databasesId}:importDocuments",
@@ -161,6 +187,67 @@
                             "path": "v1/{+name}:importDocuments",
                             "request": {
                                 "$ref": "GoogleFirestoreAdminV1ImportDocumentsRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleLongrunningOperation"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform",
+                                "https://www.googleapis.com/auth/datastore"
+                            ]
+                        },
+                        "list": {
+                            "description": "List all the databases in the project.",
+                            "flatPath": "v1/projects/{projectsId}/databases",
+                            "httpMethod": "GET",
+                            "id": "firestore.projects.databases.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. A parent name of the form `projects/{project_id}`",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+parent}/databases",
+                            "response": {
+                                "$ref": "GoogleFirestoreAdminV1ListDatabasesResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform",
+                                "https://www.googleapis.com/auth/datastore"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a database.",
+                            "flatPath": "v1/projects/{projectsId}/databases/{databasesId}",
+                            "httpMethod": "PATCH",
+                            "id": "firestore.projects.databases.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "The resource name of the Database. Format: `projects/{project}/databases/{database}`",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/databases/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "The list of fields to be updated.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}",
+                            "request": {
+                                "$ref": "GoogleFirestoreAdminV1Database"
                             },
                             "response": {
                                 "$ref": "GoogleLongrunningOperation"
@@ -203,7 +290,7 @@
                                             ]
                                         },
                                         "list": {
-                                            "description": "Lists the field configuration and metadata for this database. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with the filter set to `indexConfig.usesAncestorConfig:false`.",
+                                            "description": "Lists the field configuration and metadata for this database. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with the filter set to `indexConfig.usesAncestorConfig:false` .",
                                             "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/collectionGroups/{collectionGroupsId}/fields",
                                             "httpMethod": "GET",
                                             "id": "firestore.projects.databases.collectionGroups.fields.list",
@@ -212,7 +299,7 @@
                                             ],
                                             "parameters": {
                                                 "filter": {
-                                                    "description": "The filter to apply to list results. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with the filter set to `indexConfig.usesAncestorConfig:false`.",
+                                                    "description": "The filter to apply to list results. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with a filter that includes `indexConfig.usesAncestorConfig:false` .",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
@@ -590,7 +677,7 @@
                                             "type": "boolean"
                                         },
                                         "currentDocument.updateTime": {
-                                            "description": "When set, the target document must exist and have been last updated at that time.",
+                                            "description": "When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.",
                                             "format": "google-datetime",
                                             "location": "query",
                                             "type": "string"
@@ -830,7 +917,7 @@
                                             "type": "boolean"
                                         },
                                         "currentDocument.updateTime": {
-                                            "description": "When set, the target document must exist and have been last updated at that time.",
+                                            "description": "When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.",
                                             "format": "google-datetime",
                                             "location": "query",
                                             "type": "string"
@@ -1135,7 +1222,7 @@
                                     "type": "string"
                                 },
                                 "pageSize": {
-                                    "description": "The maximum number of results to return. If not set, the service will select a default.",
+                                    "description": "The maximum number of results to return. If not set, the service selects a default.",
                                     "format": "int32",
                                     "location": "query",
                                     "type": "integer"
@@ -1160,7 +1247,7 @@
             }
         }
     },
-    "revision": "20210317",
+    "revision": "20220221",
     "rootUrl": "https://firestore.googleapis.com/",
     "schemas": {
         "ArrayValue": {
@@ -1685,6 +1772,55 @@
             },
             "type": "object"
         },
+        "GoogleFirestoreAdminV1Database": {
+            "description": "A Cloud Firestore Database. Currently only one database is allowed per cloud project; this database must have a `database_id` of '(default)'.",
+            "id": "GoogleFirestoreAdminV1Database",
+            "properties": {
+                "concurrencyMode": {
+                    "description": "The concurrency control mode to use for this database.",
+                    "enum": [
+                        "CONCURRENCY_MODE_UNSPECIFIED",
+                        "OPTIMISTIC",
+                        "PESSIMISTIC",
+                        "OPTIMISTIC_WITH_ENTITY_GROUPS"
+                    ],
+                    "enumDescriptions": [
+                        "Not used.",
+                        "Use optimistic concurrency control by default. This setting is available for Cloud Firestore customers.",
+                        "Use pessimistic concurrency control by default. This setting is available for Cloud Firestore customers. This is the default setting for Cloud Firestore.",
+                        "Use optimistic concurrency control with entity groups by default. This is the only available setting for Cloud Datastore customers. This is the default setting for Cloud Datastore."
+                    ],
+                    "type": "string"
+                },
+                "etag": {
+                    "description": "This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.",
+                    "type": "string"
+                },
+                "locationId": {
+                    "description": "The location of the database. Available databases are listed at https://cloud.google.com/firestore/docs/locations.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "The resource name of the Database. Format: `projects/{project}/databases/{database}`",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The type of the database. See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.",
+                    "enum": [
+                        "DATABASE_TYPE_UNSPECIFIED",
+                        "FIRESTORE_NATIVE",
+                        "DATASTORE_MODE"
+                    ],
+                    "enumDescriptions": [
+                        "The default value. This value is used if the database type is omitted.",
+                        "Firestore Native Mode",
+                        "Firestore in Datastore Mode."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1ExportDocumentsMetadata": {
             "description": "Metadata for google.longrunning.Operation results from FirestoreAdmin.ExportDocuments.",
             "id": "GoogleFirestoreAdminV1ExportDocumentsMetadata",
@@ -2116,6 +2252,20 @@
             },
             "type": "object"
         },
+        "GoogleFirestoreAdminV1ListDatabasesResponse": {
+            "description": "The list of databases for a project.",
+            "id": "GoogleFirestoreAdminV1ListDatabasesResponse",
+            "properties": {
+                "databases": {
+                    "description": "The databases in the project.",
+                    "items": {
+                        "$ref": "GoogleFirestoreAdminV1Database"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1ListFieldsResponse": {
             "description": "The response for FirestoreAdmin.ListFields.",
             "id": "GoogleFirestoreAdminV1ListFieldsResponse",
@@ -2173,6 +2323,12 @@
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1UpdateDatabaseMetadata": {
+            "description": "Metadata related to the update database operation.",
+            "id": "GoogleFirestoreAdminV1UpdateDatabaseMetadata",
+            "properties": {},
             "type": "object"
         },
         "GoogleLongrunningCancelOperationRequest": {
@@ -2235,7 +2391,7 @@
             "type": "object"
         },
         "LatLng": {
-            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this must conform to the WGS84 standard. Values must be within normalized ranges.",
+            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.",
             "id": "LatLng",
             "properties": {
                 "latitude": {
@@ -2496,7 +2652,7 @@
                     "type": "boolean"
                 },
                 "updateTime": {
-                    "description": "When set, the target document must exist and have been last updated at that time.",
+                    "description": "When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.",
                     "format": "google-datetime",
                     "type": "string"
                 }
@@ -2586,7 +2742,7 @@
                     "description": "A structured query."
                 },
                 "transaction": {
-                    "description": "Reads documents in a transaction.",
+                    "description": "Run the query within an already active transaction. The value here is the opaque transaction ID to execute the query in.",
                     "format": "byte",
                     "type": "string"
                 }
@@ -2599,7 +2755,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document",
-                    "description": "A query result. Not set when reporting partial progress."
+                    "description": "A query result, not set when reporting partial progress."
                 },
                 "readTime": {
                     "description": "The time at which the document was read. This may be monotonically increasing; in this case, the previous documents in the result stream are guaranteed not to have changed between their `read_time` and this one. If the query returns no results, a response with `read_time` and no `document` will be sent, and this represents the time at which the query was run.",

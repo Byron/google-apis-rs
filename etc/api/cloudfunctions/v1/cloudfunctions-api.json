@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 }
             }
         }
@@ -197,7 +197,7 @@
                                     "type": "string"
                                 },
                                 "pageSize": {
-                                    "description": "The maximum number of results to return. If not set, the service will select a default.",
+                                    "description": "The maximum number of results to return. If not set, the service selects a default.",
                                     "format": "int32",
                                     "location": "query",
                                     "type": "integer"
@@ -392,7 +392,7 @@
                                     ],
                                     "parameters": {
                                         "options.requestedPolicyVersion": {
-                                            "description": "Optional. The policy format version to be returned. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
+                                            "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
                                             "format": "int32",
                                             "location": "query",
                                             "type": "integer"
@@ -466,7 +466,7 @@
                                             "type": "string"
                                         },
                                         "updateMask": {
-                                            "description": "Required list of fields to be updated in this request.",
+                                            "description": "Required. The list of fields in `CloudFunction` that have to be updated.",
                                             "format": "google-fieldmask",
                                             "location": "query",
                                             "type": "string"
@@ -546,7 +546,7 @@
             }
         }
     },
-    "revision": "20210325",
+    "revision": "20220224",
     "rootUrl": "https://cloudfunctions.googleapis.com/",
     "schemas": {
         "AuditConfig": {
@@ -598,22 +598,22 @@
             "type": "object"
         },
         "Binding": {
-            "description": "Associates `members` with a `role`.",
+            "description": "Associates `members`, or principals, with a `role`.",
             "id": "Binding",
             "properties": {
                 "condition": {
                     "$ref": "Expr",
-                    "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the members in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
+                    "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
                 },
                 "members": {
-                    "description": "Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+                    "description": "Specifies the principals requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "role": {
-                    "description": "Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.",
+                    "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.",
                     "type": "string"
                 }
             },
@@ -670,12 +670,35 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "buildName": {
+                    "description": "Output only. The Cloud Build Name of the function deployment. `projects//locations//builds/`.",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "buildWorkerPool": {
-                    "description": "Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is `projects/{project}/locations/{region}/workerPools/{workerPool}` where {project} and {region} are the project id and region respectively where the worker pool is defined and {workerPool} is the short name of the worker pool. If the project id is not the same as the function, then the Cloud Functions Service Agent (service-@gcf-admin-robot.iam.gserviceaccount.com) must be granted the role Cloud Build Custom Workers Builder (roles/cloudbuild.customworkers.builder) in the project.",
+                    "description": "Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is `projects/{project}/locations/{region}/workerPools/{workerPool}` where `{project}` and `{region}` are the project id and region respectively where the worker pool is defined and `{workerPool}` is the short name of the worker pool. If the project id is not the same as the function, then the Cloud Functions Service Agent (`service-@gcf-admin-robot.iam.gserviceaccount.com`) must be granted the role Cloud Build Custom Workers Builder (`roles/cloudbuild.customworkers.builder`) in the project.",
                     "type": "string"
                 },
                 "description": {
                     "description": "User-provided description of a function.",
+                    "type": "string"
+                },
+                "dockerRegistry": {
+                    "description": "Docker Registry to use for this deployment. If `docker_repository` field is specified, this field will be automatically set as `ARTIFACT_REGISTRY`. If unspecified, it currently defaults to `CONTAINER_REGISTRY`. This field may be overridden by the backend for eligible deployments.",
+                    "enum": [
+                        "DOCKER_REGISTRY_UNSPECIFIED",
+                        "CONTAINER_REGISTRY",
+                        "ARTIFACT_REGISTRY"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Docker images will be stored in multi-regional Container Registry repositories named `gcf`.",
+                        "Docker images will be stored in regional Artifact Registry repositories. By default, GCF will create and use repositories named `gcf-artifacts` in every region in which a function is deployed. But the repository to use can also be specified by the user using the `docker_repository` field."
+                    ],
+                    "type": "string"
+                },
+                "dockerRepository": {
+                    "description": "User managed repository created in Artifact Registry optionally with a customer managed encryption key. If specified, deployments will use Artifact Registry. If unspecified and the deployment is eligible to use Artifact Registry, GCF will create and use a repository named 'gcf-artifacts' for every deployed region. This is the repository to which the function docker image will be pushed after it is built by Cloud Build. It must match the pattern `projects/{project}/locations/{location}/repositories/{repository}`. Cross-project repositories are not supported. Cross-location repositories are not supported. Repository format must be 'DOCKER'.",
                     "type": "string"
                 },
                 "entryPoint": {
@@ -713,6 +736,10 @@
                     ],
                     "type": "string"
                 },
+                "kmsKeyName": {
+                    "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources. It must match the pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`. If specified, you must also provide an artifact registry repository using the `docker_repository` field that was created with the same KMS crypto key. The following service accounts need to be granted the role 'Cloud KMS CryptoKey Encrypter/Decrypter (roles/cloudkms.cryptoKeyEncrypterDecrypter)' on the Key/KeyRing/Project/Organization (least access preferred). 1. Google Cloud Functions service account (service-{project_number}@gcf-admin-robot.iam.gserviceaccount.com) - Required to protect the function's image. 2. Google Storage service account (service-{project_number}@gs-project-accounts.iam.gserviceaccount.com) - Required to protect the function's source code. If this service account does not exist, deploying a function without a KMS key or retrieving the service agent name provisions it. For more information, see https://cloud.google.com/storage/docs/projects#service-agents and https://cloud.google.com/storage/docs/getting-service-agent#gsutil. Google Cloud Functions delegates access to service agents to protect function resources in internal projects that are not accessible by the end user.",
+                    "type": "string"
+                },
                 "labels": {
                     "additionalProperties": {
                         "type": "string"
@@ -725,24 +752,43 @@
                     "format": "int32",
                     "type": "integer"
                 },
+                "minInstances": {
+                    "description": "A lower bound for the number function instances that may coexist at a given time.",
+                    "format": "int32",
+                    "type": "integer"
+                },
                 "name": {
                     "description": "A user-defined name of the function. Function names must be unique globally and match pattern `projects/*/locations/*/functions/*`",
                     "type": "string"
                 },
                 "network": {
-                    "description": "The VPC Network that this cloud function can connect to. It can be either the fully-qualified URI, or the short name of the network resource. If the short network name is used, the network must belong to the same project. Otherwise, it must belong to a project within the same organization. The format of this field is either `projects/{project}/global/networks/{network}` or `{network}`, where {project} is a project id where the network is defined, and {network} is the short name of the network. This field is mutually exclusive with `vpc_connector` and will be replaced by it. See [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for more information on connecting Cloud projects.",
+                    "description": "The VPC Network that this cloud function can connect to. It can be either the fully-qualified URI, or the short name of the network resource. If the short network name is used, the network must belong to the same project. Otherwise, it must belong to a project within the same organization. The format of this field is either `projects/{project}/global/networks/{network}` or `{network}`, where `{project}` is a project id where the network is defined, and `{network}` is the short name of the network. This field is mutually exclusive with `vpc_connector` and will be replaced by it. See [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for more information on connecting Cloud projects.",
                     "type": "string"
                 },
                 "runtime": {
-                    "description": "The runtime in which to run the function. Required when deploying a new function, optional when updating an existing function. For a complete list of possible choices, see the [`gcloud` command reference](/sdk/gcloud/reference/functions/deploy#--runtime).",
+                    "description": "The runtime in which to run the function. Required when deploying a new function, optional when updating an existing function. For a complete list of possible choices, see the [`gcloud` command reference](https://cloud.google.com/sdk/gcloud/reference/functions/deploy#--runtime).",
                     "type": "string"
+                },
+                "secretEnvironmentVariables": {
+                    "description": "Secret environment variables configuration.",
+                    "items": {
+                        "$ref": "SecretEnvVar"
+                    },
+                    "type": "array"
+                },
+                "secretVolumes": {
+                    "description": "Secret volumes configuration.",
+                    "items": {
+                        "$ref": "SecretVolume"
+                    },
+                    "type": "array"
                 },
                 "serviceAccountEmail": {
                     "description": "The email of the function's service account. If empty, defaults to `{project_id}@appspot.gserviceaccount.com`.",
                     "type": "string"
                 },
                 "sourceArchiveUrl": {
-                    "description": "The Google Cloud Storage URL, starting with gs://, pointing to the zip archive which contains the function.",
+                    "description": "The Google Cloud Storage URL, starting with `gs://`, pointing to the zip archive which contains the function.",
                     "type": "string"
                 },
                 "sourceRepository": {
@@ -754,7 +800,7 @@
                     "type": "string"
                 },
                 "sourceUploadUrl": {
-                    "description": "The Google Cloud Storage signed URL used for source uploading, generated by google.cloud.functions.v1.GenerateUploadUrl",
+                    "description": "The Google Cloud Storage signed URL used for source uploading, generated by calling [google.cloud.functions.v1.GenerateUploadUrl]. The signature is validated on write methods (Create, Update) The signature is stripped from the Function object on read methods (Get, List)",
                     "type": "string"
                 },
                 "status": {
@@ -908,6 +954,300 @@
             "properties": {
                 "uploadUrl": {
                     "description": "The generated Google Cloud Storage signed URL that should be used for a function source code upload. The uploaded file should be a zip archive which contains a function.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudFunctionsV2alphaOperationMetadata": {
+            "description": "Represents the metadata of the long-running operation.",
+            "id": "GoogleCloudFunctionsV2alphaOperationMetadata",
+            "properties": {
+                "apiVersion": {
+                    "description": "API version used to start the operation.",
+                    "type": "string"
+                },
+                "cancelRequested": {
+                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "type": "boolean"
+                },
+                "createTime": {
+                    "description": "The time the operation was created.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "The time the operation finished running.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "requestResource": {
+                    "additionalProperties": {
+                        "description": "Properties of the object. Contains field @type with type URL.",
+                        "type": "any"
+                    },
+                    "description": "The original request that started the operation.",
+                    "type": "object"
+                },
+                "stages": {
+                    "description": "Mechanism for reporting in-progress stages",
+                    "items": {
+                        "$ref": "GoogleCloudFunctionsV2alphaStage"
+                    },
+                    "type": "array"
+                },
+                "statusDetail": {
+                    "description": "Human-readable status of the operation, if any.",
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Server-defined resource path for the target of the operation.",
+                    "type": "string"
+                },
+                "verb": {
+                    "description": "Name of the verb executed by the operation.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudFunctionsV2alphaStage": {
+            "description": "Each Stage of the deployment process",
+            "id": "GoogleCloudFunctionsV2alphaStage",
+            "properties": {
+                "message": {
+                    "description": "Message describing the Stage",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name of the Stage. This will be unique for each Stage.",
+                    "enum": [
+                        "NAME_UNSPECIFIED",
+                        "ARTIFACT_REGISTRY",
+                        "BUILD",
+                        "SERVICE",
+                        "TRIGGER",
+                        "SERVICE_ROLLBACK",
+                        "TRIGGER_ROLLBACK"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified. Invalid name.",
+                        "Artifact Regsitry Stage",
+                        "Build Stage",
+                        "Service Stage",
+                        "Trigger Stage",
+                        "Service Rollback Stage",
+                        "Trigger Rollback Stage"
+                    ],
+                    "type": "string"
+                },
+                "resource": {
+                    "description": "Resource of the Stage",
+                    "type": "string"
+                },
+                "resourceUri": {
+                    "description": "Link to the current Stage resource",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Current state of the Stage",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "NOT_STARTED",
+                        "IN_PROGRESS",
+                        "COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified. Invalid state.",
+                        "Stage has not started.",
+                        "Stage is in progress.",
+                        "Stage has completed."
+                    ],
+                    "type": "string"
+                },
+                "stateMessages": {
+                    "description": "State messages from the current Stage.",
+                    "items": {
+                        "$ref": "GoogleCloudFunctionsV2alphaStateMessage"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudFunctionsV2alphaStateMessage": {
+            "description": "Informational messages about the state of the Cloud Function or Operation.",
+            "id": "GoogleCloudFunctionsV2alphaStateMessage",
+            "properties": {
+                "message": {
+                    "description": "The message.",
+                    "type": "string"
+                },
+                "severity": {
+                    "description": "Severity of the state message.",
+                    "enum": [
+                        "SEVERITY_UNSPECIFIED",
+                        "ERROR",
+                        "WARNING",
+                        "INFO"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified. Invalid severity.",
+                        "ERROR-level severity.",
+                        "WARNING-level severity.",
+                        "INFO-level severity."
+                    ],
+                    "type": "string"
+                },
+                "type": {
+                    "description": "One-word CamelCase type of the state message.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudFunctionsV2betaOperationMetadata": {
+            "description": "Represents the metadata of the long-running operation.",
+            "id": "GoogleCloudFunctionsV2betaOperationMetadata",
+            "properties": {
+                "apiVersion": {
+                    "description": "API version used to start the operation.",
+                    "type": "string"
+                },
+                "cancelRequested": {
+                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "type": "boolean"
+                },
+                "createTime": {
+                    "description": "The time the operation was created.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "The time the operation finished running.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "requestResource": {
+                    "additionalProperties": {
+                        "description": "Properties of the object. Contains field @type with type URL.",
+                        "type": "any"
+                    },
+                    "description": "The original request that started the operation.",
+                    "type": "object"
+                },
+                "stages": {
+                    "description": "Mechanism for reporting in-progress stages",
+                    "items": {
+                        "$ref": "GoogleCloudFunctionsV2betaStage"
+                    },
+                    "type": "array"
+                },
+                "statusDetail": {
+                    "description": "Human-readable status of the operation, if any.",
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Server-defined resource path for the target of the operation.",
+                    "type": "string"
+                },
+                "verb": {
+                    "description": "Name of the verb executed by the operation.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudFunctionsV2betaStage": {
+            "description": "Each Stage of the deployment process",
+            "id": "GoogleCloudFunctionsV2betaStage",
+            "properties": {
+                "message": {
+                    "description": "Message describing the Stage",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name of the Stage. This will be unique for each Stage.",
+                    "enum": [
+                        "NAME_UNSPECIFIED",
+                        "ARTIFACT_REGISTRY",
+                        "BUILD",
+                        "SERVICE",
+                        "TRIGGER",
+                        "SERVICE_ROLLBACK",
+                        "TRIGGER_ROLLBACK"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified. Invalid name.",
+                        "Artifact Regsitry Stage",
+                        "Build Stage",
+                        "Service Stage",
+                        "Trigger Stage",
+                        "Service Rollback Stage",
+                        "Trigger Rollback Stage"
+                    ],
+                    "type": "string"
+                },
+                "resource": {
+                    "description": "Resource of the Stage",
+                    "type": "string"
+                },
+                "resourceUri": {
+                    "description": "Link to the current Stage resource",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Current state of the Stage",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "NOT_STARTED",
+                        "IN_PROGRESS",
+                        "COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified. Invalid state.",
+                        "Stage has not started.",
+                        "Stage is in progress.",
+                        "Stage has completed."
+                    ],
+                    "type": "string"
+                },
+                "stateMessages": {
+                    "description": "State messages from the current Stage.",
+                    "items": {
+                        "$ref": "GoogleCloudFunctionsV2betaStateMessage"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudFunctionsV2betaStateMessage": {
+            "description": "Informational messages about the state of the Cloud Function or Operation.",
+            "id": "GoogleCloudFunctionsV2betaStateMessage",
+            "properties": {
+                "message": {
+                    "description": "The message.",
+                    "type": "string"
+                },
+                "severity": {
+                    "description": "Severity of the state message.",
+                    "enum": [
+                        "SEVERITY_UNSPECIFIED",
+                        "ERROR",
+                        "WARNING",
+                        "INFO"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified. Invalid severity.",
+                        "ERROR-level severity.",
+                        "WARNING-level severity.",
+                        "INFO-level severity."
+                    ],
+                    "type": "string"
+                },
+                "type": {
+                    "description": "One-word CamelCase type of the state message.",
                     "type": "string"
                 }
             },
@@ -1077,6 +1417,10 @@
                     "description": "The Cloud Build ID of the function created or updated by an API call. This field is only populated for Create and Update operations.",
                     "type": "string"
                 },
+                "buildName": {
+                    "description": "The Cloud Build Name of the function deployment. This field is only populated for Create and Update operations. `projects//locations//builds/`.",
+                    "type": "string"
+                },
                 "request": {
                     "additionalProperties": {
                         "description": "Properties of the object. Contains field @type with type URL.",
@@ -1090,7 +1434,7 @@
                     "type": "string"
                 },
                 "target": {
-                    "description": "Target of the operation - for example projects/project-1/locations/region-1/functions/function-1",
+                    "description": "Target of the operation - for example `projects/project-1/locations/region-1/functions/function-1`",
                     "type": "string"
                 },
                 "type": {
@@ -1123,7 +1467,7 @@
             "type": "object"
         },
         "Policy": {
-            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members` to a single `role`. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= - version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
+            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
             "id": "Policy",
             "properties": {
                 "auditConfigs": {
@@ -1134,7 +1478,7 @@
                     "type": "array"
                 },
                 "bindings": {
-                    "description": "Associates a list of `members` to a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one member.",
+                    "description": "Associates a list of `members`, or principals, with a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one principal. The `bindings` in a `Policy` can refer to up to 1,500 principals; up to 250 of these principals can be Google groups. Each occurrence of a principal counts towards these limits. For example, if the `bindings` grant 50 different roles to `user:alice@example.com`, and not to any other principal, then you can add another 1,450 principals to the `bindings` in the `Policy`.",
                     "items": {
                         "$ref": "Binding"
                     },
@@ -1157,6 +1501,70 @@
             "description": "Describes the retry policy in case of function's execution failure. A function execution will be retried on any failure. A failed execution will be retried up to 7 days with an exponential backoff (capped at 10 seconds). Retried execution is charged as any other execution.",
             "id": "Retry",
             "properties": {},
+            "type": "object"
+        },
+        "SecretEnvVar": {
+            "description": "Configuration for a secret environment variable. It has the information necessary to fetch the secret value from secret manager and expose it as an environment variable.",
+            "id": "SecretEnvVar",
+            "properties": {
+                "key": {
+                    "description": "Name of the environment variable.",
+                    "type": "string"
+                },
+                "projectId": {
+                    "description": "Project identifier (preferrably project number but can also be the project ID) of the project that contains the secret. If not set, it will be populated with the function's project assuming that the secret exists in the same project as of the function.",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "Name of the secret in secret manager (not the full resource name).",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "Version of the secret (version number or the string 'latest'). It is recommended to use a numeric version for secret environment variables as any updates to the secret value is not reflected until new instances start.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SecretVersion": {
+            "description": "Configuration for a single version.",
+            "id": "SecretVersion",
+            "properties": {
+                "path": {
+                    "description": "Relative path of the file under the mount path where the secret value for this version will be fetched and made available. For example, setting the mount_path as '/etc/secrets' and path as `/secret_foo` would mount the secret value file at `/etc/secrets/secret_foo`.",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "Version of the secret (version number or the string 'latest'). It is preferrable to use `latest` version with secret volumes as secret value changes are reflected immediately.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SecretVolume": {
+            "description": "Configuration for a secret volume. It has the information necessary to fetch the secret value from secret manager and make it available as files mounted at the requested paths within the application container. Secret value is not a part of the configuration. Every filesystem read operation performs a lookup in secret manager to retrieve the secret value.",
+            "id": "SecretVolume",
+            "properties": {
+                "mountPath": {
+                    "description": "The path within the container to mount the secret volume. For example, setting the mount_path as `/etc/secrets` would mount the secret value files under the `/etc/secrets` directory. This directory will also be completely shadowed and unavailable to mount any other secrets. Recommended mount paths: /etc/secrets Restricted mount paths: /cloudsql, /dev/log, /pod, /proc, /var/log",
+                    "type": "string"
+                },
+                "projectId": {
+                    "description": "Project identifier (preferrably project number but can also be the project ID) of the project that contains the secret. If not set, it will be populated with the function's project assuming that the secret exists in the same project as of the function.",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "Name of the secret in secret manager (not the full resource name).",
+                    "type": "string"
+                },
+                "versions": {
+                    "description": "List of secret versions to mount for this secret. If empty, the `latest` version of the secret will be made available in a file named after the secret under the mount point.",
+                    "items": {
+                        "$ref": "SecretVersion"
+                    },
+                    "type": "array"
+                }
+            },
             "type": "object"
         },
         "SetIamPolicyRequest": {

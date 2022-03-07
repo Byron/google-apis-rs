@@ -6,7 +6,7 @@
                     "description": "View and manage your Google Cloud Platform billing accounts"
                 },
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 }
             }
         }
@@ -113,7 +113,7 @@
                 "budgets": {
                     "methods": {
                         "create": {
-                            "description": "Creates a new budget. See Quotas and limits for more information on the limits of the number of budgets you can create.",
+                            "description": "Creates a new budget. See [Quotas and limits](https://cloud.google.com/billing/quotas) for more information on the limits of the number of budgets you can create.",
                             "flatPath": "v1beta1/billingAccounts/{billingAccountsId}/budgets",
                             "httpMethod": "POST",
                             "id": "billingbudgets.billingAccounts.budgets.create",
@@ -264,7 +264,7 @@
             }
         }
     },
-    "revision": "20210326",
+    "revision": "20220227",
     "rootUrl": "https://billingbudgets.googleapis.com/",
     "schemas": {
         "GoogleCloudBillingBudgetsV1beta1AllUpdatesRule": {
@@ -307,7 +307,7 @@
                 },
                 "budgetFilter": {
                     "$ref": "GoogleCloudBillingBudgetsV1beta1Filter",
-                    "description": "Optional. Filters that define which resources are used to compute the actual spend against the budget."
+                    "description": "Optional. Filters that define which resources are used to compute the actual spend against the budget amount, such as projects, services, and the budget's time period, as well as other filters."
                 },
                 "displayName": {
                     "description": "User data for display name in UI. Validation: <= 60 chars.",
@@ -323,7 +323,7 @@
                     "type": "string"
                 },
                 "thresholdRules": {
-                    "description": "Optional. Rules that trigger alerts (notifications of thresholds being crossed) when spend exceeds the specified percentages of the budget.",
+                    "description": "Optional. Rules that trigger alerts (notifications of thresholds being crossed) when spend exceeds the specified percentages of the budget. Optional for `pubsubTopic` notifications. Required if using email notifications.",
                     "items": {
                         "$ref": "GoogleCloudBillingBudgetsV1beta1ThresholdRule"
                     },
@@ -338,7 +338,7 @@
             "properties": {
                 "lastPeriodAmount": {
                     "$ref": "GoogleCloudBillingBudgetsV1beta1LastPeriodAmount",
-                    "description": "Use the last period's actual spend as the budget for the present period. Cannot be set in combination with Filter.custom_period."
+                    "description": "Use the last period's actual spend as the budget for the present period. LastPeriodAmount can only be set when the budget's time period is a Filter.calendar_period. It cannot be set in combination with Filter.custom_period."
                 },
                 "specifiedAmount": {
                     "$ref": "GoogleTypeMoney",
@@ -378,7 +378,7 @@
             "id": "GoogleCloudBillingBudgetsV1beta1Filter",
             "properties": {
                 "calendarPeriod": {
-                    "description": "Optional. Specifies to track usage for recurring calendar period. E.g. Assume that CalendarPeriod.QUARTER is set. The budget will track usage from April 1 to June 30, when current calendar month is April, May, June. After that, it will track usage from July 1 to September 30 when current calendar month is July, August, September, and so on.",
+                    "description": "Optional. Specifies to track usage for recurring calendar period. For example, assume that CalendarPeriod.QUARTER is set. The budget will track usage from April 1 to June 30, when the current calendar month is April, May, June. After that, it will track usage from July 1 to September 30 when the current calendar month is July, August, September, so on.",
                     "enum": [
                         "CALENDAR_PERIOD_UNSPECIFIED",
                         "MONTH",
@@ -386,7 +386,7 @@
                         "YEAR"
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Calendar period is unset. This is the default if the budget is for a custom time period (CustomPeriod).",
                         "A month. Month starts on the first day of each month, such as January 1, February 1, March 1, and so on.",
                         "A quarter. Quarters start on dates January 1, April 1, July 1, and October 1 of each year.",
                         "A year. Year starts on January 1."
@@ -394,7 +394,7 @@
                     "type": "string"
                 },
                 "creditTypes": {
-                    "description": "Optional. If Filter.credit_types_treatment is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be subtracted from gross cost to determine the spend for threshold calculations. If Filter.credit_types_treatment is **not** INCLUDE_SPECIFIED_CREDITS, this field must be empty. See [a list of acceptable credit type values](https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type).",
+                    "description": "Optional. If Filter.credit_types_treatment is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be subtracted from gross cost to determine the spend for threshold calculations. See [a list of acceptable credit type values](https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type). If Filter.credit_types_treatment is **not** INCLUDE_SPECIFIED_CREDITS, this field must be empty.",
                     "items": {
                         "type": "string"
                     },
@@ -412,13 +412,13 @@
                         "",
                         "All types of credit are subtracted from the gross cost to determine the spend for threshold calculations.",
                         "All types of credit are added to the net cost to determine the spend for threshold calculations.",
-                        "Credit types specified in the credit_types field are subtracted from the gross cost to determine the spend for threshold calculations."
+                        "[Credit types](https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type) specified in the credit_types field are subtracted from the gross cost to determine the spend for threshold calculations."
                     ],
                     "type": "string"
                 },
                 "customPeriod": {
                     "$ref": "GoogleCloudBillingBudgetsV1beta1CustomPeriod",
-                    "description": "Optional. Specifies to track usage from any start date (required) to any end date (optional)."
+                    "description": "Optional. Specifies to track usage from any start date (required) to any end date (optional). This time period is static, it does not recur."
                 },
                 "labels": {
                     "additionalProperties": {
@@ -427,7 +427,7 @@
                         },
                         "type": "array"
                     },
-                    "description": "Optional. A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. Currently, multiple entries or multiple values per entry are not allowed. If omitted, the report will include all labeled and unlabeled usage.",
+                    "description": "Optional. A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget. If omitted, the report will include all labeled and unlabeled usage. An object containing a single `\"key\": value` pair. Example: `{ \"name\": \"wrench\" }`. _Currently, multiple entries or multiple values per entry are not allowed._",
                     "type": "object"
                 },
                 "projects": {
@@ -455,7 +455,7 @@
             "type": "object"
         },
         "GoogleCloudBillingBudgetsV1beta1LastPeriodAmount": {
-            "description": "Describes a budget amount targeted to last period's spend. At this time, the amount is automatically 100% of last period's spend; that is, there are no other options yet. Future configuration will be described here (for example, configuring a percentage of last period's spend).",
+            "description": "Describes a budget amount targeted to the last Filter.calendar_period spend. At this time, the amount is automatically 100% of the last calendar period's spend; that is, there are no other options yet. Future configuration options will be described here (for example, configuring a percentage of last period's spend). LastPeriodAmount cannot be set for a budget configured with a Filter.custom_period.",
             "id": "GoogleCloudBillingBudgetsV1beta1LastPeriodAmount",
             "properties": {},
             "type": "object"
@@ -479,7 +479,7 @@
             "type": "object"
         },
         "GoogleCloudBillingBudgetsV1beta1ThresholdRule": {
-            "description": "ThresholdRule contains a definition of a threshold which triggers an alert (a notification of a threshold being crossed) to be sent when spend goes above the specified amount. Alerts are automatically e-mailed to users with the Billing Account Administrator role or the Billing Account User role. The thresholds here have no effect on notifications sent to anything configured under `Budget.all_updates_rule`.",
+            "description": "ThresholdRule contains the definition of a threshold. Threshold rules define the triggering events used to generate a budget notification email. When a threshold is crossed (spend exceeds the specified percentages of the budget), budget alert emails are sent to the email recipients you specify in the [NotificationsRule](#notificationsrule). Threshold rules also affect the fields included in the [JSON data object](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#notification_format) sent to a Pub/Sub topic. Threshold rules are _required_ if using email notifications. Threshold rules are _optional_ if only setting a [`pubsubTopic` NotificationsRule](#NotificationsRule), unless you want your JSON data object to include data about the thresholds you set. For more information, see [set budget threshold rules and actions](https://cloud.google.com/billing/docs/how-to/budgets#budget-actions).",
             "id": "GoogleCloudBillingBudgetsV1beta1ThresholdRule",
             "properties": {
                 "spendBasis": {
@@ -492,7 +492,7 @@
                     "enumDescriptions": [
                         "Unspecified threshold basis.",
                         "Use current spend as the basis for comparison against the threshold.",
-                        "Use forecasted spend for the period as the basis for comparison against the threshold. Cannot be set in combination with Filter.custom_period."
+                        "Use forecasted spend for the period as the basis for comparison against the threshold. FORECASTED_SPEND can only be set when the budget's time period is a Filter.calendar_period. It cannot be set in combination with Filter.custom_period."
                     ],
                     "type": "string"
                 },
@@ -527,7 +527,7 @@
             "type": "object"
         },
         "GoogleTypeDate": {
-            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day value, with a zero year, such as an anniversary * A year on its own, with zero month and day values * A year and month value, with a zero day, such as a credit card expiration date Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.",
+            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day, with a zero year (e.g., an anniversary) * A year on its own, with a zero month and a zero day * A year and month, with a zero day (e.g., a credit card expiration date) Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
             "id": "GoogleTypeDate",
             "properties": {
                 "day": {

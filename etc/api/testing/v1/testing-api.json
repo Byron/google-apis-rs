@@ -3,10 +3,10 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/cloud-platform.read-only": {
-                    "description": "View your data across Google Cloud Platform services"
+                    "description": "View your data across Google Cloud services and see the email address of your Google Account"
                 }
             }
         }
@@ -282,7 +282,7 @@
             }
         }
     },
-    "revision": "20210326",
+    "revision": "20220301",
     "rootUrl": "https://testing.googleapis.com/",
     "schemas": {
         "Account": {
@@ -375,7 +375,7 @@
                     "type": "string"
                 },
                 "orchestratorOption": {
-                    "description": "The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not. ** Orchestrator is only compatible with AndroidJUnitRunner version 1.0 or higher! ** Orchestrator offers the following benefits: - No shared state - Crashes are isolated - Logs are scoped per test See for more information about Android Test Orchestrator. If not set, the test will be run without the orchestrator.",
+                    "description": "The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not. ** Orchestrator is only compatible with AndroidJUnitRunner version 1.1 or higher! ** Orchestrator offers the following benefits: - No shared state - Crashes are isolated - Logs are scoped per test See for more information about Android Test Orchestrator. If not set, the test will be run without the orchestrator.",
                     "enum": [
                         "ORCHESTRATOR_OPTION_UNSPECIFIED",
                         "USE_ORCHESTRATOR",
@@ -383,7 +383,7 @@
                     ],
                     "enumDescriptions": [
                         "Default value: the server will choose the mode. Currently implies that the test will run without the orchestrator. In the future, all instrumentation tests will be run with the orchestrator. Using the orchestrator is highly encouraged because of all the benefits it offers.",
-                        "Run test using orchestrator. ** Only compatible with AndroidJUnitRunner version 1.0 or higher! ** Recommended.",
+                        "Run test using orchestrator. ** Only compatible with AndroidJUnitRunner version 1.1 or higher! ** Recommended.",
                         "Run test without using orchestrator."
                     ],
                     "type": "string"
@@ -553,7 +553,7 @@
             "type": "object"
         },
         "AndroidRoboTest": {
-            "description": "A test of an android application that explores the application on a virtual or physical Android Device, finding culprits and crashes as it goes. Next tag: 30",
+            "description": "A test of an android application that explores the application on a virtual or physical Android Device, finding culprits and crashes as it goes.",
             "id": "AndroidRoboTest",
             "properties": {
                 "appApk": {
@@ -572,22 +572,26 @@
                     "description": "The java package for the application under test. The default value is determined by examining the application's manifest.",
                     "type": "string"
                 },
-                "maxDepth": {
-                    "description": "The max depth of the traversal stack Robo can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity. Default is 50.",
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "maxSteps": {
-                    "description": "The max number of steps Robo can execute. Default is no limit.",
-                    "format": "int32",
-                    "type": "integer"
-                },
                 "roboDirectives": {
                     "description": "A set of directives Robo should apply during the crawl. This allows users to customize the crawl. For example, the username and password for a test account can be provided.",
                     "items": {
                         "$ref": "RoboDirective"
                     },
                     "type": "array"
+                },
+                "roboMode": {
+                    "description": "The mode in which Robo should run. Most clients should allow the server to populate this field automatically.",
+                    "enum": [
+                        "ROBO_MODE_UNSPECIFIED",
+                        "ROBO_VERSION_1",
+                        "ROBO_VERSION_2"
+                    ],
+                    "enumDescriptions": [
+                        "This means that the server should choose the mode. Recommended.",
+                        "Runs Robo in UIAutomator-only mode without app resigning",
+                        "Runs Robo in standard Espresso with UIAutomator fallback"
+                    ],
+                    "type": "string"
                 },
                 "roboScript": {
                     "$ref": "FileReference",
@@ -847,7 +851,7 @@
             "type": "object"
         },
         "Date": {
-            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day value, with a zero year, such as an anniversary * A year on its own, with zero month and day values * A year and month value, with a zero day, such as a credit card expiration date Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.",
+            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day, with a zero year (e.g., an anniversary) * A year on its own, with a zero month and a zero day * A year and month, with a zero day (e.g., a credit card expiration date) Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
             "id": "Date",
             "properties": {
                 "day": {
@@ -1273,7 +1277,7 @@
                     "type": "string"
                 },
                 "pullDirectories": {
-                    "description": "List of directories on the device to upload to Cloud Storage at the end of the test. Directories should either be in a shared directory (e.g. /private/var/mobile/Media) or within an accessible directory inside the app's filesystem (e.g. /Documents) by specifying the bundle id.",
+                    "description": "List of directories on the device to upload to Cloud Storage at the end of the test. Directories should either be in a shared directory (such as /private/var/mobile/Media) or within an accessible directory inside the app's filesystem (such as /Documents) by specifying the bundle ID.",
                     "items": {
                         "$ref": "IosDeviceFile"
                     },
@@ -1473,7 +1477,7 @@
                     "type": "string"
                 },
                 "orchestratorVersion": {
-                    "description": "A string representing the current version of Android Test Orchestrator that is used in the environment. The package is available at https://maven.google.com/web/index.html#com.android.support.test:orchestrator.",
+                    "description": "Deprecated: Use AndroidX Test Orchestrator going forward. A string representing the current version of Android Test Orchestrator that is used in the environment. The package is available at https://maven.google.com/web/index.html#com.android.support.test:orchestrator.",
                     "type": "string"
                 }
             },
@@ -1827,7 +1831,7 @@
                         "The test package and app package are the same.",
                         "The test apk does not declare an instrumentation.",
                         "The input app apk does not have a signature.",
-                        "The test runner class specified by user or in the test APK's manifest file is not compatible with Android Test Orchestrator. Orchestrator is only compatible with AndroidJUnitRunner version 1.0 or higher. Orchestrator can be disabled by using DO_NOT_USE_ORCHESTRATOR OrchestratorOption.",
+                        "The test runner class specified by user or in the test APK's manifest file is not compatible with Android Test Orchestrator. Orchestrator is only compatible with AndroidJUnitRunner version 1.1 or higher. Orchestrator can be disabled by using DO_NOT_USE_ORCHESTRATOR OrchestratorOption.",
                         "The test APK does not contain the test runner class specified by user or in the manifest file. This can be caused by either of the following reasons: - the user provided a runner class name that's incorrect, or - the test runner isn't built into the test APK (might be in the app APK instead).",
                         "A main launcher activity could not be found.",
                         "The app declares one or more permissions that are not allowed.",
@@ -1980,7 +1984,7 @@
                 },
                 "systrace": {
                     "$ref": "SystraceSetup",
-                    "description": "Systrace configuration for the run. If set a systrace will be taken, starting on test start and lasting for the configured duration. The systrace file thus obtained is put in the results bucket together with the other artifacts from the run."
+                    "description": "Deprecated: Systrace uses Python 2 which has been sunset 2020-01-01. Support of Systrace may stop at any time, at which point no Systrace file will be provided in the results. Systrace configuration for the run. If set a systrace will be taken, starting on test start and lasting for the configured duration. The systrace file thus obtained is put in the results bucket together with the other artifacts from the run."
                 }
             },
             "type": "object"
@@ -2137,7 +2141,7 @@
             "type": "object"
         },
         "UniformSharding": {
-            "description": "Uniformly shards test cases given a total number of shards. For Instrumentation test, it will be translated to \"-e numShard\" \"-e shardIndex\" AndroidJUnitRunner arguments. With uniform sharding enabled, specifying these sharding arguments via environment_variables is invalid.",
+            "description": "Uniformly shards test cases given a total number of shards. For Instrumentation test, it will be translated to \"-e numShard\" \"-e shardIndex\" AndroidJUnitRunner arguments. Based on the sharding mechanism AndroidJUnitRunner uses, there is no guarantee that test cases will be distributed uniformly across all shards. With uniform sharding enabled, specifying these sharding arguments via environment_variables is invalid.",
             "id": "UniformSharding",
             "properties": {
                 "numShards": {

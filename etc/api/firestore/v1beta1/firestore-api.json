@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "View and manage your data across Google Cloud Platform services"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 },
                 "https://www.googleapis.com/auth/datastore": {
                     "description": "View and manage your Google Cloud Datastore data"
@@ -352,7 +352,7 @@
                                             "type": "boolean"
                                         },
                                         "currentDocument.updateTime": {
-                                            "description": "When set, the target document must exist and have been last updated at that time.",
+                                            "description": "When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.",
                                             "format": "google-datetime",
                                             "location": "query",
                                             "type": "string"
@@ -592,7 +592,7 @@
                                             "type": "boolean"
                                         },
                                         "currentDocument.updateTime": {
-                                            "description": "When set, the target document must exist and have been last updated at that time.",
+                                            "description": "When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.",
                                             "format": "google-datetime",
                                             "location": "query",
                                             "type": "string"
@@ -849,7 +849,7 @@
             }
         }
     },
-    "revision": "20210317",
+    "revision": "20220221",
     "rootUrl": "https://firestore.googleapis.com/",
     "schemas": {
         "ArrayValue": {
@@ -1374,6 +1374,12 @@
             },
             "type": "object"
         },
+        "GoogleFirestoreAdminV1UpdateDatabaseMetadata": {
+            "description": "Metadata related to the update database operation.",
+            "id": "GoogleFirestoreAdminV1UpdateDatabaseMetadata",
+            "properties": {},
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1beta1ExportDocumentsMetadata": {
             "description": "Metadata for ExportDocuments operations.",
             "id": "GoogleFirestoreAdminV1beta1ExportDocumentsMetadata",
@@ -1724,7 +1730,7 @@
             "type": "object"
         },
         "LatLng": {
-            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this must conform to the WGS84 standard. Values must be within normalized ranges.",
+            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.",
             "id": "LatLng",
             "properties": {
                 "latitude": {
@@ -1933,7 +1939,7 @@
                     "type": "boolean"
                 },
                 "updateTime": {
-                    "description": "When set, the target document must exist and have been last updated at that time.",
+                    "description": "When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.",
                     "format": "google-datetime",
                     "type": "string"
                 }
@@ -2023,7 +2029,7 @@
                     "description": "A structured query."
                 },
                 "transaction": {
-                    "description": "Reads documents in a transaction.",
+                    "description": "Run the query within an already active transaction. The value here is the opaque transaction ID to execute the query in.",
                     "format": "byte",
                     "type": "string"
                 }
@@ -2036,7 +2042,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document",
-                    "description": "A query result. Not set when reporting partial progress."
+                    "description": "A query result, not set when reporting partial progress."
                 },
                 "readTime": {
                     "description": "The time at which the document was read. This may be monotonically increasing; in this case, the previous documents in the result stream are guaranteed not to have changed between their `read_time` and this one. If the query returns no results, a response with `read_time` and no `document` will be sent, and this represents the time at which the query was run.",

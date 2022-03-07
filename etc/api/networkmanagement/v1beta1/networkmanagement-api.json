@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/cloud-platform": {
-                    "description": "See, edit, configure, and delete your Google Cloud Platform data"
+                    "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
                 }
             }
         }
@@ -156,7 +156,7 @@
                                     "type": "string"
                                 },
                                 "pageSize": {
-                                    "description": "The maximum number of results to return. If not set, the service will select a default.",
+                                    "description": "The maximum number of results to return. If not set, the service selects a default.",
                                     "format": "int32",
                                     "location": "query",
                                     "type": "integer"
@@ -274,7 +274,7 @@
                                             ],
                                             "parameters": {
                                                 "options.requestedPolicyVersion": {
-                                                    "description": "Optional. The policy format version to be returned. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
+                                                    "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
                                                     "format": "int32",
                                                     "location": "query",
                                                     "type": "integer"
@@ -591,7 +591,7 @@
             }
         }
     },
-    "revision": "20210325",
+    "revision": "20220223",
     "rootUrl": "https://networkmanagement.googleapis.com/",
     "schemas": {
         "AbortInfo": {
@@ -611,7 +611,12 @@
                         "NO_EXTERNAL_IP",
                         "UNINTENDED_DESTINATION",
                         "TRACE_TOO_LONG",
-                        "INTERNAL_ERROR"
+                        "INTERNAL_ERROR",
+                        "SOURCE_ENDPOINT_NOT_FOUND",
+                        "MISMATCHED_SOURCE_NETWORK",
+                        "DESTINATION_ENDPOINT_NOT_FOUND",
+                        "MISMATCHED_DESTINATION_NETWORK",
+                        "UNSUPPORTED"
                     ],
                     "enumDescriptions": [
                         "Cause is unspecified.",
@@ -624,12 +629,40 @@
                         "Aborted because traffic is sent from a public IP to an instance without an external IP.",
                         "Aborted because none of the traces matches destination information specified in the input test request.",
                         "Aborted because the number of steps in the trace exceeding a certain limit which may be caused by routing loop.",
-                        "Aborted due to internal server error."
+                        "Aborted due to internal server error.",
+                        "Aborted because the source endpoint could not be found.",
+                        "Aborted because the source network does not match the source endpoint.",
+                        "Aborted because the destination endpoint could not be found.",
+                        "Aborted because the destination network does not match the destination endpoint.",
+                        "Aborted because the test scenario is not supported."
                     ],
                     "type": "string"
                 },
                 "resourceUri": {
                     "description": "URI of the resource that caused the abort.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AppEngineVersionInfo": {
+            "description": "For display only. Metadata associated with an App Engine version.",
+            "id": "AppEngineVersionInfo",
+            "properties": {
+                "displayName": {
+                    "description": "Name of an App Engine version.",
+                    "type": "string"
+                },
+                "environment": {
+                    "description": "App Engine execution environment for a version.",
+                    "type": "string"
+                },
+                "runtime": {
+                    "description": "Runtime of the App Engine version.",
+                    "type": "string"
+                },
+                "uri": {
+                    "description": "URI of an App Engine version.",
                     "type": "string"
                 }
             },
@@ -684,22 +717,22 @@
             "type": "object"
         },
         "Binding": {
-            "description": "Associates `members` with a `role`.",
+            "description": "Associates `members`, or principals, with a `role`.",
             "id": "Binding",
             "properties": {
                 "condition": {
                     "$ref": "Expr",
-                    "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the members in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
+                    "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
                 },
                 "members": {
-                    "description": "Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+                    "description": "Specifies the principals requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "role": {
-                    "description": "Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.",
+                    "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.",
                     "type": "string"
                 }
             },
@@ -711,6 +744,41 @@
             "properties": {},
             "type": "object"
         },
+        "CloudFunctionEndpoint": {
+            "description": "Wrapper for cloud function attributes.",
+            "id": "CloudFunctionEndpoint",
+            "properties": {
+                "uri": {
+                    "description": "A [Cloud function](https://cloud.google.com/functions) name.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CloudFunctionInfo": {
+            "description": "For display only. Metadata associated with a Cloud function.",
+            "id": "CloudFunctionInfo",
+            "properties": {
+                "displayName": {
+                    "description": "Name of a Cloud function.",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Location in which the Cloud function is deployed.",
+                    "type": "string"
+                },
+                "uri": {
+                    "description": "URI of a Cloud function.",
+                    "type": "string"
+                },
+                "versionId": {
+                    "description": "Latest successfully deployed version id of the Cloud function.",
+                    "format": "int64",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "CloudSQLInstanceInfo": {
             "description": "For display only. Metadata associated with a Cloud SQL instance.",
             "id": "CloudSQLInstanceInfo",
@@ -720,15 +788,15 @@
                     "type": "string"
                 },
                 "externalIp": {
-                    "description": "External IP address of Cloud SQL instance.",
+                    "description": "External IP address of a Cloud SQL instance.",
                     "type": "string"
                 },
                 "internalIp": {
-                    "description": "Internal IP address of Cloud SQL instance.",
+                    "description": "Internal IP address of a Cloud SQL instance.",
                     "type": "string"
                 },
                 "networkUri": {
-                    "description": "URI of a Cloud SQL instance network or empty string if instance does not have one.",
+                    "description": "URI of a Cloud SQL instance network or empty string if the instance does not have one.",
                     "type": "string"
                 },
                 "region": {
@@ -826,15 +894,21 @@
                         "INTERNET",
                         "GOOGLE_API",
                         "GKE_MASTER",
-                        "CLOUD_SQL_INSTANCE"
+                        "CLOUD_SQL_INSTANCE",
+                        "PSC_PUBLISHED_SERVICE",
+                        "PSC_GOOGLE_API",
+                        "PSC_VPC_SC"
                     ],
                     "enumDescriptions": [
                         "Target not specified.",
                         "Target is a Compute Engine instance.",
-                        "Target is the Internet.",
+                        "Target is the internet.",
                         "Target is a Google API.",
                         "Target is a Google Kubernetes Engine cluster master.",
-                        "Target is a Cloud SQL instance."
+                        "Target is a Cloud SQL instance.",
+                        "Target is a published service using [Private Service Connect](https://cloud.google.com/vpc/docs/configure-private-service-connect-services).",
+                        "Target is all Google APIs using [Private Service Connect](https://cloud.google.com/vpc/docs/configure-private-service-connect-apis).",
+                        "Target is VPC-SC using [Private Service Connect](https://cloud.google.com/vpc/docs/configure-private-service-connect-apis)."
                     ],
                     "type": "string"
                 }
@@ -867,29 +941,43 @@
                         "GKE_MASTER_UNAUTHORIZED_ACCESS",
                         "CLOUD_SQL_INSTANCE_UNAUTHORIZED_ACCESS",
                         "DROPPED_INSIDE_GKE_SERVICE",
-                        "DROPPED_INSIDE_CLOUD_SQL_SERVICE"
+                        "DROPPED_INSIDE_CLOUD_SQL_SERVICE",
+                        "GOOGLE_MANAGED_SERVICE_NO_PEERING",
+                        "CLOUD_SQL_INSTANCE_NO_IP_ADDRESS",
+                        "CLOUD_FUNCTION_NOT_ACTIVE",
+                        "VPC_CONNECTOR_NOT_SET",
+                        "VPC_CONNECTOR_NOT_RUNNING",
+                        "FORWARDING_RULE_REGION_MISMATCH",
+                        "PSC_CONNECTION_NOT_ACCEPTED"
                     ],
                     "enumDescriptions": [
                         "Cause is unspecified.",
-                        "Destination external address cannot be resolved to a known target. If the address is used in a GCP project, provide the project ID as test input.",
-                        "a Compute Engine instance can only send or receive a packet with a foreign IP if ip_forward is enabled.",
+                        "Destination external address cannot be resolved to a known target. If the address is used in a Google Cloud project, provide the project ID as test input.",
+                        "a Compute Engine instance can only send or receive a packet with a foreign IP address if ip_forward is enabled.",
                         "Dropped due to a firewall rule, unless allowed due to connection tracking.",
                         "Dropped due to no routes.",
                         "Dropped due to invalid route. Route's next hop is a blackhole.",
                         "Packet is sent to a wrong (unintended) network. Example: you trace a packet from VM1:Network1 to VM2:Network2, however, the route configured in Network1 sends the packet destined for VM2's IP addresss to Network3.",
-                        "Packet with internal destination address sent to Internet gateway.",
-                        "Instance with only an internal IP tries to access Google API and Services, but private Google access is not enabled.",
-                        "Instance with only internal IP tries to access external hosts, but Cloud NAT is not enabled in the subnet, unless special configurations on a VM allows this connection. See [Special Configurations for VM instances](https://cloud.google.com/vpc/docs/special-configurations) for more details.",
+                        "Packet with internal destination address sent to the internet gateway.",
+                        "Instance with only an internal IP address tries to access Google API and services, but private Google access is not enabled.",
+                        "Instance with only an internal IP address tries to access external hosts, but Cloud NAT is not enabled in the subnet, unless special configurations on a VM allow this connection.",
                         "Destination internal address cannot be resolved to a known target. If this is a shared VPC scenario, verify if the service project ID is provided as test input. Otherwise, verify if the IP address is being used in the project.",
                         "Forwarding rule's protocol and ports do not match the packet header.",
                         "Forwarding rule does not have backends configured.",
-                        "Firewalls block the health check probes to the backends and cause the backends to be unavailable for traffic from the load balancer. See [Health check firewall rules](https://cloud.google.com/load-balancing/docs/health-checks#firewall_rules) for more details.",
+                        "Firewalls block the health check probes to the backends and cause the backends to be unavailable for traffic from the load balancer. For more details, see [Health check firewall rules](https://cloud.google.com/load-balancing/docs/health-checks#firewall_rules).",
                         "Packet is sent from or to a Compute Engine instance that is not in a running state.",
                         "The type of traffic is blocked and the user cannot configure a firewall rule to enable it. See [Always blocked traffic](https://cloud.google.com/vpc/docs/firewalls#blockedtraffic) for more details.",
                         "Access to Google Kubernetes Engine cluster master's endpoint is not authorized. See [Access to the cluster endpoints](https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#access_to_the_cluster_endpoints) for more details.",
                         "Access to the Cloud SQL instance endpoint is not authorized. See [Authorizing with authorized networks](https://cloud.google.com/sql/docs/mysql/authorize-networks) for more details.",
                         "Packet was dropped inside Google Kubernetes Engine Service.",
-                        "Packet was dropped inside Cloud SQL Service."
+                        "Packet was dropped inside Cloud SQL Service.",
+                        "Packet was dropped because there is no peering between the originating network and the Google Managed Services Network.",
+                        "Packet was dropped because the Cloud SQL instance has neither a private nor a public IP address.",
+                        "Packet could be dropped because the Cloud function is not in an active status.",
+                        "Packet could be dropped because no VPC connector is set.",
+                        "Packet could be dropped because the VPC connector is not in a running state.",
+                        "Packet could be dropped because it was sent from a different region to a regional forwarding without global access.",
+                        "Privte Service Connect (PSC) connection is not in accepted state."
                     ],
                     "type": "string"
                 },
@@ -910,6 +998,10 @@
             "description": "Source or destination of the Connectivity Test.",
             "id": "Endpoint",
             "properties": {
+                "cloudFunction": {
+                    "$ref": "CloudFunctionEndpoint",
+                    "description": "A [Cloud function](https://cloud.google.com/functions)."
+                },
                 "cloudSqlInstance": {
                     "description": "A [Cloud SQL](https://cloud.google.com/sql) instance URI.",
                     "type": "string"
@@ -977,6 +1069,10 @@
                     "description": "IP protocol in string format, for example: \"TCP\", \"UDP\", \"ICMP\".",
                     "type": "string"
                 },
+                "sourceAgentUri": {
+                    "description": "URI of the source telemetry agent this packet originates from.",
+                    "type": "string"
+                },
                 "sourceIp": {
                     "description": "Source IP address.",
                     "type": "string"
@@ -1042,7 +1138,7 @@
                     ],
                     "enumDescriptions": [
                         "Unspecified type.",
-                        "Hierarchical firewall policy rule. For details, see [Hierarchical firewall policy rules](https://cloud.google.com/vpc/docs/firewall-policies).",
+                        "Hierarchical firewall policy rule. For details, see [Hierarchical firewall policies overview](https://cloud.google.com/vpc/docs/firewall-policies).",
                         "VPC firewall rule. For details, see [VPC firewall rules overview](https://cloud.google.com/vpc/docs/firewalls).",
                         "Implied VPC firewall rule. For details, see [Implied rules](https://cloud.google.com/vpc/docs/firewalls#default_firewall_rules)."
                     ],
@@ -1108,7 +1204,7 @@
                         "Forwarded to a Cloud Interconnect connection.",
                         "Forwarded to a Google Kubernetes Engine Container cluster master.",
                         "Forwarded to the next hop of a custom route imported from a peering VPC.",
-                        "Forwarded to a Cloud SQL Instance."
+                        "Forwarded to a Cloud SQL instance."
                     ],
                     "type": "string"
                 }
@@ -1151,23 +1247,23 @@
             "type": "object"
         },
         "GKEMasterInfo": {
-            "description": "For display only. Metadata associated with a Google Kubernetes Engine cluster master.",
+            "description": "For display only. Metadata associated with a Google Kubernetes Engine (GKE) cluster master.",
             "id": "GKEMasterInfo",
             "properties": {
                 "clusterNetworkUri": {
-                    "description": "URI of a Google Kubernetes Engine cluster network.",
+                    "description": "URI of a GKE cluster network.",
                     "type": "string"
                 },
                 "clusterUri": {
-                    "description": "URI of a Google Kubernetes Engine cluster.",
+                    "description": "URI of a GKE cluster.",
                     "type": "string"
                 },
                 "externalIp": {
-                    "description": "External IP address of a Google Kubernetes Engine cluster master.",
+                    "description": "External IP address of a GKE cluster master.",
                     "type": "string"
                 },
                 "internalIp": {
-                    "description": "Internal IP address of a Google Kubernetes Engine cluster master.",
+                    "description": "Internal IP address of a GKE cluster master.",
                     "type": "string"
                 }
             },
@@ -1532,7 +1628,7 @@
             "type": "object"
         },
         "Policy": {
-            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members` to a single `role`. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= - version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
+            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
             "id": "Policy",
             "properties": {
                 "auditConfigs": {
@@ -1543,7 +1639,7 @@
                     "type": "array"
                 },
                 "bindings": {
-                    "description": "Associates a list of `members` to a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one member.",
+                    "description": "Associates a list of `members`, or principals, with a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one principal. The `bindings` in a `Policy` can refer to up to 1,500 principals; up to 250 of these principals can be Google groups. Each occurrence of a principal counts towards these limits. For example, if the `bindings` grant 50 different roles to `user:alice@example.com`, and not to any other principal, then you can add another 1,450 principals to the `bindings` in the `Policy`.",
                     "items": {
                         "$ref": "Binding"
                     },
@@ -1715,7 +1811,8 @@
                         "NEXT_HOP_VPN_GATEWAY",
                         "NEXT_HOP_INTERNET_GATEWAY",
                         "NEXT_HOP_BLACKHOLE",
-                        "NEXT_HOP_ILB"
+                        "NEXT_HOP_ILB",
+                        "NEXT_HOP_ROUTER_APPLIANCE"
                     ],
                     "enumDescriptions": [
                         "Unspecified type. Default value.",
@@ -1725,10 +1822,11 @@
                         "Next hop is a peering VPC.",
                         "Next hop is an interconnect.",
                         "Next hop is a VPN tunnel.",
-                        "Next hop is a VPN Gateway. This scenario only happens when tracing connectivity from an on-premises network to GCP through a VPN. The analysis simulates a packet departing from the on-premises network through a VPN tunnel and arriving at a Cloud VPN gateway.",
+                        "Next hop is a VPN gateway. This scenario only happens when tracing connectivity from an on-premises network to Google Cloud through a VPN. The analysis simulates a packet departing from the on-premises network through a VPN tunnel and arriving at a Cloud VPN gateway.",
                         "Next hop is an internet gateway.",
                         "Next hop is blackhole; that is, the next hop either does not exist or is not running.",
-                        "Next hop is the forwarding rule of an Internal Load Balancer."
+                        "Next hop is the forwarding rule of an Internal Load Balancer.",
+                        "Next hop is a [router appliance instance](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/ra-overview)."
                     ],
                     "type": "string"
                 },
@@ -1751,7 +1849,7 @@
                     "enumDescriptions": [
                         "Unspecified type. Default value.",
                         "Route is a subnet route automatically created by the system.",
-                        "Static route created by the user including the default route to the Internet.",
+                        "Static route created by the user, including the default route to the internet.",
                         "Dynamic route exchanged between BGP peers.",
                         "A subnet route received from peering network.",
                         "A static route received from peering network.",
@@ -1815,19 +1913,27 @@
             "properties": {
                 "abort": {
                     "$ref": "AbortInfo",
-                    "description": "Display info of the final state \"abort\" and reason."
+                    "description": "Display information of the final state \"abort\" and reason."
+                },
+                "appEngineVersionInfo": {
+                    "$ref": "AppEngineVersionInfo",
+                    "description": "Display information of an App Engine service version."
                 },
                 "causesDrop": {
                     "description": "This is a step that leads to the final state Drop.",
                     "type": "boolean"
                 },
+                "cloudFunction": {
+                    "$ref": "CloudFunctionInfo",
+                    "description": "Display information of a Cloud function."
+                },
                 "cloudSqlInstance": {
                     "$ref": "CloudSQLInstanceInfo",
-                    "description": "Display info of a Cloud SQL instance."
+                    "description": "Display information of a Cloud SQL instance."
                 },
                 "deliver": {
                     "$ref": "DeliverInfo",
-                    "description": "Display info of the final state \"deliver\" and reason."
+                    "description": "Display information of the final state \"deliver\" and reason."
                 },
                 "description": {
                     "description": "A description of the step. Usually this is a summary of the state.",
@@ -1835,39 +1941,39 @@
                 },
                 "drop": {
                     "$ref": "DropInfo",
-                    "description": "Display info of the final state \"drop\" and reason."
+                    "description": "Display information of the final state \"drop\" and reason."
                 },
                 "endpoint": {
                     "$ref": "EndpointInfo",
-                    "description": "Display info of the source and destination under analysis. The endpoint info in an intermediate state may differ with the initial input, as it might be modified by state like NAT, or Connection Proxy."
+                    "description": "Display information of the source and destination under analysis. The endpoint information in an intermediate state may differ with the initial input, as it might be modified by state like NAT, or Connection Proxy."
                 },
                 "firewall": {
                     "$ref": "FirewallInfo",
-                    "description": "Display info of a Compute Engine firewall rule."
+                    "description": "Display information of a Compute Engine firewall rule."
                 },
                 "forward": {
                     "$ref": "ForwardInfo",
-                    "description": "Display info of the final state \"forward\" and reason."
+                    "description": "Display information of the final state \"forward\" and reason."
                 },
                 "forwardingRule": {
                     "$ref": "ForwardingRuleInfo",
-                    "description": "Display info of a Compute Engine forwarding rule."
+                    "description": "Display information of a Compute Engine forwarding rule."
                 },
                 "gkeMaster": {
                     "$ref": "GKEMasterInfo",
-                    "description": "Display info of a Google Kubernetes Engine cluster master."
+                    "description": "Display information of a Google Kubernetes Engine cluster master."
                 },
                 "instance": {
                     "$ref": "InstanceInfo",
-                    "description": "Display info of a Compute Engine instance."
+                    "description": "Display information of a Compute Engine instance."
                 },
                 "loadBalancer": {
                     "$ref": "LoadBalancerInfo",
-                    "description": "Display info of the load balancers."
+                    "description": "Display information of the load balancers."
                 },
                 "network": {
                     "$ref": "NetworkInfo",
-                    "description": "Display info of a GCP network."
+                    "description": "Display information of a Google Cloud network."
                 },
                 "projectId": {
                     "description": "Project ID that contains the configuration this step is validating.",
@@ -1875,7 +1981,7 @@
                 },
                 "route": {
                     "$ref": "RouteInfo",
-                    "description": "Display info of a Compute Engine route."
+                    "description": "Display information of a Compute Engine route."
                 },
                 "state": {
                     "description": "Each step is in one of the pre-defined states.",
@@ -1886,6 +1992,8 @@
                         "START_FROM_PRIVATE_NETWORK",
                         "START_FROM_GKE_MASTER",
                         "START_FROM_CLOUD_SQL_INSTANCE",
+                        "START_FROM_CLOUD_FUNCTION",
+                        "START_FROM_APP_ENGINE_VERSION",
                         "APPLY_INGRESS_FIREWALL_RULE",
                         "APPLY_EGRESS_FIREWALL_RULE",
                         "APPLY_ROUTE",
@@ -1896,6 +2004,7 @@
                         "ARRIVE_AT_EXTERNAL_LOAD_BALANCER",
                         "ARRIVE_AT_VPN_GATEWAY",
                         "ARRIVE_AT_VPN_TUNNEL",
+                        "ARRIVE_AT_VPC_CONNECTOR",
                         "NAT",
                         "PROXY_CONNECTION",
                         "DELIVER",
@@ -1906,11 +2015,13 @@
                     ],
                     "enumDescriptions": [
                         "Unspecified state.",
-                        "Initial state: packet originating from a Compute Engine instance. An InstanceInfo will be populated with starting instance info.",
-                        "Initial state: packet originating from Internet. The endpoint info will be populated.",
-                        "Initial state: packet originating from a VPC or on-premises network with internal source IP. If the source is a VPC network visible to the user, a NetworkInfo will be populated with details of the network.",
-                        "Initial state: packet originating from a Google Kubernetes Engine cluster master. A GKEMasterInfo will be populated with starting instance info.",
-                        "Initial state: packet originating from a Cloud SQL instance. A CloudSQLInstanceInfo will be populated with starting instance info.",
+                        "Initial state: packet originating from a Compute Engine instance. An InstanceInfo is populated with starting instance information.",
+                        "Initial state: packet originating from the internet. The endpoint information is populated.",
+                        "Initial state: packet originating from a VPC or on-premises network with internal source IP. If the source is a VPC network visible to the user, a NetworkInfo is populated with details of the network.",
+                        "Initial state: packet originating from a Google Kubernetes Engine cluster master. A GKEMasterInfo is populated with starting instance information.",
+                        "Initial state: packet originating from a Cloud SQL instance. A CloudSQLInstanceInfo is populated with starting instance information.",
+                        "Initial state: packet originating from a Cloud function. A CloudFunctionInfo is populated with starting function information.",
+                        "Initial state: packet originating from an App Engine service version. An AppEngineVersionInfo is populated with starting version information.",
                         "Config checking state: verify ingress firewall rule.",
                         "Config checking state: verify egress firewall rule.",
                         "Config checking state: verify route.",
@@ -1921,6 +2032,7 @@
                         "Forwarding state: arriving at a Compute Engine external load balancer.",
                         "Forwarding state: arriving at a Cloud VPN gateway.",
                         "Forwarding state: arriving at a Cloud VPN tunnel.",
+                        "Forwarding state: arriving at a VPC connector.",
                         "Transition state: packet header translated.",
                         "Transition state: original connection is terminated and a new proxied connection is initiated.",
                         "Final state: packet could be delivered.",
@@ -1931,13 +2043,17 @@
                     ],
                     "type": "string"
                 },
+                "vpcConnector": {
+                    "$ref": "VpcConnectorInfo",
+                    "description": "Display information of a VPC connector."
+                },
                 "vpnGateway": {
                     "$ref": "VpnGatewayInfo",
-                    "description": "Display info of a Compute Engine VPN gateway."
+                    "description": "Display information of a Compute Engine VPN gateway."
                 },
                 "vpnTunnel": {
                     "$ref": "VpnTunnelInfo",
-                    "description": "Display info of a Compute Engine VPN tunnel."
+                    "description": "Display information of a Compute Engine VPN tunnel."
                 }
             },
             "type": "object"
@@ -1971,12 +2087,12 @@
             "type": "object"
         },
         "Trace": {
-            "description": "Trace represents one simulated packet forwarding path. * Each trace contains multiple ordered Steps. * Each step is in a particular state with associated configuration. * State is categorized as final or non-final states. * Each final state has a reason associated. * Each trace must end with a final state (the last step). ``` |---------------------Trace----------------------| Step1(State) Step2(State) --- StepN(State(final)) ```",
+            "description": "Trace represents one simulated packet forwarding path. * Each trace contains multiple ordered steps. * Each step is in a particular state with associated configuration. * State is categorized as final or non-final states. * Each final state has a reason associated. * Each trace must end with a final state (the last step). ``` |---------------------Trace----------------------| Step1(State) Step2(State) --- StepN(State(final)) ```",
             "id": "Trace",
             "properties": {
                 "endpointInfo": {
                     "$ref": "EndpointInfo",
-                    "description": "Derived from the source and destination endpoints definition, and validated by the data plane model. If there are multiple traces starting from different source locations, then the endpoint_info may be different between traces."
+                    "description": "Derived from the source and destination endpoints definition specified by user request, and validated by the data plane model. If there are multiple traces starting from different source locations, then the endpoint_info may be different between traces."
                 },
                 "steps": {
                     "description": "A trace of a test contains multiple steps from the initial state to the final state (delivered, dropped, forwarded, or aborted). The steps are ordered by the processing sequence within the simulated network state machine. It is critical to preserve the order of the steps and avoid reordering or sorting them.",
@@ -1984,6 +2100,25 @@
                         "$ref": "Step"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "VpcConnectorInfo": {
+            "description": "For display only. Metadata associated with a VPC connector.",
+            "id": "VpcConnectorInfo",
+            "properties": {
+                "displayName": {
+                    "description": "Name of a VPC connector.",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Location in which the VPC connector is deployed.",
+                    "type": "string"
+                },
+                "uri": {
+                    "description": "URI of a VPC connector.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2005,7 +2140,7 @@
                     "type": "string"
                 },
                 "region": {
-                    "description": "Name of a GCP region where this VPN gateway is configured.",
+                    "description": "Name of a Google Cloud region where this VPN gateway is configured.",
                     "type": "string"
                 },
                 "uri": {
@@ -2032,7 +2167,7 @@
                     "type": "string"
                 },
                 "region": {
-                    "description": "Name of a GCP region where this VPN tunnel is configured.",
+                    "description": "Name of a Google Cloud region where this VPN tunnel is configured.",
                     "type": "string"
                 },
                 "remoteGateway": {

@@ -23,8 +23,10 @@
 	if os.environ.get('FETCH_APIS') is not None:
 		import urllib3
 		http = urllib3.PoolManager()
+		# Seems like connecting to https stopped working, so download the json below manually and put it into
+		# apis.json in the repository root.
 		discovery_url = 'https://www.googleapis.com/discovery/v1/apis'
-		apis = json.loads(http.request('GET', discovery_url).data)
+		apis = json.loads(open("apis.json", "r").read())
 
 		print('Loaded {} apis from Google'.format(len(apis['items'])))
 
