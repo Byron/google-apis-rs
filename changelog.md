@@ -1,5 +1,11 @@
 <a name="api-v2.0.0:cli-v2.0.0"></a>
 
+## api/cli-v3.0.0 (2022-3-8)
+
+- Support for yup-oauth 0.6
+- Redesigned error handling which won't swallow errors anymore by making less assumptions about
+  them. They are now merely assume to be JSON, with a fallback to the plain message.
+
 ## api-v2.0.4:cli-v2.0.4 (2021-4-1)
 
 - every call is `async`
