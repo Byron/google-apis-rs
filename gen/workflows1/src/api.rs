@@ -19,7 +19,7 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// See, edit, configure, and delete your Google Cloud Platform data
+    /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
 }
 
@@ -52,14 +52,12 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_workflows1 as workflows1;
 /// use workflows1::api::Workflow;
 /// use workflows1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use workflows1::Workflows;
+/// use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -69,9 +67,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -107,8 +105,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct Workflows<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -122,7 +120,7 @@ impl<'a, > Workflows<> {
         Workflows {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://workflows.googleapis.com/".to_string(),
             _root_url: "https://workflows.googleapis.com/".to_string(),
         }
@@ -133,7 +131,7 @@ impl<'a, > Workflows<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -343,7 +341,7 @@ pub struct Workflow {
     /// Output only. The revision of the workflow. A new revision of a workflow is created as a result of updating the following properties of a workflow: - Service account - Workflow code to be executed The format is "000001-a4d", where the first 6 characters define the zero-padded revision ordinal number. They are followed by a hyphen and 3 hexadecimal random characters.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
-    /// Name of the service account associated with the latest workflow version. This service account represents the identity of the workflow and determines what permissions the workflow has. Format: projects/{project}/serviceAccounts/{account} Using `-` as a wildcard for the `{project}` will infer the project from the account. The `{account}` value can be the `email` address or the `unique_id` of the service account. If not provided, workflow will use the project's default service account. Modifying this field for an existing workflow results in a new workflow revision.
+    /// The service account associated with the latest workflow version. This service account represents the identity of the workflow and determines what permissions the workflow has. Format: projects/{project}/serviceAccounts/{account} or {account} Using `-` as a wildcard for the `{project}` or not providing one at all will infer the project from the account. The `{account}` value can be the `email` address or the `unique_id` of the service account. If not provided, workflow will use the project's default service account. Modifying this field for an existing workflow results in a new workflow revision.
     #[serde(rename="serviceAccount")]
     pub service_account: Option<String>,
     /// Workflow code to be executed. The size limit is 128KB.
@@ -375,18 +373,16 @@ impl client::ResponseResult for Workflow {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_workflows1 as workflows1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use workflows1::Workflows;
+/// use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -612,17 +608,15 @@ impl<'a> ProjectMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -747,22 +741,22 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -870,17 +864,15 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1005,22 +997,22 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1128,17 +1120,15 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1278,22 +1268,22 @@ impl<'a> ProjectLocationOperationListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1422,18 +1412,16 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// use workflows1::api::Workflow;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -1583,22 +1571,22 @@ impl<'a> ProjectLocationWorkflowCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1722,17 +1710,15 @@ impl<'a> ProjectLocationWorkflowCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1857,22 +1843,22 @@ impl<'a> ProjectLocationWorkflowDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1980,17 +1966,15 @@ impl<'a> ProjectLocationWorkflowDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2115,22 +2099,22 @@ impl<'a> ProjectLocationWorkflowGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2238,17 +2222,15 @@ impl<'a> ProjectLocationWorkflowGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2393,22 +2375,22 @@ impl<'a> ProjectLocationWorkflowListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2544,18 +2526,16 @@ impl<'a> ProjectLocationWorkflowListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// use workflows1::api::Workflow;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2705,22 +2685,22 @@ impl<'a> ProjectLocationWorkflowPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2844,17 +2824,15 @@ impl<'a> ProjectLocationWorkflowPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2979,22 +2957,22 @@ impl<'a> ProjectLocationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3102,17 +3080,15 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_workflows1 as workflows1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use workflows1::Workflows;
+/// # use workflows1::{Workflows, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Workflows::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3252,22 +3228,22 @@ impl<'a> ProjectLocationListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3307,7 +3283,7 @@ impl<'a> ProjectLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results to return. If not set, the service will select a default.
+    /// The maximum number of results to return. If not set, the service selects a default.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {

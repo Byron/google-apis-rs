@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Safebrowsing* crate version *2.0.8+20210330*, where *20210330* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Safebrowsing* crate version *3.0.0+20220305*, where *20220305* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Safebrowsing* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/safe-browsing/).
@@ -77,11 +77,8 @@
 //! ```toml
 //! [dependencies]
 //! google-safebrowsing4 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -89,13 +86,11 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_safebrowsing4 as safebrowsing4;
 //! use safebrowsing4::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use safebrowsing4::Safebrowsing;
+//! use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -105,9 +100,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
@@ -204,10 +199,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

@@ -19,7 +19,7 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// See, edit, configure, and delete your Google Cloud Platform data
+    /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
 
     /// Manage your Google SQL Service instances
@@ -56,14 +56,12 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::User;
 /// use sqladmin1_beta4::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -73,9 +71,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -112,8 +110,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct SQLAdmin<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -127,7 +125,7 @@ impl<'a, > SQLAdmin<> {
         SQLAdmin {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://sqladmin.googleapis.com/".to_string(),
             _root_url: "https://sqladmin.googleapis.com/".to_string(),
         }
@@ -135,6 +133,9 @@ impl<'a, > SQLAdmin<> {
 
     pub fn backup_runs(&'a self) -> BackupRunMethods<'a> {
         BackupRunMethods { hub: &self }
+    }
+    pub fn connect(&'a self) -> ConnectMethods<'a> {
+        ConnectMethods { hub: &self }
     }
     pub fn databases(&'a self) -> DatabaseMethods<'a> {
         DatabaseMethods { hub: &self }
@@ -162,7 +163,7 @@ impl<'a, > SQLAdmin<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -196,10 +197,10 @@ impl<'a, > SQLAdmin<> {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclEntry {
-    /// The time when this access control entry expires in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time when this access control entry expires in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="expirationTime")]
     pub expiration_time: Option<String>,
-    /// This is always *sql#aclEntry*.
+    /// This is always `sql#aclEntry`.
     pub kind: Option<String>,
     /// Optional. A label to identify this entry.
     pub name: Option<String>,
@@ -241,17 +242,17 @@ pub struct BackupConfiguration {
     pub binary_log_enabled: Option<bool>,
     /// Whether this configuration is enabled.
     pub enabled: Option<bool>,
-    /// This is always *sql#backupConfiguration*.
+    /// This is always `sql#backupConfiguration`.
     pub kind: Option<String>,
     /// Location of the backup
     pub location: Option<String>,
-    /// Reserved for future use.
+    /// (Postgres only) Whether point in time recovery is enabled.
     #[serde(rename="pointInTimeRecoveryEnabled")]
     pub point_in_time_recovery_enabled: Option<bool>,
     /// Reserved for future use.
     #[serde(rename="replicationLogArchivingEnabled")]
     pub replication_log_archiving_enabled: Option<bool>,
-    /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - *HH:MM*.
+    /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - `HH:MM`.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// The number of days of transaction logs we retain for point in time restore, from 1-7.
@@ -271,7 +272,7 @@ pub struct BackupContext {
     /// The identifier of the backup.
     #[serde(rename="backupId")]
     pub backup_id: Option<String>,
-    /// This is always *sql#backupContext*.
+    /// This is always `sql#backupContext`.
     pub kind: Option<String>,
 }
 
@@ -314,16 +315,16 @@ pub struct BackupRun {
     pub backup_kind: Option<String>,
     /// The description of this run, only applicable to on-demand backups.
     pub description: Option<String>,
-    /// Encryption configuration specific to a backup. Applies only to Second Generation instances.
+    /// Encryption configuration specific to a backup.
     #[serde(rename="diskEncryptionConfiguration")]
     pub disk_encryption_configuration: Option<DiskEncryptionConfiguration>,
-    /// Encryption status specific to a backup. Applies only to Second Generation instances.
+    /// Encryption status specific to a backup.
     #[serde(rename="diskEncryptionStatus")]
     pub disk_encryption_status: Option<DiskEncryptionStatus>,
-    /// The time the backup operation completed in UTC timezone in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time the backup operation completed in UTC timezone in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// The time the run was enqueued in UTC timezone in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time the run was enqueued in UTC timezone in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="enqueuedTime")]
     pub enqueued_time: Option<String>,
     /// Information about why the backup operation failed. This is only present if the run has the FAILED status.
@@ -332,14 +333,14 @@ pub struct BackupRun {
     pub id: Option<String>,
     /// Name of the database instance.
     pub instance: Option<String>,
-    /// This is always *sql#backupRun*.
+    /// This is always `sql#backupRun`.
     pub kind: Option<String>,
     /// Location of the backups.
     pub location: Option<String>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// The time the backup operation actually started in UTC timezone in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time the backup operation actually started in UTC timezone in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// The status of this run.
@@ -347,7 +348,7 @@ pub struct BackupRun {
     /// The type of this run; can be either "AUTOMATED" or "ON_DEMAND". This field defaults to "ON_DEMAND" and is ignored, when specified for insert requests.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The start time of the backup window during which this the backup was attempted in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The start time of the backup window during which this the backup was attempted in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="windowStartTime")]
     pub window_start_time: Option<String>,
 }
@@ -370,7 +371,7 @@ impl client::ResponseResult for BackupRun {}
 pub struct BackupRunsListResponse {
     /// A list of backup runs in reverse chronological order of the enqueued time.
     pub items: Option<Vec<BackupRun>>,
-    /// This is always *sql#backupRunsList*.
+    /// This is always `sql#backupRunsList`.
     pub kind: Option<String>,
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -392,7 +393,7 @@ pub struct BinLogCoordinates {
     /// Position (offset) within the binary log file.
     #[serde(rename="binLogPosition")]
     pub bin_log_position: Option<String>,
-    /// This is always *sql#binLogCoordinates*.
+    /// This is always `sql#binLogCoordinates`.
     pub kind: Option<String>,
 }
 
@@ -405,23 +406,58 @@ impl client::Part for BinLogCoordinates {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloneContext {
+    /// The name of the allocated ip range for the private ip CloudSQL instance. For example: "google-managed-services-default". If set, the cloned instance ip will be created in the allocated range. The range name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?. Reserved for future use.
+    #[serde(rename="allocatedIpRange")]
+    pub allocated_ip_range: Option<String>,
     /// Binary log coordinates, if specified, identify the position up to which the source instance is cloned. If not specified, the source instance is cloned up to the most recent binary log coordinates.
     #[serde(rename="binLogCoordinates")]
     pub bin_log_coordinates: Option<BinLogCoordinates>,
     /// Name of the Cloud SQL instance to be created as a clone.
     #[serde(rename="destinationInstanceName")]
     pub destination_instance_name: Option<String>,
-    /// This is always *sql#cloneContext*.
+    /// This is always `sql#cloneContext`.
     pub kind: Option<String>,
     /// Reserved for future use.
     #[serde(rename="pitrTimestampMs")]
     pub pitr_timestamp_ms: Option<String>,
-    /// Reserved for future use.
+    /// Timestamp, if specified, identifies the time to which the source instance is cloned.
     #[serde(rename="pointInTime")]
     pub point_in_time: Option<String>,
 }
 
 impl client::Part for CloneContext {}
+
+
+/// Connect settings retrieval response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get connect](ConnectGetCall) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConnectSettings {
+    /// `SECOND_GEN`: Cloud SQL database instance. `EXTERNAL`: A database server that is not managed by Google. This property is read-only; use the `tier` property in the `settings` object to determine the database type.
+    #[serde(rename="backendType")]
+    pub backend_type: Option<String>,
+    /// The database engine type and version. The `databaseVersion` field cannot be changed after instance creation. MySQL instances: `MYSQL_8_0`, `MYSQL_5_7` (default), or `MYSQL_5_6`. PostgreSQL instances: `POSTGRES_9_6`, `POSTGRES_10`, `POSTGRES_11` or `POSTGRES_12` (default), `POSTGRES_13`, or `POSTGRES_14`. SQL Server instances: `SQLSERVER_2017_STANDARD` (default), `SQLSERVER_2017_ENTERPRISE`, `SQLSERVER_2017_EXPRESS`, `SQLSERVER_2017_WEB`, `SQLSERVER_2019_STANDARD`, `SQLSERVER_2019_ENTERPRISE`, `SQLSERVER_2019_EXPRESS`, or `SQLSERVER_2019_WEB`.
+    #[serde(rename="databaseVersion")]
+    pub database_version: Option<String>,
+    /// The assigned IP addresses for the instance.
+    #[serde(rename="ipAddresses")]
+    pub ip_addresses: Option<Vec<IpMapping>>,
+    /// This is always `sql#connectSettings`.
+    pub kind: Option<String>,
+    /// The cloud region for the instance. e.g. `us-central1`, `europe-west1`. The region cannot be changed after instance creation.
+    pub region: Option<String>,
+    /// SSL configuration.
+    #[serde(rename="serverCaCert")]
+    pub server_ca_cert: Option<SslCert>,
+}
+
+impl client::ResponseResult for ConnectSettings {}
 
 
 /// Represents a SQL database on the Cloud SQL instance.
@@ -448,7 +484,7 @@ pub struct Database {
     pub etag: Option<String>,
     /// The name of the Cloud SQL instance. This does not include the project ID.
     pub instance: Option<String>,
-    /// This is always *sql#database*.
+    /// This is always `sql#database`.
     pub kind: Option<String>,
     /// The name of the database in the Cloud SQL instance. This does not include the project ID or instance name.
     pub name: Option<String>,
@@ -473,9 +509,9 @@ impl client::ResponseResult for Database {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseFlags {
-    /// The name of the flag. These flags are passed at instance startup, so include both server options and system variables for MySQL. Flags are specified with underscores, not hyphens. For more information, see Configuring Database Flags in the Cloud SQL documentation.
+    /// The name of the flag. These flags are passed at instance startup, so include both server options and system variables. Flags are specified with underscores, not hyphens. For more information, see [Configuring Database Flags](https://cloud.google.com/sql/docs/mysql/flags) in the Cloud SQL documentation.
     pub name: Option<String>,
-    /// The value of the flag. Booleans are set to *on* for true and *off* for false. This field must be omitted if the flag doesn't take a value.
+    /// The value of the flag. Boolean flags are set to `on` for true and `off` for false. This field must be omitted if the flag doesn't take a value.
     pub value: Option<String>,
 }
 
@@ -496,33 +532,42 @@ impl client::Part for DatabaseFlags {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstance {
-    ///  *SECOND_GEN*: Cloud SQL database instance. *EXTERNAL*: A database server that is not managed by Google. This property is read-only; use the *tier* property in the *settings* object to determine the database type.
+    /// List all maintenance versions applicable on the instance
+    #[serde(rename="availableMaintenanceVersions")]
+    pub available_maintenance_versions: Option<Vec<String>>,
+    /// The backend type. `SECOND_GEN`: Cloud SQL database instance. `EXTERNAL`: A database server that is not managed by Google. This property is read-only; use the `tier` property in the `settings` object to determine the database type.
     #[serde(rename="backendType")]
     pub backend_type: Option<String>,
     /// Connection name of the Cloud SQL instance used in connection strings.
     #[serde(rename="connectionName")]
     pub connection_name: Option<String>,
-    /// The current disk usage of the instance in bytes. This property has been deprecated. Use the "cloudsql.googleapis.com/database/disk/bytes_used" metric in Cloud Monitoring API instead. Please see this announcement for details.
+    /// Output only. The time when the instance was created in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// The current disk usage of the instance in bytes. This property has been deprecated. Use the "cloudsql.googleapis.com/database/disk/bytes_used" metric in Cloud Monitoring API instead. Please see [this announcement](https://groups.google.com/d/msg/google-cloud-sql-announce/I_7-F9EBhT0/BtvFtdFeAgAJ) for details.
     #[serde(rename="currentDiskSize")]
     pub current_disk_size: Option<String>,
-    /// The database engine type and version. The *databaseVersion* field cannot be changed after instance creation. MySQL instances: *MYSQL_8_0*, *MYSQL_5_7* (default), or *MYSQL_5_6*. PostgreSQL instances: *POSTGRES_9_6*, *POSTGRES_10*, *POSTGRES_11*, *POSTGRES_12*, or *POSTGRES_13* (default). SQL Server instances: *SQLSERVER_2017_STANDARD* (default), *SQLSERVER_2017_ENTERPRISE*, *SQLSERVER_2017_EXPRESS*, or *SQLSERVER_2017_WEB*.
+    /// Output only. Stores the current database version running on the instance including minor version such as `MYSQL_8_0_18`.
+    #[serde(rename="databaseInstalledVersion")]
+    pub database_installed_version: Option<String>,
+    /// The database engine type and version. The `databaseVersion` field cannot be changed after instance creation.
     #[serde(rename="databaseVersion")]
     pub database_version: Option<String>,
-    /// Disk encryption configuration specific to an instance. Applies only to Second Generation instances.
+    /// Disk encryption configuration specific to an instance.
     #[serde(rename="diskEncryptionConfiguration")]
     pub disk_encryption_configuration: Option<DiskEncryptionConfiguration>,
-    /// Disk encryption status specific to an instance. Applies only to Second Generation instances.
+    /// Disk encryption status specific to an instance.
     #[serde(rename="diskEncryptionStatus")]
     pub disk_encryption_status: Option<DiskEncryptionStatus>,
-    /// This field is deprecated and will be removed from a future version of the API. Use the *settings.settingsVersion* field instead.
+    /// This field is deprecated and will be removed from a future version of the API. Use the `settings.settingsVersion` field instead.
     pub etag: Option<String>,
-    /// The name and status of the failover replica. This property is applicable only to Second Generation instances.
+    /// The name and status of the failover replica.
     #[serde(rename="failoverReplica")]
     pub failover_replica: Option<DatabaseInstanceFailoverReplica>,
-    /// The Compute Engine zone that the instance is currently serving from. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary zone.
+    /// The Compute Engine zone that the instance is currently serving from. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary zone. WARNING: Changing this might restart the instance.
     #[serde(rename="gceZone")]
     pub gce_zone: Option<String>,
-    /// The instance type. This can be one of the following. *CLOUD_SQL_INSTANCE*: A Cloud SQL instance that is not replicating from a primary instance. *ON_PREMISES_INSTANCE*: An instance running on the customer's premises. *READ_REPLICA_INSTANCE*: A Cloud SQL instance configured as a read-replica.
+    /// The instance type.
     #[serde(rename="instanceType")]
     pub instance_type: Option<String>,
     /// The assigned IP addresses for the instance.
@@ -531,8 +576,11 @@ pub struct DatabaseInstance {
     /// The IPv6 address assigned to the instance. (Deprecated) This property was applicable only to First Generation instances.
     #[serde(rename="ipv6Address")]
     pub ipv6_address: Option<String>,
-    /// This is always *sql#instance*.
+    /// This is always `sql#instance`.
     pub kind: Option<String>,
+    /// The current software version on the instance.
+    #[serde(rename="maintenanceVersion")]
+    pub maintenance_version: Option<String>,
     /// The name of the instance which will act as primary in the replication setup.
     #[serde(rename="masterInstanceName")]
     pub master_instance_name: Option<String>,
@@ -544,9 +592,12 @@ pub struct DatabaseInstance {
     /// Configuration specific to on-premises instances.
     #[serde(rename="onPremisesConfiguration")]
     pub on_premises_configuration: Option<OnPremisesConfiguration>,
+    /// This field represents the report generated by the proactive database wellness job for OutOfDisk issues. * Writers: * the proactive database wellness job for OOD. * Readers: * the proactive database wellness job
+    #[serde(rename="outOfDiskReport")]
+    pub out_of_disk_report: Option<SqlOutOfDiskReport>,
     /// The project ID of the project containing the Cloud SQL instance. The Google apps domain is prefixed if applicable.
     pub project: Option<String>,
-    /// The geographical region. Can be *us-central* (*FIRST_GEN* instances only) *us-central1* (*SECOND_GEN* instances only) *asia-east1* or *europe-west1*. Defaults to *us-central* or *us-central1* depending on the instance type. The region cannot be changed after instance creation.
+    /// The geographical region. Can be: * `us-central` (`FIRST_GEN` instances only) * `us-central1` (`SECOND_GEN` instances only) * `asia-east1` or `europe-west1`. Defaults to `us-central` or `us-central1` depending on the instance type. The region cannot be changed after instance creation.
     pub region: Option<String>,
     /// Configuration specific to failover replicas and read replicas.
     #[serde(rename="replicaConfiguration")]
@@ -563,7 +614,7 @@ pub struct DatabaseInstance {
     /// The start time of any upcoming scheduled maintenance for this instance.
     #[serde(rename="scheduledMaintenance")]
     pub scheduled_maintenance: Option<SqlScheduledMaintenance>,
-    /// The Compute Engine zone that the failover instance is currently serving from for a regional instance. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary/failover zone. Reserved for future use.
+    /// The Compute Engine zone that the failover instance is currently serving from for a regional instance. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary/failover zone.
     #[serde(rename="secondaryGceZone")]
     pub secondary_gce_zone: Option<String>,
     /// The URI of this resource.
@@ -572,12 +623,12 @@ pub struct DatabaseInstance {
     /// SSL configuration.
     #[serde(rename="serverCaCert")]
     pub server_ca_cert: Option<SslCert>,
-    /// The service account email address assigned to the instance. This property is applicable only to Second Generation instances.
+    /// The service account email address assigned to the instance. \This property is read-only.
     #[serde(rename="serviceAccountEmailAddress")]
     pub service_account_email_address: Option<String>,
     /// The user settings.
     pub settings: Option<Settings>,
-    /// The current serving state of the Cloud SQL instance. This can be one of the following. *SQL_INSTANCE_STATE_UNSPECIFIED*: The state of the instance is unknown. *RUNNABLE*: The instance is running, or has been stopped by owner. *SUSPENDED*: The instance is not available, for example due to problems with billing. *PENDING_DELETE*: The instance is being deleted. *PENDING_CREATE*: The instance is being created. *MAINTENANCE*: The instance is down for maintenance. *FAILED*: The instance creation failed.
+    /// The current serving state of the Cloud SQL instance.
     pub state: Option<String>,
     /// If the instance state is SUSPENDED, the reason for the suspension.
     #[serde(rename="suspensionReason")]
@@ -601,7 +652,7 @@ impl client::ResponseResult for DatabaseInstance {}
 pub struct DatabasesListResponse {
     /// List of database resources in the instance.
     pub items: Option<Vec<Database>>,
-    /// This is always *sql#databasesList*.
+    /// This is always `sql#databasesList`.
     pub kind: Option<String>,
 }
 
@@ -614,9 +665,9 @@ impl client::ResponseResult for DatabasesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DemoteMasterConfiguration {
-    /// This is always *sql#demoteMasterConfiguration*.
+    /// This is always `sql#demoteMasterConfiguration`.
     pub kind: Option<String>,
-    /// MySQL specific configuration when replicating from a MySQL on-premises primary instance. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named *master.info* in the data directory.
+    /// MySQL specific configuration when replicating from a MySQL on-premises primary instance. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named `master.info` in the data directory.
     #[serde(rename="mysqlReplicaConfiguration")]
     pub mysql_replica_configuration: Option<DemoteMasterMySqlReplicaConfiguration>,
 }
@@ -630,7 +681,7 @@ impl client::Part for DemoteMasterConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DemoteMasterContext {
-    /// This is always *sql#demoteMasterContext*.
+    /// This is always `sql#demoteMasterContext`.
     pub kind: Option<String>,
     /// The name of the instance which will act as on-premises primary instance in the replication setup.
     #[serde(rename="masterInstanceName")]
@@ -638,7 +689,10 @@ pub struct DemoteMasterContext {
     /// Configuration specific to read-replicas replicating from the on-premises primary instance.
     #[serde(rename="replicaConfiguration")]
     pub replica_configuration: Option<DemoteMasterConfiguration>,
-    /// Verify GTID consistency for demote operation. Default value: *True*. Second Generation instances only. Setting this flag to false enables you to bypass GTID consistency check between on-premises primary instance and Cloud SQL instance during the demotion operation but also exposes you to the risk of future replication failures. Change the value only if you know the reason for the GTID divergence and are confident that doing so will not cause any replication issues.
+    /// Flag to skip replication setup on the instance.
+    #[serde(rename="skipReplicationSetup")]
+    pub skip_replication_setup: Option<bool>,
+    /// Verify the GTID consistency for demote operation. Default value: `True`. Setting this flag to `false` enables you to bypass the GTID consistency check between on-premises primary instance and Cloud SQL instance during the demotion operation but also exposes you to the risk of future replication failures. Change the value only if you know the reason for the GTID divergence and are confident that doing so will not cause any replication issues.
     #[serde(rename="verifyGtidConsistency")]
     pub verify_gtid_consistency: Option<bool>,
 }
@@ -661,7 +715,7 @@ pub struct DemoteMasterMySqlReplicaConfiguration {
     /// PEM representation of the replica's private key. The corresponsing public key is encoded in the client's certificate. The format of the replica's private key can be either PKCS #1 or PKCS #8.
     #[serde(rename="clientKey")]
     pub client_key: Option<String>,
-    /// This is always *sql#demoteMasterMysqlReplicaConfiguration*.
+    /// This is always `sql#demoteMasterMysqlReplicaConfiguration`.
     pub kind: Option<String>,
     /// The password for the replication connection.
     pub password: Option<String>,
@@ -697,7 +751,7 @@ impl client::Part for DenyMaintenancePeriod {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskEncryptionConfiguration {
-    /// This is always *sql#diskEncryptionConfiguration*.
+    /// This is always `sql#diskEncryptionConfiguration`.
     pub kind: Option<String>,
     /// Resource name of KMS key for disk encryption
     #[serde(rename="kmsKeyName")]
@@ -713,7 +767,7 @@ impl client::Part for DiskEncryptionConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskEncryptionStatus {
-    /// This is always *sql#diskEncryptionStatus*.
+    /// This is always `sql#diskEncryptionStatus`.
     pub kind: Option<String>,
     /// KMS key version used to encrypt the Cloud SQL instance resource
     #[serde(rename="kmsKeyVersionName")]
@@ -729,22 +783,22 @@ impl client::Part for DiskEncryptionStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContext {
-    /// Options for exporting data as CSV. *MySQL* and *PostgreSQL* instances only.
+    /// Options for exporting data as CSV. `MySQL` and `PostgreSQL` instances only.
     #[serde(rename="csvExportOptions")]
     pub csv_export_options: Option<ExportContextCsvExportOptions>,
-    /// Databases to be exported. *MySQL instances:* If *fileType* is *SQL* and no database is specified, all databases are exported, except for the *mysql* system database. If *fileType* is *CSV*, you can specify one database, either by using this property or by using the *csvExportOptions.selectQuery* property, which takes precedence over this property. *PostgreSQL instances:* You must specify one database to be exported. If *fileType* is *CSV*, this database must match the one specified in the *csvExportOptions.selectQuery* property. *SQL Server instances:* You must specify one database to be exported, and the *fileType* must be *BAK*.
+    /// Databases to be exported. `MySQL instances:` If `fileType` is `SQL` and no database is specified, all databases are exported, except for the `mysql` system database. If `fileType` is `CSV`, you can specify one database, either by using this property or by using the `csvExportOptions.selectQuery` property, which takes precedence over this property. `PostgreSQL instances:` You must specify one database to be exported. If `fileType` is `CSV`, this database must match the one specified in the `csvExportOptions.selectQuery` property. `SQL Server instances:` You must specify one database to be exported, and the `fileType` must be `BAK`.
     pub databases: Option<Vec<String>>,
-    /// The file type for the specified uri. *SQL*: The file contains SQL statements. *CSV*: The file contains CSV data. *BAK*: The file contains backup data for a SQL Server instance.
+    /// The file type for the specified uri.
     #[serde(rename="fileType")]
     pub file_type: Option<String>,
-    /// This is always *sql#exportContext*.
+    /// This is always `sql#exportContext`.
     pub kind: Option<String>,
     /// Option for export offload.
     pub offload: Option<bool>,
     /// Options for exporting data as SQL statements.
     #[serde(rename="sqlExportOptions")]
     pub sql_export_options: Option<ExportContextSqlExportOptions>,
-    /// The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form *gs://bucketName/fileName*. If the file already exists, the request succeeds, but the operation fails. If *fileType* is *SQL* and the filename ends with .gz, the contents are compressed.
+    /// The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form `gs://bucketName/fileName`. If the file already exists, the request succeeds, but the operation fails. If `fileType` is `SQL` and the filename ends with .gz, the contents are compressed.
     pub uri: Option<String>,
 }
 
@@ -757,7 +811,7 @@ impl client::Part for ExportContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FailoverContext {
-    /// This is always *sql#failoverContext*.
+    /// This is always `sql#failoverContext`.
     pub kind: Option<String>,
     /// The current settings version of this instance. Request will be rejected if this version doesn't match the current settings version.
     #[serde(rename="settingsVersion")]
@@ -781,29 +835,29 @@ pub struct Flag {
     /// Use this field if only certain integers are accepted. Can be combined with min_value and max_value to add additional values.
     #[serde(rename="allowedIntValues")]
     pub allowed_int_values: Option<Vec<String>>,
-    /// For *STRING* flags, a list of strings that the value can be set to.
+    /// For `STRING` flags, a list of strings that the value can be set to.
     #[serde(rename="allowedStringValues")]
     pub allowed_string_values: Option<Vec<String>>,
-    /// The database version this flag applies to. Can be *MYSQL_8_0*, *MYSQL_5_6*, or *MYSQL_5_7*.
+    /// The database version this flag applies to. Can be MySQL instances: `MYSQL_8_0`, `MYSQL_8_0_18`, `MYSQL_8_0_26`, `MYSQL_5_7`, or `MYSQL_5_6`. PostgreSQL instances: `POSTGRES_9_6`, `POSTGRES_10`, `POSTGRES_11` or `POSTGRES_12`. SQL Server instances: `SQLSERVER_2017_STANDARD`, `SQLSERVER_2017_ENTERPRISE`, `SQLSERVER_2017_EXPRESS`, `SQLSERVER_2017_WEB`, `SQLSERVER_2019_STANDARD`, `SQLSERVER_2019_ENTERPRISE`, `SQLSERVER_2019_EXPRESS`, or `SQLSERVER_2019_WEB`. See [the complete list](/sql/docs/mysql/admin-api/rest/v1/SqlDatabaseVersion).
     #[serde(rename="appliesTo")]
     pub applies_to: Option<Vec<String>>,
     /// Whether or not the flag is considered in beta.
     #[serde(rename="inBeta")]
     pub in_beta: Option<bool>,
-    /// This is always *sql#flag*.
+    /// This is always `sql#flag`.
     pub kind: Option<String>,
-    /// For *INTEGER* flags, the maximum allowed value.
+    /// For `INTEGER` flags, the maximum allowed value.
     #[serde(rename="maxValue")]
     pub max_value: Option<String>,
-    /// For *INTEGER* flags, the minimum allowed value.
+    /// For `INTEGER` flags, the minimum allowed value.
     #[serde(rename="minValue")]
     pub min_value: Option<String>,
-    /// This is the name of the flag. Flag names always use underscores, not hyphens, for example: *max_allowed_packet*
+    /// This is the name of the flag. Flag names always use underscores, not hyphens, for example: `max_allowed_packet`
     pub name: Option<String>,
     /// Indicates whether changing this flag will trigger a database restart. Only applicable to Second Generation instances.
     #[serde(rename="requiresRestart")]
     pub requires_restart: Option<bool>,
-    /// The type of the flag. Flags are typed to being *BOOLEAN*, *STRING*, *INTEGER* or *NONE*. *NONE* is used for flags which do not take a value, such as *skip_grant_tables*.
+    /// The type of the flag. Flags are typed to being `BOOLEAN`, `STRING`, `INTEGER` or `NONE`. `NONE` is used for flags which do not take a value, such as `skip_grant_tables`.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -824,11 +878,56 @@ impl client::Resource for Flag {}
 pub struct FlagsListResponse {
     /// List of flags.
     pub items: Option<Vec<Flag>>,
-    /// This is always *sql#flagsList*.
+    /// This is always `sql#flagsList`.
     pub kind: Option<String>,
 }
 
 impl client::ResponseResult for FlagsListResponse {}
+
+
+/// Ephemeral certificate creation request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generate ephemeral connect](ConnectGenerateEphemeralCall) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GenerateEphemeralCertRequest {
+    /// Optional. Access token to include in the signed certificate.
+    pub access_token: Option<String>,
+    /// PEM encoded public key to include in the signed certificate.
+    pub public_key: Option<String>,
+    /// Optional. Optional snapshot read timestamp to trade freshness for performance.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
+    /// Optional. If set, it will contain the cert valid duration.
+    #[serde(rename="validDuration")]
+    pub valid_duration: Option<String>,
+}
+
+impl client::RequestValue for GenerateEphemeralCertRequest {}
+
+
+/// Ephemeral certificate creation request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generate ephemeral connect](ConnectGenerateEphemeralCall) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GenerateEphemeralCertResponse {
+    /// Generated cert
+    #[serde(rename="ephemeralCert")]
+    pub ephemeral_cert: Option<SslCert>,
+}
+
+impl client::ResponseResult for GenerateEphemeralCertResponse {}
 
 
 /// Database instance import context.
@@ -843,17 +942,17 @@ pub struct ImportContext {
     /// Options for importing data as CSV.
     #[serde(rename="csvImportOptions")]
     pub csv_import_options: Option<ImportContextCsvImportOptions>,
-    /// The target database for the import. If *fileType* is *SQL*, this field is required only if the import file does not specify a database, and is overridden by any database specification in the import file. If *fileType* is *CSV*, one database must be specified.
+    /// The target database for the import. If `fileType` is `SQL`, this field is required only if the import file does not specify a database, and is overridden by any database specification in the import file. If `fileType` is `CSV`, one database must be specified.
     pub database: Option<String>,
-    /// The file type for the specified uri. *SQL*: The file contains SQL statements. *CSV*: The file contains CSV data.
+    /// The file type for the specified uri. * `SQL`: The file contains SQL statements. * `CSV`: The file contains CSV data. * `BAK`: The file contains backup data for a SQL Server instance.
     #[serde(rename="fileType")]
     pub file_type: Option<String>,
     /// The PostgreSQL user for this import operation. PostgreSQL instances only.
     #[serde(rename="importUser")]
     pub import_user: Option<String>,
-    /// This is always *sql#importContext*.
+    /// This is always `sql#importContext`.
     pub kind: Option<String>,
-    /// Path to the import file in Cloud Storage, in the form *gs://bucketName/fileName*. Compressed gzip files (.gz) are supported when *fileType* is *SQL*. The instance must have write permissions to the bucket and read access to the file.
+    /// Path to the import file in Cloud Storage, in the form `gs://bucketName/fileName`. Compressed gzip files (.gz) are supported when `fileType` is `SQL`. The instance must have write permissions to the bucket and read access to the file.
     pub uri: Option<String>,
 }
 
@@ -869,6 +968,9 @@ pub struct InsightsConfig {
     /// Whether Query Insights feature is enabled.
     #[serde(rename="queryInsightsEnabled")]
     pub query_insights_enabled: Option<bool>,
+    /// Number of query execution plans captured by Insights per minute for all queries combined. Default is 5.
+    #[serde(rename="queryPlansPerMinute")]
+    pub query_plans_per_minute: Option<i32>,
     /// Maximum query length stored in bytes. Default value: 1024 bytes. Range: 256-4500 bytes. Query length more than this field value will be truncated to this value. When unset, query length will be the default value. Changing query length will restart the database.
     #[serde(rename="queryStringLength")]
     pub query_string_length: Option<i32>,
@@ -881,6 +983,23 @@ pub struct InsightsConfig {
 }
 
 impl client::Part for InsightsConfig {}
+
+
+/// Reference to another Cloud SQL instance.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstanceReference {
+    /// The name of the Cloud SQL instance being referenced. This does not include the project ID.
+    pub name: Option<String>,
+    /// The project ID of the Cloud SQL instance being referenced. The default is the same project ID as the instance references it.
+    pub project: Option<String>,
+    /// The region of the Cloud SQL instance being referenced.
+    pub region: Option<String>,
+}
+
+impl client::Part for InstanceReference {}
 
 
 /// Database instance clone request.
@@ -991,7 +1110,7 @@ impl client::RequestValue for InstancesImportRequest {}
 pub struct InstancesListResponse {
     /// List of database instance resources.
     pub items: Option<Vec<DatabaseInstance>>,
-    /// This is always *sql#instancesList*.
+    /// This is always `sql#instancesList`.
     pub kind: Option<String>,
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1019,7 +1138,7 @@ pub struct InstancesListServerCasResponse {
     pub active_version: Option<String>,
     /// List of server CA certificates for the instance.
     pub certs: Option<Vec<SslCert>>,
-    /// This is always *sql#instancesListServerCas*.
+    /// This is always `sql#instancesListServerCas`.
     pub kind: Option<String>,
 }
 
@@ -1089,13 +1208,16 @@ impl client::RequestValue for InstancesTruncateLogRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpConfiguration {
-    /// The list of external networks that are allowed to connect to the instance using the IP. In 'CIDR' notation, also known as 'slash' notation (for example: *192.168.100.0/24*).
+    /// The name of the allocated ip range for the private ip CloudSQL instance. For example: "google-managed-services-default". If set, the instance ip will be created in the allocated range. The range name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?.`
+    #[serde(rename="allocatedIpRange")]
+    pub allocated_ip_range: Option<String>,
+    /// The list of external networks that are allowed to connect to the instance using the IP. In 'CIDR' notation, also known as 'slash' notation (for example: `157.197.200.0/24`).
     #[serde(rename="authorizedNetworks")]
     pub authorized_networks: Option<Vec<AclEntry>>,
     /// Whether the instance is assigned a public IP address or not.
     #[serde(rename="ipv4Enabled")]
     pub ipv4_enabled: Option<bool>,
-    /// The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, */projects/myProject/global/networks/default*. This setting can be updated, but it cannot be removed after it is set.
+    /// The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, `/projects/myProject/global/networks/default`. This setting can be updated, but it cannot be removed after it is set.
     #[serde(rename="privateNetwork")]
     pub private_network: Option<String>,
     /// Whether SSL connections over IP are enforced or not.
@@ -1115,10 +1237,10 @@ pub struct IpMapping {
     /// The IP address assigned.
     #[serde(rename="ipAddress")]
     pub ip_address: Option<String>,
-    /// The due time for this IP to be retired in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*. This field is only available when the IP is scheduled to be retired.
+    /// The due time for this IP to be retired in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`. This field is only available when the IP is scheduled to be retired.
     #[serde(rename="timeToRetire")]
     pub time_to_retire: Option<String>,
-    /// The type of this IP address. A *PRIMARY* address is a public address that can accept incoming connections. A *PRIVATE* address is a private address that can accept incoming connections. An *OUTGOING* address is the source address of connections originating from the instance, if supported.
+    /// The type of this IP address. A `PRIMARY` address is a public address that can accept incoming connections. A `PRIVATE` address is a private address that can accept incoming connections. An `OUTGOING` address is the source address of connections originating from the instance, if supported.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1126,21 +1248,21 @@ pub struct IpMapping {
 impl client::Part for IpMapping {}
 
 
-/// Preferred location. This specifies where a Cloud SQL instance is located, either in a specific Compute Engine zone, or co-located with an App Engine application. Note that if the preferred location is not available, the instance will be located as close as possible within the region. Only one location may be specified.
+/// Preferred location. This specifies where a Cloud SQL instance is located. Note that if the preferred location is not available, the instance will be located as close as possible within the region. Only one location may be specified.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationPreference {
-    /// The App Engine application to follow, it must be in the same region as the Cloud SQL instance.
+    /// The App Engine application to follow, it must be in the same region as the Cloud SQL instance. WARNING: Changing this might restart the instance.
     #[serde(rename="followGaeApplication")]
     pub follow_gae_application: Option<String>,
-    /// This is always *sql#locationPreference*.
+    /// This is always `sql#locationPreference`.
     pub kind: Option<String>,
-    /// The preferred Compute Engine zone for the secondary/failover (for example: us-central1-a, us-central1-b, etc.). Reserved for future use.
+    /// The preferred Compute Engine zone for the secondary/failover (for example: us-central1-a, us-central1-b, etc.).
     #[serde(rename="secondaryZone")]
     pub secondary_zone: Option<String>,
-    /// The preferred Compute Engine zone (for example: us-central1-a, us-central1-b, etc.).
+    /// The preferred Compute Engine zone (for example: us-central1-a, us-central1-b, etc.). WARNING: Changing this might restart the instance.
     pub zone: Option<String>,
 }
 
@@ -1157,9 +1279,9 @@ pub struct MaintenanceWindow {
     pub day: Option<i32>,
     /// hour of day - 0 to 23.
     pub hour: Option<i32>,
-    /// This is always *sql#maintenanceWindow*.
+    /// This is always `sql#maintenanceWindow`.
     pub kind: Option<String>,
-    /// Maintenance timing setting: *canary* (Earlier) or *stable* (Later). Learn more.
+    /// Maintenance timing setting: `canary` (Earlier) or `stable` (Later). [Learn more](https://cloud.google.com/sql/docs/mysql/instance-settings#maintenance-timing-2ndgen).
     #[serde(rename="updateTrack")]
     pub update_track: Option<String>,
 }
@@ -1188,7 +1310,7 @@ pub struct MySqlReplicaConfiguration {
     /// Path to a SQL dump file in Google Cloud Storage from which the replica instance is to be created. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are also supported. Dumps have the binlog co-ordinates from which replication begins. This can be accomplished by setting --master-data to 1 when using mysqldump.
     #[serde(rename="dumpFilePath")]
     pub dump_file_path: Option<String>,
-    /// This is always *sql#mysqlReplicaConfiguration*.
+    /// This is always `sql#mysqlReplicaConfiguration`.
     pub kind: Option<String>,
     /// Interval in milliseconds between replication heartbeats.
     #[serde(rename="masterHeartbeatPeriod")]
@@ -1206,6 +1328,20 @@ pub struct MySqlReplicaConfiguration {
 }
 
 impl client::Part for MySqlReplicaConfiguration {}
+
+
+/// MySQL-specific external server sync settings.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MySqlSyncConfig {
+    /// Flags to use for the initial dump.
+    #[serde(rename="initialSyncFlags")]
+    pub initial_sync_flags: Option<Vec<SyncFlags>>,
+}
+
+impl client::Part for MySqlSyncConfig {}
 
 
 /// On-premises instance configuration.
@@ -1229,10 +1365,13 @@ pub struct OnPremisesConfiguration {
     /// The host and port of the on-premises instance in host:port format
     #[serde(rename="hostPort")]
     pub host_port: Option<String>,
-    /// This is always *sql#onPremisesConfiguration*.
+    /// This is always `sql#onPremisesConfiguration`.
     pub kind: Option<String>,
     /// The password for connecting to on-premises instance.
     pub password: Option<String>,
+    /// The reference to Cloud SQL instance if the source is Cloud SQL.
+    #[serde(rename="sourceInstance")]
+    pub source_instance: Option<InstanceReference>,
     /// The username for connecting to on-premises instance.
     pub username: Option<String>,
 }
@@ -1285,7 +1424,7 @@ pub struct Operation {
     /// The context for backup operation, if applicable.
     #[serde(rename="backupContext")]
     pub backup_context: Option<BackupContext>,
-    /// The time this operation finished in UTC timezone in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time this operation finished in UTC timezone in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
     /// If errors occurred during processing of this operation, this field will be populated.
@@ -1296,23 +1435,23 @@ pub struct Operation {
     /// The context for import operation, if applicable.
     #[serde(rename="importContext")]
     pub import_context: Option<ImportContext>,
-    /// The time this operation was enqueued in UTC timezone in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time this operation was enqueued in UTC timezone in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="insertTime")]
     pub insert_time: Option<String>,
-    /// This is always *sql#operation*.
+    /// This is always `sql#operation`.
     pub kind: Option<String>,
     /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
     pub name: Option<String>,
-    /// The type of the operation. Valid values are: *CREATE* *DELETE* *UPDATE* *RESTART* *IMPORT* *EXPORT* *BACKUP_VOLUME* *RESTORE_VOLUME* *CREATE_USER* *DELETE_USER* *CREATE_DATABASE* *DELETE_DATABASE*
+    /// The type of the operation. Valid values are: * `CREATE` * `DELETE` * `UPDATE` * `RESTART` * `IMPORT` * `EXPORT` * `BACKUP_VOLUME` * `RESTORE_VOLUME` * `CREATE_USER` * `DELETE_USER` * `CREATE_DATABASE` * `DELETE_DATABASE`
     #[serde(rename="operationType")]
     pub operation_type: Option<String>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// The time this operation actually started in UTC timezone in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time this operation actually started in UTC timezone in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// The status of an operation. Valid values are: *PENDING* *RUNNING* *DONE* *SQL_OPERATION_STATUS_UNSPECIFIED*
+    /// The status of an operation.
     pub status: Option<String>,
     /// Name of the database instance related to this operation.
     #[serde(rename="targetId")]
@@ -1339,7 +1478,7 @@ impl client::ResponseResult for Operation {}
 pub struct OperationError {
     /// Identifies the specific error that occurred.
     pub code: Option<String>,
-    /// This is always *sql#operationError*.
+    /// This is always `sql#operationError`.
     pub kind: Option<String>,
     /// Additional information about the error encountered.
     pub message: Option<String>,
@@ -1356,14 +1495,14 @@ impl client::Part for OperationError {}
 pub struct OperationErrors {
     /// The list of errors encountered while processing this operation.
     pub errors: Option<Vec<OperationError>>,
-    /// This is always *sql#operationErrors*.
+    /// This is always `sql#operationErrors`.
     pub kind: Option<String>,
 }
 
 impl client::Part for OperationErrors {}
 
 
-/// Database instance list operations response.
+/// Operations list response.
 /// 
 /// # Activities
 /// 
@@ -1376,7 +1515,7 @@ impl client::Part for OperationErrors {}
 pub struct OperationsListResponse {
     /// List of operation resources.
     pub items: Option<Vec<Operation>>,
-    /// This is always *sql#operationsList*.
+    /// This is always `sql#operationsList`.
     pub kind: Option<String>,
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1386,18 +1525,59 @@ pub struct OperationsListResponse {
 impl client::ResponseResult for OperationsListResponse {}
 
 
+/// Read-only password status.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PasswordStatus {
+    /// If true, user does not have login privileges.
+    pub locked: Option<bool>,
+    /// The expiration time of the current password.
+    #[serde(rename="passwordExpirationTime")]
+    pub password_expiration_time: Option<String>,
+}
+
+impl client::Part for PasswordStatus {}
+
+
+/// Database instance local user password validation policy
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PasswordValidationPolicy {
+    /// The complexity of the password.
+    pub complexity: Option<String>,
+    /// Disallow username as a part of the password.
+    #[serde(rename="disallowUsernameSubstring")]
+    pub disallow_username_substring: Option<bool>,
+    /// Minimum number of characters allowed.
+    #[serde(rename="minLength")]
+    pub min_length: Option<i32>,
+    /// Minimum interval after which the password can be changed. This flag is only supported for PostgresSQL.
+    #[serde(rename="passwordChangeInterval")]
+    pub password_change_interval: Option<String>,
+    /// Number of previous passwords that cannot be reused.
+    #[serde(rename="reuseInterval")]
+    pub reuse_interval: Option<i32>,
+}
+
+impl client::Part for PasswordValidationPolicy {}
+
+
 /// Read-replica configuration for connecting to the primary instance.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaConfiguration {
-    /// Specifies if the replica is the failover target. If the field is set to *true* the replica will be designated as a failover replica. In case the primary instance fails, the replica instance will be promoted as the new primary instance. Only one replica can be specified as failover target, and the replica has to be in different zone with the primary instance.
+    /// Specifies if the replica is the failover target. If the field is set to `true` the replica will be designated as a failover replica. In case the primary instance fails, the replica instance will be promoted as the new primary instance. Only one replica can be specified as failover target, and the replica has to be in different zone with the primary instance.
     #[serde(rename="failoverTarget")]
     pub failover_target: Option<bool>,
-    /// This is always *sql#replicaConfiguration*.
+    /// This is always `sql#replicaConfiguration`.
     pub kind: Option<String>,
-    /// MySQL specific configuration when replicating from a MySQL on-premises primary instance. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named *master.info* in the data directory.
+    /// MySQL specific configuration when replicating from a MySQL on-premises primary instance. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named `master.info` in the data directory.
     #[serde(rename="mysqlReplicaConfiguration")]
     pub mysql_replica_configuration: Option<MySqlReplicaConfiguration>,
 }
@@ -1414,7 +1594,7 @@ pub struct Reschedule {
     /// Required. The type of the reschedule.
     #[serde(rename="rescheduleType")]
     pub reschedule_type: Option<String>,
-    /// Optional. Timestamp when the maintenance shall be rescheduled to if reschedule_type=SPECIFIC_TIME, in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// Optional. Timestamp when the maintenance shall be rescheduled to if reschedule_type=SPECIFIC_TIME, in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
 }
@@ -1434,7 +1614,7 @@ pub struct RestoreBackupContext {
     /// The ID of the instance that the backup was taken from.
     #[serde(rename="instanceId")]
     pub instance_id: Option<String>,
-    /// This is always *sql#restoreBackupContext*.
+    /// This is always `sql#restoreBackupContext`.
     pub kind: Option<String>,
     /// The full project ID of the source instance.
     pub project: Option<String>,
@@ -1449,7 +1629,7 @@ impl client::Part for RestoreBackupContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RotateServerCaContext {
-    /// This is always *sql#rotateServerCaContext*.
+    /// This is always `sql#rotateServerCaContext`.
     pub kind: Option<String>,
     /// The fingerprint of the next version to be rotated to. If left unspecified, will be rotated to the most recently added server CA version.
     #[serde(rename="nextVersion")]
@@ -1465,7 +1645,7 @@ impl client::Part for RotateServerCaContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
-    /// The activation policy specifies when the instance is activated; it is applicable only when the instance state is RUNNABLE. Valid values: *ALWAYS*: The instance is on, and remains so even in the absence of connection requests. *NEVER*: The instance is off; it is not activated, even if a connection request arrives.
+    /// The activation policy specifies when the instance is activated; it is applicable only when the instance state is RUNNABLE. Valid values: * `ALWAYS`: The instance is on, and remains so even in the absence of connection requests. * `NEVER`: The instance is off; it is not activated, even if a connection request arrives.
     #[serde(rename="activationPolicy")]
     pub activation_policy: Option<String>,
     /// Active Directory configuration, relevant only for Cloud SQL for SQL Server.
@@ -1474,7 +1654,7 @@ pub struct Settings {
     /// The App Engine app IDs that can access this instance. (Deprecated) Applied to First Generation instances only.
     #[serde(rename="authorizedGaeApplications")]
     pub authorized_gae_applications: Option<Vec<String>>,
-    /// Availability type. Potential values: *ZONAL*: The instance serves data from only one zone. Outages in that zone affect data accessibility. *REGIONAL*: The instance can serve data from more than one zone in a region (it is highly available). For more information, see Overview of the High Availability Configuration.
+    /// Availability type. Potential values: * `ZONAL`: The instance serves data from only one zone. Outages in that zone affect data accessibility. * `REGIONAL`: The instance can serve data from more than one zone in a region (it is highly available)./ For more information, see [Overview of the High Availability Configuration](https://cloud.google.com/sql/docs/mysql/high-availability).
     #[serde(rename="availabilityType")]
     pub availability_type: Option<String>,
     /// The daily backup configuration for the instance.
@@ -1488,13 +1668,13 @@ pub struct Settings {
     /// The size of data disk, in GB. The data disk size minimum is 10GB.
     #[serde(rename="dataDiskSizeGb")]
     pub data_disk_size_gb: Option<String>,
-    /// The type of data disk: PD_SSD (default) or PD_HDD. Not used for First Generation instances.
+    /// The type of data disk: `PD_SSD` (default) or `PD_HDD`. Not used for First Generation instances.
     #[serde(rename="dataDiskType")]
     pub data_disk_type: Option<String>,
     /// The database flags passed to the instance at startup.
     #[serde(rename="databaseFlags")]
     pub database_flags: Option<Vec<DatabaseFlags>>,
-    /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.
+    /// Configuration specific to read replica instances. Indicates whether replication is enabled or not. WARNING: Changing this restarts the instance.
     #[serde(rename="databaseReplicationEnabled")]
     pub database_replication_enabled: Option<bool>,
     /// Deny maintenance periods
@@ -1506,7 +1686,7 @@ pub struct Settings {
     /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled for Second Generation instances.
     #[serde(rename="ipConfiguration")]
     pub ip_configuration: Option<IpConfiguration>,
-    /// This is always *sql#settings*.
+    /// This is always `sql#settings`.
     pub kind: Option<String>,
     /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or Compute Engine zone for better performance. App Engine co-location was only applicable to First Generation instances.
     #[serde(rename="locationPreference")]
@@ -1514,22 +1694,28 @@ pub struct Settings {
     /// The maintenance window for this instance. This specifies when the instance can be restarted for maintenance purposes.
     #[serde(rename="maintenanceWindow")]
     pub maintenance_window: Option<MaintenanceWindow>,
-    /// The pricing plan for this instance. This can be either *PER_USE* or *PACKAGE*. Only *PER_USE* is supported for Second Generation instances.
+    /// The local user password validation policy of the instance.
+    #[serde(rename="passwordValidationPolicy")]
+    pub password_validation_policy: Option<PasswordValidationPolicy>,
+    /// The pricing plan for this instance. This can be either `PER_USE` or `PACKAGE`. Only `PER_USE` is supported for Second Generation instances.
     #[serde(rename="pricingPlan")]
     pub pricing_plan: Option<String>,
-    /// The type of replication this instance uses. This can be either *ASYNCHRONOUS* or *SYNCHRONOUS*. (Deprecated_ This property was only applicable to First Generation instances.
+    /// The type of replication this instance uses. This can be either `ASYNCHRONOUS` or `SYNCHRONOUS`. (Deprecated) This property was only applicable to First Generation instances.
     #[serde(rename="replicationType")]
     pub replication_type: Option<String>,
     /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.
     #[serde(rename="settingsVersion")]
     pub settings_version: Option<String>,
+    /// SQL Server specific audit configuration.
+    #[serde(rename="sqlServerAuditConfig")]
+    pub sql_server_audit_config: Option<SqlServerAuditConfig>,
     /// Configuration to increase storage size automatically. The default value is true.
     #[serde(rename="storageAutoResize")]
     pub storage_auto_resize: Option<bool>,
     /// The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit.
     #[serde(rename="storageAutoResizeLimit")]
     pub storage_auto_resize_limit: Option<String>,
-    /// The tier (or machine type) for this instance, for example *db-custom-1-3840* .
+    /// The tier (or machine type) for this instance, for example `db-custom-1-3840`. WARNING: Changing this restarts the instance.
     pub tier: Option<String>,
     /// User-provided labels, represented as a dictionary where each label is a single key value pair.
     #[serde(rename="userLabels")]
@@ -1562,7 +1748,7 @@ impl client::Part for SqlActiveDirectoryConfig {}
 pub struct SqlExternalSyncSettingError {
     /// Additional information about the error encountered.
     pub detail: Option<String>,
-    /// Can be *sql#externalSyncSettingError* or *sql#externalSyncSettingWarning*.
+    /// Can be `sql#externalSyncSettingError` or `sql#externalSyncSettingWarning`.
     pub kind: Option<String>,
     /// Identifies the specific error that occurred.
     #[serde(rename="type")]
@@ -1590,6 +1776,59 @@ pub struct SqlInstancesRescheduleMaintenanceRequestBody {
 impl client::RequestValue for SqlInstancesRescheduleMaintenanceRequestBody {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances start external sync projects](ProjectInstanceStartExternalSyncCall) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlInstancesStartExternalSyncRequest {
+    /// MySQL-specific settings for start external sync.
+    #[serde(rename="mysqlSyncConfig")]
+    pub mysql_sync_config: Option<MySqlSyncConfig>,
+    /// Whether to skip the verification step (VESS).
+    #[serde(rename="skipVerification")]
+    pub skip_verification: Option<bool>,
+    /// External sync mode.
+    #[serde(rename="syncMode")]
+    pub sync_mode: Option<String>,
+}
+
+impl client::RequestValue for SqlInstancesStartExternalSyncRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances verify external sync settings projects](ProjectInstanceVerifyExternalSyncSettingCall) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlInstancesVerifyExternalSyncSettingsRequest {
+    /// Optional. MySQL-specific settings for start external sync.
+    #[serde(rename="mysqlSyncConfig")]
+    pub mysql_sync_config: Option<MySqlSyncConfig>,
+    /// External sync mode
+    #[serde(rename="syncMode")]
+    pub sync_mode: Option<String>,
+    /// Flag to enable verifying connection only
+    #[serde(rename="verifyConnectionOnly")]
+    pub verify_connection_only: Option<bool>,
+    /// Optional. Flag to verify settings required by replication setup only
+    #[serde(rename="verifyReplicationOnly")]
+    pub verify_replication_only: Option<bool>,
+}
+
+impl client::RequestValue for SqlInstancesVerifyExternalSyncSettingsRequest {}
+
+
 /// Instance verify external sync settings response.
 /// 
 /// # Activities
@@ -1603,13 +1842,30 @@ impl client::RequestValue for SqlInstancesRescheduleMaintenanceRequestBody {}
 pub struct SqlInstancesVerifyExternalSyncSettingsResponse {
     /// List of migration violations.
     pub errors: Option<Vec<SqlExternalSyncSettingError>>,
-    /// This is always *sql#migrationSettingErrorList*.
+    /// This is always `sql#migrationSettingErrorList`.
     pub kind: Option<String>,
     /// List of migration warnings.
     pub warnings: Option<Vec<SqlExternalSyncSettingError>>,
 }
 
 impl client::ResponseResult for SqlInstancesVerifyExternalSyncSettingsResponse {}
+
+
+/// This message wraps up the information written by out-of-disk detection job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlOutOfDiskReport {
+    /// The minimum recommended increase size in GigaBytes This field is consumed by the frontend * Writers: * the proactive database wellness job for OOD. * Readers:
+    #[serde(rename="sqlMinRecommendedIncreaseSizeGb")]
+    pub sql_min_recommended_increase_size_gb: Option<i32>,
+    /// This field represents the state generated by the proactive database wellness job for OutOfDisk issues. * Writers: * the proactive database wellness job for OOD. * Readers: * the proactive database wellness job
+    #[serde(rename="sqlOutOfDiskState")]
+    pub sql_out_of_disk_state: Option<String>,
+}
+
+impl client::Part for SqlOutOfDiskReport {}
 
 
 /// Any scheduled maintenancce for this instance.
@@ -1624,12 +1880,30 @@ pub struct SqlScheduledMaintenance {
     /// If the scheduled maintenance can be rescheduled.
     #[serde(rename="canReschedule")]
     pub can_reschedule: Option<bool>,
+    /// Maintenance cannot be rescheduled to start beyond this deadline.
+    #[serde(rename="scheduleDeadlineTime")]
+    pub schedule_deadline_time: Option<String>,
     /// The start time of any upcoming scheduled maintenance for this instance.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
 }
 
 impl client::Part for SqlScheduledMaintenance {}
+
+
+/// SQL Server specific audit configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerAuditConfig {
+    /// The name of the destination bucket (e.g., gs://mybucket).
+    pub bucket: Option<String>,
+    /// This is always sql#sqlServerAuditConfig
+    pub kind: Option<String>,
+}
+
+impl client::Part for SqlServerAuditConfig {}
 
 
 /// Represents a Sql Server database on the Cloud SQL instance.
@@ -1688,15 +1962,15 @@ pub struct SslCert {
     /// User supplied name. Constrained to [a-zA-Z.-_ ]+.
     #[serde(rename="commonName")]
     pub common_name: Option<String>,
-    /// The time when the certificate was created in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*
+    /// The time when the certificate was created in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// The time when the certificate expires in RFC 3339 format, for example *2012-11-15T16:19:00.094Z*.
+    /// The time when the certificate expires in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="expirationTime")]
     pub expiration_time: Option<String>,
     /// Name of the database instance.
     pub instance: Option<String>,
-    /// This is always *sql#sslCert*.
+    /// This is always `sql#sslCert`.
     pub kind: Option<String>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
@@ -1780,7 +2054,7 @@ pub struct SslCertsInsertResponse {
     /// The new client certificate and private key.
     #[serde(rename="clientCert")]
     pub client_cert: Option<SslCertDetail>,
-    /// This is always *sql#sslCertsInsert*.
+    /// This is always `sql#sslCertsInsert`.
     pub kind: Option<String>,
     /// The operation to track the ssl certs insert request.
     pub operation: Option<Operation>,
@@ -1805,11 +2079,26 @@ impl client::ResponseResult for SslCertsInsertResponse {}
 pub struct SslCertsListResponse {
     /// List of client certificates for the instance.
     pub items: Option<Vec<SslCert>>,
-    /// This is always *sql#sslCertsList*.
+    /// This is always `sql#sslCertsList`.
     pub kind: Option<String>,
 }
 
 impl client::ResponseResult for SslCertsListResponse {}
+
+
+/// Initial sync flags for certain Cloud SQL APIs. Currently used for the MySQL external server initial dump.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SyncFlags {
+    /// The name of the flag.
+    pub name: Option<String>,
+    /// The value of the flag. This field must be omitted if the flag doesn't take a value.
+    pub value: Option<String>,
+}
+
+impl client::Part for SyncFlags {}
 
 
 /// A Google Cloud SQL service tier resource.
@@ -1829,11 +2118,11 @@ pub struct Tier {
     /// The maximum RAM usage of this tier in bytes.
     #[serde(rename="RAM")]
     pub ram: Option<String>,
-    /// This is always *sql#tier*.
+    /// This is always `sql#tier`.
     pub kind: Option<String>,
     /// The applicable regions for this tier.
     pub region: Option<Vec<String>>,
-    /// An identifier for the machine type, for example, db-custom-1-3840. For related information, see Pricing.
+    /// An identifier for the machine type, for example, `db-custom-1-3840`. For related information, see [Pricing](/sql/pricing).
     pub tier: Option<String>,
 }
 
@@ -1853,7 +2142,7 @@ impl client::Resource for Tier {}
 pub struct TiersListResponse {
     /// List of tiers.
     pub items: Option<Vec<Tier>>,
-    /// This is always *sql#tiersList*.
+    /// This is always `sql#tiersList`.
     pub kind: Option<String>,
 }
 
@@ -1866,9 +2155,9 @@ impl client::ResponseResult for TiersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TruncateLogContext {
-    /// This is always *sql#truncateLogContext*.
+    /// This is always `sql#truncateLogContext`.
     pub kind: Option<String>,
-    /// The type of log to truncate. Valid values are *MYSQL_GENERAL_TABLE* and *MYSQL_SLOW_TABLE*.
+    /// The type of log to truncate. Valid values are `MYSQL_GENERAL_TABLE` and `MYSQL_SLOW_TABLE`.
     #[serde(rename="logType")]
     pub log_type: Option<String>,
 }
@@ -1892,17 +2181,20 @@ impl client::Part for TruncateLogContext {}
 pub struct User {
     /// This field is deprecated and will be removed from a future version of the API.
     pub etag: Option<String>,
-    /// The host name from which the user can connect. For *insert* operations, host defaults to an empty string. For *update* operations, host is specified as part of the request URL. The host name cannot be updated after insertion.
+    /// Optional. The host from which the user can connect. For `insert` operations, host defaults to an empty string. For `update` operations, host is specified as part of the request URL. The host name cannot be updated after insertion. For a MySQL instance, it's required; for a PostgreSQL or SQL Server instance, it's optional.
     pub host: Option<String>,
-    /// The name of the Cloud SQL instance. This does not include the project ID. Can be omitted for *update* since it is already specified on the URL.
+    /// The name of the Cloud SQL instance. This does not include the project ID. Can be omitted for *update* because it is already specified on the URL.
     pub instance: Option<String>,
-    /// This is always *sql#user*.
+    /// This is always `sql#user`.
     pub kind: Option<String>,
-    /// The name of the user in the Cloud SQL instance. Can be omitted for *update* since it is already specified in the URL.
+    /// The name of the user in the Cloud SQL instance. Can be omitted for `update` because it is already specified in the URL.
     pub name: Option<String>,
     /// The password for the user.
     pub password: Option<String>,
-    /// The project ID of the project containing the Cloud SQL database. The Google apps domain is prefixed if applicable. Can be omitted for *update* since it is already specified on the URL.
+    /// User level password validation policy.
+    #[serde(rename="passwordPolicy")]
+    pub password_policy: Option<UserPasswordValidationPolicy>,
+    /// The project ID of the project containing the Cloud SQL database. The Google apps domain is prefixed if applicable. Can be omitted for *update* because it is already specified on the URL.
     pub project: Option<String>,
     /// no description provided
     #[serde(rename="sqlserverUserDetails")]
@@ -1914,6 +2206,28 @@ pub struct User {
 
 impl client::RequestValue for User {}
 impl client::Resource for User {}
+
+
+/// User level password validation policy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserPasswordValidationPolicy {
+    /// Number of failed login attempts allowed before user get locked.
+    #[serde(rename="allowedFailedAttempts")]
+    pub allowed_failed_attempts: Option<i32>,
+    /// If true, failed login attempts check will be enabled.
+    #[serde(rename="enableFailedAttemptsCheck")]
+    pub enable_failed_attempts_check: Option<bool>,
+    /// Expiration duration after password is updated.
+    #[serde(rename="passwordExpirationDuration")]
+    pub password_expiration_duration: Option<String>,
+    /// Output only. Read-only password status.
+    pub status: Option<PasswordStatus>,
+}
+
+impl client::Part for UserPasswordValidationPolicy {}
 
 
 /// User list response.
@@ -1939,7 +2253,7 @@ pub struct UsersListResponse {
 impl client::ResponseResult for UsersListResponse {}
 
 
-/// The name and status of the failover replica. This property is applicable only to Second Generation instances.
+/// The name and status of the failover replica.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1947,7 +2261,7 @@ impl client::ResponseResult for UsersListResponse {}
 pub struct DatabaseInstanceFailoverReplica {
     /// The availability status of the failover replica. A false status indicates that the failover replica is out of sync. The primary instance can only failover to the failover replica when the status is true.
     pub available: Option<bool>,
-    /// The name of the failover replica. If specified at instance creation, a failover replica is created for the instance. The name doesn't include the project ID. This property is applicable only to Second Generation instances.
+    /// The name of the failover replica. If specified at instance creation, a failover replica is created for the instance. The name doesn't include the project ID.
     pub name: Option<String>,
 }
 
@@ -1955,12 +2269,24 @@ impl client::NestedType for DatabaseInstanceFailoverReplica {}
 impl client::Part for DatabaseInstanceFailoverReplica {}
 
 
-/// Options for exporting data as CSV. *MySQL* and *PostgreSQL* instances only.
+/// Options for exporting data as CSV. `MySQL` and `PostgreSQL` instances only.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextCsvExportOptions {
+    /// Specifies the character that should appear before a data character that needs to be escaped.
+    #[serde(rename="escapeCharacter")]
+    pub escape_character: Option<String>,
+    /// Specifies the character that separates columns within each row (line) of the file.
+    #[serde(rename="fieldsTerminatedBy")]
+    pub fields_terminated_by: Option<String>,
+    /// This is used to separate lines. If a line does not contain all fields, the rest of the columns are set to their default values.
+    #[serde(rename="linesTerminatedBy")]
+    pub lines_terminated_by: Option<String>,
+    /// Specifies the quoting character to be used when a data value is quoted.
+    #[serde(rename="quoteCharacter")]
+    pub quote_character: Option<String>,
     /// The select query used to extract the data.
     #[serde(rename="selectQuery")]
     pub select_query: Option<String>,
@@ -1996,7 +2322,7 @@ impl client::Part for ExportContextSqlExportOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextSqlExportOptionsMysqlExportOptions {
-    /// Option to include SQL statement required to set up replication. If set to *1*, the dump file includes a CHANGE MASTER TO statement with the binary log coordinates, and --set-gtid-purged is set to ON. If set to *2*, the CHANGE MASTER TO statement is written as a SQL comment and has no effect. If set to any value other than *1*, --set-gtid-purged is set to OFF.
+    /// Option to include SQL statement required to set up replication. If set to `1`, the dump file includes a CHANGE MASTER TO statement with the binary log coordinates, and --set-gtid-purged is set to ON. If set to `2`, the CHANGE MASTER TO statement is written as a SQL comment and has no effect. If set to any value other than `1`, --set-gtid-purged is set to OFF.
     #[serde(rename="masterData")]
     pub master_data: Option<i32>,
 }
@@ -2026,13 +2352,13 @@ impl client::Part for ImportContextBakImportOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContextBakImportOptionsEncryptionOptions {
-    /// Path to the Certificate (.cer) in Cloud Storage, in the form *gs://bucketName/fileName*. The instance must have write permissions to the bucket and read access to the file.
+    /// Path to the Certificate (.cer) in Cloud Storage, in the form `gs://bucketName/fileName`. The instance must have write permissions to the bucket and read access to the file.
     #[serde(rename="certPath")]
     pub cert_path: Option<String>,
     /// Password that encrypts the private key
     #[serde(rename="pvkPassword")]
     pub pvk_password: Option<String>,
-    /// Path to the Certificate Private Key (.pvk) in Cloud Storage, in the form *gs://bucketName/fileName*. The instance must have write permissions to the bucket and read access to the file.
+    /// Path to the Certificate Private Key (.pvk) in Cloud Storage, in the form `gs://bucketName/fileName`. The instance must have write permissions to the bucket and read access to the file.
     #[serde(rename="pvkPath")]
     pub pvk_path: Option<String>,
 }
@@ -2049,6 +2375,18 @@ impl client::Part for ImportContextBakImportOptionsEncryptionOptions {}
 pub struct ImportContextCsvImportOptions {
     /// The columns to which CSV data is imported. If not specified, all columns of the database table are loaded with CSV data.
     pub columns: Option<Vec<String>>,
+    /// Specifies the character that should appear before a data character that needs to be escaped.
+    #[serde(rename="escapeCharacter")]
+    pub escape_character: Option<String>,
+    /// Specifies the character that separates columns within each row (line) of the file.
+    #[serde(rename="fieldsTerminatedBy")]
+    pub fields_terminated_by: Option<String>,
+    /// This is used to separate lines. If a line does not contain all fields, the rest of the columns are set to their default values.
+    #[serde(rename="linesTerminatedBy")]
+    pub lines_terminated_by: Option<String>,
+    /// Specifies the quoting character to be used when a data value is quoted.
+    #[serde(rename="quoteCharacter")]
+    pub quote_character: Option<String>,
     /// The table to which CSV data is imported.
     pub table: Option<String>,
 }
@@ -2072,18 +2410,16 @@ impl client::Part for ImportContextCsvImportOptions {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2110,7 +2446,7 @@ impl<'a> BackupRunMethods<'a> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    /// * `id` - The ID of the Backup Run to delete. To find a Backup Run ID, use the list method.
+    /// * `id` - The ID of the backup run to delete. To find a backup run ID, use the [list](https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/backupRuns/list) method.
     pub fn delete(&self, project: &str, instance: &str, id: &str) -> BackupRunDeleteCall<'a> {
         BackupRunDeleteCall {
             hub: self.hub,
@@ -2131,7 +2467,7 @@ impl<'a> BackupRunMethods<'a> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    /// * `id` - The ID of this Backup Run.
+    /// * `id` - The ID of this backup run.
     pub fn get(&self, project: &str, instance: &str, id: &str) -> BackupRunGetCall<'a> {
         BackupRunGetCall {
             hub: self.hub,
@@ -2146,7 +2482,7 @@ impl<'a> BackupRunMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new backup run on demand. This method is applicable only to Second Generation instances.
+    /// Creates a new backup run on demand.
     /// 
     /// # Arguments
     ///
@@ -2167,12 +2503,12 @@ impl<'a> BackupRunMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all backup runs associated with a given instance and configuration in the reverse chronological order of the backup initiation time.
+    /// Lists all backup runs associated with the project or a given instance and configuration in the reverse chronological order of the backup initiation time.
     /// 
     /// # Arguments
     ///
     /// * `project` - Project ID of the project that contains the instance.
-    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    /// * `instance` - Cloud SQL instance ID, or "-" for all instances. This does not include the project ID.
     pub fn list(&self, project: &str, instance: &str) -> BackupRunListCall<'a> {
         BackupRunListCall {
             hub: self.hub,
@@ -2180,6 +2516,88 @@ impl<'a> BackupRunMethods<'a> {
             _instance: instance.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *connect* resources.
+/// It is not used directly, but through the `SQLAdmin` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `generate_ephemeral(...)` and `get(...)`
+/// // to build up your call.
+/// let rb = hub.connect();
+/// # }
+/// ```
+pub struct ConnectMethods<'a>
+    where  {
+
+    hub: &'a SQLAdmin<>,
+}
+
+impl<'a> client::MethodsBuilder for ConnectMethods<'a> {}
+
+impl<'a> ConnectMethods<'a> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generates a short-lived X509 certificate containing the provided public key and signed by a private key specific to the target instance. Users may use the certificate to authenticate as themselves when connecting to the database.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    pub fn generate_ephemeral(&self, request: GenerateEphemeralCertRequest, project: &str, instance: &str) -> ConnectGenerateEphemeralCall<'a> {
+        ConnectGenerateEphemeralCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves connect settings about a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    pub fn get(&self, project: &str, instance: &str) -> ConnectGetCall<'a> {
+        ConnectGetCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _read_time: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2199,18 +2617,16 @@ impl<'a> BackupRunMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2370,18 +2786,16 @@ impl<'a> DatabaseMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2402,7 +2816,7 @@ impl<'a> FlagMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all available database flags for Cloud SQL instances.
+    /// Lists all available database flags for Cloud SQL instances.
     pub fn list(&self) -> FlagListCall<'a> {
         FlagListCall {
             hub: self.hub,
@@ -2426,18 +2840,16 @@ impl<'a> FlagMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2559,7 +2971,7 @@ impl<'a> InstanceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Failover the instance to its failover replica instance. Using this operation might cause your instance to restart.
+    /// Initiates a manual failover of a high availability (HA) primary instance to a standby instance, which becomes the primary instance. Users are then rerouted to the new primary. For more information, see the [Overview of high availability](https://cloud.google.com/sql/docs/mysql/high-availability) page in the Cloud SQL documentation. If using Legacy HA (MySQL only), this causes the instance to failover to its failover replica instance.
     /// 
     /// # Arguments
     ///
@@ -2889,18 +3301,16 @@ impl<'a> InstanceMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2971,18 +3381,16 @@ impl<'a> OperationMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -3028,15 +3436,15 @@ impl<'a> ProjectMethods<'a> {
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `project` - ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn instances_start_external_sync(&self, project: &str, instance: &str) -> ProjectInstanceStartExternalSyncCall<'a> {
+    pub fn instances_start_external_sync(&self, request: SqlInstancesStartExternalSyncRequest, project: &str, instance: &str) -> ProjectInstanceStartExternalSyncCall<'a> {
         ProjectInstanceStartExternalSyncCall {
             hub: self.hub,
+            _request: request,
             _project: project.to_string(),
             _instance: instance.to_string(),
-            _sync_mode: Default::default(),
-            _skip_verification: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3049,15 +3457,15 @@ impl<'a> ProjectMethods<'a> {
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn instances_verify_external_sync_settings(&self, project: &str, instance: &str) -> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
+    pub fn instances_verify_external_sync_settings(&self, request: SqlInstancesVerifyExternalSyncSettingsRequest, project: &str, instance: &str) -> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
         ProjectInstanceVerifyExternalSyncSettingCall {
             hub: self.hub,
+            _request: request,
             _project: project.to_string(),
             _instance: instance.to_string(),
-            _verify_connection_only: Default::default(),
-            _sync_mode: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3077,18 +3485,16 @@ impl<'a> ProjectMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -3223,18 +3629,16 @@ impl<'a> SslCertMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -3255,7 +3659,7 @@ impl<'a> TierMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all available machine types (tiers) for Cloud SQL, for example, db-custom-1-3840. For related information, see Pricing.
+    /// Lists all available machine types (tiers) for Cloud SQL, for example, `db-custom-1-3840`. For related information, see [Pricing](/sql/pricing).
     /// 
     /// # Arguments
     ///
@@ -3283,18 +3687,16 @@ impl<'a> TierMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use sqladmin1_beta4::SQLAdmin;
+/// use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -3418,17 +3820,15 @@ impl<'a> UserMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3553,22 +3953,22 @@ impl<'a> BackupRunDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3611,7 +4011,7 @@ impl<'a> BackupRunDeleteCall<'a> {
         self._instance = new_value.to_string();
         self
     }
-    /// The ID of the Backup Run to delete. To find a Backup Run ID, use the list method.
+    /// The ID of the backup run to delete. To find a backup run ID, use the [list](https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/backupRuns/list) method.
     ///
     /// Sets the *id* path property to the given value.
     ///
@@ -3696,17 +4096,15 @@ impl<'a> BackupRunDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3831,22 +4229,22 @@ impl<'a> BackupRunGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3889,7 +4287,7 @@ impl<'a> BackupRunGetCall<'a> {
         self._instance = new_value.to_string();
         self
     }
-    /// The ID of this Backup Run.
+    /// The ID of this backup run.
     ///
     /// Sets the *id* path property to the given value.
     ///
@@ -3962,7 +4360,7 @@ impl<'a> BackupRunGetCall<'a> {
 }
 
 
-/// Creates a new backup run on demand. This method is applicable only to Second Generation instances.
+/// Creates a new backup run on demand.
 ///
 /// A builder for the *insert* method supported by a *backupRun* resource.
 /// It is not used directly, but through a `BackupRunMethods` instance.
@@ -3974,18 +4372,16 @@ impl<'a> BackupRunGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::BackupRun;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4128,22 +4524,22 @@ impl<'a> BackupRunInsertCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4258,7 +4654,7 @@ impl<'a> BackupRunInsertCall<'a> {
 }
 
 
-/// Lists all backup runs associated with a given instance and configuration in the reverse chronological order of the backup initiation time.
+/// Lists all backup runs associated with the project or a given instance and configuration in the reverse chronological order of the backup initiation time.
 ///
 /// A builder for the *list* method supported by a *backupRun* resource.
 /// It is not used directly, but through a `BackupRunMethods` instance.
@@ -4270,17 +4666,15 @@ impl<'a> BackupRunInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4413,22 +4807,22 @@ impl<'a> BackupRunListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4461,7 +4855,7 @@ impl<'a> BackupRunListCall<'a> {
         self._project = new_value.to_string();
         self
     }
-    /// Cloud SQL instance ID. This does not include the project ID.
+    /// Cloud SQL instance ID, or "-" for all instances. This does not include the project ID.
     ///
     /// Sets the *instance* path property to the given value.
     ///
@@ -4548,6 +4942,576 @@ impl<'a> BackupRunListCall<'a> {
 }
 
 
+/// Generates a short-lived X509 certificate containing the provided public key and signed by a private key specific to the target instance. Users may use the certificate to authenticate as themselves when connecting to the database.
+///
+/// A builder for the *generateEphemeral* method supported by a *connect* resource.
+/// It is not used directly, but through a `ConnectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::api::GenerateEphemeralCertRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GenerateEphemeralCertRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.connect().generate_ephemeral(req, "project", "instance")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ConnectGenerateEphemeralCall<'a>
+    where  {
+
+    hub: &'a SQLAdmin<>,
+    _request: GenerateEphemeralCertRequest,
+    _project: String,
+    _instance: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a> client::CallBuilder for ConnectGenerateEphemeralCall<'a> {}
+
+impl<'a> ConnectGenerateEphemeralCall<'a> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GenerateEphemeralCertResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "sql.connect.generateEphemeral",
+                               http_method: hyper::Method::POST });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("instance", self._instance.to_string()));
+        for &field in ["alt", "project", "instance"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "sql/v1beta4/projects/{project}/instances/{instance}:generateEphemeralCert";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["instance", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d);
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GenerateEphemeralCertRequest) -> ConnectGenerateEphemeralCall<'a> {
+        self._request = new_value;
+        self
+    }
+    /// Project ID of the project that contains the instance.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ConnectGenerateEphemeralCall<'a> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> ConnectGenerateEphemeralCall<'a> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ConnectGenerateEphemeralCall<'a> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ConnectGenerateEphemeralCall<'a>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ConnectGenerateEphemeralCall<'a>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves connect settings about a Cloud SQL instance.
+///
+/// A builder for the *get* method supported by a *connect* resource.
+/// It is not used directly, but through a `ConnectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.connect().get("project", "instance")
+///              .read_time("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ConnectGetCall<'a>
+    where  {
+
+    hub: &'a SQLAdmin<>,
+    _project: String,
+    _instance: String,
+    _read_time: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a> client::CallBuilder for ConnectGetCall<'a> {}
+
+impl<'a> ConnectGetCall<'a> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ConnectSettings)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "sql.connect.get",
+                               http_method: hyper::Method::GET });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("instance", self._instance.to_string()));
+        if let Some(value) = self._read_time {
+            params.push(("readTime", value.to_string()));
+        }
+        for &field in ["alt", "project", "instance", "readTime"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "sql/v1beta4/projects/{project}/instances/{instance}/connectSettings";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["instance", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d);
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID of the project that contains the instance.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ConnectGetCall<'a> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> ConnectGetCall<'a> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// Optional. Optional snapshot read timestamp to trade freshness for performance.
+    ///
+    /// Sets the *read time* query property to the given value.
+    pub fn read_time(mut self, new_value: &str) -> ConnectGetCall<'a> {
+        self._read_time = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ConnectGetCall<'a> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ConnectGetCall<'a>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ConnectGetCall<'a>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Deletes a database from a Cloud SQL instance.
 ///
 /// A builder for the *delete* method supported by a *database* resource.
@@ -4560,17 +5524,15 @@ impl<'a> BackupRunListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4695,22 +5657,22 @@ impl<'a> DatabaseDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4838,17 +5800,15 @@ impl<'a> DatabaseDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4973,22 +5933,22 @@ impl<'a> DatabaseGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5116,18 +6076,16 @@ impl<'a> DatabaseGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::Database;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5270,22 +6228,22 @@ impl<'a> DatabaseInsertCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5412,17 +6370,15 @@ impl<'a> DatabaseInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -5545,22 +6501,22 @@ impl<'a> DatabaseListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5678,18 +6634,16 @@ impl<'a> DatabaseListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::Database;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5834,22 +6788,22 @@ impl<'a> DatabasePatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5986,18 +6940,16 @@ impl<'a> DatabasePatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::Database;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -6142,22 +7094,22 @@ impl<'a> DatabaseUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6282,7 +7234,7 @@ impl<'a> DatabaseUpdateCall<'a> {
 }
 
 
-/// List all available database flags for Cloud SQL instances.
+/// Lists all available database flags for Cloud SQL instances.
 ///
 /// A builder for the *list* method supported by a *flag* resource.
 /// It is not used directly, but through a `FlagMethods` instance.
@@ -6294,17 +7246,15 @@ impl<'a> DatabaseUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6407,22 +7357,22 @@ impl<'a> FlagListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6527,17 +7477,15 @@ impl<'a> FlagListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6660,22 +7608,22 @@ impl<'a> InstanceAddServerCaCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6793,18 +7741,16 @@ impl<'a> InstanceAddServerCaCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesCloneRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -6947,22 +7893,22 @@ impl<'a> InstanceCloneCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7089,17 +8035,15 @@ impl<'a> InstanceCloneCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -7222,22 +8166,22 @@ impl<'a> InstanceDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7355,18 +8299,16 @@ impl<'a> InstanceDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesDemoteMasterRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -7509,22 +8451,22 @@ impl<'a> InstanceDemoteMasterCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7651,18 +8593,16 @@ impl<'a> InstanceDemoteMasterCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesExportRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -7805,22 +8745,22 @@ impl<'a> InstanceExportCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7935,7 +8875,7 @@ impl<'a> InstanceExportCall<'a> {
 }
 
 
-/// Failover the instance to its failover replica instance. Using this operation might cause your instance to restart.
+/// Initiates a manual failover of a high availability (HA) primary instance to a standby instance, which becomes the primary instance. Users are then rerouted to the new primary. For more information, see the [Overview of high availability](https://cloud.google.com/sql/docs/mysql/high-availability) page in the Cloud SQL documentation. If using Legacy HA (MySQL only), this causes the instance to failover to its failover replica instance.
 ///
 /// A builder for the *failover* method supported by a *instance* resource.
 /// It is not used directly, but through a `InstanceMethods` instance.
@@ -7947,18 +8887,16 @@ impl<'a> InstanceExportCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesFailoverRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8101,22 +9039,22 @@ impl<'a> InstanceFailoverCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8243,17 +9181,15 @@ impl<'a> InstanceFailoverCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -8376,22 +9312,22 @@ impl<'a> InstanceGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8509,18 +9445,16 @@ impl<'a> InstanceGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesImportRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8663,22 +9597,22 @@ impl<'a> InstanceImportCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8805,18 +9739,16 @@ impl<'a> InstanceImportCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::DatabaseInstance;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8957,22 +9889,22 @@ impl<'a> InstanceInsertCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9089,26 +10021,24 @@ impl<'a> InstanceInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().list("project")
-///              .page_token("et")
-///              .max_results(79)
-///              .filter("sadipscing")
+///              .page_token("duo")
+///              .max_results(25)
+///              .filter("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9235,22 +10165,22 @@ impl<'a> InstanceListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9379,17 +10309,15 @@ impl<'a> InstanceListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -9512,22 +10440,22 @@ impl<'a> InstanceListServerCaCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9645,18 +10573,16 @@ impl<'a> InstanceListServerCaCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::DatabaseInstance;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9799,22 +10725,22 @@ impl<'a> InstancePatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9941,17 +10867,15 @@ impl<'a> InstancePatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10074,22 +10998,22 @@ impl<'a> InstancePromoteReplicaCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10207,17 +11131,15 @@ impl<'a> InstancePromoteReplicaCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10340,22 +11262,22 @@ impl<'a> InstanceResetSslConfigCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10473,17 +11395,15 @@ impl<'a> InstanceResetSslConfigCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10606,22 +11526,22 @@ impl<'a> InstanceRestartCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10739,18 +11659,16 @@ impl<'a> InstanceRestartCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesRestoreBackupRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -10893,22 +11811,22 @@ impl<'a> InstanceRestoreBackupCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11035,18 +11953,16 @@ impl<'a> InstanceRestoreBackupCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesRotateServerCaRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -11189,22 +12105,22 @@ impl<'a> InstanceRotateServerCaCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11331,17 +12247,15 @@ impl<'a> InstanceRotateServerCaCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -11464,22 +12378,22 @@ impl<'a> InstanceStartReplicaCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11597,17 +12511,15 @@ impl<'a> InstanceStartReplicaCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -11730,22 +12642,22 @@ impl<'a> InstanceStopReplicaCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11863,18 +12775,16 @@ impl<'a> InstanceStopReplicaCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::InstancesTruncateLogRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -12017,22 +12927,22 @@ impl<'a> InstanceTruncateLogCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -12159,18 +13069,16 @@ impl<'a> InstanceTruncateLogCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::DatabaseInstance;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -12313,22 +13221,22 @@ impl<'a> InstanceUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -12455,17 +13363,15 @@ impl<'a> InstanceUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -12588,22 +13494,22 @@ impl<'a> OperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -12721,26 +13627,24 @@ impl<'a> OperationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list("project")
-///              .page_token("et")
-///              .max_results(78)
-///              .instance("voluptua.")
+///              .page_token("dolore")
+///              .max_results(23)
+///              .instance("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12867,22 +13771,22 @@ impl<'a> OperationListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13011,18 +13915,16 @@ impl<'a> OperationListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::SqlInstancesRescheduleMaintenanceRequestBody;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -13165,22 +14067,22 @@ impl<'a> ProjectInstanceRescheduleMaintenanceCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13307,25 +14209,27 @@ impl<'a> ProjectInstanceRescheduleMaintenanceCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::api::SqlInstancesStartExternalSyncRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SqlInstancesStartExternalSyncRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_start_external_sync("project", "instance")
-///              .sync_mode("amet.")
-///              .skip_verification(false)
+/// let result = hub.projects().instances_start_external_sync(req, "project", "instance")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13333,10 +14237,9 @@ pub struct ProjectInstanceStartExternalSyncCall<'a>
     where  {
 
     hub: &'a SQLAdmin<>,
+    _request: SqlInstancesStartExternalSyncRequest,
     _project: String,
     _instance: String,
-    _sync_mode: Option<String>,
-    _skip_verification: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13359,16 +14262,10 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "sql.projects.instances.startExternalSync",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("instance", self._instance.to_string()));
-        if let Some(value) = self._sync_mode {
-            params.push(("syncMode", value.to_string()));
-        }
-        if let Some(value) = self._skip_verification {
-            params.push(("skipVerification", value.to_string()));
-        }
-        for &field in ["alt", "project", "instance", "syncMode", "skipVerification"].iter() {
+        for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -13409,6 +14306,17 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -13424,6 +14332,7 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
                     }
                 }
             };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -13432,7 +14341,9 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
 
 
                         let request = req_builder
-                        .body(hyper::body::Body::empty());
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
                 
@@ -13450,22 +14361,22 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13488,6 +14399,15 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SqlInstancesStartExternalSyncRequest) -> ProjectInstanceStartExternalSyncCall<'a> {
+        self._request = new_value;
+        self
+    }
     /// ID of the project that contains the instance.
     ///
     /// Sets the *project* path property to the given value.
@@ -13506,20 +14426,6 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
     /// we provide this method for API completeness.
     pub fn instance(mut self, new_value: &str) -> ProjectInstanceStartExternalSyncCall<'a> {
         self._instance = new_value.to_string();
-        self
-    }
-    /// External sync mode.
-    ///
-    /// Sets the *sync mode* query property to the given value.
-    pub fn sync_mode(mut self, new_value: &str) -> ProjectInstanceStartExternalSyncCall<'a> {
-        self._sync_mode = Some(new_value.to_string());
-        self
-    }
-    /// Whether to skip the verification step (VESS).
-    ///
-    /// Sets the *skip verification* query property to the given value.
-    pub fn skip_verification(mut self, new_value: bool) -> ProjectInstanceStartExternalSyncCall<'a> {
-        self._skip_verification = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13597,25 +14503,27 @@ impl<'a> ProjectInstanceStartExternalSyncCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::api::SqlInstancesVerifyExternalSyncSettingsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SqlInstancesVerifyExternalSyncSettingsRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_verify_external_sync_settings("project", "instance")
-///              .verify_connection_only(true)
-///              .sync_mode("sit")
+/// let result = hub.projects().instances_verify_external_sync_settings(req, "project", "instance")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13623,10 +14531,9 @@ pub struct ProjectInstanceVerifyExternalSyncSettingCall<'a>
     where  {
 
     hub: &'a SQLAdmin<>,
+    _request: SqlInstancesVerifyExternalSyncSettingsRequest,
     _project: String,
     _instance: String,
-    _verify_connection_only: Option<bool>,
-    _sync_mode: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13649,16 +14556,10 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "sql.projects.instances.verifyExternalSyncSettings",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("instance", self._instance.to_string()));
-        if let Some(value) = self._verify_connection_only {
-            params.push(("verifyConnectionOnly", value.to_string()));
-        }
-        if let Some(value) = self._sync_mode {
-            params.push(("syncMode", value.to_string()));
-        }
-        for &field in ["alt", "project", "instance", "verifyConnectionOnly", "syncMode"].iter() {
+        for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -13699,6 +14600,17 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -13714,6 +14626,7 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
                     }
                 }
             };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -13722,7 +14635,9 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
 
 
                         let request = req_builder
-                        .body(hyper::body::Body::empty());
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
                 
@@ -13740,22 +14655,22 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13778,6 +14693,15 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SqlInstancesVerifyExternalSyncSettingsRequest) -> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
+        self._request = new_value;
+        self
+    }
     /// Project ID of the project that contains the instance.
     ///
     /// Sets the *project* path property to the given value.
@@ -13796,20 +14720,6 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
     /// we provide this method for API completeness.
     pub fn instance(mut self, new_value: &str) -> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
         self._instance = new_value.to_string();
-        self
-    }
-    /// Flag to enable verifying connection only
-    ///
-    /// Sets the *verify connection only* query property to the given value.
-    pub fn verify_connection_only(mut self, new_value: bool) -> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
-        self._verify_connection_only = Some(new_value);
-        self
-    }
-    /// External sync mode
-    ///
-    /// Sets the *sync mode* query property to the given value.
-    pub fn sync_mode(mut self, new_value: &str) -> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
-        self._sync_mode = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13887,18 +14797,16 @@ impl<'a> ProjectInstanceVerifyExternalSyncSettingCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::SslCertsCreateEphemeralRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -14041,22 +14949,22 @@ impl<'a> SslCertCreateEphemeralCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -14183,17 +15091,15 @@ impl<'a> SslCertCreateEphemeralCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -14318,22 +15224,22 @@ impl<'a> SslCertDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -14461,17 +15367,15 @@ impl<'a> SslCertDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -14596,22 +15500,22 @@ impl<'a> SslCertGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -14739,18 +15643,16 @@ impl<'a> SslCertGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::SslCertsInsertRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -14893,22 +15795,22 @@ impl<'a> SslCertInsertCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15035,17 +15937,15 @@ impl<'a> SslCertInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15168,22 +16068,22 @@ impl<'a> SslCertListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15289,7 +16189,7 @@ impl<'a> SslCertListCall<'a> {
 }
 
 
-/// Lists all available machine types (tiers) for Cloud SQL, for example, db-custom-1-3840. For related information, see Pricing.
+/// Lists all available machine types (tiers) for Cloud SQL, for example, `db-custom-1-3840`. For related information, see [Pricing](/sql/pricing).
 ///
 /// A builder for the *list* method supported by a *tier* resource.
 /// It is not used directly, but through a `TierMethods` instance.
@@ -15301,17 +16201,15 @@ impl<'a> SslCertListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15432,22 +16330,22 @@ impl<'a> TierListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15555,17 +16453,15 @@ impl<'a> TierListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15573,7 +16469,7 @@ impl<'a> TierListCall<'a> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().delete("project", "instance")
 ///              .name("et")
-///              .host("elitr")
+///              .host("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15698,22 +16594,22 @@ impl<'a> UserDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15845,18 +16741,16 @@ impl<'a> UserDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::User;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -15999,22 +16893,22 @@ impl<'a> UserInsertCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -16141,17 +17035,15 @@ impl<'a> UserInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -16274,22 +17166,22 @@ impl<'a> UserListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -16407,18 +17299,16 @@ impl<'a> UserListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
 /// use sqladmin1_beta4::api::User;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use sqladmin1_beta4::SQLAdmin;
+/// # use sqladmin1_beta4::{SQLAdmin, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -16430,7 +17320,7 @@ impl<'a> UserListCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().update(req, "project", "instance")
-///              .name("dolores")
+///              .name("At")
 ///              .host("sadipscing")
 ///              .doit().await;
 /// # }
@@ -16571,22 +17461,22 @@ impl<'a> UserUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

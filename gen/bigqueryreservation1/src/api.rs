@@ -19,10 +19,10 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage your data in Google BigQuery
+    /// View and manage your data in Google BigQuery and see the email address for your Google Account
     Bigquery,
 
-    /// See, edit, configure, and delete your Google Cloud Platform data
+    /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
 }
 
@@ -56,14 +56,12 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::CapacityCommitment;
 /// use bigqueryreservation1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use bigqueryreservation1::BigQueryReservation;
+/// use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -73,9 +71,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -88,6 +86,7 @@ impl Default for Scope {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_capacity_commitments_create(req, "parent")
 ///              .enforce_single_admin_project_per_org(true)
+///              .capacity_commitment_id("duo")
 ///              .doit().await;
 /// 
 /// match result {
@@ -111,8 +110,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct BigQueryReservation<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -126,7 +125,7 @@ impl<'a, > BigQueryReservation<> {
         BigQueryReservation {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://bigqueryreservation.googleapis.com/".to_string(),
             _root_url: "https://bigqueryreservation.googleapis.com/".to_string(),
         }
@@ -137,7 +136,7 @@ impl<'a, > BigQueryReservation<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -165,7 +164,7 @@ impl<'a, > BigQueryReservation<> {
 // ############
 // SCHEMAS ###
 // ##########
-/// A Assignment allows a project to submit jobs of a certain type using slots from the specified reservation.
+/// An assignment allows a project to submit jobs of a certain type using slots from the specified reservation.
 /// 
 /// # Activities
 /// 
@@ -182,7 +181,7 @@ pub struct Assignment {
     /// Which type of jobs will use the reservation.
     #[serde(rename="jobType")]
     pub job_type: Option<String>,
-    /// Output only. Name of the resource. E.g.: `projects/myproject/locations/US/reservations/team1-prod/assignments/123`.
+    /// Output only. Name of the resource. E.g.: `projects/myproject/locations/US/reservations/team1-prod/assignments/123`. For the assignment id, it must only contain lower case alphanumeric characters or dashes and the max length is 64 characters.
     pub name: Option<String>,
     /// Output only. State of the assignment.
     pub state: Option<String>,
@@ -240,7 +239,10 @@ pub struct CapacityCommitment {
     /// Output only. For FAILED commitment plan, provides the reason of failure.
     #[serde(rename="failureStatus")]
     pub failure_status: Option<Status>,
-    /// Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123`
+    /// Applicable only for commitments located within one of the BigQuery multi-regions (US or EU). If set to true, this commitment is placed in the organization's secondary region which is designated for disaster recovery purposes. If false, this commitment is placed in the organization's default region.
+    #[serde(rename="multiRegionAuxiliary")]
+    pub multi_region_auxiliary: Option<bool>,
+    /// Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123` For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     pub name: Option<String>,
     /// Capacity commitment commitment plan.
     pub plan: Option<String>,
@@ -390,15 +392,20 @@ impl client::RequestValue for MoveAssignmentRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reservation {
+    /// Maximum number of queries that are allowed to run concurrently in this reservation. This is a soft limit due to asynchronous nature of the system and various optimizations for small queries. Default value is 0 which means that concurrency will be automatically set based on the reservation size.
+    pub concurrency: Option<String>,
     /// Output only. Creation time of the reservation.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// If false, any query using this reservation will use idle slots from other reservations within the same admin project. If true, a query using this reservation will execute with the slot capacity specified above at most.
+    /// If false, any query or pipeline job using this reservation will use idle slots from other reservations within the same admin project. If true, a query or pipeline job using this reservation will execute with the slot capacity specified in the slot_capacity field at most.
     #[serde(rename="ignoreIdleSlots")]
     pub ignore_idle_slots: Option<bool>,
-    /// The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`.
+    /// Applicable only for reservations located within one of the BigQuery multi-regions (US or EU). If set to true, this reservation is placed in the organization's secondary region which is designated for disaster recovery purposes. If false, this reservation is placed in the organization's default region.
+    #[serde(rename="multiRegionAuxiliary")]
+    pub multi_region_auxiliary: Option<bool>,
+    /// The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     pub name: Option<String>,
-    /// Minimum slots available to this reservation. A slot is a unit of computational power in BigQuery, and serves as the unit of parallelism. Queries using this reservation might use more slots during runtime if ignore_idle_slots is set to false. If the new reservation's slot capacity exceed the parent's slot capacity or if total slot capacity of the new reservation and its siblings exceeds the parent's slot capacity, the request will fail with `google.rpc.Code.RESOURCE_EXHAUSTED`.
+    /// Minimum slots available to this reservation. A slot is a unit of computational power in BigQuery, and serves as the unit of parallelism. Queries using this reservation might use more slots during runtime if ignore_idle_slots is set to false. If the new reservation's slot capacity exceed the project's slot capacity or if total slot capacity of the new reservation and its siblings exceeds the project's slot capacity, the request will fail with `google.rpc.Code.RESOURCE_EXHAUSTED`. NOTE: for reservations in US or EU multi-regions slot capacity constraints are checked separately for default and auxiliary regions. See multi_region_auxiliary flag for more details.
     #[serde(rename="slotCapacity")]
     pub slot_capacity: Option<String>,
     /// Output only. Last update time of the reservation.
@@ -523,18 +530,16 @@ impl client::Part for Status {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use bigqueryreservation1::BigQueryReservation;
+/// use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -567,6 +572,7 @@ impl<'a> ProjectMethods<'a> {
             _request: request,
             _parent: parent.to_string(),
             _enforce_single_admin_project_per_org: Default::default(),
+            _capacity_commitment_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -584,6 +590,7 @@ impl<'a> ProjectMethods<'a> {
         ProjectLocationCapacityCommitmentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _force: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -652,7 +659,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123`
+    /// * `name` - Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123` For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     pub fn locations_capacity_commitments_patch(&self, request: CapacityCommitment, name: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a> {
         ProjectLocationCapacityCommitmentPatchCall {
             hub: self.hub,
@@ -697,6 +704,7 @@ impl<'a> ProjectMethods<'a> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _assignment_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -838,7 +846,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`.
+    /// * `name` - The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     pub fn locations_reservations_patch(&self, request: Reservation, name: &str) -> ProjectLocationReservationPatchCall<'a> {
         ProjectLocationReservationPatchCall {
             hub: self.hub,
@@ -890,7 +898,7 @@ impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn't have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project->folder->organization) happens in this API. 3. Parent here is `projects/*/locations/*`, instead of `projects/*/locations/*reservations/*`. **Note** "-" cannot be used for projects nor locations.
+    /// Deprecated: Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn't have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project->folder->organization) happens in this API. 3. Parent here is `projects/*/locations/*`, instead of `projects/*/locations/*reservations/*`. **Note** "-" cannot be used for projects nor locations.
     /// 
     /// # Arguments
     ///
@@ -949,18 +957,16 @@ impl<'a> ProjectMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::CapacityCommitment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -973,6 +979,7 @@ impl<'a> ProjectMethods<'a> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_capacity_commitments_create(req, "parent")
 ///              .enforce_single_admin_project_per_org(true)
+///              .capacity_commitment_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -983,6 +990,7 @@ pub struct ProjectLocationCapacityCommitmentCreateCall<'a>
     _request: CapacityCommitment,
     _parent: String,
     _enforce_single_admin_project_per_org: Option<bool>,
+    _capacity_commitment_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1006,12 +1014,15 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "bigqueryreservation.projects.locations.capacityCommitments.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._enforce_single_admin_project_per_org {
             params.push(("enforceSingleAdminProjectPerOrg", value.to_string()));
         }
-        for &field in ["alt", "parent", "enforceSingleAdminProjectPerOrg"].iter() {
+        if let Some(value) = self._capacity_commitment_id {
+            params.push(("capacityCommitmentId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "enforceSingleAdminProjectPerOrg", "capacityCommitmentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -1110,22 +1121,22 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1172,6 +1183,13 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
     /// Sets the *enforce single admin project per org* query property to the given value.
     pub fn enforce_single_admin_project_per_org(mut self, new_value: bool) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
         self._enforce_single_admin_project_per_org = Some(new_value);
+        self
+    }
+    /// The optional capacity commitment ID. Capacity commitment name will be generated automatically if this field is empty. This field must only contain lower case alphanumeric characters or dashes. The first and last character cannot be a dash. Max length is 64 characters. NOTE: this ID won't be kept if the capacity commitment is split or merged.
+    ///
+    /// Sets the *capacity commitment id* query property to the given value.
+    pub fn capacity_commitment_id(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+        self._capacity_commitment_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1249,23 +1267,22 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_capacity_commitments_delete("name")
+///              .force(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1274,6 +1291,7 @@ pub struct ProjectLocationCapacityCommitmentDeleteCall<'a>
 
     hub: &'a BigQueryReservation<>,
     _name: String,
+    _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1297,9 +1315,12 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "bigqueryreservation.projects.locations.capacityCommitments.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._force {
+            params.push(("force", value.to_string()));
+        }
+        for &field in ["alt", "name", "force"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -1384,22 +1405,22 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1430,6 +1451,13 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentDeleteCall<'a> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Can be used to force delete commitments even if assignments exist. Deleting commitments with assignments may cause queries to fail if they no longer have access to slots.
+    ///
+    /// Sets the *force* query property to the given value.
+    pub fn force(mut self, new_value: bool) -> ProjectLocationCapacityCommitmentDeleteCall<'a> {
+        self._force = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1507,17 +1535,15 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1642,22 +1668,22 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1765,25 +1791,23 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_capacity_commitments_list("parent")
-///              .page_token("eos")
-///              .page_size(-4)
+///              .page_token("ipsum")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1910,22 +1934,22 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2047,18 +2071,16 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::MergeCapacityCommitmentsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2203,22 +2225,22 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2335,18 +2357,16 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::CapacityCommitment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2358,7 +2378,7 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_capacity_commitments_patch(req, "name")
-///              .update_mask("invidunt")
+///              .update_mask("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2496,22 +2516,22 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2543,7 +2563,7 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
         self._request = new_value;
         self
     }
-    /// Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123`
+    /// Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123` For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2635,18 +2655,16 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::SplitCapacityCommitmentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2791,22 +2809,22 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2923,18 +2941,16 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::Assignment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2946,6 +2962,7 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_reservations_assignments_create(req, "parent")
+///              .assignment_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2955,6 +2972,7 @@ pub struct ProjectLocationReservationAssignmentCreateCall<'a>
     hub: &'a BigQueryReservation<>,
     _request: Assignment,
     _parent: String,
+    _assignment_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2978,9 +2996,12 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "bigqueryreservation.projects.locations.reservations.assignments.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
+        if let Some(value) = self._assignment_id {
+            params.push(("assignmentId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "assignmentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -3079,22 +3100,22 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3134,6 +3155,13 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationAssignmentCreateCall<'a> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// The optional assignment ID. Assignment name will be generated automatically if this field is empty. This field must only contain lower case alphanumeric characters or dashes. Max length is 64 characters.
+    ///
+    /// Sets the *assignment id* query property to the given value.
+    pub fn assignment_id(mut self, new_value: &str) -> ProjectLocationReservationAssignmentCreateCall<'a> {
+        self._assignment_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3211,17 +3239,15 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3346,22 +3372,22 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3469,25 +3495,23 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_reservations_assignments_list("parent")
-///              .page_token("ut")
-///              .page_size(-12)
+///              .page_token("ipsum")
+///              .page_size(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3614,22 +3638,22 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3751,18 +3775,16 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::MoveAssignmentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -3907,22 +3929,22 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4039,18 +4061,16 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::Reservation;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4062,7 +4082,7 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_reservations_create(req, "parent")
-///              .reservation_id("ipsum")
+///              .reservation_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4200,22 +4220,22 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4257,7 +4277,7 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// The reservation ID. This field must only contain lower case alphanumeric characters or dash. Max length is 64 characters.
+    /// The reservation ID. It must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     ///
     /// Sets the *reservation id* query property to the given value.
     pub fn reservation_id(mut self, new_value: &str) -> ProjectLocationReservationCreateCall<'a> {
@@ -4339,17 +4359,15 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4474,22 +4492,22 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4597,17 +4615,15 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4732,22 +4748,22 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4855,25 +4871,23 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_reservations_list("parent")
-///              .page_token("ea")
-///              .page_size(-99)
+///              .page_token("labore")
+///              .page_size(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5000,22 +5014,22 @@ impl<'a> ProjectLocationReservationListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5137,18 +5151,16 @@ impl<'a> ProjectLocationReservationListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::Reservation;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5160,7 +5172,7 @@ impl<'a> ProjectLocationReservationListCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_reservations_patch(req, "name")
-///              .update_mask("eos")
+///              .update_mask("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5298,22 +5310,22 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5345,7 +5357,7 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
         self._request = new_value;
         self
     }
-    /// The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`.
+    /// The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5437,17 +5449,15 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -5572,22 +5582,22 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5695,26 +5705,24 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_search_all_assignments("parent")
-///              .query("duo")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .query("kasd")
+///              .page_token("et")
+///              .page_size(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5845,22 +5853,22 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5977,7 +5985,7 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
 }
 
 
-/// Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn't have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project->folder->organization) happens in this API. 3. Parent here is `projects/*/locations/*`, instead of `projects/*/locations/*reservations/*`. **Note** "-" cannot be used for projects nor locations.
+/// Deprecated: Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn't have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project->folder->organization) happens in this API. 3. Parent here is `projects/*/locations/*`, instead of `projects/*/locations/*reservations/*`. **Note** "-" cannot be used for projects nor locations.
 ///
 /// A builder for the *locations.searchAssignments* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5989,26 +5997,24 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_search_assignments("parent")
-///              .query("kasd")
-///              .page_token("et")
-///              .page_size(-43)
+///              .query("et")
+///              .page_token("vero")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6139,22 +6145,22 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6283,18 +6289,16 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigqueryreservation1 as bigqueryreservation1;
 /// use bigqueryreservation1::api::BiReservation;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use bigqueryreservation1::BigQueryReservation;
+/// # use bigqueryreservation1::{BigQueryReservation, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -6306,7 +6310,7 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_update_bi_reservation(req, "name")
-///              .update_mask("et")
+///              .update_mask("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6444,22 +6448,22 @@ impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

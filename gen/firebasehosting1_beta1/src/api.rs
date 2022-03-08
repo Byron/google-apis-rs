@@ -19,10 +19,10 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage your data across Google Cloud Platform services
+    /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
 
-    /// View your data across Google Cloud Platform services
+    /// View your data across Google Cloud services and see the email address of your Google Account
     CloudPlatformReadOnly,
 
     /// View and administer all your Firebase data and settings
@@ -64,13 +64,11 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use firebasehosting1_beta1::FirebaseHosting;
+/// use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -80,9 +78,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -115,8 +113,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct FirebaseHosting<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -130,7 +128,7 @@ impl<'a, > FirebaseHosting<> {
         FirebaseHosting {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
@@ -144,7 +142,7 @@ impl<'a, > FirebaseHosting<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -661,22 +659,6 @@ pub struct PopulateVersionFilesResponse {
 impl client::ResponseResult for PopulateVersionFilesResponse {}
 
 
-/// Deprecated in favor of [site channels](sites.channels).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PreviewConfig {
-    /// If true, preview URLs are enabled for this version.
-    pub active: Option<bool>,
-    /// Indicates the expiration time for previewing this version; preview URL requests received after this time will 404.
-    #[serde(rename="expireTime")]
-    pub expire_time: Option<String>,
-}
-
-impl client::Part for PreviewConfig {}
-
-
 /// A [`Redirect`](https://firebase.google.com/docs/hosting/full-config#redirects) specifies a URL pattern that, if matched to the request URL path, triggers Hosting to respond with a redirect to the specified destination path.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -924,8 +906,6 @@ pub struct Version {
     pub labels: Option<HashMap<String, String>>,
     /// The fully-qualified resource name for the version, in the format: sites/ SITE_ID/versions/VERSION_ID This name is provided in the response body when you call [`CreateVersion`](sites.versions/create).
     pub name: Option<String>,
-    /// Deprecated in favor of [site channels](sites.channels).
-    pub preview: Option<PreviewConfig>,
     /// The deploy status of the version. For a successful deploy, call [`CreateVersion`](sites.versions/create) to make a new version (`CREATED` status), [upload all desired files](sites.versions/populateFiles) to the version, then [update](sites.versions/patch) the version to the `FINALIZED` status. Note that if you leave the version in the `CREATED` state for more than 12 hours, the system will automatically mark the version as `ABANDONED`. You can also change the status of a version to `DELETED` by calling [`DeleteVersion`](sites.versions/delete).
     pub status: Option<String>,
     /// Output only. The total stored bytesize of the version. This value is calculated after a version is `FINALIZED`.
@@ -969,18 +949,16 @@ impl client::Part for VersionFile {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use firebasehosting1_beta1::FirebaseHosting;
+/// use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -1557,18 +1535,16 @@ impl<'a> ProjectMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use firebasehosting1_beta1::FirebaseHosting;
+/// use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2043,17 +2019,15 @@ impl<'a> SiteMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2178,22 +2152,22 @@ impl<'a> ProjectOperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2301,18 +2275,16 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Release;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2462,22 +2434,22 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2601,17 +2573,15 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2746,22 +2716,22 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2883,18 +2853,16 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -3044,22 +3012,22 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3183,17 +3151,15 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3318,22 +3284,22 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3441,17 +3407,15 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3576,22 +3540,22 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3699,17 +3663,15 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3844,22 +3806,22 @@ impl<'a> ProjectSiteChannelListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3981,18 +3943,16 @@ impl<'a> ProjectSiteChannelListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4142,22 +4102,22 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4281,18 +4241,16 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Domain;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4437,22 +4395,22 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4569,17 +4527,15 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4704,22 +4660,22 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4827,17 +4783,15 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4962,22 +4916,22 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5085,17 +5039,15 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -5230,22 +5182,22 @@ impl<'a> ProjectSiteDomainListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5367,18 +5319,16 @@ impl<'a> ProjectSiteDomainListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Domain;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5523,22 +5473,22 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5655,18 +5605,16 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Release;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5816,22 +5764,22 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5955,17 +5903,15 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6100,22 +6046,22 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6237,17 +6183,15 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6387,22 +6331,22 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6531,18 +6475,16 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::CloneVersionRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -6687,22 +6629,22 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6819,18 +6761,16 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Version;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -6985,22 +6925,22 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7131,17 +7071,15 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -7266,22 +7204,22 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7389,17 +7327,15 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -7539,22 +7475,22 @@ impl<'a> ProjectSiteVersionListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7683,18 +7619,16 @@ impl<'a> ProjectSiteVersionListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Version;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -7844,22 +7778,22 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7983,18 +7917,16 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::PopulateVersionFilesRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8139,22 +8071,22 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8271,18 +8203,16 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Site;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8432,22 +8362,22 @@ impl<'a> ProjectSiteCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8571,17 +8501,15 @@ impl<'a> ProjectSiteCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -8706,22 +8634,22 @@ impl<'a> ProjectSiteDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8829,17 +8757,15 @@ impl<'a> ProjectSiteDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -8964,22 +8890,22 @@ impl<'a> ProjectSiteGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9087,17 +9013,15 @@ impl<'a> ProjectSiteGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -9222,22 +9146,22 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9345,17 +9269,15 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -9490,22 +9412,22 @@ impl<'a> ProjectSiteListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9627,18 +9549,16 @@ impl<'a> ProjectSiteListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Site;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9788,22 +9708,22 @@ impl<'a> ProjectSitePatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9927,18 +9847,16 @@ impl<'a> ProjectSitePatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::SiteConfig;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -10088,22 +10006,22 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10227,18 +10145,16 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Release;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -10388,22 +10304,22 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10527,17 +10443,15 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10672,22 +10586,22 @@ impl<'a> SiteChannelReleaseListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10809,18 +10723,16 @@ impl<'a> SiteChannelReleaseListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -10970,22 +10882,22 @@ impl<'a> SiteChannelCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11109,17 +11021,15 @@ impl<'a> SiteChannelCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -11244,22 +11154,22 @@ impl<'a> SiteChannelDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11367,17 +11277,15 @@ impl<'a> SiteChannelDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -11502,22 +11410,22 @@ impl<'a> SiteChannelGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11625,17 +11533,15 @@ impl<'a> SiteChannelGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -11770,22 +11676,22 @@ impl<'a> SiteChannelListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -11907,18 +11813,16 @@ impl<'a> SiteChannelListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -12068,22 +11972,22 @@ impl<'a> SiteChannelPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -12207,18 +12111,16 @@ impl<'a> SiteChannelPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Domain;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -12363,22 +12265,22 @@ impl<'a> SiteDomainCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -12495,17 +12397,15 @@ impl<'a> SiteDomainCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -12630,22 +12530,22 @@ impl<'a> SiteDomainDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -12753,17 +12653,15 @@ impl<'a> SiteDomainDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -12888,22 +12786,22 @@ impl<'a> SiteDomainGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13011,17 +12909,15 @@ impl<'a> SiteDomainGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -13156,22 +13052,22 @@ impl<'a> SiteDomainListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13293,18 +13189,16 @@ impl<'a> SiteDomainListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Domain;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -13449,22 +13343,22 @@ impl<'a> SiteDomainUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13581,18 +13475,16 @@ impl<'a> SiteDomainUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Release;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -13742,22 +13634,22 @@ impl<'a> SiteReleaseCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -13881,17 +13773,15 @@ impl<'a> SiteReleaseCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -14026,22 +13916,22 @@ impl<'a> SiteReleaseListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -14163,17 +14053,15 @@ impl<'a> SiteReleaseListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -14313,22 +14201,22 @@ impl<'a> SiteVersionFileListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -14457,18 +14345,16 @@ impl<'a> SiteVersionFileListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::CloneVersionRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -14613,22 +14499,22 @@ impl<'a> SiteVersionCloneCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -14745,18 +14631,16 @@ impl<'a> SiteVersionCloneCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Version;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -14911,22 +14795,22 @@ impl<'a> SiteVersionCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15057,17 +14941,15 @@ impl<'a> SiteVersionCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15192,22 +15074,22 @@ impl<'a> SiteVersionDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15315,17 +15197,15 @@ impl<'a> SiteVersionDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15465,22 +15345,22 @@ impl<'a> SiteVersionListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15609,18 +15489,16 @@ impl<'a> SiteVersionListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::Version;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -15770,22 +15648,22 @@ impl<'a> SiteVersionPatchCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -15909,18 +15787,16 @@ impl<'a> SiteVersionPatchCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::PopulateVersionFilesRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -16065,22 +15941,22 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -16197,17 +16073,15 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -16332,22 +16206,22 @@ impl<'a> SiteGetConfigCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -16455,18 +16329,16 @@ impl<'a> SiteGetConfigCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
 /// use firebasehosting1_beta1::api::SiteConfig;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use firebasehosting1_beta1::FirebaseHosting;
+/// # use firebasehosting1_beta1::{FirebaseHosting, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -16616,22 +16488,22 @@ impl<'a> SiteUpdateConfigCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

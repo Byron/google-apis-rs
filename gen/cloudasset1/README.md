@@ -5,27 +5,34 @@ DO NOT EDIT !
 -->
 The `google-cloudasset1` library allows access to all features of the *Google Cloud Asset* service.
 
-This documentation was generated from *Cloud Asset* crate version *2.0.8+20210319*, where *20210319* is the exact revision of the *cloudasset:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+This documentation was generated from *Cloud Asset* crate version *3.0.0+20220225*, where *20220225* is the exact revision of the *cloudasset:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 
 Everything else about the *Cloud Asset* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/asset-inventory/docs/quickstart).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/CloudAsset) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/CloudAsset) ... 
 
-* [feeds](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::Feed)
- * [*create*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::FeedCreateCall), [*delete*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::FeedDeleteCall), [*get*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::FeedGetCall), [*list*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::FeedListCall) and [*patch*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::FeedPatchCall)
-* [operations](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::Operation)
- * [*get*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::OperationGetCall)
+* [assets](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::Asset)
+ * [*list*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::AssetListCall)
+* [effective iam policies](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::EffectiveIamPolicy)
+ * [*batch get*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::EffectiveIamPolicyBatchGetCall)
+* [feeds](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::Feed)
+ * [*create*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::FeedCreateCall), [*delete*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::FeedDeleteCall), [*get*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::FeedGetCall), [*list*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::FeedListCall) and [*patch*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::FeedPatchCall)
+* [operations](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::Operation)
+ * [*get*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::OperationGetCall)
+* [saved queries](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::SavedQuery)
+ * [*create*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::SavedQueryCreateCall), [*delete*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::SavedQueryDeleteCall), [*get*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::SavedQueryGetCall), [*list*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::SavedQueryListCall) and [*patch*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::SavedQueryPatchCall)
 
 Other activities are ...
 
-* [analyze iam policy](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::MethodAnalyzeIamPolicyCall)
-* [analyze iam policy longrunning](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::MethodAnalyzeIamPolicyLongrunningCall)
-* [batch get assets history](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::MethodBatchGetAssetsHistoryCall)
-* [export assets](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::MethodExportAssetCall)
-* [search all iam policies](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::MethodSearchAllIamPolicyCall)
-* [search all resources](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/api::MethodSearchAllResourceCall)
+* [analyze iam policy](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodAnalyzeIamPolicyCall)
+* [analyze iam policy longrunning](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodAnalyzeIamPolicyLongrunningCall)
+* [analyze move](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodAnalyzeMoveCall)
+* [batch get assets history](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodBatchGetAssetsHistoryCall)
+* [export assets](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodExportAssetCall)
+* [search all iam policies](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodSearchAllIamPolicyCall)
+* [search all resources](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/api::MethodSearchAllResourceCall)
 
 
 
@@ -33,17 +40,17 @@ Other activities are ...
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/CloudAsset)**
+* **[Hub](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/CloudAsset)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Part)**
+    * **[Parts](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -78,11 +85,8 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 google-cloudasset1 = "*"
-hyper = "^0.14"
-hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -90,13 +94,11 @@ yup-oauth2 = "^5.0"
 ```Rust
 extern crate hyper;
 extern crate hyper_rustls;
-extern crate yup_oauth2 as oauth2;
 extern crate google_cloudasset1 as cloudasset1;
 use cloudasset1::api::CreateFeedRequest;
 use cloudasset1::{Result, Error};
 use std::default::Default;
-use oauth2;
-use cloudasset1::CloudAsset;
+use cloudasset1::{CloudAsset, oauth2, hyper, hyper_rustls};
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -106,9 +108,9 @@ let secret: oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
-        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
 let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // As the method needs a request, you would usually fill it with the desired information
@@ -143,17 +145,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -163,29 +165,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::RequestValue) and 
-[decodable](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::RequestValue) and 
+[decodable](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-cloudasset1/2.0.8+20210319/google_cloudasset1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-cloudasset1/3.0.0+20220225/google_cloudasset1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

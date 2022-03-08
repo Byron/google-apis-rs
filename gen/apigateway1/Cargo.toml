@@ -4,12 +4,12 @@
 [package]
 
 name = "google-apigateway1"
-version = "2.0.8+20210318"
+version = "3.0.0+20220223"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with apigateway (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/apigateway1"
 homepage = "https://cloud.google.com/api-gateway/docs"
-documentation = "https://docs.rs/google-apigateway1/2.0.8+20210318"
+documentation = "https://docs.rs/google-apigateway1/3.0.0+20220223"
 license = "MIT"
 keywords = ["apigateway", "google", "protocol", "web", "api"]
 autobins = false
@@ -22,7 +22,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 5.0"
+yup-oauth2 = "^ 6.0"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
 url = "= 1.7"

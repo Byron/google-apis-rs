@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Recommender* crate version *2.0.8+20210319*, where *20210319* is the exact revision of the *recommender:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Recommender* crate version *3.0.0+20220228*, where *20220228* is the exact revision of the *recommender:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Recommender* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/recommender/docs/).
@@ -16,9 +16,9 @@
 //! * folders
 //!  * [*locations insight types insights get*](api::FolderLocationInsightTypeInsightGetCall), [*locations insight types insights list*](api::FolderLocationInsightTypeInsightListCall), [*locations insight types insights mark accepted*](api::FolderLocationInsightTypeInsightMarkAcceptedCall), [*locations recommenders recommendations get*](api::FolderLocationRecommenderRecommendationGetCall), [*locations recommenders recommendations list*](api::FolderLocationRecommenderRecommendationListCall), [*locations recommenders recommendations mark claimed*](api::FolderLocationRecommenderRecommendationMarkClaimedCall), [*locations recommenders recommendations mark failed*](api::FolderLocationRecommenderRecommendationMarkFailedCall) and [*locations recommenders recommendations mark succeeded*](api::FolderLocationRecommenderRecommendationMarkSucceededCall)
 //! * organizations
-//!  * [*locations insight types insights get*](api::OrganizationLocationInsightTypeInsightGetCall), [*locations insight types insights list*](api::OrganizationLocationInsightTypeInsightListCall), [*locations insight types insights mark accepted*](api::OrganizationLocationInsightTypeInsightMarkAcceptedCall), [*locations recommenders recommendations get*](api::OrganizationLocationRecommenderRecommendationGetCall), [*locations recommenders recommendations list*](api::OrganizationLocationRecommenderRecommendationListCall), [*locations recommenders recommendations mark claimed*](api::OrganizationLocationRecommenderRecommendationMarkClaimedCall), [*locations recommenders recommendations mark failed*](api::OrganizationLocationRecommenderRecommendationMarkFailedCall) and [*locations recommenders recommendations mark succeeded*](api::OrganizationLocationRecommenderRecommendationMarkSucceededCall)
+//!  * [*locations insight types config*](api::OrganizationLocationInsightTypeConfigCall), [*locations insight types get config*](api::OrganizationLocationInsightTypeGetConfigCall), [*locations insight types insights get*](api::OrganizationLocationInsightTypeInsightGetCall), [*locations insight types insights list*](api::OrganizationLocationInsightTypeInsightListCall), [*locations insight types insights mark accepted*](api::OrganizationLocationInsightTypeInsightMarkAcceptedCall), [*locations recommenders config*](api::OrganizationLocationRecommenderConfigCall), [*locations recommenders get config*](api::OrganizationLocationRecommenderGetConfigCall), [*locations recommenders recommendations get*](api::OrganizationLocationRecommenderRecommendationGetCall), [*locations recommenders recommendations list*](api::OrganizationLocationRecommenderRecommendationListCall), [*locations recommenders recommendations mark claimed*](api::OrganizationLocationRecommenderRecommendationMarkClaimedCall), [*locations recommenders recommendations mark failed*](api::OrganizationLocationRecommenderRecommendationMarkFailedCall) and [*locations recommenders recommendations mark succeeded*](api::OrganizationLocationRecommenderRecommendationMarkSucceededCall)
 //! * projects
-//!  * [*locations insight types insights get*](api::ProjectLocationInsightTypeInsightGetCall), [*locations insight types insights list*](api::ProjectLocationInsightTypeInsightListCall), [*locations insight types insights mark accepted*](api::ProjectLocationInsightTypeInsightMarkAcceptedCall), [*locations recommenders recommendations get*](api::ProjectLocationRecommenderRecommendationGetCall), [*locations recommenders recommendations list*](api::ProjectLocationRecommenderRecommendationListCall), [*locations recommenders recommendations mark claimed*](api::ProjectLocationRecommenderRecommendationMarkClaimedCall), [*locations recommenders recommendations mark failed*](api::ProjectLocationRecommenderRecommendationMarkFailedCall) and [*locations recommenders recommendations mark succeeded*](api::ProjectLocationRecommenderRecommendationMarkSucceededCall)
+//!  * [*locations insight types get config*](api::ProjectLocationInsightTypeGetConfigCall), [*locations insight types insights get*](api::ProjectLocationInsightTypeInsightGetCall), [*locations insight types insights list*](api::ProjectLocationInsightTypeInsightListCall), [*locations insight types insights mark accepted*](api::ProjectLocationInsightTypeInsightMarkAcceptedCall), [*locations insight types update config*](api::ProjectLocationInsightTypeUpdateConfigCall), [*locations recommenders get config*](api::ProjectLocationRecommenderGetConfigCall), [*locations recommenders recommendations get*](api::ProjectLocationRecommenderRecommendationGetCall), [*locations recommenders recommendations list*](api::ProjectLocationRecommenderRecommendationListCall), [*locations recommenders recommendations mark claimed*](api::ProjectLocationRecommenderRecommendationMarkClaimedCall), [*locations recommenders recommendations mark failed*](api::ProjectLocationRecommenderRecommendationMarkFailedCall), [*locations recommenders recommendations mark succeeded*](api::ProjectLocationRecommenderRecommendationMarkSucceededCall) and [*locations recommenders update config*](api::ProjectLocationRecommenderUpdateConfigCall)
 //! 
 //! 
 //! 
@@ -85,11 +85,8 @@
 //! ```toml
 //! [dependencies]
 //! google-recommender1_beta1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -97,14 +94,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_recommender1_beta1 as recommender1_beta1;
 //! use recommender1_beta1::api::GoogleCloudRecommenderV1beta1MarkRecommendationClaimedRequest;
 //! use recommender1_beta1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use recommender1_beta1::Recommender;
+//! use recommender1_beta1::{Recommender, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -114,9 +109,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Recommender::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
@@ -216,10 +211,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

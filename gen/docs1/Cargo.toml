@@ -3,15 +3,15 @@
 # DO NOT EDIT !
 [package]
 
-name = "google-dns1"
-version = "2.0.8+20210319"
+name = "google-docs1"
+version = "3.0.0+20220301"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with Dns (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dns1"
-homepage = "https://cloud.google.com/dns/docs"
-documentation = "https://docs.rs/google-dns1/2.0.8+20210319"
+description = "A complete library to interact with Docs (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/docs1"
+homepage = "https://developers.google.com/docs/"
+documentation = "https://docs.rs/google-docs1/3.0.0+20220301"
 license = "MIT"
-keywords = ["dns", "google", "protocol", "web", "api"]
+keywords = ["docs", "google", "protocol", "web", "api"]
 autobins = false
 edition = "2018"
 
@@ -22,7 +22,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 5.0"
+yup-oauth2 = "^ 6.0"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
 url = "= 1.7"

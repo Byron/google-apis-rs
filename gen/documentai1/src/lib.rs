@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Document* crate version *2.0.8+20210329*, where *20210329* is the exact revision of the *documentai:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Document* crate version *3.0.0+20220226*, where *20220226* is the exact revision of the *documentai:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Document* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/document-ai/docs/).
@@ -12,11 +12,11 @@
 //! Handle the following *Resources* with ease from the central [hub](Document) ... 
 //! 
 //! * operations
-//!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall) and [*list*](api::OperationListCall)
+//!  * [*delete*](api::OperationDeleteCall)
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations processors batch process*](api::ProjectLocationProcessorBatchProcesCall), [*locations processors human review config review document*](api::ProjectLocationProcessorHumanReviewConfigReviewDocumentCall), [*locations processors process*](api::ProjectLocationProcessorProcesCall), [*locations processors processor versions batch process*](api::ProjectLocationProcessorProcessorVersionBatchProcesCall), [*locations processors processor versions process*](api::ProjectLocationProcessorProcessorVersionProcesCall) and [*operations get*](api::ProjectOperationGetCall)
+//!  * [*locations fetch processor types*](api::ProjectLocationFetchProcessorTypeCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations processors batch process*](api::ProjectLocationProcessorBatchProcesCall), [*locations processors create*](api::ProjectLocationProcessorCreateCall), [*locations processors delete*](api::ProjectLocationProcessorDeleteCall), [*locations processors disable*](api::ProjectLocationProcessorDisableCall), [*locations processors enable*](api::ProjectLocationProcessorEnableCall), [*locations processors get*](api::ProjectLocationProcessorGetCall), [*locations processors human review config review document*](api::ProjectLocationProcessorHumanReviewConfigReviewDocumentCall), [*locations processors list*](api::ProjectLocationProcessorListCall), [*locations processors process*](api::ProjectLocationProcessorProcesCall), [*locations processors processor versions batch process*](api::ProjectLocationProcessorProcessorVersionBatchProcesCall), [*locations processors processor versions delete*](api::ProjectLocationProcessorProcessorVersionDeleteCall), [*locations processors processor versions deploy*](api::ProjectLocationProcessorProcessorVersionDeployCall), [*locations processors processor versions get*](api::ProjectLocationProcessorProcessorVersionGetCall), [*locations processors processor versions list*](api::ProjectLocationProcessorProcessorVersionListCall), [*locations processors processor versions process*](api::ProjectLocationProcessorProcessorVersionProcesCall), [*locations processors processor versions undeploy*](api::ProjectLocationProcessorProcessorVersionUndeployCall), [*locations processors set default processor version*](api::ProjectLocationProcessorSetDefaultProcessorVersionCall) and [*operations get*](api::ProjectOperationGetCall)
 //! * uiv1beta3
-//!  * [*projects locations get*](api::Uiv1beta3ProjectLocationGetCall), [*projects locations list*](api::Uiv1beta3ProjectLocationListCall) and [*projects locations operations get*](api::Uiv1beta3ProjectLocationOperationGetCall)
+//!  * [*projects locations get*](api::Uiv1beta3ProjectLocationGetCall), [*projects locations list*](api::Uiv1beta3ProjectLocationListCall), [*projects locations operations cancel*](api::Uiv1beta3ProjectLocationOperationCancelCall), [*projects locations operations get*](api::Uiv1beta3ProjectLocationOperationGetCall) and [*projects locations operations list*](api::Uiv1beta3ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -54,7 +54,14 @@
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_processors_human_review_config_review_document(...).doit().await
 //! let r = hub.projects().locations_processors_processor_versions_batch_process(...).doit().await
+//! let r = hub.projects().locations_processors_processor_versions_delete(...).doit().await
+//! let r = hub.projects().locations_processors_processor_versions_deploy(...).doit().await
+//! let r = hub.projects().locations_processors_processor_versions_undeploy(...).doit().await
 //! let r = hub.projects().locations_processors_batch_process(...).doit().await
+//! let r = hub.projects().locations_processors_delete(...).doit().await
+//! let r = hub.projects().locations_processors_disable(...).doit().await
+//! let r = hub.projects().locations_processors_enable(...).doit().await
+//! let r = hub.projects().locations_processors_set_default_processor_version(...).doit().await
 //! let r = hub.projects().operations_get(...).doit().await
 //! let r = hub.uiv1beta3().projects_locations_operations_get(...).doit().await
 //! ```
@@ -73,11 +80,8 @@
 //! ```toml
 //! [dependencies]
 //! google-documentai1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -85,14 +89,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_documentai1 as documentai1;
 //! use documentai1::api::GoogleCloudDocumentaiV1ReviewDocumentRequest;
 //! use documentai1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use documentai1::Document;
+//! use documentai1::{Document, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -102,9 +104,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
@@ -204,10 +206,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

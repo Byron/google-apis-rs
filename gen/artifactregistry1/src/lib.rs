@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Artifact Registry* crate version *2.0.8+20210324*, where *20210324* is the exact revision of the *artifactregistry:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Artifact Registry* crate version *3.0.0+20220225*, where *20220225* is the exact revision of the *artifactregistry:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Artifact Registry* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/artifacts/docs/).
@@ -11,11 +11,15 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](ArtifactRegistry) ... 
 //! 
-//! * [operations](api::Operation)
-//!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * projects
-//!  * [*locations repositories docker images list*](api::ProjectLocationRepositoryDockerImageListCall)
+//!  * [*get project settings*](api::ProjectGetProjectSettingCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations repositories apt artifacts import*](api::ProjectLocationRepositoryAptArtifactImportCall), [*locations repositories apt artifacts upload*](api::ProjectLocationRepositoryAptArtifactUploadCall), [*locations repositories create*](api::ProjectLocationRepositoryCreateCall), [*locations repositories delete*](api::ProjectLocationRepositoryDeleteCall), [*locations repositories docker images get*](api::ProjectLocationRepositoryDockerImageGetCall), [*locations repositories docker images list*](api::ProjectLocationRepositoryDockerImageListCall), [*locations repositories files get*](api::ProjectLocationRepositoryFileGetCall), [*locations repositories files list*](api::ProjectLocationRepositoryFileListCall), [*locations repositories get*](api::ProjectLocationRepositoryGetCall), [*locations repositories get iam policy*](api::ProjectLocationRepositoryGetIamPolicyCall), [*locations repositories goo get artifacts import*](api::ProjectLocationRepositoryGooGetArtifactImportCall), [*locations repositories googet artifacts upload*](api::ProjectLocationRepositoryGoogetArtifactUploadCall), [*locations repositories list*](api::ProjectLocationRepositoryListCall), [*locations repositories packages delete*](api::ProjectLocationRepositoryPackageDeleteCall), [*locations repositories packages get*](api::ProjectLocationRepositoryPackageGetCall), [*locations repositories packages list*](api::ProjectLocationRepositoryPackageListCall), [*locations repositories packages tags create*](api::ProjectLocationRepositoryPackageTagCreateCall), [*locations repositories packages tags delete*](api::ProjectLocationRepositoryPackageTagDeleteCall), [*locations repositories packages tags get*](api::ProjectLocationRepositoryPackageTagGetCall), [*locations repositories packages tags list*](api::ProjectLocationRepositoryPackageTagListCall), [*locations repositories packages tags patch*](api::ProjectLocationRepositoryPackageTagPatchCall), [*locations repositories packages versions delete*](api::ProjectLocationRepositoryPackageVersionDeleteCall), [*locations repositories packages versions get*](api::ProjectLocationRepositoryPackageVersionGetCall), [*locations repositories packages versions list*](api::ProjectLocationRepositoryPackageVersionListCall), [*locations repositories patch*](api::ProjectLocationRepositoryPatchCall), [*locations repositories set iam policy*](api::ProjectLocationRepositorySetIamPolicyCall), [*locations repositories test iam permissions*](api::ProjectLocationRepositoryTestIamPermissionCall), [*locations repositories yum artifacts import*](api::ProjectLocationRepositoryYumArtifactImportCall), [*locations repositories yum artifacts upload*](api::ProjectLocationRepositoryYumArtifactUploadCall) and [*update project settings*](api::ProjectUpdateProjectSettingCall)
 //! 
+//! 
+//! Upload supported by ...
+//! 
+//! * [*locations repositories apt artifacts upload projects*](api::ProjectLocationRepositoryAptArtifactUploadCall)
+//! * [*locations repositories googet artifacts upload projects*](api::ProjectLocationRepositoryGoogetArtifactUploadCall)
+//! * [*locations repositories yum artifacts upload projects*](api::ProjectLocationRepositoryYumArtifactUploadCall)
 //! 
 //! 
 //! 
@@ -49,10 +53,14 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.operations().cancel(...).doit().await
-//! let r = hub.operations().delete(...).doit().await
-//! let r = hub.operations().get(...).doit().await
-//! let r = hub.operations().list(...).doit().await
+//! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_repositories_apt_artifacts_import(...).doit().await
+//! let r = hub.projects().locations_repositories_goo_get_artifacts_import(...).doit().await
+//! let r = hub.projects().locations_repositories_packages_versions_delete(...).doit().await
+//! let r = hub.projects().locations_repositories_packages_delete(...).doit().await
+//! let r = hub.projects().locations_repositories_yum_artifacts_import(...).doit().await
+//! let r = hub.projects().locations_repositories_create(...).doit().await
+//! let r = hub.projects().locations_repositories_delete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -69,11 +77,8 @@
 //! ```toml
 //! [dependencies]
 //! google-artifactregistry1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -81,13 +86,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_artifactregistry1 as artifactregistry1;
+//! use artifactregistry1::api::Repository;
 //! use artifactregistry1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use artifactregistry1::ArtifactRegistry;
+//! use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -97,19 +101,21 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Repository::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.operations().list()
-//!              .page_token("voluptua.")
-//!              .page_size(-27)
-//!              .name("sanctus")
-//!              .filter("sed")
+//! let result = hub.projects().locations_repositories_create(req, "parent")
+//!              .repository_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {
@@ -198,10 +204,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *2.0.8+20210329*, where *20210329* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Cloud Build* crate version *3.0.0+20220218*, where *20220218* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-build/docs/).
@@ -11,11 +11,16 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudBuild) ... 
 //! 
+//! * locations
+//!  * [*regional webhook*](api::LocationRegionalWebhookCall)
 //! * [operations](api::Operation)
 //!  * [*cancel*](api::OperationCancelCall) and [*get*](api::OperationGetCall)
 //! * projects
-//!  * [*builds cancel*](api::ProjectBuildCancelCall), [*builds create*](api::ProjectBuildCreateCall), [*builds get*](api::ProjectBuildGetCall), [*builds list*](api::ProjectBuildListCall), [*builds retry*](api::ProjectBuildRetryCall), [*locations builds cancel*](api::ProjectLocationBuildCancelCall), [*locations builds create*](api::ProjectLocationBuildCreateCall), [*locations builds get*](api::ProjectLocationBuildGetCall), [*locations builds list*](api::ProjectLocationBuildListCall), [*locations builds retry*](api::ProjectLocationBuildRetryCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*triggers create*](api::ProjectTriggerCreateCall), [*triggers delete*](api::ProjectTriggerDeleteCall), [*triggers get*](api::ProjectTriggerGetCall), [*triggers list*](api::ProjectTriggerListCall), [*triggers patch*](api::ProjectTriggerPatchCall), [*triggers run*](api::ProjectTriggerRunCall) and [*triggers webhook*](api::ProjectTriggerWebhookCall)
+//!  * [*builds approve*](api::ProjectBuildApproveCall), [*builds cancel*](api::ProjectBuildCancelCall), [*builds create*](api::ProjectBuildCreateCall), [*builds get*](api::ProjectBuildGetCall), [*builds list*](api::ProjectBuildListCall), [*builds retry*](api::ProjectBuildRetryCall), [*github enterprise configs create*](api::ProjectGithubEnterpriseConfigCreateCall), [*github enterprise configs delete*](api::ProjectGithubEnterpriseConfigDeleteCall), [*github enterprise configs get*](api::ProjectGithubEnterpriseConfigGetCall), [*github enterprise configs list*](api::ProjectGithubEnterpriseConfigListCall), [*github enterprise configs patch*](api::ProjectGithubEnterpriseConfigPatchCall), [*locations bitbucket server configs add bitbucket server connected repository*](api::ProjectLocationBitbucketServerConfigAddBitbucketServerConnectedRepositoryCall), [*locations bitbucket server configs connected repositories batch create*](api::ProjectLocationBitbucketServerConfigConnectedRepositoryBatchCreateCall), [*locations bitbucket server configs create*](api::ProjectLocationBitbucketServerConfigCreateCall), [*locations bitbucket server configs delete*](api::ProjectLocationBitbucketServerConfigDeleteCall), [*locations bitbucket server configs get*](api::ProjectLocationBitbucketServerConfigGetCall), [*locations bitbucket server configs list*](api::ProjectLocationBitbucketServerConfigListCall), [*locations bitbucket server configs patch*](api::ProjectLocationBitbucketServerConfigPatchCall), [*locations bitbucket server configs remove bitbucket server connected repository*](api::ProjectLocationBitbucketServerConfigRemoveBitbucketServerConnectedRepositoryCall), [*locations bitbucket server configs repos list*](api::ProjectLocationBitbucketServerConfigRepoListCall), [*locations builds approve*](api::ProjectLocationBuildApproveCall), [*locations builds cancel*](api::ProjectLocationBuildCancelCall), [*locations builds create*](api::ProjectLocationBuildCreateCall), [*locations builds get*](api::ProjectLocationBuildGetCall), [*locations builds list*](api::ProjectLocationBuildListCall), [*locations builds retry*](api::ProjectLocationBuildRetryCall), [*locations github enterprise configs create*](api::ProjectLocationGithubEnterpriseConfigCreateCall), [*locations github enterprise configs delete*](api::ProjectLocationGithubEnterpriseConfigDeleteCall), [*locations github enterprise configs get*](api::ProjectLocationGithubEnterpriseConfigGetCall), [*locations github enterprise configs list*](api::ProjectLocationGithubEnterpriseConfigListCall), [*locations github enterprise configs patch*](api::ProjectLocationGithubEnterpriseConfigPatchCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers run*](api::ProjectLocationTriggerRunCall), [*locations triggers webhook*](api::ProjectLocationTriggerWebhookCall), [*locations worker pools create*](api::ProjectLocationWorkerPoolCreateCall), [*locations worker pools delete*](api::ProjectLocationWorkerPoolDeleteCall), [*locations worker pools get*](api::ProjectLocationWorkerPoolGetCall), [*locations worker pools list*](api::ProjectLocationWorkerPoolListCall), [*locations worker pools patch*](api::ProjectLocationWorkerPoolPatchCall), [*triggers create*](api::ProjectTriggerCreateCall), [*triggers delete*](api::ProjectTriggerDeleteCall), [*triggers get*](api::ProjectTriggerGetCall), [*triggers list*](api::ProjectTriggerListCall), [*triggers patch*](api::ProjectTriggerPatchCall), [*triggers run*](api::ProjectTriggerRunCall) and [*triggers webhook*](api::ProjectTriggerWebhookCall)
 //! 
+//! Other activities are ...
+//! 
+//! * [webhook](api::MethodWebhookCall)
 //! 
 //! 
 //! 
@@ -51,11 +56,27 @@
 //! ```ignore
 //! let r = hub.operations().cancel(...).doit().await
 //! let r = hub.operations().get(...).doit().await
+//! let r = hub.projects().builds_approve(...).doit().await
 //! let r = hub.projects().builds_create(...).doit().await
 //! let r = hub.projects().builds_retry(...).doit().await
+//! let r = hub.projects().github_enterprise_configs_create(...).doit().await
+//! let r = hub.projects().github_enterprise_configs_delete(...).doit().await
+//! let r = hub.projects().github_enterprise_configs_patch(...).doit().await
+//! let r = hub.projects().locations_bitbucket_server_configs_connected_repositories_batch_create(...).doit().await
+//! let r = hub.projects().locations_bitbucket_server_configs_create(...).doit().await
+//! let r = hub.projects().locations_bitbucket_server_configs_delete(...).doit().await
+//! let r = hub.projects().locations_bitbucket_server_configs_patch(...).doit().await
+//! let r = hub.projects().locations_builds_approve(...).doit().await
 //! let r = hub.projects().locations_builds_create(...).doit().await
 //! let r = hub.projects().locations_builds_retry(...).doit().await
+//! let r = hub.projects().locations_github_enterprise_configs_create(...).doit().await
+//! let r = hub.projects().locations_github_enterprise_configs_delete(...).doit().await
+//! let r = hub.projects().locations_github_enterprise_configs_patch(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_triggers_run(...).doit().await
+//! let r = hub.projects().locations_worker_pools_create(...).doit().await
+//! let r = hub.projects().locations_worker_pools_delete(...).doit().await
+//! let r = hub.projects().locations_worker_pools_patch(...).doit().await
 //! let r = hub.projects().triggers_run(...).doit().await
 //! ```
 //! 
@@ -73,11 +94,8 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudbuild1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -85,14 +103,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_cloudbuild1 as cloudbuild1;
-//! use cloudbuild1::api::Build;
+//! use cloudbuild1::api::GitHubEnterpriseConfig;
 //! use cloudbuild1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use cloudbuild1::CloudBuild;
+//! use cloudbuild1::{CloudBuild, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -102,21 +118,22 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = CloudBuild::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Build::default();
+//! let mut req = GitHubEnterpriseConfig::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().builds_create(req, "projectId")
-//!              .parent("ipsum")
+//! let result = hub.projects().github_enterprise_configs_create(req, "parent")
+//!              .project_id("voluptua.")
+//!              .ghe_config_id("At")
 //!              .doit().await;
 //! 
 //! match result {
@@ -205,10 +222,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

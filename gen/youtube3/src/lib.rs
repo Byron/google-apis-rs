@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *2.0.10+20210330*, where *20210330* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.10*.
+//! This documentation was generated from *YouTube* crate version *3.0.0+20220303*, where *20220303* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/).
@@ -24,7 +24,7 @@
 //! * [channels](api::Channel)
 //!  * [*list*](api::ChannelListCall) and [*update*](api::ChannelUpdateCall)
 //! * [comment threads](api::CommentThread)
-//!  * [*insert*](api::CommentThreadInsertCall), [*list*](api::CommentThreadListCall) and [*update*](api::CommentThreadUpdateCall)
+//!  * [*insert*](api::CommentThreadInsertCall) and [*list*](api::CommentThreadListCall)
 //! * [comments](api::Comment)
 //!  * [*delete*](api::CommentDeleteCall), [*insert*](api::CommentInsertCall), [*list*](api::CommentListCall), [*mark as spam*](api::CommentMarkAsSpamCall), [*set moderation status*](api::CommentSetModerationStatuCall) and [*update*](api::CommentUpdateCall)
 //! * [i18n languages](api::I18nLanguage)
@@ -69,6 +69,8 @@
 //!  * [*delete*](api::VideoDeleteCall), [*get rating*](api::VideoGetRatingCall), [*insert*](api::VideoInsertCall), [*list*](api::VideoListCall), [*rate*](api::VideoRateCall), [*report abuse*](api::VideoReportAbuseCall) and [*update*](api::VideoUpdateCall)
 //! * watermarks
 //!  * [*set*](api::WatermarkSetCall) and [*unset*](api::WatermarkUnsetCall)
+//! * youtube
+//!  * [*v3 update comment threads*](api::YoutubeV3UpdateCommentThreadCall)
 //! 
 //! 
 //! Upload supported by ...

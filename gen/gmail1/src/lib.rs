@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Gmail* crate version *2.0.9+20210322*, where *20210322* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.9*.
+//! This documentation was generated from *Gmail* crate version *3.0.0+20220228*, where *20220228* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Gmail* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/gmail/api/).
@@ -80,8 +80,6 @@
 //! ```toml
 //! [dependencies]
 //! google-gmail1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
 //! ```
@@ -97,7 +95,7 @@
 //! use std::fs;
 //! # async fn dox() {
 //! use std::default::Default;
-//! use gmail1::{Gmail, oauth2};
+//! use gmail1::{Gmail, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -213,7 +211,9 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client

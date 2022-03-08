@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AI Platform Notebooks* crate version *2.0.8+20210305*, where *20210305* is the exact revision of the *notebooks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *AI Platform Notebooks* crate version *3.0.0+20220224*, where *20220224* is the exact revision of the *notebooks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *AI Platform Notebooks* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/ai-platform/notebooks/docs/).
+//! [official documentation site](https://cloud.google.com/notebooks/docs/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/notebooks1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](AIPlatformNotebooks) ... 
 //! 
 //! * projects
-//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations executions create*](api::ProjectLocationExecutionCreateCall), [*locations executions delete*](api::ProjectLocationExecutionDeleteCall), [*locations executions get*](api::ProjectLocationExecutionGetCall), [*locations executions list*](api::ProjectLocationExecutionListCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get iam policy*](api::ProjectLocationInstanceGetIamPolicyCall), [*locations instances get instance health*](api::ProjectLocationInstanceGetInstanceHealthCall), [*locations instances is upgradeable*](api::ProjectLocationInstanceIsUpgradeableCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances register*](api::ProjectLocationInstanceRegisterCall), [*locations instances report*](api::ProjectLocationInstanceReportCall), [*locations instances reset*](api::ProjectLocationInstanceResetCall), [*locations instances set accelerator*](api::ProjectLocationInstanceSetAcceleratorCall), [*locations instances set iam policy*](api::ProjectLocationInstanceSetIamPolicyCall), [*locations instances set labels*](api::ProjectLocationInstanceSetLabelCall), [*locations instances set machine type*](api::ProjectLocationInstanceSetMachineTypeCall), [*locations instances start*](api::ProjectLocationInstanceStartCall), [*locations instances stop*](api::ProjectLocationInstanceStopCall), [*locations instances test iam permissions*](api::ProjectLocationInstanceTestIamPermissionCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations instances upgrade internal*](api::ProjectLocationInstanceUpgradeInternalCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations schedules create*](api::ProjectLocationScheduleCreateCall), [*locations schedules delete*](api::ProjectLocationScheduleDeleteCall), [*locations schedules get*](api::ProjectLocationScheduleGetCall), [*locations schedules list*](api::ProjectLocationScheduleListCall) and [*locations schedules trigger*](api::ProjectLocationScheduleTriggerCall)
+//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations executions create*](api::ProjectLocationExecutionCreateCall), [*locations executions delete*](api::ProjectLocationExecutionDeleteCall), [*locations executions get*](api::ProjectLocationExecutionGetCall), [*locations executions list*](api::ProjectLocationExecutionListCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get iam policy*](api::ProjectLocationInstanceGetIamPolicyCall), [*locations instances get instance health*](api::ProjectLocationInstanceGetInstanceHealthCall), [*locations instances is upgradeable*](api::ProjectLocationInstanceIsUpgradeableCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances register*](api::ProjectLocationInstanceRegisterCall), [*locations instances report*](api::ProjectLocationInstanceReportCall), [*locations instances reset*](api::ProjectLocationInstanceResetCall), [*locations instances rollback*](api::ProjectLocationInstanceRollbackCall), [*locations instances set accelerator*](api::ProjectLocationInstanceSetAcceleratorCall), [*locations instances set iam policy*](api::ProjectLocationInstanceSetIamPolicyCall), [*locations instances set labels*](api::ProjectLocationInstanceSetLabelCall), [*locations instances set machine type*](api::ProjectLocationInstanceSetMachineTypeCall), [*locations instances start*](api::ProjectLocationInstanceStartCall), [*locations instances stop*](api::ProjectLocationInstanceStopCall), [*locations instances test iam permissions*](api::ProjectLocationInstanceTestIamPermissionCall), [*locations instances update config*](api::ProjectLocationInstanceUpdateConfigCall), [*locations instances update metadata items*](api::ProjectLocationInstanceUpdateMetadataItemCall), [*locations instances update shielded instance config*](api::ProjectLocationInstanceUpdateShieldedInstanceConfigCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations instances upgrade internal*](api::ProjectLocationInstanceUpgradeInternalCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations runtimes create*](api::ProjectLocationRuntimeCreateCall), [*locations runtimes delete*](api::ProjectLocationRuntimeDeleteCall), [*locations runtimes get*](api::ProjectLocationRuntimeGetCall), [*locations runtimes get iam policy*](api::ProjectLocationRuntimeGetIamPolicyCall), [*locations runtimes list*](api::ProjectLocationRuntimeListCall), [*locations runtimes report event*](api::ProjectLocationRuntimeReportEventCall), [*locations runtimes reset*](api::ProjectLocationRuntimeResetCall), [*locations runtimes set iam policy*](api::ProjectLocationRuntimeSetIamPolicyCall), [*locations runtimes start*](api::ProjectLocationRuntimeStartCall), [*locations runtimes stop*](api::ProjectLocationRuntimeStopCall), [*locations runtimes switch*](api::ProjectLocationRuntimeSwitchCall), [*locations runtimes test iam permissions*](api::ProjectLocationRuntimeTestIamPermissionCall), [*locations schedules create*](api::ProjectLocationScheduleCreateCall), [*locations schedules delete*](api::ProjectLocationScheduleDeleteCall), [*locations schedules get*](api::ProjectLocationScheduleGetCall), [*locations schedules list*](api::ProjectLocationScheduleListCall) and [*locations schedules trigger*](api::ProjectLocationScheduleTriggerCall)
 //! 
 //! 
 //! 
@@ -56,14 +56,24 @@
 //! let r = hub.projects().locations_instances_register(...).doit().await
 //! let r = hub.projects().locations_instances_report(...).doit().await
 //! let r = hub.projects().locations_instances_reset(...).doit().await
+//! let r = hub.projects().locations_instances_rollback(...).doit().await
 //! let r = hub.projects().locations_instances_set_accelerator(...).doit().await
 //! let r = hub.projects().locations_instances_set_labels(...).doit().await
 //! let r = hub.projects().locations_instances_set_machine_type(...).doit().await
 //! let r = hub.projects().locations_instances_start(...).doit().await
 //! let r = hub.projects().locations_instances_stop(...).doit().await
+//! let r = hub.projects().locations_instances_update_config(...).doit().await
+//! let r = hub.projects().locations_instances_update_shielded_instance_config(...).doit().await
 //! let r = hub.projects().locations_instances_upgrade(...).doit().await
 //! let r = hub.projects().locations_instances_upgrade_internal(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_runtimes_create(...).doit().await
+//! let r = hub.projects().locations_runtimes_delete(...).doit().await
+//! let r = hub.projects().locations_runtimes_report_event(...).doit().await
+//! let r = hub.projects().locations_runtimes_reset(...).doit().await
+//! let r = hub.projects().locations_runtimes_start(...).doit().await
+//! let r = hub.projects().locations_runtimes_stop(...).doit().await
+//! let r = hub.projects().locations_runtimes_switch(...).doit().await
 //! let r = hub.projects().locations_schedules_create(...).doit().await
 //! let r = hub.projects().locations_schedules_delete(...).doit().await
 //! let r = hub.projects().locations_schedules_trigger(...).doit().await
@@ -83,11 +93,8 @@
 //! ```toml
 //! [dependencies]
 //! google-notebooks1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -95,14 +102,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_notebooks1 as notebooks1;
 //! use notebooks1::api::Environment;
 //! use notebooks1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use notebooks1::AIPlatformNotebooks;
+//! use notebooks1::{AIPlatformNotebooks, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -112,9 +117,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = AIPlatformNotebooks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
@@ -215,10 +220,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

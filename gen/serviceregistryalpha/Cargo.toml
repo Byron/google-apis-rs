@@ -4,12 +4,12 @@
 [package]
 
 name = "google-serviceregistryalpha"
-version = "2.0.8+20160401"
+version = "3.0.0+20160401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Registry (protocol alpha)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/serviceregistryalpha"
 homepage = "https://developers.google.com/cloud-serviceregistry/"
-documentation = "https://docs.rs/google-serviceregistryalpha/2.0.8+20160401"
+documentation = "https://docs.rs/google-serviceregistryalpha/3.0.0+20160401"
 license = "MIT"
 keywords = ["serviceregistry", "google", "protocol", "web", "api"]
 autobins = false
@@ -22,7 +22,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 5.0"
+yup-oauth2 = "^ 6.0"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
 url = "= 1.7"

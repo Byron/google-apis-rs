@@ -1,4 +1,4 @@
-site_name: AdExchangeBuyerII v2.0.8+20210331
+site_name: AdExchangeBuyerII v3.0.0+20220307
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer2_v2_beta1-cli
 site_description: A complete library to interact with AdExchangeBuyerII (protocol v2beta1)
 
@@ -29,6 +29,8 @@ pages:
 - ['accounts_creatives-update.md', 'Accounts', 'Creatives Update']
 - ['accounts_creatives-watch.md', 'Accounts', 'Creatives Watch']
 - ['accounts_finalized-proposals-list.md', 'Accounts', 'Finalized Proposals List']
+- ['accounts_finalized-proposals-pause.md', 'Accounts', 'Finalized Proposals Pause']
+- ['accounts_finalized-proposals-resume.md', 'Accounts', 'Finalized Proposals Resume']
 - ['accounts_products-get.md', 'Accounts', 'Products Get']
 - ['accounts_products-list.md', 'Accounts', 'Products List']
 - ['accounts_proposals-accept.md', 'Accounts', 'Proposals Accept']

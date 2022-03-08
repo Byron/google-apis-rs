@@ -19,7 +19,7 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// See, edit, configure, and delete your Google Cloud Platform data
+    /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
 }
 
@@ -52,14 +52,12 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_documentai1_beta2 as documentai1_beta2;
 /// use documentai1_beta2::api::GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest;
 /// use documentai1_beta2::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use documentai1_beta2::Document;
+/// use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -69,9 +67,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -106,8 +104,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct Document<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -121,7 +119,7 @@ impl<'a, > Document<> {
         Document {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://documentai.googleapis.com/".to_string(),
             _root_url: "https://documentai.googleapis.com/".to_string(),
         }
@@ -132,7 +130,7 @@ impl<'a, > Document<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -224,7 +222,7 @@ pub struct GoogleCloudDocumentaiV1beta2Document {
     pub content: Option<String>,
     /// A list of entities detected on Document.text. For document shards, entities in this list may cross shard boundaries.
     pub entities: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentEntity>>,
-    /// Relationship among Document.entities.
+    /// Placeholder. Relationship among Document.entities.
     #[serde(rename="entityRelations")]
     pub entity_relations: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentEntityRelation>>,
     /// Any error that occurred while processing this document.
@@ -236,17 +234,17 @@ pub struct GoogleCloudDocumentaiV1beta2Document {
     pub mime_type: Option<String>,
     /// Visual page layout for the Document.
     pub pages: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPage>>,
-    /// Revision history of this document.
+    /// Placeholder. Revision history of this document.
     pub revisions: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentRevision>>,
     /// Information about the sharding if this document is sharded part of a larger document. If the document is not sharded, this message is not specified.
     #[serde(rename="shardInfo")]
     pub shard_info: Option<GoogleCloudDocumentaiV1beta2DocumentShardInfo>,
     /// Optional. UTF-8 encoded text in reading order from the document.
     pub text: Option<String>,
-    /// A list of text corrections made to [Document.text]. This is usually used for annotating corrections to OCR mistakes. Text changes for a given revision may not overlap with each other.
+    /// Placeholder. A list of text corrections made to [Document.text]. This is usually used for annotating corrections to OCR mistakes. Text changes for a given revision may not overlap with each other.
     #[serde(rename="textChanges")]
     pub text_changes: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentTextChange>>,
-    /// Styles for the Document.text.
+    /// Placeholder. Styles for the Document.text.
     #[serde(rename="textStyles")]
     pub text_styles: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentStyle>>,
     /// Optional. Currently supports Google Cloud Storage URI of the form `gs://bucket_name/object_name`. Object versioning is not supported. See [Google Cloud Storage Request URIs](https://cloud.google.com/storage/docs/reference-uris) for more info.
@@ -256,7 +254,7 @@ pub struct GoogleCloudDocumentaiV1beta2Document {
 impl client::ResponseResult for GoogleCloudDocumentaiV1beta2Document {}
 
 
-/// A phrase in the text that is a known entity type, such as a person, an organization, or location.
+/// An entity that could be a phrase in the text or a property that belongs to the document. It is a known entity type, such as a person, an organization, or location.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -269,7 +267,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentEntity {
     /// Optional. Deprecated. Use `id` field instead.
     #[serde(rename="mentionId")]
     pub mention_id: Option<String>,
-    /// Optional. Text value in the document e.g. `1600 Amphitheatre Pkwy`.
+    /// Optional. Text value in the document e.g. `1600 Amphitheatre Pkwy`. If the entity is not present in the document, this field will be empty.
     #[serde(rename="mentionText")]
     pub mention_text: Option<String>,
     /// Optional. Normalized entity value. Absent if the extracted value could not be converted or the type (e.g. address) is not supported for certain parsers. This field is also only populated for certain supported document types.
@@ -313,10 +311,16 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentEntityNormalizedValue {
     /// DateTime value. Includes date, time, and timezone. See also: https://github.com/googleapis/googleapis/blob/master/google/type/datetime.proto
     #[serde(rename="datetimeValue")]
     pub datetime_value: Option<GoogleTypeDateTime>,
+    /// Float value.
+    #[serde(rename="floatValue")]
+    pub float_value: Option<f32>,
+    /// Integer value.
+    #[serde(rename="integerValue")]
+    pub integer_value: Option<i32>,
     /// Money value. See also: https://github.com/googleapis/googleapis/blob/master/google/type/money.proto
     #[serde(rename="moneyValue")]
     pub money_value: Option<GoogleTypeMoney>,
-    /// Required. Normalized entity value stored as a string. This field is populated for supported document type (e.g. Invoice). For some entity types, one of respective 'structured_value' fields may also be populated. - Money/Currency type (`money_value`) is in the ISO 4217 text format. - Date type (`date_value`) is in the ISO 8601 text format. - Datetime type (`datetime_value`) is in the ISO 8601 text format.
+    /// Optional. An optional field to store a normalized string. For some entity types, one of respective `structured_value` fields may also be populated. Also not all the types of `structured_value` will be normalized. For example, some processors may not generate float or int normalized text by default. Below are sample formats mapped to structured values. - Money/Currency type (`money_value`) is in the ISO 4217 text format. - Date type (`date_value`) is in the ISO 8601 text format. - Datetime type (`datetime_value`) is in the ISO 8601 text format.
     pub text: Option<String>,
 }
 
@@ -387,6 +391,10 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPage {
     pub page_number: Option<i32>,
     /// A list of visually detected text paragraphs on the page. A collection of lines that a human would perceive as a paragraph.
     pub paragraphs: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageParagraph>>,
+    /// The history of this page.
+    pub provenance: Option<GoogleCloudDocumentaiV1beta2DocumentProvenance>,
+    /// A list of visually detected symbols on the page.
+    pub symbols: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageSymbol>>,
     /// A list of visually detected tables on the page.
     pub tables: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageTable>>,
     /// A list of visually detected tokens on the page.
@@ -424,13 +432,15 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageAnchorPageRef {
     /// Optional. Identifies the bounding polygon of a layout element on the page.
     #[serde(rename="boundingPoly")]
     pub bounding_poly: Option<GoogleCloudDocumentaiV1beta2BoundingPoly>,
+    /// Optional. Confidence of detected page element, if applicable. Range [0, 1].
+    pub confidence: Option<f32>,
     /// Optional. Deprecated. Use PageRef.bounding_poly instead.
     #[serde(rename="layoutId")]
     pub layout_id: Option<String>,
     /// Optional. The type of the layout element that is being referenced if any.
     #[serde(rename="layoutType")]
     pub layout_type: Option<String>,
-    /// Required. Index into the Document.pages element, for example using Document.pages to locate the related page element.
+    /// Required. Index into the Document.pages element, for example using Document.pages to locate the related page element. This field is skipped when its value is the default 0. See https://developers.google.com/protocol-buffers/docs/proto3#json.
     pub page: Option<String>,
 }
 
@@ -463,7 +473,7 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageBlock {}
 pub struct GoogleCloudDocumentaiV1beta2DocumentPageDetectedLanguage {
     /// Confidence of detected language. Range [0, 1].
     pub confidence: Option<f32>,
-    /// The BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+    /// The BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
 }
@@ -494,6 +504,12 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageDimension {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1beta2DocumentPageFormField {
+    /// Created for Labeling UI to export key text. If corrections were made to the text identified by the `field_name.text_anchor`, this field will contain the correction.
+    #[serde(rename="correctedKeyText")]
+    pub corrected_key_text: Option<String>,
+    /// Created for Labeling UI to export value text. If corrections were made to the text identified by the `field_value.text_anchor`, this field will contain the correction.
+    #[serde(rename="correctedValueText")]
+    pub corrected_value_text: Option<String>,
     /// Layout for the FormField name. e.g. `Address`, `Email`, `Grand total`, `Phone number`, etc.
     #[serde(rename="fieldName")]
     pub field_name: Option<GoogleCloudDocumentaiV1beta2DocumentPageLayout>,
@@ -503,6 +519,8 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageFormField {
     /// A list of detected languages for name together with confidence.
     #[serde(rename="nameDetectedLanguages")]
     pub name_detected_languages: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageDetectedLanguage>>,
+    /// The history of this annotation.
+    pub provenance: Option<GoogleCloudDocumentaiV1beta2DocumentProvenance>,
     /// A list of detected languages for value together with confidence.
     #[serde(rename="valueDetectedLanguages")]
     pub value_detected_languages: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageDetectedLanguage>>,
@@ -609,6 +627,22 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageParagraph {
 }
 
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageParagraph {}
+
+
+/// A detected symbol.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1beta2DocumentPageSymbol {
+    /// A list of detected languages together with confidence.
+    #[serde(rename="detectedLanguages")]
+    pub detected_languages: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageDetectedLanguage>>,
+    /// Layout for Symbol.
+    pub layout: Option<GoogleCloudDocumentaiV1beta2DocumentPageLayout>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageSymbol {}
 
 
 /// A table representation similar to HTML table structure.
@@ -742,7 +776,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentProvenance {
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentProvenance {}
 
 
-/// Structure for referencing parent provenances. When an element replaces one of more other elements parent references identify the elements that are replaced.
+/// The parent element the current element is based on. Used for referencing/aligning, removal and replacement operations.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -750,7 +784,9 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentProvenance {}
 pub struct GoogleCloudDocumentaiV1beta2DocumentProvenanceParent {
     /// The id of the parent provenance.
     pub id: Option<i32>,
-    /// The index of the [Document.revisions] identifying the parent revision.
+    /// The index of the parent item in the corresponding item list (eg. list of entities, properties within entities, etc.) in the parent revision.
+    pub index: Option<i32>,
+    /// The index of the index into current revision's parent_ids list.
     pub revision: Option<i32>,
 }
 
@@ -775,6 +811,9 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentRevision {
     pub id: Option<String>,
     /// The revisions that this revision is based on. This can include one or more parent (when documents are merged.) This field represents the index into the `revisions` field.
     pub parent: Option<Vec<i32>>,
+    /// The revisions that this revision is based on. Must include all the ids that have anything to do with this revision - eg. there are `provenance.parent.revision` fields that index into this field.
+    #[serde(rename="parentIds")]
+    pub parent_ids: Option<Vec<String>>,
     /// If the annotation was made by processor identify the processor by its resource name.
     pub processor: Option<String>,
 }
@@ -870,7 +909,7 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentStyleFontSize {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1beta2DocumentTextAnchor {
-    /// Contains the content of the text span so that users do not have to look it up in the text_segments.
+    /// Contains the content of the text span so that users do not have to look it up in the text_segments. It is always populated for formFields.
     pub content: Option<String>,
     /// The text segments from the Document.text.
     #[serde(rename="textSegments")]
@@ -943,7 +982,7 @@ pub struct GoogleCloudDocumentaiV1beta2FormExtractionParams {
     /// Reserved for future use.
     #[serde(rename="keyValuePairHints")]
     pub key_value_pair_hints: Option<Vec<GoogleCloudDocumentaiV1beta2KeyValuePairHint>>,
-    /// Model version of the form extraction system. Default is "builtin/stable". Specify "builtin/latest" for the latest model. For custom form models, specify: “custom/{model_name}". Model name format is "bucket_name/path/to/modeldir" corresponding to "gs://bucket_name/path/to/modeldir" where annotated examples are stored.
+    /// Model version of the form extraction system. Default is "builtin/stable". Specify "builtin/latest" for the latest model. For custom form models, specify: "custom/{model_name}". Model name format is "bucket_name/path/to/modeldir" corresponding to "gs://bucket_name/path/to/modeldir" where annotated examples are stored.
     #[serde(rename="modelVersion")]
     pub model_version: Option<String>,
 }
@@ -1220,7 +1259,7 @@ pub struct GoogleTypeColor {
 impl client::Part for GoogleTypeColor {}
 
 
-/// Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day value, with a zero year, such as an anniversary * A year on its own, with zero month and day values * A year and month value, with a zero day, such as a credit card expiration date Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
+/// Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day, with a zero year (e.g., an anniversary) * A year on its own, with a zero month and a zero day * A year and month, with a zero day (e.g., a credit card expiration date) Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1310,7 +1349,7 @@ pub struct GoogleTypePostalAddress {
     pub postal_code: Option<String>,
     /// Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain "care of" information.
     pub recipients: Option<Vec<String>>,
-    /// Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: "CH" for Switzerland.
+    /// Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: "CH" for Switzerland.
     #[serde(rename="regionCode")]
     pub region_code: Option<String>,
     /// The schema revision of the `PostalAddress`. This must be set to 0, which is the latest revision. All new revisions **must** be backward compatible with old revisions.
@@ -1355,18 +1394,16 @@ impl client::Part for GoogleTypeTimeZone {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_documentai1_beta2 as documentai1_beta2;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use documentai1_beta2::Document;
+/// use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -1516,18 +1553,16 @@ impl<'a> ProjectMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_documentai1_beta2 as documentai1_beta2;
 /// use documentai1_beta2::api::GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use documentai1_beta2::Document;
+/// # use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -1672,22 +1707,22 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1804,18 +1839,16 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_documentai1_beta2 as documentai1_beta2;
 /// use documentai1_beta2::api::GoogleCloudDocumentaiV1beta2ProcessDocumentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use documentai1_beta2::Document;
+/// # use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -1960,22 +1993,22 @@ impl<'a> ProjectDocumentProcesCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2092,18 +2125,16 @@ impl<'a> ProjectDocumentProcesCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_documentai1_beta2 as documentai1_beta2;
 /// use documentai1_beta2::api::GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use documentai1_beta2::Document;
+/// # use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2248,22 +2279,22 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2380,18 +2411,16 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_documentai1_beta2 as documentai1_beta2;
 /// use documentai1_beta2::api::GoogleCloudDocumentaiV1beta2ProcessDocumentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use documentai1_beta2::Document;
+/// # use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2536,22 +2565,22 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2668,17 +2697,15 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_documentai1_beta2 as documentai1_beta2;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use documentai1_beta2::Document;
+/// # use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2803,22 +2830,22 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2926,17 +2953,15 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_documentai1_beta2 as documentai1_beta2;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use documentai1_beta2::Document;
+/// # use documentai1_beta2::{Document, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3061,22 +3086,22 @@ impl<'a> ProjectOperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

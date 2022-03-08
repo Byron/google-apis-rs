@@ -56,13 +56,11 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_vault1 as vault1;
 /// use vault1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use vault1::Vault;
+/// use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -72,9 +70,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -107,8 +105,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct Vault<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -122,7 +120,7 @@ impl<'a, > Vault<> {
         Vault {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://vault.googleapis.com/".to_string(),
             _root_url: "https://vault.googleapis.com/".to_string(),
         }
@@ -136,7 +134,7 @@ impl<'a, > Vault<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -164,7 +162,7 @@ impl<'a, > Vault<> {
 // ############
 // SCHEMAS ###
 // ##########
-/// Accounts to search
+/// The accounts to search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -177,15 +175,15 @@ pub struct AccountInfo {
 impl client::Part for AccountInfo {}
 
 
-/// A status detailing the status of each account creation, and the HeldAccount, if successful.
+/// The status of each account creation, and the **HeldAccount**, if successful.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddHeldAccountResult {
-    /// If present, this account was successfully created.
+    /// Returned when the account was successfully created.
     pub account: Option<HeldAccount>,
-    /// This represents the success status. If failed, check message.
+    /// Reports the request status. If it failed, returns an error message.
     pub status: Option<Status>,
 }
 
@@ -203,10 +201,10 @@ impl client::Part for AddHeldAccountResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddHeldAccountsRequest {
-    /// Account IDs to identify which accounts to add. Only account_ids or only emails should be specified, but not both.
+    /// A comma-separated list of the account IDs of the accounts to add to the hold. Specify either **emails** or **account_ids**, but not both.
     #[serde(rename="accountIds")]
     pub account_ids: Option<Vec<String>>,
-    /// Emails to identify which accounts to add. Only emails or only account_ids should be specified, but not both.
+    /// A comma-separated list of the emails of the accounts to add to the hold. Specify either **emails** or **account_ids**, but not both.
     pub emails: Option<Vec<String>>,
 }
 
@@ -231,7 +229,7 @@ pub struct AddHeldAccountsResponse {
 impl client::ResponseResult for AddHeldAccountsResponse {}
 
 
-/// Add an account with the permission specified. The role cannot be owner. If an account already has a role in the matter, it will be overwritten.
+/// Add an account with the permission specified. The role cannot be owner. If an account already has a role in the matter, the existing role is overwritten.
 /// 
 /// # Activities
 /// 
@@ -242,13 +240,13 @@ impl client::ResponseResult for AddHeldAccountsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddMatterPermissionsRequest {
-    /// Only relevant if send_emails is true. True to CC requestor in the email message. False to not CC requestor.
+    /// Only relevant if **sendEmails** is **true**. To CC the requestor in the email message, set to **true**. To not CC requestor, set to **false**.
     #[serde(rename="ccMe")]
     pub cc_me: Option<bool>,
-    /// The MatterPermission to add.
+    /// The account and its role to add.
     #[serde(rename="matterPermission")]
     pub matter_permission: Option<MatterPermission>,
-    /// True to send notification email to the added account. False to not send notification email.
+    /// To send a notification email to the added account, set to **true**. To not send a notification email, set to **false**.
     #[serde(rename="sendEmails")]
     pub send_emails: Option<bool>,
 }
@@ -297,67 +295,67 @@ impl client::RequestValue for CloseMatterRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloseMatterResponse {
-    /// The updated matter, with state CLOSED.
+    /// The updated matter, with state **CLOSED**.
     pub matter: Option<Matter>,
 }
 
 impl client::ResponseResult for CloseMatterResponse {}
 
 
-/// An export file on cloud storage
+/// The export file in Cloud Storage
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudStorageFile {
-    /// The cloud storage bucket name of this export file. Can be used in cloud storage JSON/XML API, but not to list the bucket contents. Instead, you can get individual export files by object name.
+    /// The name of the Cloud Storage bucket for the export file. You can use this value in the [Cloud Storage JSON or XML APIs](https://cloud.google.com/storage/docs/apis), but not to list the bucket contents. Instead, you can [get individual export files](https://cloud.google.com/storage/docs/json_api/v1/objects/get) by object name.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
     /// The md5 hash of the file.
     #[serde(rename="md5Hash")]
     pub md5_hash: Option<String>,
-    /// The cloud storage object name of this export file. Can be used in cloud storage JSON/XML API.
+    /// The name of the Cloud Storage object for the export file. You can use this value in the [Cloud Storage JSON or XML APIs](https://cloud.google.com/storage/docs/apis).
     #[serde(rename="objectName")]
     pub object_name: Option<String>,
-    /// The size of the export file.
+    /// The export file size.
     pub size: Option<String>,
 }
 
 impl client::Part for CloudStorageFile {}
 
 
-/// Export sink for cloud storage files.
+/// Export sink for Cloud Storage files.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudStorageSink {
-    /// Output only. The exported files on cloud storage.
+    /// Output only. The exported files in Cloud Storage.
     pub files: Option<Vec<CloudStorageFile>>,
 }
 
 impl client::Part for CloudStorageSink {}
 
 
-/// Corpus specific queries.
+/// Service-specific options for holds.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CorpusQuery {
-    /// Details pertaining to Drive holds. If set, corpus must be Drive.
+    /// Service-specific options for Drive holds. If set, **CorpusType** must be **DRIVE**.
     #[serde(rename="driveQuery")]
     pub drive_query: Option<HeldDriveQuery>,
-    /// Details pertaining to Groups holds. If set, corpus must be Groups.
+    /// Service-specific options for Groups holds. If set, **CorpusType** must be **GROUPS**.
     #[serde(rename="groupsQuery")]
     pub groups_query: Option<HeldGroupsQuery>,
-    /// Details pertaining to Hangouts Chat holds. If set, corpus must be Hangouts Chat.
+    /// Service-specific options for Chat holds. If set, **CorpusType** must be **HANGOUTS_CHAT**.
     #[serde(rename="hangoutsChatQuery")]
     pub hangouts_chat_query: Option<HeldHangoutsChatQuery>,
-    /// Details pertaining to mail holds. If set, corpus must be mail.
+    /// Service-specific options for Gmail holds. If set, **CorpusType** must be **MAIL**.
     #[serde(rename="mailQuery")]
     pub mail_query: Option<HeldMailQuery>,
-    /// Details pertaining to Voice holds. If set, corpus must be Voice.
+    /// Service-specific options for Voice holds. If set, **CorpusType** must be **VOICE**.
     #[serde(rename="voiceQuery")]
     pub voice_query: Option<HeldVoiceQuery>,
 }
@@ -378,20 +376,20 @@ impl client::Part for CorpusQuery {}
 pub struct CountArtifactsRequest {
     /// The search query.
     pub query: Option<Query>,
-    /// Specifies the granularity of the count result returned in response.
+    /// Sets the granularity of the count results.
     pub view: Option<String>,
 }
 
 impl client::RequestValue for CountArtifactsRequest {}
 
 
-/// The options for Drive export.
+/// Options for Drive exports.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveExportOptions {
-    /// Set to true to include access level information for users with indirect access to files.
+    /// To include access level information for users with [indirect access](https://support.google.com/vault/answer/6099459#metadata) to files, set to **true**.
     #[serde(rename="includeAccessInfo")]
     pub include_access_info: Option<bool>,
 }
@@ -399,19 +397,19 @@ pub struct DriveExportOptions {
 impl client::Part for DriveExportOptions {}
 
 
-/// Drive search advanced options
+/// Additional options for Drive search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveOptions {
-    /// Set to true to include shared drive.
+    /// Set to **true** to include shared drives.
     #[serde(rename="includeSharedDrives")]
     pub include_shared_drives: Option<bool>,
     /// Set to true to include Team Drive.
     #[serde(rename="includeTeamDrives")]
     pub include_team_drives: Option<bool>,
-    /// Search the versions of the Drive file as of the reference date. These timestamps are in GMT and rounded down to the given date.
+    /// Search the current version of the Drive file, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.
     #[serde(rename="versionDate")]
     pub version_date: Option<String>,
 }
@@ -440,7 +438,7 @@ pub struct Empty { _never_set: Option<bool> }
 impl client::ResponseResult for Empty {}
 
 
-/// An export
+/// An export. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege.
 /// 
 /// # Activities
 /// 
@@ -452,13 +450,13 @@ impl client::ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Export {
-    /// Output only. Export sink for cloud storage files.
+    /// Output only. The sink for export files in Cloud Storage.
     #[serde(rename="cloudStorageSink")]
     pub cloud_storage_sink: Option<CloudStorageSink>,
     /// Output only. The time when the export was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Advanced options of the export.
+    /// Additional export options.
     #[serde(rename="exportOptions")]
     pub export_options: Option<ExportOptions>,
     /// Output only. The generated export ID.
@@ -468,13 +466,13 @@ pub struct Export {
     pub matter_id: Option<String>,
     /// The export name.
     pub name: Option<String>,
-    /// The search query being exported.
+    /// The query parameters used to create the export.
     pub query: Option<Query>,
     /// Output only. The requester of the export.
     pub requester: Option<UserInfo>,
-    /// Output only. Export statistics.
+    /// Output only. Details about the export progress and size.
     pub stats: Option<ExportStats>,
-    /// Output only. The export status.
+    /// Output only. The status of the export.
     pub status: Option<String>,
 }
 
@@ -482,27 +480,27 @@ impl client::RequestValue for Export {}
 impl client::ResponseResult for Export {}
 
 
-/// Export advanced options
+/// Additional options for exports
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportOptions {
-    /// Option available for Drive export.
+    /// Options for Drive exports.
     #[serde(rename="driveOptions")]
     pub drive_options: Option<DriveExportOptions>,
-    /// Option available for groups export.
+    /// Options for Groups exports.
     #[serde(rename="groupsOptions")]
     pub groups_options: Option<GroupsExportOptions>,
-    /// Option available for hangouts chat export.
+    /// Options for Chat exports.
     #[serde(rename="hangoutsChatOptions")]
     pub hangouts_chat_options: Option<HangoutsChatExportOptions>,
-    /// Option available for mail export.
+    /// Options for Gmail exports.
     #[serde(rename="mailOptions")]
     pub mail_options: Option<MailExportOptions>,
-    /// The requested export location.
+    /// The requested data region for the export.
     pub region: Option<String>,
-    /// Option available for voice export.
+    /// Options for Voice exports.
     #[serde(rename="voiceOptions")]
     pub voice_options: Option<VoiceExportOptions>,
 }
@@ -510,19 +508,19 @@ pub struct ExportOptions {
 impl client::Part for ExportOptions {}
 
 
-/// Stats of an export.
+/// Progress information for an export.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportStats {
-    /// The number of documents already processed by the export.
+    /// The number of messages or files already processed for export.
     #[serde(rename="exportedArtifactCount")]
     pub exported_artifact_count: Option<String>,
     /// The size of export in bytes.
     #[serde(rename="sizeInBytes")]
     pub size_in_bytes: Option<String>,
-    /// The number of documents to be exported.
+    /// The number of messages or files to be exported.
     #[serde(rename="totalArtifactCount")]
     pub total_artifact_count: Option<String>,
 }
@@ -530,13 +528,13 @@ pub struct ExportStats {
 impl client::Part for ExportStats {}
 
 
-/// The options for groups export.
+/// Options for Groups exports.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupsExportOptions {
-    /// The export format for groups export.
+    /// The file format for exported messages.
     #[serde(rename="exportFormat")]
     pub export_format: Option<String>,
 }
@@ -544,13 +542,13 @@ pub struct GroupsExportOptions {
 impl client::Part for GroupsExportOptions {}
 
 
-/// The options for hangouts chat export.
+/// Options for Chat exports.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HangoutsChatExportOptions {
-    /// The export format for hangouts chat export.
+    /// The file format for exported messages.
     #[serde(rename="exportFormat")]
     pub export_format: Option<String>,
 }
@@ -558,13 +556,13 @@ pub struct HangoutsChatExportOptions {
 impl client::Part for HangoutsChatExportOptions {}
 
 
-/// Accounts to search
+/// The Chat spaces to search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HangoutsChatInfo {
-    /// A set of rooms to search.
+    /// A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/hangouts/chat).
     #[serde(rename="roomId")]
     pub room_id: Option<Vec<String>>,
 }
@@ -572,13 +570,13 @@ pub struct HangoutsChatInfo {
 impl client::Part for HangoutsChatInfo {}
 
 
-/// Hangouts chat search advanced options
+/// Additional options for Google Chat search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HangoutsChatOptions {
-    /// Set to true to include rooms.
+    /// For searches by account or organizational unit, set to **true** to include rooms.
     #[serde(rename="includeRooms")]
     pub include_rooms: Option<bool>,
 }
@@ -586,7 +584,7 @@ pub struct HangoutsChatOptions {
 impl client::Part for HangoutsChatOptions {}
 
 
-/// An account being held in a particular hold. This structure is immutable. This can be either a single user or a google group, depending on the corpus.
+/// An account covered by a hold. This structure is immutable. It can be an individual account or a Google Group, depending on the service. To work with Vault resources, the account must have the [required Vault privileges] (https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege.
 /// 
 /// # Activities
 /// 
@@ -597,10 +595,10 @@ impl client::Part for HangoutsChatOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldAccount {
-    /// The account's ID as provided by the Admin SDK.
+    /// The account ID, as provided by the [Admin SDK](https://developers.google.com/admin-sdk/).
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
-    /// The primary email address of the account. If used as an input, this takes precedence over account ID.
+    /// The primary email address of the account. If used as an input, this takes precedence over **accountId**.
     pub email: Option<String>,
     /// Output only. The first name of the account holder.
     #[serde(rename="firstName")]
@@ -617,16 +615,16 @@ impl client::RequestValue for HeldAccount {}
 impl client::ResponseResult for HeldAccount {}
 
 
-/// Query options for Drive holds.
+/// Options for Drive holds.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldDriveQuery {
-    /// If true, include files in shared drives in the hold.
+    /// To include files in shared drives in the hold, set to **true**.
     #[serde(rename="includeSharedDriveFiles")]
     pub include_shared_drive_files: Option<bool>,
-    /// If true, include files in Team Drives in the hold.
+    /// To include files in Team Drives in the hold, set to **true**.
     #[serde(rename="includeTeamDriveFiles")]
     pub include_team_drive_files: Option<bool>,
 }
@@ -640,26 +638,26 @@ impl client::Part for HeldDriveQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldGroupsQuery {
-    /// The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.
+    /// The end time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.
+    /// The start time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// The search terms for the hold.
+    /// The [search operators](https://support.google.com/vault/answer/2474474) used to refine the messages covered by the hold.
     pub terms: Option<String>,
 }
 
 impl client::Part for HeldGroupsQuery {}
 
 
-/// Query options for hangouts chat holds.
+/// Options for Chat holds.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldHangoutsChatQuery {
-    /// If true, include rooms the user has participated in.
+    /// To include messages in Chat spaces the user was a member of, set to **true**.
     #[serde(rename="includeRooms")]
     pub include_rooms: Option<bool>,
 }
@@ -667,35 +665,35 @@ pub struct HeldHangoutsChatQuery {
 impl client::Part for HeldHangoutsChatQuery {}
 
 
-/// Query options for mail holds.
+/// Query options for Gmail holds.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldMailQuery {
-    /// The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.
+    /// The end time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.
+    /// The start time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// The search terms for the hold.
+    /// The [search operators](https://support.google.com/vault/answer/2474474) used to refine the messages covered by the hold.
     pub terms: Option<String>,
 }
 
 impl client::Part for HeldMailQuery {}
 
 
-/// A organizational unit being held in a particular hold. This structure is immutable.
+/// The organizational unit covered by a hold. This structure is immutable.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldOrgUnit {
-    /// When the org unit was put on hold. This property is immutable.
+    /// When the organizational unit was put on hold. This property is immutable.
     #[serde(rename="holdTime")]
     pub hold_time: Option<String>,
-    /// The org unit's immutable ID as provided by the Admin SDK.
+    /// The organizational unit's immutable ID as provided by the [Admin SDK](https://developers.google.com/admin-sdk/).
     #[serde(rename="orgUnitId")]
     pub org_unit_id: Option<String>,
 }
@@ -703,13 +701,13 @@ pub struct HeldOrgUnit {
 impl client::Part for HeldOrgUnit {}
 
 
-/// Query options for Voice holds.
+/// Options for Voice holds.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldVoiceQuery {
-    /// Data covered by this rule. Should be non-empty. Order does not matter and duplicates will be ignored.
+    /// A list of data types covered by the hold. Should be non-empty. Order does not matter and duplicates are ignored.
     #[serde(rename="coveredData")]
     pub covered_data: Option<Vec<String>>,
 }
@@ -717,7 +715,7 @@ pub struct HeldVoiceQuery {
 impl client::Part for HeldVoiceQuery {}
 
 
-/// Represents a hold within Vault. A hold restricts purging of artifacts based on the combination of the query and accounts restrictions. A hold can be configured to either apply to an explicitly configured set of accounts, or can be applied to all members of an organizational unit.
+/// A hold. A hold prevents the specified Google Workspace service from purging data for specific accounts or all members of an organizational unit. To work with Vault resources, the account must have the [required Vault privileges] (https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege.
 /// 
 /// # Activities
 /// 
@@ -730,19 +728,19 @@ impl client::Part for HeldVoiceQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Hold {
-    /// If set, the hold applies to the enumerated accounts and org_unit must be empty.
+    /// If set, the hold applies to the specified accounts and **orgUnit** must be empty.
     pub accounts: Option<Vec<HeldAccount>>,
-    /// The corpus to be searched.
+    /// The service to be searched.
     pub corpus: Option<String>,
     /// The unique immutable ID of the hold. Assigned during creation.
     #[serde(rename="holdId")]
     pub hold_id: Option<String>,
     /// The name of the hold.
     pub name: Option<String>,
-    /// If set, the hold applies to all members of the organizational unit and accounts must be empty. This property is mutable. For groups holds, set the accounts field.
+    /// If set, the hold applies to all members of the organizational unit and **accounts** must be empty. This property is mutable. For Groups holds, set **accounts**.
     #[serde(rename="orgUnit")]
     pub org_unit: Option<HeldOrgUnit>,
-    /// The corpus-specific query. If set, the corpusQuery must match corpus type.
+    /// Service-specific options. If set, **CorpusQuery** must match **CorpusType**.
     pub query: Option<CorpusQuery>,
     /// The last time this hold was modified.
     #[serde(rename="updateTime")]
@@ -753,7 +751,7 @@ impl client::RequestValue for Hold {}
 impl client::ResponseResult for Hold {}
 
 
-/// The holds for a matter.
+/// The exports for a matter.
 /// 
 /// # Activities
 /// 
@@ -774,7 +772,7 @@ pub struct ListExportsResponse {
 impl client::ResponseResult for ListExportsResponse {}
 
 
-/// Returns a list of held accounts for a hold.
+/// Returns a list of the accounts covered by a hold.
 /// 
 /// # Activities
 /// 
@@ -869,7 +867,7 @@ pub struct ListSavedQueriesResponse {
     /// Page token to retrieve the next page of results in the list. If this is empty, then there are no more saved queries to list.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// List of output saved queries.
+    /// List of saved queries.
     #[serde(rename="savedQueries")]
     pub saved_queries: Option<Vec<SavedQuery>>,
 }
@@ -877,30 +875,33 @@ pub struct ListSavedQueriesResponse {
 impl client::ResponseResult for ListSavedQueriesResponse {}
 
 
-/// The options for mail export.
+/// Options for Gmail exports.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MailExportOptions {
-    /// The export file format.
+    /// The file format for exported messages.
     #[serde(rename="exportFormat")]
     pub export_format: Option<String>,
-    /// Set to true to export confidential mode content.
+    /// To export confidential mode content, set to **true**.
     #[serde(rename="showConfidentialModeContent")]
     pub show_confidential_mode_content: Option<bool>,
+    /// To use the new export system, set to **true**.
+    #[serde(rename="useNewExport")]
+    pub use_new_export: Option<bool>,
 }
 
 impl client::Part for MailExportOptions {}
 
 
-/// Mail search advanced options
+/// Additional options for Gmail search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MailOptions {
-    /// Set to true to exclude drafts.
+    /// Set to **true** to exclude drafts.
     #[serde(rename="excludeDrafts")]
     pub exclude_drafts: Option<bool>,
 }
@@ -908,7 +909,7 @@ pub struct MailOptions {
 impl client::Part for MailOptions {}
 
 
-/// Represents a matter.
+/// Represents a matter. To work with Vault resources, the account must have the [required Vault privileges] (https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege.
 /// 
 /// # Activities
 /// 
@@ -947,12 +948,12 @@ impl client::Part for MailOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Matter {
-    /// The description of the matter.
+    /// An optional description for the matter.
     pub description: Option<String>,
-    /// The matter ID which is generated by the server. Should be blank when creating a new matter.
+    /// The matter ID, which is generated by the server. Leave blank when creating a matter.
     #[serde(rename="matterId")]
     pub matter_id: Option<String>,
-    /// List of users and access to the matter. Currently there is no programmer defined limit on the number of permissions a matter can have.
+    /// Lists the users and their permission for the matter. Currently there is no programmer defined limit on the number of permissions a matter can have.
     #[serde(rename="matterPermissions")]
     pub matter_permissions: Option<Vec<MatterPermission>>,
     /// The name of the matter.
@@ -966,7 +967,7 @@ impl client::Resource for Matter {}
 impl client::ResponseResult for Matter {}
 
 
-/// Currently each matter only has one owner, and all others are collaborators. When an account is purged, its corresponding MatterPermission resources cease to exist.
+/// Users can be matter owners or collaborators. Each matter has only one owner. All others users who can access the matter are collaborators. When an account is purged, its corresponding MatterPermission resources cease to exist.
 /// 
 /// # Activities
 /// 
@@ -977,10 +978,10 @@ impl client::ResponseResult for Matter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MatterPermission {
-    /// The account ID, as provided by Admin SDK.
+    /// The account ID, as provided by the [Admin SDK](https://developers.google.com/admin-sdk/).
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
-    /// The user's role in this matter.
+    /// The user's role for the matter.
     pub role: Option<String>,
 }
 
@@ -1018,13 +1019,13 @@ impl client::Resource for Operation {}
 impl client::ResponseResult for Operation {}
 
 
-/// Org Unit to search
+/// The organizational unit to search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrgUnitInfo {
-    /// Org unit to search, as provided by the Admin SDK Directory API.
+    /// The name of the organizational unit to search, as provided by the [Admin SDK Directory API](https://developers.google.com/admin-sdk/directory/).
     #[serde(rename="orgUnitId")]
     pub org_unit_id: Option<String>,
 }
@@ -1032,58 +1033,58 @@ pub struct OrgUnitInfo {
 impl client::Part for OrgUnitInfo {}
 
 
-/// A query definition relevant for search & export.
+/// The query definition used for search and export.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Query {
-    /// When 'ACCOUNT' is chosen as search method, account_info needs to be specified.
+    /// Required when **SearchMethod** is **ACCOUNT**.
     #[serde(rename="accountInfo")]
     pub account_info: Option<AccountInfo>,
-    /// The corpus to search.
+    /// The Google Workspace service to search.
     pub corpus: Option<String>,
-    /// The data source to search from.
+    /// The data source to search.
     #[serde(rename="dataScope")]
     pub data_scope: Option<String>,
-    /// For Drive search, specify more options in this field.
+    /// Set Drive search-specific options.
     #[serde(rename="driveOptions")]
     pub drive_options: Option<DriveOptions>,
-    /// The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.
+    /// The end time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// When 'ROOM' is chosen as search method, hangout_chats_info needs to be specified. (read-only)
+    /// Required when **SearchMethod** is **ROOM**. (read-only)
     #[serde(rename="hangoutsChatInfo")]
     pub hangouts_chat_info: Option<HangoutsChatInfo>,
-    /// For hangouts chat search, specify more options in this field. (read-only)
+    /// Set Chat search-specific options. (read-only)
     #[serde(rename="hangoutsChatOptions")]
     pub hangouts_chat_options: Option<HangoutsChatOptions>,
-    /// For mail search, specify more options in this field.
+    /// Set Gmail search-specific options.
     #[serde(rename="mailOptions")]
     pub mail_options: Option<MailOptions>,
-    /// The search method to use. This field is similar to the search_method field but is introduced to support shared drives. It supports all search method types. In case the search_method is TEAM_DRIVE the response of this field will be SHARED_DRIVE only.
+    /// The entity to search. This field replaces **searchMethod** to support shared drives. When **searchMethod** is **TEAM_DRIVE**, the response of this field is **SHARED_DRIVE**.
     pub method: Option<String>,
-    /// When 'ORG_UNIT' is chosen as as search method, org_unit_info needs to be specified.
+    /// Required when **SearchMethod** is **ORG_UNIT**.
     #[serde(rename="orgUnitInfo")]
     pub org_unit_info: Option<OrgUnitInfo>,
     /// The search method to use.
     #[serde(rename="searchMethod")]
     pub search_method: Option<String>,
-    /// When 'SHARED_DRIVE' is chosen as search method, shared_drive_info needs to be specified.
+    /// Required when **SearchMethod** is **SHARED_DRIVE**.
     #[serde(rename="sharedDriveInfo")]
     pub shared_drive_info: Option<SharedDriveInfo>,
-    /// The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.
+    /// The start time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// When 'TEAM_DRIVE' is chosen as search method, team_drive_info needs to be specified.
+    /// Required when **SearchMethod** is **TEAM_DRIVE**.
     #[serde(rename="teamDriveInfo")]
     pub team_drive_info: Option<TeamDriveInfo>,
-    /// The corpus-specific search operators used to generate search results.
+    /// Service-specific [search operators](https://support.google.com/vault/answer/2474474) to filter search results.
     pub terms: Option<String>,
-    /// The time zone name. It should be an IANA TZ name, such as "America/Los_Angeles". For more information, see Time Zone.
+    /// The time zone name. It should be an IANA TZ name, such as "America/Los_Angeles". For a list of time zone names, see [Time Zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). For more information about how Vault uses time zones, see [the Vault help center](https://support.google.com/vault/answer/6092995#time).
     #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
-    /// For voice search, specify more options in this field.
+    /// Set Voice search-specific options.
     #[serde(rename="voiceOptions")]
     pub voice_options: Option<VoiceOptions>,
 }
@@ -1102,7 +1103,7 @@ impl client::Part for Query {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoveHeldAccountsRequest {
-    /// Account IDs to identify HeldAccounts to remove.
+    /// The account IDs of the accounts to remove from the hold.
     #[serde(rename="accountIds")]
     pub account_ids: Option<Vec<String>>,
 }
@@ -1121,7 +1122,7 @@ impl client::RequestValue for RemoveHeldAccountsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoveHeldAccountsResponse {
-    /// A list of statuses for deleted accounts. Results have the same order as the request.
+    /// A list of statuses for the deleted accounts. Results have the same order as the request.
     pub statuses: Option<Vec<Status>>,
 }
 
@@ -1173,14 +1174,14 @@ impl client::RequestValue for ReopenMatterRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReopenMatterResponse {
-    /// The updated matter, with state OPEN.
+    /// The updated matter, with state **OPEN**.
     pub matter: Option<Matter>,
 }
 
 impl client::ResponseResult for ReopenMatterResponse {}
 
 
-/// Definition of the saved query.
+/// The definition of a saved query. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege.
 /// 
 /// # Activities
 /// 
@@ -1192,16 +1193,16 @@ impl client::ResponseResult for ReopenMatterResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedQuery {
-    /// Output only. The server generated timestamp at which saved query was created.
+    /// Output only. The server-generated timestamp when the saved query was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Name of the saved query.
+    /// The name of the saved query.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Output only. The matter ID of the associated matter. The server does not look at this field during create and always uses matter id in the URL.
+    /// Output only. The matter ID of the matter the saved query is saved in. The server does not use this field during create and always uses matter ID in the URL.
     #[serde(rename="matterId")]
     pub matter_id: Option<String>,
-    /// The underlying Query object which contains all the information of the saved query.
+    /// The search parameters of the saved query.
     pub query: Option<Query>,
     /// A unique identifier for the saved query.
     #[serde(rename="savedQueryId")]
@@ -1212,13 +1213,13 @@ impl client::RequestValue for SavedQuery {}
 impl client::ResponseResult for SavedQuery {}
 
 
-/// Shared drives to search
+/// The shared drives to search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SharedDriveInfo {
-    /// List of Shared drive IDs, as provided by Drive API.
+    /// A list of shared drive IDs, as provided by the [Drive API](https://developers.google.com/drive).
     #[serde(rename="sharedDriveIds")]
     pub shared_drive_ids: Option<Vec<String>>,
 }
@@ -1249,7 +1250,7 @@ impl client::Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveInfo {
-    /// List of Team Drive IDs, as provided by Drive API.
+    /// List of Team Drive IDs, as provided by the [Drive API](https://developers.google.com/drive).
     #[serde(rename="teamDriveIds")]
     pub team_drive_ids: Option<Vec<String>>,
 }
@@ -1288,13 +1289,13 @@ pub struct UserInfo {
 impl client::Part for UserInfo {}
 
 
-/// The options for voice export.
+/// The options for Voice exports.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VoiceExportOptions {
-    /// The export format for voice export.
+    /// The file format for exported text messages.
     #[serde(rename="exportFormat")]
     pub export_format: Option<String>,
 }
@@ -1302,7 +1303,7 @@ pub struct VoiceExportOptions {
 impl client::Part for VoiceExportOptions {}
 
 
-/// Voice search options
+/// Additional options for Voice search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1331,18 +1332,16 @@ impl client::Part for VoiceOptions {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_vault1 as vault1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use vault1::Vault;
+/// use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -1363,7 +1362,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an Export.
+    /// Creates an export.
     /// 
     /// # Arguments
     ///
@@ -1382,7 +1381,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an Export.
+    /// Deletes an export.
     /// 
     /// # Arguments
     ///
@@ -1401,7 +1400,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets an Export.
+    /// Gets an export.
     /// 
     /// # Arguments
     ///
@@ -1420,7 +1419,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists Exports.
+    /// Lists details about the exports in the specified matter.
     /// 
     /// # Arguments
     ///
@@ -1439,7 +1438,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a HeldAccount to a hold. Accounts can only be added to a hold that has no held_org_unit set. Attempting to add an account to an OU-based hold will result in an error.
+    /// Adds an account to a hold. Accounts can be added only to a hold that does not have an organizational unit set. If you try to add an account to an organizational unit-based hold, an error is returned.
     /// 
     /// # Arguments
     ///
@@ -1460,7 +1459,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a HeldAccount from a hold. If this request leaves the hold with no held accounts, the hold will not apply to any accounts.
+    /// Removes an account from a hold.
     /// 
     /// # Arguments
     ///
@@ -1481,7 +1480,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists HeldAccounts for a hold. This will only list individually specified held accounts. If the hold is on an OU, then use Admin SDK to enumerate its members.
+    /// Lists the accounts covered by a hold. This can list only individually-specified accounts covered by the hold. If the hold covers an organizational unit, use the [Admin SDK](https://developers.google.com/admin-sdk/). to list the members of the organizational unit on hold.
     /// 
     /// # Arguments
     ///
@@ -1500,7 +1499,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds HeldAccounts to a hold. Returns a list of accounts that have been successfully added. Accounts can only be added to an existing account-based hold.
+    /// Adds accounts to a hold. Returns a list of accounts that have been successfully added. Accounts can be added only to an existing account-based hold.
     /// 
     /// # Arguments
     ///
@@ -1521,7 +1520,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a hold in the given matter.
+    /// Creates a hold in the specified matter.
     /// 
     /// # Arguments
     ///
@@ -1540,7 +1539,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a hold by ID. This will release any HeldAccounts on this Hold.
+    /// Removes the specified hold and releases the accounts or organizational unit covered by the hold. If the data is not preserved by another hold or retention rule, it might be purged.
     /// 
     /// # Arguments
     ///
@@ -1559,7 +1558,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a hold by ID.
+    /// Gets the specified hold.
     /// 
     /// # Arguments
     ///
@@ -1579,7 +1578,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists holds within a matter. An empty page token in ListHoldsResponse denotes no more holds to list.
+    /// Lists the holds in a matter.
     /// 
     /// # Arguments
     ///
@@ -1599,7 +1598,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes HeldAccounts from a hold. Returns a list of statuses in the same order as the request. If this request leaves the hold with no held accounts, the hold will not apply to any accounts.
+    /// Removes the specified accounts from a hold. Returns a list of statuses in the same order as the request.
     /// 
     /// # Arguments
     ///
@@ -1620,7 +1619,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the OU and/or query parameters of a hold. You cannot add accounts to a hold that covers an OU, nor can you add OUs to a hold that covers individual accounts. Accounts listed in the hold will be ignored.
+    /// Updates the scope (organizational unit or accounts) and query parameters of a hold. You cannot add accounts to a hold that covers an organizational unit, nor can you add organizational units to a hold that covers individual accounts. If you try, the unsupported values are ignored.
     /// 
     /// # Arguments
     ///
@@ -1646,7 +1645,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `matterId` - The matter ID of the parent matter for which the saved query is to be created.
+    /// * `matterId` - The ID of the matter to create the saved query in.
     pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a> {
         MatterSavedQueryCreateCall {
             hub: self.hub,
@@ -1660,12 +1659,12 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a saved query by Id.
+    /// Deletes the specified saved query.
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter ID of the parent matter for which the saved query is to be deleted.
-    /// * `savedQueryId` - ID of the saved query to be deleted.
+    /// * `matterId` - The ID of the matter to delete the saved query from.
+    /// * `savedQueryId` - ID of the saved query to delete.
     pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a> {
         MatterSavedQueryDeleteCall {
             hub: self.hub,
@@ -1679,12 +1678,12 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a saved query by Id.
+    /// Retrieves the specified saved query.
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter ID of the parent matter for which the saved query is to be retrieved.
-    /// * `savedQueryId` - ID of the saved query to be retrieved.
+    /// * `matterId` - The ID of the matter to get the saved query from.
+    /// * `savedQueryId` - ID of the saved query to retrieve.
     pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a> {
         MatterSavedQueryGetCall {
             hub: self.hub,
@@ -1698,11 +1697,11 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists saved queries within a matter. An empty page token in ListSavedQueriesResponse denotes no more saved queries to list.
+    /// Lists the saved queries in a matter.
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter ID of the parent matter for which the saved queries are to be retrieved.
+    /// * `matterId` - The ID of the matter to get the saved queries for.
     pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a> {
         MatterSavedQueryListCall {
             hub: self.hub,
@@ -1736,7 +1735,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Closes the specified matter. Returns matter with updated state.
+    /// Closes the specified matter. Returns the matter with updated state.
     /// 
     /// # Arguments
     ///
@@ -1755,7 +1754,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Counts the artifacts within the context of a matter and returns a detailed breakdown of metrics.
+    /// Counts the accounts processed by the specified query.
     /// 
     /// # Arguments
     ///
@@ -1774,7 +1773,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new matter with the given name and description. The initial state is open, and the owner is the method caller. Returns the created matter with default view.
+    /// Creates a matter with the given name and description. The initial state is open, and the owner is the method caller. Returns the created matter with default view.
     /// 
     /// # Arguments
     ///
@@ -1791,7 +1790,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified matter. Returns matter with updated state.
+    /// Deletes the specified matter. Returns the matter with updated state.
     /// 
     /// # Arguments
     ///
@@ -1826,7 +1825,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists matters the user has access to.
+    /// Lists matters the requestor has access to.
     pub fn list(&self) -> MatterListCall<'a> {
         MatterListCall {
             hub: self.hub,
@@ -1861,7 +1860,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reopens the specified matter. Returns matter with updated state.
+    /// Reopens the specified matter. Returns the matter with updated state.
     /// 
     /// # Arguments
     ///
@@ -1880,7 +1879,7 @@ impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Undeletes the specified matter. Returns matter with updated state.
+    /// Undeletes the specified matter. Returns the matter with updated state.
     /// 
     /// # Arguments
     ///
@@ -1929,18 +1928,16 @@ impl<'a> MatterMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_vault1 as vault1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use vault1::Vault;
+/// use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -2038,7 +2035,7 @@ impl<'a> OperationMethods<'a> {
 // CallBuilders   ###
 // #################
 
-/// Creates an Export.
+/// Creates an export.
 ///
 /// A builder for the *exports.create* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -2050,18 +2047,16 @@ impl<'a> OperationMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::Export;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2202,22 +2197,22 @@ impl<'a> MatterExportCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2322,7 +2317,7 @@ impl<'a> MatterExportCreateCall<'a> {
 }
 
 
-/// Deletes an Export.
+/// Deletes an export.
 ///
 /// A builder for the *exports.delete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -2334,17 +2329,15 @@ impl<'a> MatterExportCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2467,22 +2460,22 @@ impl<'a> MatterExportDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2588,7 +2581,7 @@ impl<'a> MatterExportDeleteCall<'a> {
 }
 
 
-/// Gets an Export.
+/// Gets an export.
 ///
 /// A builder for the *exports.get* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -2600,17 +2593,15 @@ impl<'a> MatterExportDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2733,22 +2724,22 @@ impl<'a> MatterExportGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2854,7 +2845,7 @@ impl<'a> MatterExportGetCall<'a> {
 }
 
 
-/// Lists Exports.
+/// Lists details about the exports in the specified matter.
 ///
 /// A builder for the *exports.list* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -2866,17 +2857,15 @@ impl<'a> MatterExportGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3007,22 +2996,22 @@ impl<'a> MatterExportListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3132,7 +3121,7 @@ impl<'a> MatterExportListCall<'a> {
 }
 
 
-/// Adds a HeldAccount to a hold. Accounts can only be added to a hold that has no held_org_unit set. Attempting to add an account to an OU-based hold will result in an error.
+/// Adds an account to a hold. Accounts can be added only to a hold that does not have an organizational unit set. If you try to add an account to an organizational unit-based hold, an error is returned.
 ///
 /// A builder for the *holds.accounts.create* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -3144,18 +3133,16 @@ impl<'a> MatterExportListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::HeldAccount;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -3298,22 +3285,22 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3428,7 +3415,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
 }
 
 
-/// Removes a HeldAccount from a hold. If this request leaves the hold with no held accounts, the hold will not apply to any accounts.
+/// Removes an account from a hold.
 ///
 /// A builder for the *holds.accounts.delete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -3440,17 +3427,15 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3575,22 +3560,22 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3706,7 +3691,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
 }
 
 
-/// Lists HeldAccounts for a hold. This will only list individually specified held accounts. If the hold is on an OU, then use Admin SDK to enumerate its members.
+/// Lists the accounts covered by a hold. This can list only individually-specified accounts covered by the hold. If the hold covers an organizational unit, use the [Admin SDK](https://developers.google.com/admin-sdk/). to list the members of the organizational unit on hold.
 ///
 /// A builder for the *holds.accounts.list* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -3718,17 +3703,15 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3851,22 +3834,22 @@ impl<'a> MatterHoldAccountListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3972,7 +3955,7 @@ impl<'a> MatterHoldAccountListCall<'a> {
 }
 
 
-/// Adds HeldAccounts to a hold. Returns a list of accounts that have been successfully added. Accounts can only be added to an existing account-based hold.
+/// Adds accounts to a hold. Returns a list of accounts that have been successfully added. Accounts can be added only to an existing account-based hold.
 ///
 /// A builder for the *holds.addHeldAccounts* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -3984,18 +3967,16 @@ impl<'a> MatterHoldAccountListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::AddHeldAccountsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4138,22 +4119,22 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4268,7 +4249,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
 }
 
 
-/// Creates a hold in the given matter.
+/// Creates a hold in the specified matter.
 ///
 /// A builder for the *holds.create* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -4280,18 +4261,16 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::Hold;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4432,22 +4411,22 @@ impl<'a> MatterHoldCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4552,7 +4531,7 @@ impl<'a> MatterHoldCreateCall<'a> {
 }
 
 
-/// Removes a hold by ID. This will release any HeldAccounts on this Hold.
+/// Removes the specified hold and releases the accounts or organizational unit covered by the hold. If the data is not preserved by another hold or retention rule, it might be purged.
 ///
 /// A builder for the *holds.delete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -4564,17 +4543,15 @@ impl<'a> MatterHoldCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4697,22 +4674,22 @@ impl<'a> MatterHoldDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4818,7 +4795,7 @@ impl<'a> MatterHoldDeleteCall<'a> {
 }
 
 
-/// Gets a hold by ID.
+/// Gets the specified hold.
 ///
 /// A builder for the *holds.get* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -4830,17 +4807,15 @@ impl<'a> MatterHoldDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4968,22 +4943,22 @@ impl<'a> MatterHoldGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5026,7 +5001,7 @@ impl<'a> MatterHoldGetCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
-    /// Specifies which parts of the Hold to return.
+    /// The amount of detail to return for a hold.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
@@ -5096,7 +5071,7 @@ impl<'a> MatterHoldGetCall<'a> {
 }
 
 
-/// Lists holds within a matter. An empty page token in ListHoldsResponse denotes no more holds to list.
+/// Lists the holds in a matter.
 ///
 /// A builder for the *holds.list* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -5108,17 +5083,15 @@ impl<'a> MatterHoldGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -5254,22 +5227,22 @@ impl<'a> MatterHoldListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5302,7 +5275,7 @@ impl<'a> MatterHoldListCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
-    /// Specifies which parts of the Hold to return.
+    /// The amount of detail to return for a hold.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> MatterHoldListCall<'a> {
@@ -5316,7 +5289,7 @@ impl<'a> MatterHoldListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The number of holds to return in the response, between 0 and 100 inclusive. Leaving this empty, or as 0, is the same as page_size = 100.
+    /// The number of holds to return in the response, between 0 and 100 inclusive. Leaving this empty, or as 0, is the same as **page_size** = 100.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> MatterHoldListCall<'a> {
@@ -5386,7 +5359,7 @@ impl<'a> MatterHoldListCall<'a> {
 }
 
 
-/// Removes HeldAccounts from a hold. Returns a list of statuses in the same order as the request. If this request leaves the hold with no held accounts, the hold will not apply to any accounts.
+/// Removes the specified accounts from a hold. Returns a list of statuses in the same order as the request.
 ///
 /// A builder for the *holds.removeHeldAccounts* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -5398,18 +5371,16 @@ impl<'a> MatterHoldListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::RemoveHeldAccountsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5552,22 +5523,22 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5682,7 +5653,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
 }
 
 
-/// Updates the OU and/or query parameters of a hold. You cannot add accounts to a hold that covers an OU, nor can you add OUs to a hold that covers individual accounts. Accounts listed in the hold will be ignored.
+/// Updates the scope (organizational unit or accounts) and query parameters of a hold. You cannot add accounts to a hold that covers an organizational unit, nor can you add organizational units to a hold that covers individual accounts. If you try, the unsupported values are ignored.
 ///
 /// A builder for the *holds.update* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -5694,18 +5665,16 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::Hold;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5848,22 +5817,22 @@ impl<'a> MatterHoldUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5990,18 +5959,16 @@ impl<'a> MatterHoldUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::SavedQuery;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -6142,22 +6109,22 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6189,7 +6156,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
         self._request = new_value;
         self
     }
-    /// The matter ID of the parent matter for which the saved query is to be created.
+    /// The ID of the matter to create the saved query in.
     ///
     /// Sets the *matter id* path property to the given value.
     ///
@@ -6262,7 +6229,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
 }
 
 
-/// Deletes a saved query by Id.
+/// Deletes the specified saved query.
 ///
 /// A builder for the *savedQueries.delete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -6274,17 +6241,15 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6407,22 +6372,22 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6445,7 +6410,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
     }
 
 
-    /// The matter ID of the parent matter for which the saved query is to be deleted.
+    /// The ID of the matter to delete the saved query from.
     ///
     /// Sets the *matter id* path property to the given value.
     ///
@@ -6455,7 +6420,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
-    /// ID of the saved query to be deleted.
+    /// ID of the saved query to delete.
     ///
     /// Sets the *saved query id* path property to the given value.
     ///
@@ -6528,7 +6493,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
 }
 
 
-/// Retrieves a saved query by Id.
+/// Retrieves the specified saved query.
 ///
 /// A builder for the *savedQueries.get* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -6540,17 +6505,15 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6673,22 +6636,22 @@ impl<'a> MatterSavedQueryGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6711,7 +6674,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
     }
 
 
-    /// The matter ID of the parent matter for which the saved query is to be retrieved.
+    /// The ID of the matter to get the saved query from.
     ///
     /// Sets the *matter id* path property to the given value.
     ///
@@ -6721,7 +6684,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
-    /// ID of the saved query to be retrieved.
+    /// ID of the saved query to retrieve.
     ///
     /// Sets the *saved query id* path property to the given value.
     ///
@@ -6794,7 +6757,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
 }
 
 
-/// Lists saved queries within a matter. An empty page token in ListSavedQueriesResponse denotes no more saved queries to list.
+/// Lists the saved queries in a matter.
 ///
 /// A builder for the *savedQueries.list* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -6806,17 +6769,15 @@ impl<'a> MatterSavedQueryGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -6947,22 +6908,22 @@ impl<'a> MatterSavedQueryListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -6985,7 +6946,7 @@ impl<'a> MatterSavedQueryListCall<'a> {
     }
 
 
-    /// The matter ID of the parent matter for which the saved queries are to be retrieved.
+    /// The ID of the matter to get the saved queries for.
     ///
     /// Sets the *matter id* path property to the given value.
     ///
@@ -7084,18 +7045,16 @@ impl<'a> MatterSavedQueryListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::AddMatterPermissionsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -7236,22 +7195,22 @@ impl<'a> MatterAddPermissionCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7356,7 +7315,7 @@ impl<'a> MatterAddPermissionCall<'a> {
 }
 
 
-/// Closes the specified matter. Returns matter with updated state.
+/// Closes the specified matter. Returns the matter with updated state.
 ///
 /// A builder for the *close* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -7368,18 +7327,16 @@ impl<'a> MatterAddPermissionCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::CloseMatterRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -7520,22 +7477,22 @@ impl<'a> MatterCloseCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7640,7 +7597,7 @@ impl<'a> MatterCloseCall<'a> {
 }
 
 
-/// Counts the artifacts within the context of a matter and returns a detailed breakdown of metrics.
+/// Counts the accounts processed by the specified query.
 ///
 /// A builder for the *count* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -7652,18 +7609,16 @@ impl<'a> MatterCloseCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::CountArtifactsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -7804,22 +7759,22 @@ impl<'a> MatterCountCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7924,7 +7879,7 @@ impl<'a> MatterCountCall<'a> {
 }
 
 
-/// Creates a new matter with the given name and description. The initial state is open, and the owner is the method caller. Returns the created matter with default view.
+/// Creates a matter with the given name and description. The initial state is open, and the owner is the method caller. Returns the created matter with default view.
 ///
 /// A builder for the *create* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -7936,18 +7891,16 @@ impl<'a> MatterCountCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::Matter;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8065,22 +8018,22 @@ impl<'a> MatterCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8175,7 +8128,7 @@ impl<'a> MatterCreateCall<'a> {
 }
 
 
-/// Deletes the specified matter. Returns matter with updated state.
+/// Deletes the specified matter. Returns the matter with updated state.
 ///
 /// A builder for the *delete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -8187,17 +8140,15 @@ impl<'a> MatterCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -8318,22 +8269,22 @@ impl<'a> MatterDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8441,17 +8392,15 @@ impl<'a> MatterDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -8577,22 +8526,22 @@ impl<'a> MatterGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8625,7 +8574,7 @@ impl<'a> MatterGetCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
-    /// Specifies which parts of the Matter to return in the response.
+    /// Specifies how much information about the matter to return in the response.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> MatterGetCall<'a> {
@@ -8695,7 +8644,7 @@ impl<'a> MatterGetCall<'a> {
 }
 
 
-/// Lists matters the user has access to.
+/// Lists matters the requestor has access to.
 ///
 /// A builder for the *list* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -8707,17 +8656,15 @@ impl<'a> MatterGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -8835,22 +8782,22 @@ impl<'a> MatterListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8873,14 +8820,14 @@ impl<'a> MatterListCall<'a> {
     }
 
 
-    /// Specifies which parts of the matter to return in response.
+    /// Specifies how much information about the matter to return in response.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> MatterListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// If set, list only matters with that specific state. The default is listing matters of all states.
+    /// If set, lists only matters with the specified state. The default lists matters of all states.
     ///
     /// Sets the *state* query property to the given value.
     pub fn state(mut self, new_value: &str) -> MatterListCall<'a> {
@@ -8976,18 +8923,16 @@ impl<'a> MatterListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::RemoveMatterPermissionsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9128,22 +9073,22 @@ impl<'a> MatterRemovePermissionCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9248,7 +9193,7 @@ impl<'a> MatterRemovePermissionCall<'a> {
 }
 
 
-/// Reopens the specified matter. Returns matter with updated state.
+/// Reopens the specified matter. Returns the matter with updated state.
 ///
 /// A builder for the *reopen* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -9260,18 +9205,16 @@ impl<'a> MatterRemovePermissionCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::ReopenMatterRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9412,22 +9355,22 @@ impl<'a> MatterReopenCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9532,7 +9475,7 @@ impl<'a> MatterReopenCall<'a> {
 }
 
 
-/// Undeletes the specified matter. Returns matter with updated state.
+/// Undeletes the specified matter. Returns the matter with updated state.
 ///
 /// A builder for the *undelete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
@@ -9544,18 +9487,16 @@ impl<'a> MatterReopenCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::UndeleteMatterRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9696,22 +9637,22 @@ impl<'a> MatterUndeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -9828,18 +9769,16 @@ impl<'a> MatterUndeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::Matter;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9980,22 +9919,22 @@ impl<'a> MatterUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10112,18 +10051,16 @@ impl<'a> MatterUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// use vault1::api::CancelOperationRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -10261,22 +10198,22 @@ impl<'a> OperationCancelCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10370,17 +10307,15 @@ impl<'a> OperationCancelCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10498,22 +10433,22 @@ impl<'a> OperationDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10598,17 +10533,15 @@ impl<'a> OperationDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10733,22 +10666,22 @@ impl<'a> OperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -10856,17 +10789,15 @@ impl<'a> OperationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_vault1 as vault1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use vault1::Vault;
+/// # use vault1::{Vault, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10999,22 +10930,22 @@ impl<'a> OperationListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

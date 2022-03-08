@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Iam* crate version *2.0.8+20210325*, where *20210325* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Iam* crate version *3.0.0+20220224*, where *20220224* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -13,12 +13,14 @@
 //! 
 //! * iam policies
 //!  * [*lint policy*](api::IamPolicyLintPolicyCall) and [*query auditable services*](api::IamPolicyQueryAuditableServiceCall)
+//! * locations
+//!  * [*workforce pools operations get*](api::LocationWorkforcePoolOperationGetCall), [*workforce pools providers operations get*](api::LocationWorkforcePoolProviderOperationGetCall) and [*workforce pools subjects operations get*](api::LocationWorkforcePoolSubjectOperationGetCall)
 //! * organizations
 //!  * [*roles create*](api::OrganizationRoleCreateCall), [*roles delete*](api::OrganizationRoleDeleteCall), [*roles get*](api::OrganizationRoleGetCall), [*roles list*](api::OrganizationRoleListCall), [*roles patch*](api::OrganizationRolePatchCall) and [*roles undelete*](api::OrganizationRoleUndeleteCall)
 //! * [permissions](api::Permission)
 //!  * [*query testable permissions*](api::PermissionQueryTestablePermissionCall)
 //! * projects
-//!  * [*locations workload identity pools create*](api::ProjectLocationWorkloadIdentityPoolCreateCall), [*locations workload identity pools delete*](api::ProjectLocationWorkloadIdentityPoolDeleteCall), [*locations workload identity pools get*](api::ProjectLocationWorkloadIdentityPoolGetCall), [*locations workload identity pools list*](api::ProjectLocationWorkloadIdentityPoolListCall), [*locations workload identity pools operations get*](api::ProjectLocationWorkloadIdentityPoolOperationGetCall), [*locations workload identity pools patch*](api::ProjectLocationWorkloadIdentityPoolPatchCall), [*locations workload identity pools providers create*](api::ProjectLocationWorkloadIdentityPoolProviderCreateCall), [*locations workload identity pools providers delete*](api::ProjectLocationWorkloadIdentityPoolProviderDeleteCall), [*locations workload identity pools providers get*](api::ProjectLocationWorkloadIdentityPoolProviderGetCall), [*locations workload identity pools providers list*](api::ProjectLocationWorkloadIdentityPoolProviderListCall), [*locations workload identity pools providers operations get*](api::ProjectLocationWorkloadIdentityPoolProviderOperationGetCall), [*locations workload identity pools providers patch*](api::ProjectLocationWorkloadIdentityPoolProviderPatchCall), [*locations workload identity pools providers undelete*](api::ProjectLocationWorkloadIdentityPoolProviderUndeleteCall), [*locations workload identity pools undelete*](api::ProjectLocationWorkloadIdentityPoolUndeleteCall), [*roles create*](api::ProjectRoleCreateCall), [*roles delete*](api::ProjectRoleDeleteCall), [*roles get*](api::ProjectRoleGetCall), [*roles list*](api::ProjectRoleListCall), [*roles patch*](api::ProjectRolePatchCall), [*roles undelete*](api::ProjectRoleUndeleteCall), [*service accounts create*](api::ProjectServiceAccountCreateCall), [*service accounts delete*](api::ProjectServiceAccountDeleteCall), [*service accounts disable*](api::ProjectServiceAccountDisableCall), [*service accounts enable*](api::ProjectServiceAccountEnableCall), [*service accounts get*](api::ProjectServiceAccountGetCall), [*service accounts get iam policy*](api::ProjectServiceAccountGetIamPolicyCall), [*service accounts keys create*](api::ProjectServiceAccountKeyCreateCall), [*service accounts keys delete*](api::ProjectServiceAccountKeyDeleteCall), [*service accounts keys get*](api::ProjectServiceAccountKeyGetCall), [*service accounts keys list*](api::ProjectServiceAccountKeyListCall), [*service accounts keys upload*](api::ProjectServiceAccountKeyUploadCall), [*service accounts list*](api::ProjectServiceAccountListCall), [*service accounts patch*](api::ProjectServiceAccountPatchCall), [*service accounts set iam policy*](api::ProjectServiceAccountSetIamPolicyCall), [*service accounts sign blob*](api::ProjectServiceAccountSignBlobCall), [*service accounts sign jwt*](api::ProjectServiceAccountSignJwtCall), [*service accounts test iam permissions*](api::ProjectServiceAccountTestIamPermissionCall), [*service accounts undelete*](api::ProjectServiceAccountUndeleteCall) and [*service accounts update*](api::ProjectServiceAccountUpdateCall)
+//!  * [*locations workload identity pools create*](api::ProjectLocationWorkloadIdentityPoolCreateCall), [*locations workload identity pools delete*](api::ProjectLocationWorkloadIdentityPoolDeleteCall), [*locations workload identity pools get*](api::ProjectLocationWorkloadIdentityPoolGetCall), [*locations workload identity pools list*](api::ProjectLocationWorkloadIdentityPoolListCall), [*locations workload identity pools operations get*](api::ProjectLocationWorkloadIdentityPoolOperationGetCall), [*locations workload identity pools patch*](api::ProjectLocationWorkloadIdentityPoolPatchCall), [*locations workload identity pools providers create*](api::ProjectLocationWorkloadIdentityPoolProviderCreateCall), [*locations workload identity pools providers delete*](api::ProjectLocationWorkloadIdentityPoolProviderDeleteCall), [*locations workload identity pools providers get*](api::ProjectLocationWorkloadIdentityPoolProviderGetCall), [*locations workload identity pools providers keys operations get*](api::ProjectLocationWorkloadIdentityPoolProviderKeyOperationGetCall), [*locations workload identity pools providers list*](api::ProjectLocationWorkloadIdentityPoolProviderListCall), [*locations workload identity pools providers operations get*](api::ProjectLocationWorkloadIdentityPoolProviderOperationGetCall), [*locations workload identity pools providers patch*](api::ProjectLocationWorkloadIdentityPoolProviderPatchCall), [*locations workload identity pools providers undelete*](api::ProjectLocationWorkloadIdentityPoolProviderUndeleteCall), [*locations workload identity pools undelete*](api::ProjectLocationWorkloadIdentityPoolUndeleteCall), [*roles create*](api::ProjectRoleCreateCall), [*roles delete*](api::ProjectRoleDeleteCall), [*roles get*](api::ProjectRoleGetCall), [*roles list*](api::ProjectRoleListCall), [*roles patch*](api::ProjectRolePatchCall), [*roles undelete*](api::ProjectRoleUndeleteCall), [*service accounts create*](api::ProjectServiceAccountCreateCall), [*service accounts delete*](api::ProjectServiceAccountDeleteCall), [*service accounts disable*](api::ProjectServiceAccountDisableCall), [*service accounts enable*](api::ProjectServiceAccountEnableCall), [*service accounts get*](api::ProjectServiceAccountGetCall), [*service accounts get iam policy*](api::ProjectServiceAccountGetIamPolicyCall), [*service accounts keys create*](api::ProjectServiceAccountKeyCreateCall), [*service accounts keys delete*](api::ProjectServiceAccountKeyDeleteCall), [*service accounts keys disable*](api::ProjectServiceAccountKeyDisableCall), [*service accounts keys enable*](api::ProjectServiceAccountKeyEnableCall), [*service accounts keys get*](api::ProjectServiceAccountKeyGetCall), [*service accounts keys list*](api::ProjectServiceAccountKeyListCall), [*service accounts keys upload*](api::ProjectServiceAccountKeyUploadCall), [*service accounts list*](api::ProjectServiceAccountListCall), [*service accounts patch*](api::ProjectServiceAccountPatchCall), [*service accounts set iam policy*](api::ProjectServiceAccountSetIamPolicyCall), [*service accounts sign blob*](api::ProjectServiceAccountSignBlobCall), [*service accounts sign jwt*](api::ProjectServiceAccountSignJwtCall), [*service accounts test iam permissions*](api::ProjectServiceAccountTestIamPermissionCall), [*service accounts undelete*](api::ProjectServiceAccountUndeleteCall) and [*service accounts update*](api::ProjectServiceAccountUpdateCall)
 //! * [roles](api::Role)
 //!  * [*get*](api::RoleGetCall), [*list*](api::RoleListCall) and [*query grantable roles*](api::RoleQueryGrantableRoleCall)
 //! 
@@ -55,19 +57,20 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.organizations().roles_create(...).doit().await
-//! let r = hub.organizations().roles_delete(...).doit().await
-//! let r = hub.organizations().roles_get(...).doit().await
-//! let r = hub.organizations().roles_patch(...).doit().await
-//! let r = hub.organizations().roles_undelete(...).doit().await
-//! let r = hub.projects().roles_create(...).doit().await
-//! let r = hub.projects().roles_delete(...).doit().await
-//! let r = hub.projects().roles_get(...).doit().await
-//! let r = hub.projects().roles_patch(...).doit().await
-//! let r = hub.projects().roles_undelete(...).doit().await
-//! let r = hub.roles().get(...).doit().await
-//! let r = hub.roles().list(...).doit().await
-//! let r = hub.roles().query_grantable_roles(...).doit().await
+//! let r = hub.locations().workforce_pools_operations_get(...).doit().await
+//! let r = hub.locations().workforce_pools_providers_operations_get(...).doit().await
+//! let r = hub.locations().workforce_pools_subjects_operations_get(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_operations_get(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_providers_keys_operations_get(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_providers_operations_get(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_providers_create(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_providers_delete(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_providers_patch(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_providers_undelete(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_create(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_delete(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_patch(...).doit().await
+//! let r = hub.projects().locations_workload_identity_pools_undelete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -84,11 +87,8 @@
 //! ```toml
 //! [dependencies]
 //! google-iam1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -96,13 +96,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_iam1 as iam1;
+//! use iam1::api::WorkloadIdentityPoolProvider;
 //! use iam1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use iam1::Iam;
+//! use iam1::{Iam, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -112,20 +111,21 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = WorkloadIdentityPoolProvider::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.roles().list()
-//!              .view("sed")
-//!              .show_deleted(true)
-//!              .parent("amet.")
-//!              .page_token("duo")
-//!              .page_size(-55)
+//! let result = hub.projects().locations_workload_identity_pools_providers_create(req, "parent")
+//!              .workload_identity_pool_provider_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {
@@ -214,10 +214,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

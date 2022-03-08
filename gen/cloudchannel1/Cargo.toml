@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudchannel1"
-version = "2.0.8+20210326"
+version = "3.0.0+20220303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloudchannel (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudchannel1"
 homepage = "https://cloud.google.com/channel"
-documentation = "https://docs.rs/google-cloudchannel1/2.0.8+20210326"
+documentation = "https://docs.rs/google-cloudchannel1/3.0.0+20220303"
 license = "MIT"
 keywords = ["cloudchannel", "google", "protocol", "web", "api"]
 autobins = false
@@ -22,7 +22,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 5.0"
+yup-oauth2 = "^ 6.0"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
 url = "= 1.7"

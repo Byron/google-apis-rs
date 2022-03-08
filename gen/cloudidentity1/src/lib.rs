@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Identity* crate version *2.0.8+20210310*, where *20210310* is the exact revision of the *cloudidentity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Cloud Identity* crate version *3.0.0+20220301*, where *20220301* is the exact revision of the *cloudidentity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Cloud Identity* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/identity/).
@@ -14,7 +14,7 @@
 //! * devices
 //!  * [*cancel wipe*](api::DeviceCancelWipeCall), [*create*](api::DeviceCreateCall), [*delete*](api::DeviceDeleteCall), [*device users approve*](api::DeviceDeviceUserApproveCall), [*device users block*](api::DeviceDeviceUserBlockCall), [*device users cancel wipe*](api::DeviceDeviceUserCancelWipeCall), [*device users client states get*](api::DeviceDeviceUserClientStateGetCall), [*device users client states list*](api::DeviceDeviceUserClientStateListCall), [*device users client states patch*](api::DeviceDeviceUserClientStatePatchCall), [*device users delete*](api::DeviceDeviceUserDeleteCall), [*device users get*](api::DeviceDeviceUserGetCall), [*device users list*](api::DeviceDeviceUserListCall), [*device users lookup*](api::DeviceDeviceUserLookupCall), [*device users wipe*](api::DeviceDeviceUserWipeCall), [*get*](api::DeviceGetCall), [*list*](api::DeviceListCall) and [*wipe*](api::DeviceWipeCall)
 //! * [groups](api::Group)
-//!  * [*create*](api::GroupCreateCall), [*delete*](api::GroupDeleteCall), [*get*](api::GroupGetCall), [*list*](api::GroupListCall), [*lookup*](api::GroupLookupCall), [*memberships check transitive membership*](api::GroupMembershipCheckTransitiveMembershipCall), [*memberships create*](api::GroupMembershipCreateCall), [*memberships delete*](api::GroupMembershipDeleteCall), [*memberships get*](api::GroupMembershipGetCall), [*memberships get membership graph*](api::GroupMembershipGetMembershipGraphCall), [*memberships list*](api::GroupMembershipListCall), [*memberships lookup*](api::GroupMembershipLookupCall), [*memberships modify membership roles*](api::GroupMembershipModifyMembershipRoleCall), [*memberships search transitive groups*](api::GroupMembershipSearchTransitiveGroupCall), [*memberships search transitive memberships*](api::GroupMembershipSearchTransitiveMembershipCall), [*patch*](api::GroupPatchCall) and [*search*](api::GroupSearchCall)
+//!  * [*create*](api::GroupCreateCall), [*delete*](api::GroupDeleteCall), [*get*](api::GroupGetCall), [*get security settings*](api::GroupGetSecuritySettingCall), [*list*](api::GroupListCall), [*lookup*](api::GroupLookupCall), [*memberships check transitive membership*](api::GroupMembershipCheckTransitiveMembershipCall), [*memberships create*](api::GroupMembershipCreateCall), [*memberships delete*](api::GroupMembershipDeleteCall), [*memberships get*](api::GroupMembershipGetCall), [*memberships get membership graph*](api::GroupMembershipGetMembershipGraphCall), [*memberships list*](api::GroupMembershipListCall), [*memberships lookup*](api::GroupMembershipLookupCall), [*memberships modify membership roles*](api::GroupMembershipModifyMembershipRoleCall), [*memberships search transitive groups*](api::GroupMembershipSearchTransitiveGroupCall), [*memberships search transitive memberships*](api::GroupMembershipSearchTransitiveMembershipCall), [*patch*](api::GroupPatchCall), [*search*](api::GroupSearchCall) and [*update security settings*](api::GroupUpdateSecuritySettingCall)
 //! 
 //! 
 //! 
@@ -62,10 +62,12 @@
 //! let r = hub.groups().create(...).doit().await
 //! let r = hub.groups().delete(...).doit().await
 //! let r = hub.groups().get(...).doit().await
+//! let r = hub.groups().get_security_settings(...).doit().await
 //! let r = hub.groups().list(...).doit().await
 //! let r = hub.groups().lookup(...).doit().await
 //! let r = hub.groups().patch(...).doit().await
 //! let r = hub.groups().search(...).doit().await
+//! let r = hub.groups().update_security_settings(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -82,11 +84,8 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudidentity1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -94,13 +93,11 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_cloudidentity1 as cloudidentity1;
 //! use cloudidentity1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use cloudidentity1::CloudIdentity;
+//! use cloudidentity1::{CloudIdentity, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -110,9 +107,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = CloudIdentity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
@@ -210,10 +207,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

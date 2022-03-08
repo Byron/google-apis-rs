@@ -4,7 +4,7 @@
 [package]
 
 name = "google-acceleratedmobilepageurl1-cli"
-version = "2.0.8+20210330"
+version = "3.0.0+20220305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Acceleratedmobilepageurl (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/acceleratedmobilepageurl1-cli"
@@ -25,7 +25,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 5.0"
+yup-oauth2 = "^ 6.0"
 itertools = "^ 0.10"
 strsim = "^0.5"
 clap = "^2.0"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-acceleratedmobilepageurl1]
 path = "../acceleratedmobilepageurl1"
-version = "2.0.8+20210330"
+version = "3.0.0+20220305"

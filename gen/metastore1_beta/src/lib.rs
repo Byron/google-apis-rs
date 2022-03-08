@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dataproc Metastore* crate version *2.0.8+20210325*, where *20210325* is the exact revision of the *metastore:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Dataproc Metastore* crate version *3.0.0+20220222*, where *20220222* is the exact revision of the *metastore:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Dataproc Metastore* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc-metastore/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](DataprocMetastore) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations services backups create*](api::ProjectLocationServiceBackupCreateCall), [*locations services backups delete*](api::ProjectLocationServiceBackupDeleteCall), [*locations services backups get*](api::ProjectLocationServiceBackupGetCall), [*locations services backups list*](api::ProjectLocationServiceBackupListCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services export metadata*](api::ProjectLocationServiceExportMetadataCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services metadata imports create*](api::ProjectLocationServiceMetadataImportCreateCall), [*locations services metadata imports get*](api::ProjectLocationServiceMetadataImportGetCall), [*locations services metadata imports list*](api::ProjectLocationServiceMetadataImportListCall), [*locations services metadata imports patch*](api::ProjectLocationServiceMetadataImportPatchCall), [*locations services patch*](api::ProjectLocationServicePatchCall), [*locations services restore*](api::ProjectLocationServiceRestoreCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations services backups create*](api::ProjectLocationServiceBackupCreateCall), [*locations services backups delete*](api::ProjectLocationServiceBackupDeleteCall), [*locations services backups get*](api::ProjectLocationServiceBackupGetCall), [*locations services backups get iam policy*](api::ProjectLocationServiceBackupGetIamPolicyCall), [*locations services backups list*](api::ProjectLocationServiceBackupListCall), [*locations services backups set iam policy*](api::ProjectLocationServiceBackupSetIamPolicyCall), [*locations services backups test iam permissions*](api::ProjectLocationServiceBackupTestIamPermissionCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services databases get iam policy*](api::ProjectLocationServiceDatabaseGetIamPolicyCall), [*locations services databases set iam policy*](api::ProjectLocationServiceDatabaseSetIamPolicyCall), [*locations services databases tables get iam policy*](api::ProjectLocationServiceDatabaseTableGetIamPolicyCall), [*locations services databases tables set iam policy*](api::ProjectLocationServiceDatabaseTableSetIamPolicyCall), [*locations services databases tables test iam permissions*](api::ProjectLocationServiceDatabaseTableTestIamPermissionCall), [*locations services databases test iam permissions*](api::ProjectLocationServiceDatabaseTestIamPermissionCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services export metadata*](api::ProjectLocationServiceExportMetadataCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services metadata imports create*](api::ProjectLocationServiceMetadataImportCreateCall), [*locations services metadata imports get*](api::ProjectLocationServiceMetadataImportGetCall), [*locations services metadata imports list*](api::ProjectLocationServiceMetadataImportListCall), [*locations services metadata imports patch*](api::ProjectLocationServiceMetadataImportPatchCall), [*locations services patch*](api::ProjectLocationServicePatchCall), [*locations services remove iam policy*](api::ProjectLocationServiceRemoveIamPolicyCall), [*locations services restore*](api::ProjectLocationServiceRestoreCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -73,11 +73,8 @@
 //! ```toml
 //! [dependencies]
 //! google-metastore1_beta = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -85,14 +82,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_metastore1_beta as metastore1_beta;
 //! use metastore1_beta::api::Backup;
 //! use metastore1_beta::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use metastore1_beta::DataprocMetastore;
+//! use metastore1_beta::{DataprocMetastore, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -102,9 +97,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = DataprocMetastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
@@ -206,10 +201,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

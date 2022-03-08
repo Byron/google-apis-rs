@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Access Approval* API can be found at the
-[official documentation site](https://cloud.google.com/access-approval/docs).
+[official documentation site](https://cloud.google.com/cloud-provider-access-management/access-approval/docs).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Approval* API at revision *20210318*. The CLI is at version *2.0.8*.
+This documentation was generated from the *Access Approval* API at revision *20220225*. The CLI is at version *3.0.0*.
 
 ```bash
 accessapproval1 [options]

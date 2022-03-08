@@ -2,7 +2,7 @@
 // DO NOT EDIT
 use clap::{App, SubCommand};
 use mime::Mime;
-use oauth2::{ApplicationSecret, ConsoleApplicationSecret};
+use crate::oauth2::{ApplicationSecret, ConsoleApplicationSecret};
 use serde_json as json;
 use serde_json::value::Value;
 

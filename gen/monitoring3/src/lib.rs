@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Monitoring* crate version *2.0.8+20210322*, where *20210322* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Monitoring* crate version *3.0.0+20220218*, where *20220218* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Monitoring* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/api/).
@@ -16,7 +16,7 @@
 //! * organizations
 //!  * [*time series list*](api::OrganizationTimeSeryListCall)
 //! * projects
-//!  * [*alert policies create*](api::ProjectAlertPolicyCreateCall), [*alert policies delete*](api::ProjectAlertPolicyDeleteCall), [*alert policies get*](api::ProjectAlertPolicyGetCall), [*alert policies list*](api::ProjectAlertPolicyListCall), [*alert policies patch*](api::ProjectAlertPolicyPatchCall), [*collectd time series create*](api::ProjectCollectdTimeSeryCreateCall), [*groups create*](api::ProjectGroupCreateCall), [*groups delete*](api::ProjectGroupDeleteCall), [*groups get*](api::ProjectGroupGetCall), [*groups list*](api::ProjectGroupListCall), [*groups members list*](api::ProjectGroupMemberListCall), [*groups update*](api::ProjectGroupUpdateCall), [*metric descriptors create*](api::ProjectMetricDescriptorCreateCall), [*metric descriptors delete*](api::ProjectMetricDescriptorDeleteCall), [*metric descriptors get*](api::ProjectMetricDescriptorGetCall), [*metric descriptors list*](api::ProjectMetricDescriptorListCall), [*monitored resource descriptors get*](api::ProjectMonitoredResourceDescriptorGetCall), [*monitored resource descriptors list*](api::ProjectMonitoredResourceDescriptorListCall), [*notification channel descriptors get*](api::ProjectNotificationChannelDescriptorGetCall), [*notification channel descriptors list*](api::ProjectNotificationChannelDescriptorListCall), [*notification channels create*](api::ProjectNotificationChannelCreateCall), [*notification channels delete*](api::ProjectNotificationChannelDeleteCall), [*notification channels get*](api::ProjectNotificationChannelGetCall), [*notification channels get verification code*](api::ProjectNotificationChannelGetVerificationCodeCall), [*notification channels list*](api::ProjectNotificationChannelListCall), [*notification channels patch*](api::ProjectNotificationChannelPatchCall), [*notification channels send verification code*](api::ProjectNotificationChannelSendVerificationCodeCall), [*notification channels verify*](api::ProjectNotificationChannelVerifyCall), [*time series create*](api::ProjectTimeSeryCreateCall), [*time series list*](api::ProjectTimeSeryListCall), [*time series query*](api::ProjectTimeSeryQueryCall), [*uptime check configs create*](api::ProjectUptimeCheckConfigCreateCall), [*uptime check configs delete*](api::ProjectUptimeCheckConfigDeleteCall), [*uptime check configs get*](api::ProjectUptimeCheckConfigGetCall), [*uptime check configs list*](api::ProjectUptimeCheckConfigListCall) and [*uptime check configs patch*](api::ProjectUptimeCheckConfigPatchCall)
+//!  * [*alert policies create*](api::ProjectAlertPolicyCreateCall), [*alert policies delete*](api::ProjectAlertPolicyDeleteCall), [*alert policies get*](api::ProjectAlertPolicyGetCall), [*alert policies list*](api::ProjectAlertPolicyListCall), [*alert policies patch*](api::ProjectAlertPolicyPatchCall), [*collectd time series create*](api::ProjectCollectdTimeSeryCreateCall), [*groups create*](api::ProjectGroupCreateCall), [*groups delete*](api::ProjectGroupDeleteCall), [*groups get*](api::ProjectGroupGetCall), [*groups list*](api::ProjectGroupListCall), [*groups members list*](api::ProjectGroupMemberListCall), [*groups update*](api::ProjectGroupUpdateCall), [*metric descriptors create*](api::ProjectMetricDescriptorCreateCall), [*metric descriptors delete*](api::ProjectMetricDescriptorDeleteCall), [*metric descriptors get*](api::ProjectMetricDescriptorGetCall), [*metric descriptors list*](api::ProjectMetricDescriptorListCall), [*monitored resource descriptors get*](api::ProjectMonitoredResourceDescriptorGetCall), [*monitored resource descriptors list*](api::ProjectMonitoredResourceDescriptorListCall), [*notification channel descriptors get*](api::ProjectNotificationChannelDescriptorGetCall), [*notification channel descriptors list*](api::ProjectNotificationChannelDescriptorListCall), [*notification channels create*](api::ProjectNotificationChannelCreateCall), [*notification channels delete*](api::ProjectNotificationChannelDeleteCall), [*notification channels get*](api::ProjectNotificationChannelGetCall), [*notification channels get verification code*](api::ProjectNotificationChannelGetVerificationCodeCall), [*notification channels list*](api::ProjectNotificationChannelListCall), [*notification channels patch*](api::ProjectNotificationChannelPatchCall), [*notification channels send verification code*](api::ProjectNotificationChannelSendVerificationCodeCall), [*notification channels verify*](api::ProjectNotificationChannelVerifyCall), [*time series create*](api::ProjectTimeSeryCreateCall), [*time series create service*](api::ProjectTimeSeryCreateServiceCall), [*time series list*](api::ProjectTimeSeryListCall), [*time series query*](api::ProjectTimeSeryQueryCall), [*uptime check configs create*](api::ProjectUptimeCheckConfigCreateCall), [*uptime check configs delete*](api::ProjectUptimeCheckConfigDeleteCall), [*uptime check configs get*](api::ProjectUptimeCheckConfigGetCall), [*uptime check configs list*](api::ProjectUptimeCheckConfigListCall) and [*uptime check configs patch*](api::ProjectUptimeCheckConfigPatchCall)
 //! * [services](api::Service)
 //!  * [*create*](api::ServiceCreateCall), [*delete*](api::ServiceDeleteCall), [*get*](api::ServiceGetCall), [*list*](api::ServiceListCall), [*patch*](api::ServicePatchCall), [*service level objectives create*](api::ServiceServiceLevelObjectiveCreateCall), [*service level objectives delete*](api::ServiceServiceLevelObjectiveDeleteCall), [*service level objectives get*](api::ServiceServiceLevelObjectiveGetCall), [*service level objectives list*](api::ServiceServiceLevelObjectiveListCall) and [*service level objectives patch*](api::ServiceServiceLevelObjectivePatchCall)
 //! * [uptime check ips](api::UptimeCheckIp)
@@ -81,11 +81,8 @@
 //! ```toml
 //! [dependencies]
 //! google-monitoring3 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -93,13 +90,11 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_monitoring3 as monitoring3;
 //! use monitoring3::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use monitoring3::Monitoring;
+//! use monitoring3::{Monitoring, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -109,9 +104,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Monitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
@@ -210,10 +205,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

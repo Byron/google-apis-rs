@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Context Manager* API at revision *20210319*. The CLI is at version *2.0.8*.
+This documentation was generated from the *Access Context Manager* API at revision *20220301*. The CLI is at version *3.0.0*.
 
 ```bash
 accesscontextmanager1 [options]
@@ -36,9 +36,11 @@ accesscontextmanager1 [options]
                 access-levels-list <parent> [-p <v>]... [-o <out>]
                 access-levels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 access-levels-replace-all <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                access-levels-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-perimeters-commit <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -48,6 +50,9 @@ accesscontextmanager1 [options]
                 service-perimeters-list <parent> [-p <v>]... [-o <out>]
                 service-perimeters-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-perimeters-replace-all <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-perimeters-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]

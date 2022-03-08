@@ -25,11 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdMob* API at revision *20210331*. The CLI is at version *2.0.8*.
+This documentation was generated from the *AdMob* API at revision *20220303*. The CLI is at version *3.0.0*.
 
 ```bash
 admob1 [options]
         accounts
+                ad-units-list <parent> [-p <v>]... [-o <out>]
+                apps-list <parent> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 mediation-report-generate <parent> (-r <kv>)... [-p <v>]... [-o <out>]

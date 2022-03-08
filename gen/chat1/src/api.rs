@@ -30,14 +30,12 @@ use crate::client;
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// use chat1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use chat1::HangoutsChat;
+/// use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -47,9 +45,9 @@ use crate::client;
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -61,7 +59,8 @@ use crate::client;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.dms().conversations_messages(req, "parent")
-///              .thread_key("At")
+///              .thread_key("sed")
+///              .request_id("amet.")
 ///              .doit().await;
 /// 
 /// match result {
@@ -85,8 +84,8 @@ use crate::client;
 /// ```
 #[derive(Clone)]
 pub struct HangoutsChat<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -100,7 +99,7 @@ impl<'a, > HangoutsChat<> {
         HangoutsChat {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://chat.googleapis.com/".to_string(),
             _root_url: "https://chat.googleapis.com/".to_string(),
         }
@@ -120,7 +119,7 @@ impl<'a, > HangoutsChat<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -169,6 +168,9 @@ impl client::Part for ActionParameter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActionResponse {
+    /// A response to an event related to a [dialog](https://developers.google.com/chat/how-tos/bot-dialogs). Must be accompanied by `ResponseType.Dialog`.
+    #[serde(rename="dialogAction")]
+    pub dialog_action: Option<DialogAction>,
     /// The type of bot response.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -177,6 +179,23 @@ pub struct ActionResponse {
 }
 
 impl client::Part for ActionResponse {}
+
+
+/// Represents the status of a request.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActionStatus {
+    /// The status code.
+    #[serde(rename="statusCode")]
+    pub status_code: Option<String>,
+    /// The message to send users about the status of their request. If unset, a generic message based on the `status_code` is sent.
+    #[serde(rename="userFacingMessage")]
+    pub user_facing_message: Option<String>,
+}
+
+impl client::Part for ActionStatus {}
 
 
 /// Annotations associated with the plain-text body of the message. Example plain-text message body: ``` Hello @FooBot how are you!" ``` The corresponding annotations metadata: ``` "annotations":[{ "type":"USER_MENTION", "startIndex":6, "length":7, "userMention": { "user": { "name":"users/107946847022116401880", "displayName":"FooBot", "avatarUrl":"https://goo.gl/aeDtrS", "type":"BOT" }, "type":"MENTION" } }] ```
@@ -204,7 +223,7 @@ pub struct Annotation {
 impl client::Part for Annotation {}
 
 
-/// An attachment in Hangouts Chat.
+/// An attachment in Google Chat.
 /// 
 /// # Activities
 /// 
@@ -331,6 +350,54 @@ pub struct CardHeader {
 impl client::Part for CardHeader {}
 
 
+/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to/from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't carry information about the absolute color space that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB, DCI-P3, BT.2020, etc.). By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most 1e-5. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Color {
+    /// The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: `pixel color = alpha * (this color) + (1.0 - alpha) * (background color)` This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).
+    pub alpha: Option<f32>,
+    /// The amount of blue in the color as a value in the interval [0, 1].
+    pub blue: Option<f32>,
+    /// The amount of green in the color as a value in the interval [0, 1].
+    pub green: Option<f32>,
+    /// The amount of red in the color as a value in the interval [0, 1].
+    pub red: Option<f32>,
+}
+
+impl client::Part for Color {}
+
+
+/// Wrapper around the card body of the dialog.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Dialog {
+    /// Body of the dialog, which is rendered in a modal. Google Chat apps do not support the following card entities: `DateTimePicker`, `OnChangeAction`.
+    pub body: Option<GoogleAppsCardV1Card>,
+}
+
+impl client::Part for Dialog {}
+
+
+/// Contains a [dialog](https://developers.google.com/chat/how-tos/bot-dialogs) and request status code.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DialogAction {
+    /// Status for a request to either invoke or submit a [dialog](https://developers.google.com/chat/how-tos/bot-dialogs). Displays a status and message to users, if necessary. For example, in case of an error or success.
+    #[serde(rename="actionStatus")]
+    pub action_status: Option<ActionStatus>,
+    /// [Dialog](https://developers.google.com/chat/how-tos/bot-dialogs) for the request.
+    pub dialog: Option<Dialog>,
+}
+
+impl client::Part for DialogAction {}
+
+
 /// A reference to the data of a drive attachment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -374,6 +441,625 @@ pub struct FormAction {
 }
 
 impl client::Part for FormAction {}
+
+
+/// An action that describes the behavior when the form is submitted. For example, an Apps Script can be invoked to handle the form.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Action {
+    /// Apps Script function to invoke when the containing element is clicked/activated.
+    pub function: Option<String>,
+    /// Specifies the loading indicator that the action displays while making the call to the action.
+    #[serde(rename="loadIndicator")]
+    pub load_indicator: Option<String>,
+    /// List of action parameters.
+    pub parameters: Option<Vec<GoogleAppsCardV1ActionParameter>>,
+    /// Indicates whether form values persist after the action. The default value is `false`. If `true`, form values remain after the action is triggered. When using [LoadIndicator.NONE](workspace/add-ons/reference/rpc/google.apps.card.v1#loadindicator) for actions, `persist_values` = `true`is recommended, as it ensures that any changes made by the user after form or on change actions are sent to the server are not overwritten by the response. If `false`, the form values are cleared when the action is triggered. When `persist_values` is set to `false`, it is strongly recommended that the card use [LoadIndicator.SPINNER](workspace/add-ons/reference/rpc/google.apps.card.v1#loadindicator) for all actions, as this locks the UI to ensure no changes are made by the user while the action is being processed.
+    #[serde(rename="persistValues")]
+    pub persist_values: Option<bool>,
+}
+
+impl client::Part for GoogleAppsCardV1Action {}
+
+
+/// List of string parameters to supply when the action method is invoked. For example, consider three snooze buttons: snooze now, snooze 1 day, snooze next week. You might use action method = snooze(), passing the snooze type and snooze time in the list of string parameters.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1ActionParameter {
+    /// The name of the parameter for the action script.
+    pub key: Option<String>,
+    /// The value of the parameter.
+    pub value: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1ActionParameter {}
+
+
+/// Represents the complete border style applied to widgets.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1BorderStyle {
+    /// The corner radius for the border.
+    #[serde(rename="cornerRadius")]
+    pub corner_radius: Option<i32>,
+    /// The colors to use when the type is `BORDER_TYPE_STROKE`.
+    #[serde(rename="strokeColor")]
+    pub stroke_color: Option<Color>,
+    /// The border type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1BorderStyle {}
+
+
+/// A button. Can be a text button or an image button.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Button {
+    /// The alternative text used for accessibility. Has no effect when an icon is set; use `icon.alt_text` instead.
+    #[serde(rename="altText")]
+    pub alt_text: Option<String>,
+    /// If set, the button is filled with a solid background.
+    pub color: Option<Color>,
+    /// If `true`, the button is displayed in a disabled state and doesn't respond to user actions.
+    pub disabled: Option<bool>,
+    /// The icon image.
+    pub icon: Option<GoogleAppsCardV1Icon>,
+    /// The action to perform when the button is clicked.
+    #[serde(rename="onClick")]
+    pub on_click: Option<GoogleAppsCardV1OnClick>,
+    /// The text of the button.
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1Button {}
+
+
+/// A list of buttons layed out horizontally.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1ButtonList {
+    /// An array of buttons.
+    pub buttons: Option<Vec<GoogleAppsCardV1Button>>,
+}
+
+impl client::Part for GoogleAppsCardV1ButtonList {}
+
+
+/// A card is a UI element that can contain UI widgets such as text and images. For more information, see Cards . For example, the following JSON creates a card that has a header with the name, position, icons, and link for a contact, followed by a section with contact information like email and phone number. ``` { "header": { "title": "Sasha", "subtitle": "Software Engineer", "imageStyle": "ImageStyle.AVATAR", "imageUrl": "https://example.com/sasha.png", "imageAltText": "Avatar for Sasha" }, "sections" : [ { "header": "Contact Info", "widgets": [ { "decorated_text": { "icon": { "knownIcon": "EMAIL" }, "content": "sasha@example.com" } }, { "decoratedText": { "icon": { "knownIcon": "PERSON" }, "content": "Online" } }, { "decoratedText": { "icon": { "knownIcon": "PHONE" }, "content": "+1 (555) 555-1234" } }, { "buttons": [ { "textButton": { "text": "Share", }, "onClick": { "openLink": { "url": "https://example.com/share" } } }, { "textButton": { "text": "Edit", }, "onClick": { "action": { "function": "goToView", "parameters": [ { "key": "viewType", "value": "EDIT" } ], "loadIndicator": "LoadIndicator.SPINNER" } } } ] } ], "collapsible": true, "uncollapsibleWidgetsCount": 3 } ], "cardActions": [ { "actionLabel": "Send Feedback", "onClick": { "openLink": { "url": "https://example.com/feedback" } } } ], "name": "contact-card-K3wB6arF2H9L" } ```
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Card {
+    /// The card's actions. Actions are added to the card's generated toolbar menu. For example, the following JSON constructs a card action menu with Settings and Send Feedback options: ``` "card_actions": [ { "actionLabel": "Settings", "onClick": { "action": { "functionName": "goToView", "parameters": [ { "key": "viewType", "value": "SETTING" } ], "loadIndicator": "LoadIndicator.SPINNER" } } }, { "actionLabel": "Send Feedback", "onClick": { "openLink": { "url": "https://example.com/feedback" } } } ] ```
+    #[serde(rename="cardActions")]
+    pub card_actions: Option<Vec<GoogleAppsCardV1CardAction>>,
+    /// The display style for `peekCardHeader`.
+    #[serde(rename="displayStyle")]
+    pub display_style: Option<String>,
+    /// The fixed footer shown at the bottom of this card.
+    #[serde(rename="fixedFooter")]
+    pub fixed_footer: Option<GoogleAppsCardV1CardFixedFooter>,
+    /// The header of the card. A header usually contains a title and an image.
+    pub header: Option<GoogleAppsCardV1CardHeader>,
+    /// Name of the card. Used as a card identifier in card navigation.
+    pub name: Option<String>,
+    /// When displaying contextual content, the peek card header acts as a placeholder so that the user can navigate forward between the homepage cards and the contextual cards.
+    #[serde(rename="peekCardHeader")]
+    pub peek_card_header: Option<GoogleAppsCardV1CardHeader>,
+    /// Sections are separated by a line divider.
+    pub sections: Option<Vec<GoogleAppsCardV1Section>>,
+}
+
+impl client::Part for GoogleAppsCardV1Card {}
+
+
+/// A card action is the action associated with the card. For example, an invoice card might include actions such as delete invoice, email invoice, or open the invoice in a browser.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1CardAction {
+    /// The label that displays as the action menu item.
+    #[serde(rename="actionLabel")]
+    pub action_label: Option<String>,
+    /// The `onClick` action for this action item.
+    #[serde(rename="onClick")]
+    pub on_click: Option<GoogleAppsCardV1OnClick>,
+}
+
+impl client::Part for GoogleAppsCardV1CardAction {}
+
+
+/// A persistent (sticky) footer that is added to the bottom of the card.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1CardFixedFooter {
+    /// The primary button of the fixed footer. The button must be a text button with text and color set.
+    #[serde(rename="primaryButton")]
+    pub primary_button: Option<GoogleAppsCardV1Button>,
+    /// The secondary button of the fixed footer. The button must be a text button with text and color set. `primaryButton` must be set if `secondaryButton` is set.
+    #[serde(rename="secondaryButton")]
+    pub secondary_button: Option<GoogleAppsCardV1Button>,
+}
+
+impl client::Part for GoogleAppsCardV1CardFixedFooter {}
+
+
+/// Represents a card header.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1CardHeader {
+    /// The alternative text of this image which is used for accessibility.
+    #[serde(rename="imageAltText")]
+    pub image_alt_text: Option<String>,
+    /// The image's type.
+    #[serde(rename="imageType")]
+    pub image_type: Option<String>,
+    /// The URL of the image in the card header.
+    #[serde(rename="imageUrl")]
+    pub image_url: Option<String>,
+    /// The subtitle of the card header.
+    pub subtitle: Option<String>,
+    /// Required. The title of the card header. The header has a fixed height: if both a title and subtitle are specified, each takes up one line. If only the title is specified, it takes up both lines.
+    pub title: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1CardHeader {}
+
+
+/// The widget that lets users to specify a date and time. Not supported by Google Chat apps.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1DateTimePicker {
+    /// The label for the field that displays to the user.
+    pub label: Option<String>,
+    /// The name of the text input that's used in `formInput`, and uniquely identifies this input.
+    pub name: Option<String>,
+    /// Triggered when the user clicks Save or Clear from the date/time picker dialog. This is only triggered if the value changed as a result of the Save/Clear operation.
+    #[serde(rename="onChangeAction")]
+    pub on_change_action: Option<GoogleAppsCardV1Action>,
+    /// The number representing the time zone offset from UTC, in minutes. If set, the `value_ms_epoch` is displayed in the specified time zone. If not set, it uses the user's time zone setting on the client side.
+    #[serde(rename="timezoneOffsetDate")]
+    pub timezone_offset_date: Option<i32>,
+    /// The type of the date/time picker.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The value to display as the default value before user input or previous user input. It is represented in milliseconds (Epoch time). For `DATE_AND_TIME` type, the full epoch value is used. For `DATE_ONLY` type, only date of the epoch time is used. For `TIME_ONLY` type, only time of the epoch time is used. For example, you can set epoch time to `3 * 60 * 60 * 1000` to represent 3am.
+    #[serde(rename="valueMsEpoch")]
+    pub value_ms_epoch: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1DateTimePicker {}
+
+
+/// A widget that displays text with optional decorations such as a label above or below the text, an icon in front of the text, a selection widget or a button after the text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1DecoratedText {
+    /// The formatted text label that shows below the main text.
+    #[serde(rename="bottomLabel")]
+    pub bottom_label: Option<String>,
+    /// A button that can be clicked to trigger an action.
+    pub button: Option<GoogleAppsCardV1Button>,
+    /// An icon displayed after the text.
+    #[serde(rename="endIcon")]
+    pub end_icon: Option<GoogleAppsCardV1Icon>,
+    /// Deprecated in favor of start_icon.
+    pub icon: Option<GoogleAppsCardV1Icon>,
+    /// Only the top and bottom label and content region are clickable.
+    #[serde(rename="onClick")]
+    pub on_click: Option<GoogleAppsCardV1OnClick>,
+    /// The icon displayed in front of the text.
+    #[serde(rename="startIcon")]
+    pub start_icon: Option<GoogleAppsCardV1Icon>,
+    /// A switch widget can be clicked to change its state or trigger an action.
+    #[serde(rename="switchControl")]
+    pub switch_control: Option<GoogleAppsCardV1SwitchControl>,
+    /// Required. The main widget formatted text. See Text formatting for details.
+    pub text: Option<String>,
+    /// The formatted text label that shows above the main text.
+    #[serde(rename="topLabel")]
+    pub top_label: Option<String>,
+    /// The wrap text setting. If `true`, the text is wrapped and displayed in multiline. Otherwise, the text is truncated.
+    #[serde(rename="wrapText")]
+    pub wrap_text: Option<bool>,
+}
+
+impl client::Part for GoogleAppsCardV1DecoratedText {}
+
+
+/// A divider that appears in between widgets.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Divider { _never_set: Option<bool> }
+
+impl client::Part for GoogleAppsCardV1Divider {}
+
+
+/// Represents a Grid widget that displays items in a configurable grid layout.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Grid {
+    /// The border style to apply to each grid item.
+    #[serde(rename="borderStyle")]
+    pub border_style: Option<GoogleAppsCardV1BorderStyle>,
+    /// The number of columns to display in the grid. A default value is used if this field isn't specified, and that default value is different depending on where the grid is shown (dialog versus companion).
+    #[serde(rename="columnCount")]
+    pub column_count: Option<i32>,
+    /// The items to display in the grid.
+    pub items: Option<Vec<GoogleAppsCardV1GridItem>>,
+    /// This callback is reused by each individual grid item, but with the item's identifier and index in the items list added to the callback's parameters.
+    #[serde(rename="onClick")]
+    pub on_click: Option<GoogleAppsCardV1OnClick>,
+    /// The text that displays in the grid header.
+    pub title: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1Grid {}
+
+
+/// Represents a single item in the grid layout.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1GridItem {
+    /// A user-specified identifier for this grid item. This identifier is returned in the parent Grid's onClick callback parameters.
+    pub id: Option<String>,
+    /// The image that displays in the grid item.
+    pub image: Option<GoogleAppsCardV1ImageComponent>,
+    /// The layout to use for the grid item.
+    pub layout: Option<String>,
+    /// The grid item's subtitle.
+    pub subtitle: Option<String>,
+    /// The horizontal alignment of the grid item's text.
+    #[serde(rename="textAlignment")]
+    pub text_alignment: Option<String>,
+    /// The grid item's title.
+    pub title: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1GridItem {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Icon {
+    /// The description of the icon, used for accessibility. The default value is provided if you don't specify one.
+    #[serde(rename="altText")]
+    pub alt_text: Option<String>,
+    /// The icon specified by a URL.
+    #[serde(rename="iconUrl")]
+    pub icon_url: Option<String>,
+    /// The crop style applied to the image. In some cases, applying a `CIRCLE` crop causes the image to be drawn larger than a standard icon.
+    #[serde(rename="imageType")]
+    pub image_type: Option<String>,
+    /// The icon specified by the string name of a list of known icons.
+    #[serde(rename="knownIcon")]
+    pub known_icon: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1Icon {}
+
+
+/// An image that is specified by a URL and can have an `onClick` action.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Image {
+    /// The alternative text of this image, used for accessibility.
+    #[serde(rename="altText")]
+    pub alt_text: Option<String>,
+    /// An image URL.
+    #[serde(rename="imageUrl")]
+    pub image_url: Option<String>,
+    /// The action triggered by an `onClick` event.
+    #[serde(rename="onClick")]
+    pub on_click: Option<GoogleAppsCardV1OnClick>,
+}
+
+impl client::Part for GoogleAppsCardV1Image {}
+
+
+/// Represents an image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1ImageComponent {
+    /// The accessibility label for the image.
+    #[serde(rename="altText")]
+    pub alt_text: Option<String>,
+    /// The border style to apply to the image.
+    #[serde(rename="borderStyle")]
+    pub border_style: Option<GoogleAppsCardV1BorderStyle>,
+    /// The crop style to apply to the image.
+    #[serde(rename="cropStyle")]
+    pub crop_style: Option<GoogleAppsCardV1ImageCropStyle>,
+    /// The image URL.
+    #[serde(rename="imageUri")]
+    pub image_uri: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1ImageComponent {}
+
+
+/// Represents the crop style applied to an image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1ImageCropStyle {
+    /// The aspect ratio to use if the crop type is `RECTANGLE_CUSTOM`.
+    #[serde(rename="aspectRatio")]
+    pub aspect_ratio: Option<f64>,
+    /// The crop type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1ImageCropStyle {}
+
+
+/// Represents the response to an `onClick` event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1OnClick {
+    /// If specified, an action is triggered by this `onClick`.
+    pub action: Option<GoogleAppsCardV1Action>,
+    /// A new card is pushed to the card stack after clicking if specified.
+    pub card: Option<GoogleAppsCardV1Card>,
+    /// An add-on triggers this action when the action needs to open a link. This differs from the `open_link` above in that this needs to talk to server to get the link. Thus some preparation work is required for web client to do before the open link action response comes back.
+    #[serde(rename="openDynamicLinkAction")]
+    pub open_dynamic_link_action: Option<GoogleAppsCardV1Action>,
+    /// If specified, this `onClick` triggers an open link action.
+    #[serde(rename="openLink")]
+    pub open_link: Option<GoogleAppsCardV1OpenLink>,
+}
+
+impl client::Part for GoogleAppsCardV1OnClick {}
+
+
+/// Represents an `onClick` event that opens a hyperlink.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1OpenLink {
+    /// Whether the client forgets about a link after opening it, or observes it until the window closes. Not supported by Chat apps.
+    #[serde(rename="onClose")]
+    pub on_close: Option<String>,
+    /// How to open a link. Not supported by Chat apps.
+    #[serde(rename="openAs")]
+    pub open_as: Option<String>,
+    /// The URL to open.
+    pub url: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1OpenLink {}
+
+
+/// A section contains a collection of widgets that are rendered vertically in the order that they are specified. Across all platforms, cards have a narrow fixed width, so there is currently no need for layout properties, for example, float.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Section {
+    /// Indicates whether this section is collapsible. If a section is collapsible, the description must be given.
+    pub collapsible: Option<bool>,
+    /// The header of the section. Formatted text is supported.
+    pub header: Option<String>,
+    /// The number of uncollapsible widgets. For example, when a section contains five widgets and the `uncollapsibleWidgetsCount` is set to `2`, the first two widgets are always shown and the last three are collapsed as default. The `uncollapsibleWidgetsCount` is taken into account only when `collapsible` is `true`.
+    #[serde(rename="uncollapsibleWidgetsCount")]
+    pub uncollapsible_widgets_count: Option<i32>,
+    /// A section must contain at least 1 widget.
+    pub widgets: Option<Vec<GoogleAppsCardV1Widget>>,
+}
+
+impl client::Part for GoogleAppsCardV1Section {}
+
+
+/// A widget that creates a UI item with options for users to select. For example, a dropdown menu.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1SelectionInput {
+    /// An array of the selected items.
+    pub items: Option<Vec<GoogleAppsCardV1SelectionItem>>,
+    /// The label displayed ahead of the switch control.
+    pub label: Option<String>,
+    /// The name of the text input which is used in `formInput`.
+    pub name: Option<String>,
+    /// If specified, the form is submitted when the selection changes. If not specified, you must specify a separate button.
+    #[serde(rename="onChangeAction")]
+    pub on_change_action: Option<GoogleAppsCardV1Action>,
+    /// The type of the selection.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1SelectionInput {}
+
+
+/// A selectable item in the switch control.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1SelectionItem {
+    /// If more than one item is selected for `RADIO_BUTTON` and `DROPDOWN`, the first selected item is treated as selected and the ones after are ignored.
+    pub selected: Option<bool>,
+    /// The text to be displayed.
+    pub text: Option<String>,
+    /// The value associated with this item. The client should use this as a form input value.
+    pub value: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1SelectionItem {}
+
+
+/// A suggestion item.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1SuggestionItem {
+    /// The suggested autocomplete result.
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1SuggestionItem {}
+
+
+/// A container wrapping elements necessary for showing suggestion items used in text input autocomplete.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Suggestions {
+    /// A list of suggestions used for autocomplete recommendations.
+    pub items: Option<Vec<GoogleAppsCardV1SuggestionItem>>,
+}
+
+impl client::Part for GoogleAppsCardV1Suggestions {}
+
+
+/// Either a toggle-style switch or a checkbox.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1SwitchControl {
+    /// The control type, either switch or checkbox.
+    #[serde(rename="controlType")]
+    pub control_type: Option<String>,
+    /// The name of the switch widget that's used in `formInput`.
+    pub name: Option<String>,
+    /// The action when the switch state is changed.
+    #[serde(rename="onChangeAction")]
+    pub on_change_action: Option<GoogleAppsCardV1Action>,
+    /// If the switch is selected.
+    pub selected: Option<bool>,
+    /// The value is what is passed back in the callback.
+    pub value: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1SwitchControl {}
+
+
+/// A text input is a UI item where users can input text. A text input can also have an onChange action and suggestions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1TextInput {
+    /// The refresh function that returns suggestions based on the user's input text. If the callback is not specified, autocomplete is done in client side based on the initial suggestion items.
+    #[serde(rename="autoCompleteAction")]
+    pub auto_complete_action: Option<GoogleAppsCardV1Action>,
+    /// The hint text.
+    #[serde(rename="hintText")]
+    pub hint_text: Option<String>,
+    /// The initial suggestions made before any user input.
+    #[serde(rename="initialSuggestions")]
+    pub initial_suggestions: Option<GoogleAppsCardV1Suggestions>,
+    /// At least one of label and hintText must be specified.
+    pub label: Option<String>,
+    /// The name of the text input which is used in `formInput`.
+    pub name: Option<String>,
+    /// The onChange action, for example, invoke a function.
+    #[serde(rename="onChangeAction")]
+    pub on_change_action: Option<GoogleAppsCardV1Action>,
+    /// The style of the text, for example, a single line or multiple lines.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The default value when there is no input from the user.
+    pub value: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1TextInput {}
+
+
+/// A paragraph of text that supports formatting. See [Text formatting](workspace/add-ons/concepts/widgets#text_formatting") for details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1TextParagraph {
+    /// The text that's shown in the widget.
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleAppsCardV1TextParagraph {}
+
+
+/// A widget is a UI element that presents texts, images, etc.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleAppsCardV1Widget {
+    /// A list of buttons. For example, the following JSON creates two buttons. The first is a filled text button and the second is an image button that opens a link: ``` "buttonList": { "buttons": [ "button": { "text": "Edit", "Color": { "Red": 255 "Green": 255 "Blue": 255 } "disabled": true }, "button": { "icon": { "knownIcon": "INVITE" "altText": "check calendar" }, "onClick": { "openLink": { "url": "https://example.com/calendar" } } }, ] } ```
+    #[serde(rename="buttonList")]
+    pub button_list: Option<GoogleAppsCardV1ButtonList>,
+    /// Displays a selection/input widget for date/time. For example, the following JSON creates a date/time picker for an appointment time: ``` "date_time_picker": { "name": "appointment_time", "label": "Book your appointment at:", "type": "DateTimePickerType.DATE_AND_TIME", "valueMsEpoch": "796435200000" } ```
+    #[serde(rename="dateTimePicker")]
+    pub date_time_picker: Option<GoogleAppsCardV1DateTimePicker>,
+    /// Displays a decorated text item in this widget. For example, the following JSON creates a decorated text widget showing email address: ``` "decoratedText": { "icon": { "knownIcon": "EMAIL" }, "topLabel": "Email Address", "content": "sasha@example.com", "bottomLabel": "This is a new Email address!", "switchWidget": { "name": "has_send_welcome_email_to_sasha", "selected": false, "controlType": "ControlType.CHECKBOX" } } ```
+    #[serde(rename="decoratedText")]
+    pub decorated_text: Option<GoogleAppsCardV1DecoratedText>,
+    /// Displays a divider. For example, the following JSON creates a divider: ``` "divider": { } ```
+    pub divider: Option<GoogleAppsCardV1Divider>,
+    /// Displays a grid with a collection of items. For example, the following JSON creates a 2 column grid with a single item: ``` "grid": { "title": "A fine collection of items", "numColumns": 2, "borderStyle": { "type": "STROKE", "cornerRadius": 4.0 }, "items": [ "image": { "imageUri": "https://www.example.com/image.png", "cropStyle": { "type": "SQUARE" }, "borderStyle": { "type": "STROKE" } }, "title": "An item", "textAlignment": "CENTER" ], "onClick": { "openLink": { "url":"https://www.example.com" } } } ```
+    pub grid: Option<GoogleAppsCardV1Grid>,
+    /// The horizontal alignment of this widget.
+    #[serde(rename="horizontalAlignment")]
+    pub horizontal_alignment: Option<String>,
+    /// Displays an image in this widget. For example, the following JSON creates an image with alternative text: ``` "image": { "imageUrl": "https://example.com/sasha.png" "altText": "Avatar for Sasha" } ```
+    pub image: Option<GoogleAppsCardV1Image>,
+    /// Displays a switch control in this widget. For example, the following JSON creates a dropdown selection for size: ``` "switchControl": { "name": "size", "label": "Size" "type": "SelectionType.DROPDOWN", "items": [ { "text": "S", "value": "small", "selected": false }, { "text": "M", "value": "medium", "selected": true }, { "text": "L", "value": "large", "selected": false }, { "text": "XL", "value": "extra_large", "selected": false } ] } ```
+    #[serde(rename="selectionInput")]
+    pub selection_input: Option<GoogleAppsCardV1SelectionInput>,
+    /// Displays a text input in this widget. For example, the following JSON creates a text input for mail address: ``` "textInput": { "name": "mailing_address", "label": "Mailing Address" } ``` As another example, the following JSON creates a text input for programming language with static suggestions: ``` "textInput": { "name": "preferred_programing_language", "label": "Preferred Language", "initialSuggestions": { "items": [ { "text": "C++" }, { "text": "Java" }, { "text": "JavaScript" }, { "text": "Python" } ] } } ```
+    #[serde(rename="textInput")]
+    pub text_input: Option<GoogleAppsCardV1TextInput>,
+    /// Displays a text paragraph in this widget. For example, the following JSON creates a bolded text: ``` "textParagraph": { "text": " *bold text*" } ```
+    #[serde(rename="textParagraph")]
+    pub text_paragraph: Option<GoogleAppsCardV1TextParagraph>,
+}
+
+impl client::Part for GoogleAppsCardV1Widget {}
 
 
 /// An image that is specified by a URL and can have an onclick action.
@@ -491,6 +1177,19 @@ pub struct ListSpacesResponse {
 impl client::ResponseResult for ListSpacesResponse {}
 
 
+/// A matched url in a Chat message. Chat bots can unfurl matched URLs. For more information, refer to [Unfurl links](/chat/how-tos/link-unfurling).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MatchedUrl {
+    /// The url that was matched.
+    pub url: Option<String>,
+}
+
+impl client::Part for MatchedUrl {}
+
+
 /// Media resource.
 /// 
 /// # Activities
@@ -510,7 +1209,7 @@ pub struct Media {
 impl client::ResponseResult for Media {}
 
 
-/// Represents a membership relation in Hangouts Chat.
+/// Represents a membership relation in Google Chat.
 /// 
 /// # Activities
 /// 
@@ -521,21 +1220,21 @@ impl client::ResponseResult for Media {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Membership {
-    /// The creation time of the membership a.k.a the time at which the member joined the space, if applicable.
+    /// Output only. The creation time of the membership a.k.a. the time at which the member joined the space, if applicable.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// A User in Hangout Chat
+    /// A user in Google Chat. Represents a [person](https://developers.google.com/people/api/rest/v1/people) in the People API or a [user](https://developers.google.com/admin-sdk/directory/reference/rest/v1/users) in the Admin SDK Directory API. Format: `users/{user}`
     pub member: Option<User>,
     /// no description provided
     pub name: Option<String>,
-    /// State of the membership.
+    /// Output only. State of the membership.
     pub state: Option<String>,
 }
 
 impl client::ResponseResult for Membership {}
 
 
-/// A message in Hangouts Chat.
+/// A message in Google Chat.
 /// 
 /// # Activities
 /// 
@@ -567,13 +1266,19 @@ pub struct Message {
     pub attachment: Option<Vec<Attachment>>,
     /// Rich, formatted and interactive cards that can be used to display UI elements such as: formatted texts, buttons, clickable images. Cards are normally displayed below the plain-text body of the message.
     pub cards: Option<Vec<Card>>,
-    /// Output only. The time at which the message was created in Hangouts Chat server.
+    /// Output only. The time at which the message was created in Google Chat server.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
     /// A plain-text description of the message's cards, used when the actual cards cannot be displayed (e.g. mobile notifications).
     #[serde(rename="fallbackText")]
     pub fallback_text: Option<String>,
-    /// no description provided
+    /// Output only. The time at which the message was last updated in Google Chat server. If the message was never updated, this field will be same as create_time.
+    #[serde(rename="lastUpdateTime")]
+    pub last_update_time: Option<String>,
+    /// A URL in `spaces.messages.text` that matches a link unfurling pattern. For more information, refer to [Unfurl links](/chat/how-tos/link-unfurling).
+    #[serde(rename="matchedUrl")]
+    pub matched_url: Option<MatchedUrl>,
+    /// Resource name in the form `spaces/*/messages/*`. Example: `spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB`
     pub name: Option<String>,
     /// Text for generating preview chips. This text will not be displayed to the user, but any links to images, web pages, videos, etc. included here will generate preview chips.
     #[serde(rename="previewText")]
@@ -639,7 +1344,7 @@ pub struct Section {
 impl client::Part for Section {}
 
 
-/// A Slash Command in Chat.
+/// A [slash command](https://developers.google.com/chat/how-tos/slash-commands) in Google Chat.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -678,7 +1383,7 @@ pub struct SlashCommandMetadata {
 impl client::Part for SlashCommandMetadata {}
 
 
-/// A room or DM in Hangouts Chat.
+/// A space in Google Chat. Spaces are conversations between two or more users or 1:1 messages between a user and a Chat bot.
 /// 
 /// # Activities
 /// 
@@ -698,17 +1403,17 @@ impl client::Part for SlashCommandMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Space {
-    /// Output only. The display name (only if the space is a room). Please note that this field might not be populated in direct messages between humans.
+    /// The space's display name. For direct messages between humans, this field might be empty.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Resource name of the space, in the form "spaces/*". Example: spaces/AAAAMpdlehYs
+    /// Resource name of the space, in the form "spaces/*". Example: spaces/AAAAAAAAAAAA
     pub name: Option<String>,
-    /// Whether the space is a DM between a bot and a single human.
+    /// Output only. Whether the space is a DM between a bot and a single human.
     #[serde(rename="singleUserBotDm")]
     pub single_user_bot_dm: Option<bool>,
-    /// Whether the messages are threaded in this space.
+    /// Output only. Whether the messages are threaded in this space.
     pub threaded: Option<bool>,
-    /// Output only. The type of a space. This is deprecated. Use `single_user_bot_dm` instead.
+    /// Deprecated. Use `single_user_bot_dm` instead. Output only. The type of a space.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -746,13 +1451,13 @@ pub struct TextParagraph {
 impl client::Part for TextParagraph {}
 
 
-/// A thread in Hangouts Chat.
+/// A thread in Google Chat.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Thread {
-    /// Resource name, in the form "spaces/*/threads/*". Example: spaces/AAAAMpdlehY/threads/UMxbHmzDlr4
+    /// Resource name, in the form "spaces/*/threads/*". Example: spaces/AAAAAAAAAAA/threads/TTTTTTTTTTT
     pub name: Option<String>,
 }
 
@@ -768,13 +1473,13 @@ pub struct User {
     /// The user's display name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Obfuscated domain information.
+    /// Unique identifier of the user's Google Workspace domain.
     #[serde(rename="domainId")]
     pub domain_id: Option<String>,
     /// True when the user is deleted or the user's profile is not visible.
     #[serde(rename="isAnonymous")]
     pub is_anonymous: Option<bool>,
-    /// Resource name, in the format "users/*".
+    /// Resource name for a Google Chat user. Represents a [person](https://developers.google.com/people/api/rest/v1/people#Person) in the People API or a [user](https://developers.google.com/admin-sdk/directory/reference/rest/v1/users) in the Admin SDK Directory API. Formatted as: `users/{user}`
     pub name: Option<String>,
     /// User type.
     #[serde(rename="type")]
@@ -836,18 +1541,16 @@ impl client::Part for WidgetMarkup {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_chat1 as chat1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use chat1::HangoutsChat;
+/// use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -873,13 +1576,14 @@ impl<'a> DmMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn conversations_messages(&self, request: Message, parent: &str) -> DmConversationMessageCall<'a> {
         DmConversationMessageCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -892,13 +1596,14 @@ impl<'a> DmMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn messages(&self, request: Message, parent: &str) -> DmMessageCall<'a> {
         DmMessageCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -911,13 +1616,14 @@ impl<'a> DmMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn webhooks(&self, request: Message, parent: &str) -> DmWebhookCall<'a> {
         DmWebhookCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -936,18 +1642,16 @@ impl<'a> DmMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_chat1 as chat1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use chat1::HangoutsChat;
+/// use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -995,18 +1699,16 @@ impl<'a> MediaMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_chat1 as chat1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use chat1::HangoutsChat;
+/// use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -1032,13 +1734,14 @@ impl<'a> RoomMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn conversations_messages(&self, request: Message, parent: &str) -> RoomConversationMessageCall<'a> {
         RoomConversationMessageCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1051,13 +1754,14 @@ impl<'a> RoomMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn messages(&self, request: Message, parent: &str) -> RoomMessageCall<'a> {
         RoomMessageCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1070,13 +1774,14 @@ impl<'a> RoomMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn webhooks(&self, request: Message, parent: &str) -> RoomWebhookCall<'a> {
         RoomWebhookCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1095,18 +1800,16 @@ impl<'a> RoomMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_chat1 as chat1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use chat1::HangoutsChat;
+/// use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -1131,7 +1834,7 @@ impl<'a> SpaceMethods<'a> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the membership to be retrieved, in the form "spaces/*/members/*". Example: spaces/AAAAMpdlehY/members/105115627578887013105
+    /// * `name` - Required. Resource name of the membership to be retrieved, in the form "spaces/*/members/*". Example: spaces/AAAAAAAAAAAA/members/111111111111111111111
     pub fn members_get(&self, name: &str) -> SpaceMemberGetCall<'a> {
         SpaceMemberGetCall {
             hub: self.hub,
@@ -1147,7 +1850,7 @@ impl<'a> SpaceMethods<'a> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The resource name of the space for which membership list is to be fetched, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. The resource name of the space for which membership list is to be fetched, in the form "spaces/*". Example: spaces/AAAAAAAAAAAA
     pub fn members_list(&self, parent: &str) -> SpaceMemberListCall<'a> {
         SpaceMemberListCall {
             hub: self.hub,
@@ -1182,13 +1885,14 @@ impl<'a> SpaceMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn messages_create(&self, request: Message, parent: &str) -> SpaceMessageCreateCall<'a> {
         SpaceMessageCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1200,7 +1904,7 @@ impl<'a> SpaceMethods<'a> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the message to be deleted, in the form "spaces/*/messages/*" Example: spaces/AAAAMpdlehY/messages/UMxbHmzDlr4.UMxbHmzDlr4
+    /// * `name` - Required. Resource name of the message to be deleted, in the form "spaces/*/messages/*" Example: spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB
     pub fn messages_delete(&self, name: &str) -> SpaceMessageDeleteCall<'a> {
         SpaceMessageDeleteCall {
             hub: self.hub,
@@ -1216,7 +1920,7 @@ impl<'a> SpaceMethods<'a> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the message to be retrieved, in the form "spaces/*/messages/*". Example: spaces/AAAAMpdlehY/messages/UMxbHmzDlr4.UMxbHmzDlr4
+    /// * `name` - Required. Resource name of the message to be retrieved, in the form "spaces/*/messages/*". Example: spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB
     pub fn messages_get(&self, name: &str) -> SpaceMessageGetCall<'a> {
         SpaceMessageGetCall {
             hub: self.hub,
@@ -1233,7 +1937,7 @@ impl<'a> SpaceMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - No description provided.
+    /// * `name` - Resource name in the form `spaces/*/messages/*`. Example: `spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB`
     pub fn messages_update(&self, request: Message, name: &str) -> SpaceMessageUpdateCall<'a> {
         SpaceMessageUpdateCall {
             hub: self.hub,
@@ -1251,7 +1955,7 @@ impl<'a> SpaceMethods<'a> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the space, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `name` - Required. Resource name of the space, in the form "spaces/*". Example: spaces/AAAAAAAAAAAA
     pub fn get(&self, name: &str) -> SpaceGetCall<'a> {
         SpaceGetCall {
             hub: self.hub,
@@ -1281,13 +1985,14 @@ impl<'a> SpaceMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     pub fn webhooks(&self, request: Message, parent: &str) -> SpaceWebhookCall<'a> {
         SpaceWebhookCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _thread_key: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1314,18 +2019,16 @@ impl<'a> SpaceMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -1337,7 +2040,8 @@ impl<'a> SpaceMethods<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.dms().conversations_messages(req, "parent")
-///              .thread_key("sed")
+///              .thread_key("amet.")
+///              .request_id("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1348,6 +2052,7 @@ pub struct DmConversationMessageCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -1370,12 +2075,15 @@ impl<'a> DmConversationMessageCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.dms.conversations.messages",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -1468,22 +2176,22 @@ impl<'a> DmConversationMessageCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1515,7 +2223,7 @@ impl<'a> DmConversationMessageCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -1525,11 +2233,18 @@ impl<'a> DmConversationMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> DmConversationMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> DmConversationMessageCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1584,18 +2299,16 @@ impl<'a> DmConversationMessageCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -1607,7 +2320,8 @@ impl<'a> DmConversationMessageCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.dms().messages(req, "parent")
-///              .thread_key("takimata")
+///              .thread_key("gubergren")
+///              .request_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1618,6 +2332,7 @@ pub struct DmMessageCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -1640,12 +2355,15 @@ impl<'a> DmMessageCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.dms.messages",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -1738,22 +2456,22 @@ impl<'a> DmMessageCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1785,7 +2503,7 @@ impl<'a> DmMessageCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -1795,11 +2513,18 @@ impl<'a> DmMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> DmMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> DmMessageCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1854,18 +2579,16 @@ impl<'a> DmMessageCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -1877,7 +2600,8 @@ impl<'a> DmMessageCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.dms().webhooks(req, "parent")
-///              .thread_key("duo")
+///              .thread_key("eos")
+///              .request_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1888,6 +2612,7 @@ pub struct DmWebhookCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -1910,12 +2635,15 @@ impl<'a> DmWebhookCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.dms.webhooks",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -2008,22 +2736,22 @@ impl<'a> DmWebhookCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2055,7 +2783,7 @@ impl<'a> DmWebhookCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2065,11 +2793,18 @@ impl<'a> DmWebhookCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> DmWebhookCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> DmWebhookCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2129,17 +2864,15 @@ impl<'a> DmWebhookCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2273,22 +3006,22 @@ impl<'a> MediaDownloadCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = if enable_resource_parsing {
@@ -2373,18 +3106,16 @@ impl<'a> MediaDownloadCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2396,7 +3127,8 @@ impl<'a> MediaDownloadCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().conversations_messages(req, "parent")
-///              .thread_key("Lorem")
+///              .thread_key("invidunt")
+///              .request_id("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2407,6 +3139,7 @@ pub struct RoomConversationMessageCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -2429,12 +3162,15 @@ impl<'a> RoomConversationMessageCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.rooms.conversations.messages",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -2527,22 +3263,22 @@ impl<'a> RoomConversationMessageCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2574,7 +3310,7 @@ impl<'a> RoomConversationMessageCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2584,11 +3320,18 @@ impl<'a> RoomConversationMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> RoomConversationMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> RoomConversationMessageCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2643,18 +3386,16 @@ impl<'a> RoomConversationMessageCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2666,7 +3407,8 @@ impl<'a> RoomConversationMessageCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().messages(req, "parent")
-///              .thread_key("eos")
+///              .thread_key("ipsum")
+///              .request_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2677,6 +3419,7 @@ pub struct RoomMessageCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -2699,12 +3442,15 @@ impl<'a> RoomMessageCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.rooms.messages",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -2797,22 +3543,22 @@ impl<'a> RoomMessageCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2844,7 +3590,7 @@ impl<'a> RoomMessageCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2854,11 +3600,18 @@ impl<'a> RoomMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> RoomMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> RoomMessageCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2913,18 +3666,16 @@ impl<'a> RoomMessageCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2936,7 +3687,8 @@ impl<'a> RoomMessageCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().webhooks(req, "parent")
-///              .thread_key("ea")
+///              .thread_key("gubergren")
+///              .request_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2947,6 +3699,7 @@ pub struct RoomWebhookCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -2969,12 +3722,15 @@ impl<'a> RoomWebhookCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.rooms.webhooks",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -3067,22 +3823,22 @@ impl<'a> RoomWebhookCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3114,7 +3870,7 @@ impl<'a> RoomWebhookCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3124,11 +3880,18 @@ impl<'a> RoomWebhookCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> RoomWebhookCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> RoomWebhookCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3183,17 +3946,15 @@ impl<'a> RoomWebhookCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3311,22 +4072,22 @@ impl<'a> SpaceMemberGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3349,7 +4110,7 @@ impl<'a> SpaceMemberGetCall<'a> {
     }
 
 
-    /// Required. Resource name of the membership to be retrieved, in the form "spaces/*/members/*". Example: spaces/AAAAMpdlehY/members/105115627578887013105
+    /// Required. Resource name of the membership to be retrieved, in the form "spaces/*/members/*". Example: spaces/AAAAAAAAAAAA/members/111111111111111111111
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3411,25 +4172,23 @@ impl<'a> SpaceMemberGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spaces().members_list("parent")
-///              .page_token("amet")
-///              .page_size(-20)
+///              .page_token("ipsum")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3549,22 +4308,22 @@ impl<'a> SpaceMemberListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3587,7 +4346,7 @@ impl<'a> SpaceMemberListCall<'a> {
     }
 
 
-    /// Required. The resource name of the space for which membership list is to be fetched, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. The resource name of the space for which membership list is to be fetched, in the form "spaces/*". Example: spaces/AAAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3663,17 +4422,15 @@ impl<'a> SpaceMemberListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -3791,22 +4548,22 @@ impl<'a> SpaceMessageAttachmentGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -3891,18 +4648,16 @@ impl<'a> SpaceMessageAttachmentGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -3914,7 +4669,8 @@ impl<'a> SpaceMessageAttachmentGetCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spaces().messages_create(req, "parent")
-///              .thread_key("ut")
+///              .thread_key("dolor")
+///              .request_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3925,6 +4681,7 @@ pub struct SpaceMessageCreateCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -3947,12 +4704,15 @@ impl<'a> SpaceMessageCreateCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.spaces.messages.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -4045,22 +4805,22 @@ impl<'a> SpaceMessageCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4092,7 +4852,7 @@ impl<'a> SpaceMessageCreateCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4102,11 +4862,18 @@ impl<'a> SpaceMessageCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> SpaceMessageCreateCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> SpaceMessageCreateCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4161,17 +4928,15 @@ impl<'a> SpaceMessageCreateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4289,22 +5054,22 @@ impl<'a> SpaceMessageDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4327,7 +5092,7 @@ impl<'a> SpaceMessageDeleteCall<'a> {
     }
 
 
-    /// Required. Resource name of the message to be deleted, in the form "spaces/*/messages/*" Example: spaces/AAAAMpdlehY/messages/UMxbHmzDlr4.UMxbHmzDlr4
+    /// Required. Resource name of the message to be deleted, in the form "spaces/*/messages/*" Example: spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4389,17 +5154,15 @@ impl<'a> SpaceMessageDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -4517,22 +5280,22 @@ impl<'a> SpaceMessageGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4555,7 +5318,7 @@ impl<'a> SpaceMessageGetCall<'a> {
     }
 
 
-    /// Required. Resource name of the message to be retrieved, in the form "spaces/*/messages/*". Example: spaces/AAAAMpdlehY/messages/UMxbHmzDlr4.UMxbHmzDlr4
+    /// Required. Resource name of the message to be retrieved, in the form "spaces/*/messages/*". Example: spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4617,18 +5380,16 @@ impl<'a> SpaceMessageGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -4640,7 +5401,7 @@ impl<'a> SpaceMessageGetCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spaces().messages_update(req, "name")
-///              .update_mask("ipsum")
+///              .update_mask("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4771,22 +5532,22 @@ impl<'a> SpaceMessageUpdateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -4818,6 +5579,7 @@ impl<'a> SpaceMessageUpdateCall<'a> {
         self._request = new_value;
         self
     }
+    /// Resource name in the form `spaces/*/messages/*`. Example: `spaces/AAAAAAAAAAA/messages/BBBBBBBBBBB.BBBBBBBBBBB`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4827,7 +5589,7 @@ impl<'a> SpaceMessageUpdateCall<'a> {
         self._name = new_value.to_string();
         self
     }
-    /// Required. The field paths to be updated, comma separated if there are multiple. Currently supported field paths: * text * cards
+    /// Required. The field paths to be updated, comma separated if there are multiple. Currently supported field paths: * text * cards * attachment
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> SpaceMessageUpdateCall<'a> {
@@ -4886,17 +5648,15 @@ impl<'a> SpaceMessageUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -5014,22 +5774,22 @@ impl<'a> SpaceGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5052,7 +5812,7 @@ impl<'a> SpaceGetCall<'a> {
     }
 
 
-    /// Required. Resource name of the space, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Resource name of the space, in the form "spaces/*". Example: spaces/AAAAAAAAAAAA
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5114,25 +5874,23 @@ impl<'a> SpaceGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spaces().list()
-///              .page_token("est")
-///              .page_size(-62)
+///              .page_token("no")
+///              .page_size(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5225,22 +5983,22 @@ impl<'a> SpaceListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5329,18 +6087,16 @@ impl<'a> SpaceListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_chat1 as chat1;
 /// use chat1::api::Message;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use chat1::HangoutsChat;
+/// # use chat1::{HangoutsChat, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = HangoutsChat::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -5352,7 +6108,8 @@ impl<'a> SpaceListCall<'a> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spaces().webhooks(req, "parent")
-///              .thread_key("dolor")
+///              .thread_key("et")
+///              .request_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5363,6 +6120,7 @@ pub struct SpaceWebhookCall<'a>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
+    _request_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -5385,12 +6143,15 @@ impl<'a> SpaceWebhookCall<'a> {
         };
         dlg.begin(client::MethodInfo { id: "chat.spaces.webhooks",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._thread_key {
             params.push(("threadKey", value.to_string()));
         }
-        for &field in ["alt", "parent", "threadKey"].iter() {
+        if let Some(value) = self._request_id {
+            params.push(("requestId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "threadKey", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -5483,22 +6244,22 @@ impl<'a> SpaceWebhookCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5530,7 +6291,7 @@ impl<'a> SpaceWebhookCall<'a> {
         self._request = new_value;
         self
     }
-    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
+    /// Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAAAAAAAA
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5540,11 +6301,18 @@ impl<'a> SpaceWebhookCall<'a> {
         self._parent = new_value.to_string();
         self
     }
-    /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
+    /// Optional. Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Google Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
     pub fn thread_key(mut self, new_value: &str) -> SpaceWebhookCall<'a> {
         self._thread_key = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A unique request ID for this message. Specifying an existing request ID returns the message created with that ID instead of creating a new message.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> SpaceWebhookCall<'a> {
+        self._request_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

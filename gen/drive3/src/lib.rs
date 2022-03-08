@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *2.0.10+20210322*, where *20210322* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.10*.
+//! This documentation was generated from *drive* crate version *3.0.0+20220225*, where *20220225* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).

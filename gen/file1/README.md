@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-file1` library allows access to all features of the *Google Cloud Filestore* service.
 
-This documentation was generated from *Cloud Filestore* crate version *2.0.8+20210323*, where *20210323* is the exact revision of the *file:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+This documentation was generated from *Cloud Filestore* crate version *3.0.0+20220214*, where *20220214* is the exact revision of the *file:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 
 Everything else about the *Cloud Filestore* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/filestore/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-file1/2.0.8+20210323/google_file1/CloudFilestore) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-file1/3.0.0+20220214/google_file1/CloudFilestore) ... 
 
 * projects
- * [*locations backups create*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationBackupCreateCall), [*locations backups delete*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationBackupDeleteCall), [*locations backups get*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationBackupGetCall), [*locations backups list*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationBackupListCall), [*locations backups patch*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationBackupPatchCall), [*locations get*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationGetCall), [*locations instances create*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationInstanceCreateCall), [*locations instances delete*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationInstanceDeleteCall), [*locations instances get*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationInstanceGetCall), [*locations instances list*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationInstanceListCall), [*locations instances patch*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationInstancePatchCall), [*locations instances restore*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationInstanceRestoreCall), [*locations list*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationOperationGetCall) and [*locations operations list*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/api::ProjectLocationOperationListCall)
+ * [*locations backups create*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationBackupCreateCall), [*locations backups delete*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationBackupDeleteCall), [*locations backups get*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationBackupGetCall), [*locations backups list*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationBackupListCall), [*locations backups patch*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationBackupPatchCall), [*locations get*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationGetCall), [*locations instances create*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceCreateCall), [*locations instances delete*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceDeleteCall), [*locations instances get*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceGetCall), [*locations instances list*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceListCall), [*locations instances patch*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstancePatchCall), [*locations instances restore*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceRestoreCall), [*locations instances snapshots create*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationOperationGetCall) and [*locations operations list*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/api::ProjectLocationOperationListCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-file1/2.0.8+20210323/google_file1/CloudFilestore)**
+* **[Hub](https://docs.rs/google-file1/3.0.0+20220214/google_file1/CloudFilestore)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Part)**
+    * **[Parts](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -50,6 +50,9 @@ Or specifically ...
 let r = hub.projects().locations_backups_create(...).doit().await
 let r = hub.projects().locations_backups_delete(...).doit().await
 let r = hub.projects().locations_backups_patch(...).doit().await
+let r = hub.projects().locations_instances_snapshots_create(...).doit().await
+let r = hub.projects().locations_instances_snapshots_delete(...).doit().await
+let r = hub.projects().locations_instances_snapshots_patch(...).doit().await
 let r = hub.projects().locations_instances_create(...).doit().await
 let r = hub.projects().locations_instances_delete(...).doit().await
 let r = hub.projects().locations_instances_patch(...).doit().await
@@ -71,11 +74,8 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 google-file1 = "*"
-hyper = "^0.14"
-hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -83,13 +83,11 @@ yup-oauth2 = "^5.0"
 ```Rust
 extern crate hyper;
 extern crate hyper_rustls;
-extern crate yup_oauth2 as oauth2;
 extern crate google_file1 as file1;
 use file1::api::Backup;
 use file1::{Result, Error};
 use std::default::Default;
-use oauth2;
-use file1::CloudFilestore;
+use file1::{CloudFilestore, oauth2, hyper, hyper_rustls};
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -99,9 +97,9 @@ let secret: oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
-        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
 let mut hub = CloudFilestore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // As the method needs a request, you would usually fill it with the desired information
@@ -137,17 +135,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -157,29 +155,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::RequestValue) and 
-[decodable](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::RequestValue) and 
+[decodable](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-file1/2.0.8+20210323/google_file1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-file1/3.0.0+20220214/google_file1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

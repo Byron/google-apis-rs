@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dataproc* crate version *2.0.8+20210322*, where *20210322* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Dataproc* crate version *3.0.0+20220224*, where *20220224* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Dataproc) ... 
 //! 
 //! * projects
-//!  * [*locations autoscaling policies create*](api::ProjectLocationAutoscalingPolicyCreateCall), [*locations autoscaling policies delete*](api::ProjectLocationAutoscalingPolicyDeleteCall), [*locations autoscaling policies get*](api::ProjectLocationAutoscalingPolicyGetCall), [*locations autoscaling policies get iam policy*](api::ProjectLocationAutoscalingPolicyGetIamPolicyCall), [*locations autoscaling policies list*](api::ProjectLocationAutoscalingPolicyListCall), [*locations autoscaling policies set iam policy*](api::ProjectLocationAutoscalingPolicySetIamPolicyCall), [*locations autoscaling policies test iam permissions*](api::ProjectLocationAutoscalingPolicyTestIamPermissionCall), [*locations autoscaling policies update*](api::ProjectLocationAutoscalingPolicyUpdateCall), [*locations workflow templates create*](api::ProjectLocationWorkflowTemplateCreateCall), [*locations workflow templates delete*](api::ProjectLocationWorkflowTemplateDeleteCall), [*locations workflow templates get*](api::ProjectLocationWorkflowTemplateGetCall), [*locations workflow templates get iam policy*](api::ProjectLocationWorkflowTemplateGetIamPolicyCall), [*locations workflow templates instantiate*](api::ProjectLocationWorkflowTemplateInstantiateCall), [*locations workflow templates instantiate inline*](api::ProjectLocationWorkflowTemplateInstantiateInlineCall), [*locations workflow templates list*](api::ProjectLocationWorkflowTemplateListCall), [*locations workflow templates set iam policy*](api::ProjectLocationWorkflowTemplateSetIamPolicyCall), [*locations workflow templates test iam permissions*](api::ProjectLocationWorkflowTemplateTestIamPermissionCall), [*locations workflow templates update*](api::ProjectLocationWorkflowTemplateUpdateCall), [*regions autoscaling policies create*](api::ProjectRegionAutoscalingPolicyCreateCall), [*regions autoscaling policies delete*](api::ProjectRegionAutoscalingPolicyDeleteCall), [*regions autoscaling policies get*](api::ProjectRegionAutoscalingPolicyGetCall), [*regions autoscaling policies get iam policy*](api::ProjectRegionAutoscalingPolicyGetIamPolicyCall), [*regions autoscaling policies list*](api::ProjectRegionAutoscalingPolicyListCall), [*regions autoscaling policies set iam policy*](api::ProjectRegionAutoscalingPolicySetIamPolicyCall), [*regions autoscaling policies test iam permissions*](api::ProjectRegionAutoscalingPolicyTestIamPermissionCall), [*regions autoscaling policies update*](api::ProjectRegionAutoscalingPolicyUpdateCall), [*regions clusters create*](api::ProjectRegionClusterCreateCall), [*regions clusters delete*](api::ProjectRegionClusterDeleteCall), [*regions clusters diagnose*](api::ProjectRegionClusterDiagnoseCall), [*regions clusters get*](api::ProjectRegionClusterGetCall), [*regions clusters get iam policy*](api::ProjectRegionClusterGetIamPolicyCall), [*regions clusters inject credentials*](api::ProjectRegionClusterInjectCredentialCall), [*regions clusters list*](api::ProjectRegionClusterListCall), [*regions clusters patch*](api::ProjectRegionClusterPatchCall), [*regions clusters set iam policy*](api::ProjectRegionClusterSetIamPolicyCall), [*regions clusters start*](api::ProjectRegionClusterStartCall), [*regions clusters stop*](api::ProjectRegionClusterStopCall), [*regions clusters test iam permissions*](api::ProjectRegionClusterTestIamPermissionCall), [*regions jobs cancel*](api::ProjectRegionJobCancelCall), [*regions jobs delete*](api::ProjectRegionJobDeleteCall), [*regions jobs get*](api::ProjectRegionJobGetCall), [*regions jobs get iam policy*](api::ProjectRegionJobGetIamPolicyCall), [*regions jobs list*](api::ProjectRegionJobListCall), [*regions jobs patch*](api::ProjectRegionJobPatchCall), [*regions jobs set iam policy*](api::ProjectRegionJobSetIamPolicyCall), [*regions jobs submit*](api::ProjectRegionJobSubmitCall), [*regions jobs submit as operation*](api::ProjectRegionJobSubmitAsOperationCall), [*regions jobs test iam permissions*](api::ProjectRegionJobTestIamPermissionCall), [*regions operations cancel*](api::ProjectRegionOperationCancelCall), [*regions operations delete*](api::ProjectRegionOperationDeleteCall), [*regions operations get*](api::ProjectRegionOperationGetCall), [*regions operations get iam policy*](api::ProjectRegionOperationGetIamPolicyCall), [*regions operations list*](api::ProjectRegionOperationListCall), [*regions operations set iam policy*](api::ProjectRegionOperationSetIamPolicyCall), [*regions operations test iam permissions*](api::ProjectRegionOperationTestIamPermissionCall), [*regions workflow templates create*](api::ProjectRegionWorkflowTemplateCreateCall), [*regions workflow templates delete*](api::ProjectRegionWorkflowTemplateDeleteCall), [*regions workflow templates get*](api::ProjectRegionWorkflowTemplateGetCall), [*regions workflow templates get iam policy*](api::ProjectRegionWorkflowTemplateGetIamPolicyCall), [*regions workflow templates instantiate*](api::ProjectRegionWorkflowTemplateInstantiateCall), [*regions workflow templates instantiate inline*](api::ProjectRegionWorkflowTemplateInstantiateInlineCall), [*regions workflow templates list*](api::ProjectRegionWorkflowTemplateListCall), [*regions workflow templates set iam policy*](api::ProjectRegionWorkflowTemplateSetIamPolicyCall), [*regions workflow templates test iam permissions*](api::ProjectRegionWorkflowTemplateTestIamPermissionCall) and [*regions workflow templates update*](api::ProjectRegionWorkflowTemplateUpdateCall)
+//!  * [*locations autoscaling policies create*](api::ProjectLocationAutoscalingPolicyCreateCall), [*locations autoscaling policies delete*](api::ProjectLocationAutoscalingPolicyDeleteCall), [*locations autoscaling policies get*](api::ProjectLocationAutoscalingPolicyGetCall), [*locations autoscaling policies get iam policy*](api::ProjectLocationAutoscalingPolicyGetIamPolicyCall), [*locations autoscaling policies list*](api::ProjectLocationAutoscalingPolicyListCall), [*locations autoscaling policies set iam policy*](api::ProjectLocationAutoscalingPolicySetIamPolicyCall), [*locations autoscaling policies test iam permissions*](api::ProjectLocationAutoscalingPolicyTestIamPermissionCall), [*locations autoscaling policies update*](api::ProjectLocationAutoscalingPolicyUpdateCall), [*locations batches create*](api::ProjectLocationBatcheCreateCall), [*locations batches delete*](api::ProjectLocationBatcheDeleteCall), [*locations batches get*](api::ProjectLocationBatcheGetCall), [*locations batches list*](api::ProjectLocationBatcheListCall), [*locations workflow templates create*](api::ProjectLocationWorkflowTemplateCreateCall), [*locations workflow templates delete*](api::ProjectLocationWorkflowTemplateDeleteCall), [*locations workflow templates get*](api::ProjectLocationWorkflowTemplateGetCall), [*locations workflow templates get iam policy*](api::ProjectLocationWorkflowTemplateGetIamPolicyCall), [*locations workflow templates instantiate*](api::ProjectLocationWorkflowTemplateInstantiateCall), [*locations workflow templates instantiate inline*](api::ProjectLocationWorkflowTemplateInstantiateInlineCall), [*locations workflow templates list*](api::ProjectLocationWorkflowTemplateListCall), [*locations workflow templates set iam policy*](api::ProjectLocationWorkflowTemplateSetIamPolicyCall), [*locations workflow templates test iam permissions*](api::ProjectLocationWorkflowTemplateTestIamPermissionCall), [*locations workflow templates update*](api::ProjectLocationWorkflowTemplateUpdateCall), [*regions autoscaling policies create*](api::ProjectRegionAutoscalingPolicyCreateCall), [*regions autoscaling policies delete*](api::ProjectRegionAutoscalingPolicyDeleteCall), [*regions autoscaling policies get*](api::ProjectRegionAutoscalingPolicyGetCall), [*regions autoscaling policies get iam policy*](api::ProjectRegionAutoscalingPolicyGetIamPolicyCall), [*regions autoscaling policies list*](api::ProjectRegionAutoscalingPolicyListCall), [*regions autoscaling policies set iam policy*](api::ProjectRegionAutoscalingPolicySetIamPolicyCall), [*regions autoscaling policies test iam permissions*](api::ProjectRegionAutoscalingPolicyTestIamPermissionCall), [*regions autoscaling policies update*](api::ProjectRegionAutoscalingPolicyUpdateCall), [*regions clusters create*](api::ProjectRegionClusterCreateCall), [*regions clusters delete*](api::ProjectRegionClusterDeleteCall), [*regions clusters diagnose*](api::ProjectRegionClusterDiagnoseCall), [*regions clusters get*](api::ProjectRegionClusterGetCall), [*regions clusters get iam policy*](api::ProjectRegionClusterGetIamPolicyCall), [*regions clusters inject credentials*](api::ProjectRegionClusterInjectCredentialCall), [*regions clusters list*](api::ProjectRegionClusterListCall), [*regions clusters patch*](api::ProjectRegionClusterPatchCall), [*regions clusters repair*](api::ProjectRegionClusterRepairCall), [*regions clusters set iam policy*](api::ProjectRegionClusterSetIamPolicyCall), [*regions clusters start*](api::ProjectRegionClusterStartCall), [*regions clusters stop*](api::ProjectRegionClusterStopCall), [*regions clusters test iam permissions*](api::ProjectRegionClusterTestIamPermissionCall), [*regions jobs cancel*](api::ProjectRegionJobCancelCall), [*regions jobs delete*](api::ProjectRegionJobDeleteCall), [*regions jobs get*](api::ProjectRegionJobGetCall), [*regions jobs get iam policy*](api::ProjectRegionJobGetIamPolicyCall), [*regions jobs list*](api::ProjectRegionJobListCall), [*regions jobs patch*](api::ProjectRegionJobPatchCall), [*regions jobs set iam policy*](api::ProjectRegionJobSetIamPolicyCall), [*regions jobs submit*](api::ProjectRegionJobSubmitCall), [*regions jobs submit as operation*](api::ProjectRegionJobSubmitAsOperationCall), [*regions jobs test iam permissions*](api::ProjectRegionJobTestIamPermissionCall), [*regions operations cancel*](api::ProjectRegionOperationCancelCall), [*regions operations delete*](api::ProjectRegionOperationDeleteCall), [*regions operations get*](api::ProjectRegionOperationGetCall), [*regions operations get iam policy*](api::ProjectRegionOperationGetIamPolicyCall), [*regions operations list*](api::ProjectRegionOperationListCall), [*regions operations set iam policy*](api::ProjectRegionOperationSetIamPolicyCall), [*regions operations test iam permissions*](api::ProjectRegionOperationTestIamPermissionCall), [*regions workflow templates create*](api::ProjectRegionWorkflowTemplateCreateCall), [*regions workflow templates delete*](api::ProjectRegionWorkflowTemplateDeleteCall), [*regions workflow templates get*](api::ProjectRegionWorkflowTemplateGetCall), [*regions workflow templates get iam policy*](api::ProjectRegionWorkflowTemplateGetIamPolicyCall), [*regions workflow templates instantiate*](api::ProjectRegionWorkflowTemplateInstantiateCall), [*regions workflow templates instantiate inline*](api::ProjectRegionWorkflowTemplateInstantiateInlineCall), [*regions workflow templates list*](api::ProjectRegionWorkflowTemplateListCall), [*regions workflow templates set iam policy*](api::ProjectRegionWorkflowTemplateSetIamPolicyCall), [*regions workflow templates test iam permissions*](api::ProjectRegionWorkflowTemplateTestIamPermissionCall) and [*regions workflow templates update*](api::ProjectRegionWorkflowTemplateUpdateCall)
 //! 
 //! 
 //! 
@@ -47,20 +47,21 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_autoscaling_policies_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_autoscaling_policies_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_workflow_templates_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_workflow_templates_set_iam_policy(...).doit().await
-//! let r = hub.projects().regions_autoscaling_policies_get_iam_policy(...).doit().await
-//! let r = hub.projects().regions_autoscaling_policies_set_iam_policy(...).doit().await
-//! let r = hub.projects().regions_clusters_get_iam_policy(...).doit().await
-//! let r = hub.projects().regions_clusters_set_iam_policy(...).doit().await
-//! let r = hub.projects().regions_jobs_get_iam_policy(...).doit().await
-//! let r = hub.projects().regions_jobs_set_iam_policy(...).doit().await
-//! let r = hub.projects().regions_operations_get_iam_policy(...).doit().await
-//! let r = hub.projects().regions_operations_set_iam_policy(...).doit().await
-//! let r = hub.projects().regions_workflow_templates_get_iam_policy(...).doit().await
-//! let r = hub.projects().regions_workflow_templates_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_batches_create(...).doit().await
+//! let r = hub.projects().locations_workflow_templates_instantiate(...).doit().await
+//! let r = hub.projects().locations_workflow_templates_instantiate_inline(...).doit().await
+//! let r = hub.projects().regions_clusters_create(...).doit().await
+//! let r = hub.projects().regions_clusters_delete(...).doit().await
+//! let r = hub.projects().regions_clusters_diagnose(...).doit().await
+//! let r = hub.projects().regions_clusters_inject_credentials(...).doit().await
+//! let r = hub.projects().regions_clusters_patch(...).doit().await
+//! let r = hub.projects().regions_clusters_repair(...).doit().await
+//! let r = hub.projects().regions_clusters_start(...).doit().await
+//! let r = hub.projects().regions_clusters_stop(...).doit().await
+//! let r = hub.projects().regions_jobs_submit_as_operation(...).doit().await
+//! let r = hub.projects().regions_operations_get(...).doit().await
+//! let r = hub.projects().regions_workflow_templates_instantiate(...).doit().await
+//! let r = hub.projects().regions_workflow_templates_instantiate_inline(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -77,11 +78,8 @@
 //! ```toml
 //! [dependencies]
 //! google-dataproc1 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -89,14 +87,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_dataproc1 as dataproc1;
-//! use dataproc1::api::GetIamPolicyRequest;
+//! use dataproc1::api::Cluster;
 //! use dataproc1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use dataproc1::Dataproc;
+//! use dataproc1::{Dataproc, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -106,20 +102,23 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GetIamPolicyRequest::default();
+//! let mut req = Cluster::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_autoscaling_policies_get_iam_policy(req, "resource")
+//! let result = hub.projects().regions_clusters_patch(req, "projectId", "region", "clusterName")
+//!              .update_mask("takimata")
+//!              .request_id("amet.")
+//!              .graceful_decommission_timeout("duo")
 //!              .doit().await;
 //! 
 //! match result {
@@ -208,10 +207,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

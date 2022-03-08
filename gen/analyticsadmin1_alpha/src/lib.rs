@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Google Analytics Admin* crate version *2.0.8+20210331*, where *20210331* is the exact revision of the *analyticsadmin:v1alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Google Analytics Admin* crate version *3.0.0+20220307*, where *20220307* is the exact revision of the *analyticsadmin:v1alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Google Analytics Admin* *v1_alpha* API can be found at the
 //! [official documentation site](http://code.google.com/apis/analytics/docs/mgmt/home.html).
@@ -16,7 +16,7 @@
 //! * accounts
 //!  * [*delete*](api::AccountDeleteCall), [*get*](api::AccountGetCall), [*get data sharing settings*](api::AccountGetDataSharingSettingCall), [*list*](api::AccountListCall), [*patch*](api::AccountPatchCall), [*provision account ticket*](api::AccountProvisionAccountTicketCall), [*search change history events*](api::AccountSearchChangeHistoryEventCall), [*user links audit*](api::AccountUserLinkAuditCall), [*user links batch create*](api::AccountUserLinkBatchCreateCall), [*user links batch delete*](api::AccountUserLinkBatchDeleteCall), [*user links batch get*](api::AccountUserLinkBatchGetCall), [*user links batch update*](api::AccountUserLinkBatchUpdateCall), [*user links create*](api::AccountUserLinkCreateCall), [*user links delete*](api::AccountUserLinkDeleteCall), [*user links get*](api::AccountUserLinkGetCall), [*user links list*](api::AccountUserLinkListCall) and [*user links patch*](api::AccountUserLinkPatchCall)
 //! * properties
-//!  * [*android app data streams create*](api::PropertyAndroidAppDataStreamCreateCall), [*android app data streams delete*](api::PropertyAndroidAppDataStreamDeleteCall), [*android app data streams get*](api::PropertyAndroidAppDataStreamGetCall), [*android app data streams list*](api::PropertyAndroidAppDataStreamListCall), [*android app data streams patch*](api::PropertyAndroidAppDataStreamPatchCall), [*create*](api::PropertyCreateCall), [*delete*](api::PropertyDeleteCall), [*firebase links create*](api::PropertyFirebaseLinkCreateCall), [*firebase links delete*](api::PropertyFirebaseLinkDeleteCall), [*firebase links list*](api::PropertyFirebaseLinkListCall), [*firebase links patch*](api::PropertyFirebaseLinkPatchCall), [*get*](api::PropertyGetCall), [*google ads links create*](api::PropertyGoogleAdsLinkCreateCall), [*google ads links delete*](api::PropertyGoogleAdsLinkDeleteCall), [*google ads links list*](api::PropertyGoogleAdsLinkListCall), [*google ads links patch*](api::PropertyGoogleAdsLinkPatchCall), [*ios app data streams create*](api::PropertyIosAppDataStreamCreateCall), [*ios app data streams delete*](api::PropertyIosAppDataStreamDeleteCall), [*ios app data streams get*](api::PropertyIosAppDataStreamGetCall), [*ios app data streams list*](api::PropertyIosAppDataStreamListCall), [*ios app data streams patch*](api::PropertyIosAppDataStreamPatchCall), [*list*](api::PropertyListCall), [*patch*](api::PropertyPatchCall), [*user links audit*](api::PropertyUserLinkAuditCall), [*user links batch create*](api::PropertyUserLinkBatchCreateCall), [*user links batch delete*](api::PropertyUserLinkBatchDeleteCall), [*user links batch get*](api::PropertyUserLinkBatchGetCall), [*user links batch update*](api::PropertyUserLinkBatchUpdateCall), [*user links create*](api::PropertyUserLinkCreateCall), [*user links delete*](api::PropertyUserLinkDeleteCall), [*user links get*](api::PropertyUserLinkGetCall), [*user links list*](api::PropertyUserLinkListCall), [*user links patch*](api::PropertyUserLinkPatchCall), [*web data streams create*](api::PropertyWebDataStreamCreateCall), [*web data streams delete*](api::PropertyWebDataStreamDeleteCall), [*web data streams get*](api::PropertyWebDataStreamGetCall), [*web data streams get enhanced measurement settings*](api::PropertyWebDataStreamGetEnhancedMeasurementSettingCall), [*web data streams get global site tag*](api::PropertyWebDataStreamGetGlobalSiteTagCall), [*web data streams list*](api::PropertyWebDataStreamListCall), [*web data streams patch*](api::PropertyWebDataStreamPatchCall) and [*web data streams update enhanced measurement settings*](api::PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall)
+//!  * [*acknowledge user data collection*](api::PropertyAcknowledgeUserDataCollectionCall), [*conversion events create*](api::PropertyConversionEventCreateCall), [*conversion events delete*](api::PropertyConversionEventDeleteCall), [*conversion events get*](api::PropertyConversionEventGetCall), [*conversion events list*](api::PropertyConversionEventListCall), [*create*](api::PropertyCreateCall), [*custom dimensions archive*](api::PropertyCustomDimensionArchiveCall), [*custom dimensions create*](api::PropertyCustomDimensionCreateCall), [*custom dimensions get*](api::PropertyCustomDimensionGetCall), [*custom dimensions list*](api::PropertyCustomDimensionListCall), [*custom dimensions patch*](api::PropertyCustomDimensionPatchCall), [*custom metrics archive*](api::PropertyCustomMetricArchiveCall), [*custom metrics create*](api::PropertyCustomMetricCreateCall), [*custom metrics get*](api::PropertyCustomMetricGetCall), [*custom metrics list*](api::PropertyCustomMetricListCall), [*custom metrics patch*](api::PropertyCustomMetricPatchCall), [*data streams create*](api::PropertyDataStreamCreateCall), [*data streams delete*](api::PropertyDataStreamDeleteCall), [*data streams get*](api::PropertyDataStreamGetCall), [*data streams get global site tag*](api::PropertyDataStreamGetGlobalSiteTagCall), [*data streams list*](api::PropertyDataStreamListCall), [*data streams measurement protocol secrets create*](api::PropertyDataStreamMeasurementProtocolSecretCreateCall), [*data streams measurement protocol secrets delete*](api::PropertyDataStreamMeasurementProtocolSecretDeleteCall), [*data streams measurement protocol secrets get*](api::PropertyDataStreamMeasurementProtocolSecretGetCall), [*data streams measurement protocol secrets list*](api::PropertyDataStreamMeasurementProtocolSecretListCall), [*data streams measurement protocol secrets patch*](api::PropertyDataStreamMeasurementProtocolSecretPatchCall), [*data streams patch*](api::PropertyDataStreamPatchCall), [*delete*](api::PropertyDeleteCall), [*display video360 advertiser link proposals approve*](api::PropertyDisplayVideo360AdvertiserLinkProposalApproveCall), [*display video360 advertiser link proposals cancel*](api::PropertyDisplayVideo360AdvertiserLinkProposalCancelCall), [*display video360 advertiser link proposals create*](api::PropertyDisplayVideo360AdvertiserLinkProposalCreateCall), [*display video360 advertiser link proposals delete*](api::PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall), [*display video360 advertiser link proposals get*](api::PropertyDisplayVideo360AdvertiserLinkProposalGetCall), [*display video360 advertiser link proposals list*](api::PropertyDisplayVideo360AdvertiserLinkProposalListCall), [*display video360 advertiser links create*](api::PropertyDisplayVideo360AdvertiserLinkCreateCall), [*display video360 advertiser links delete*](api::PropertyDisplayVideo360AdvertiserLinkDeleteCall), [*display video360 advertiser links get*](api::PropertyDisplayVideo360AdvertiserLinkGetCall), [*display video360 advertiser links list*](api::PropertyDisplayVideo360AdvertiserLinkListCall), [*display video360 advertiser links patch*](api::PropertyDisplayVideo360AdvertiserLinkPatchCall), [*firebase links create*](api::PropertyFirebaseLinkCreateCall), [*firebase links delete*](api::PropertyFirebaseLinkDeleteCall), [*firebase links list*](api::PropertyFirebaseLinkListCall), [*get*](api::PropertyGetCall), [*get data retention settings*](api::PropertyGetDataRetentionSettingCall), [*get google signals settings*](api::PropertyGetGoogleSignalsSettingCall), [*google ads links create*](api::PropertyGoogleAdsLinkCreateCall), [*google ads links delete*](api::PropertyGoogleAdsLinkDeleteCall), [*google ads links list*](api::PropertyGoogleAdsLinkListCall), [*google ads links patch*](api::PropertyGoogleAdsLinkPatchCall), [*list*](api::PropertyListCall), [*patch*](api::PropertyPatchCall), [*update data retention settings*](api::PropertyUpdateDataRetentionSettingCall), [*update google signals settings*](api::PropertyUpdateGoogleSignalsSettingCall), [*user links audit*](api::PropertyUserLinkAuditCall), [*user links batch create*](api::PropertyUserLinkBatchCreateCall), [*user links batch delete*](api::PropertyUserLinkBatchDeleteCall), [*user links batch get*](api::PropertyUserLinkBatchGetCall), [*user links batch update*](api::PropertyUserLinkBatchUpdateCall), [*user links create*](api::PropertyUserLinkCreateCall), [*user links delete*](api::PropertyUserLinkDeleteCall), [*user links get*](api::PropertyUserLinkGetCall), [*user links list*](api::PropertyUserLinkListCall) and [*user links patch*](api::PropertyUserLinkPatchCall)
 //! 
 //! 
 //! 
@@ -54,14 +54,17 @@
 //! let r = hub.accounts().user_links_batch_delete(...).doit().await
 //! let r = hub.accounts().user_links_delete(...).doit().await
 //! let r = hub.accounts().delete(...).doit().await
-//! let r = hub.properties().android_app_data_streams_delete(...).doit().await
+//! let r = hub.properties().conversion_events_delete(...).doit().await
+//! let r = hub.properties().custom_dimensions_archive(...).doit().await
+//! let r = hub.properties().custom_metrics_archive(...).doit().await
+//! let r = hub.properties().data_streams_measurement_protocol_secrets_delete(...).doit().await
+//! let r = hub.properties().data_streams_delete(...).doit().await
+//! let r = hub.properties().display_video360_advertiser_link_proposals_delete(...).doit().await
+//! let r = hub.properties().display_video360_advertiser_links_delete(...).doit().await
 //! let r = hub.properties().firebase_links_delete(...).doit().await
 //! let r = hub.properties().google_ads_links_delete(...).doit().await
-//! let r = hub.properties().ios_app_data_streams_delete(...).doit().await
 //! let r = hub.properties().user_links_batch_delete(...).doit().await
 //! let r = hub.properties().user_links_delete(...).doit().await
-//! let r = hub.properties().web_data_streams_delete(...).doit().await
-//! let r = hub.properties().delete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -78,11 +81,8 @@
 //! ```toml
 //! [dependencies]
 //! google-analyticsadmin1_alpha = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -90,14 +90,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_analyticsadmin1_alpha as analyticsadmin1_alpha;
 //! use analyticsadmin1_alpha::api::GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest;
 //! use analyticsadmin1_alpha::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use analyticsadmin1_alpha::GoogleAnalyticsAdmin;
+//! use analyticsadmin1_alpha::{GoogleAnalyticsAdmin, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -107,9 +105,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
@@ -209,10 +207,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

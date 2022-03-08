@@ -4,11 +4,11 @@
 [package]
 
 name = "google-cloudlatencytest2"
-version = "2.0.8+20160309"
+version = "3.0.0+20160309"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudlatencytest (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudlatencytest2"
-documentation = "https://docs.rs/google-cloudlatencytest2/2.0.8+20160309"
+documentation = "https://docs.rs/google-cloudlatencytest2/3.0.0+20160309"
 license = "MIT"
 keywords = ["cloudlatencytest", "google", "protocol", "web", "api"]
 autobins = false
@@ -21,7 +21,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 5.0"
+yup-oauth2 = "^ 6.0"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
 url = "= 1.7"

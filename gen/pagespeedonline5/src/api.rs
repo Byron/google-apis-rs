@@ -52,13 +52,11 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_pagespeedonline5 as pagespeedonline5;
 /// use pagespeedonline5::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use pagespeedonline5::PagespeedInsights;
+/// use pagespeedonline5::{PagespeedInsights, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -68,9 +66,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = PagespeedInsights::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -106,8 +104,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct PagespeedInsights<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -121,7 +119,7 @@ impl<'a, > PagespeedInsights<> {
         PagespeedInsights {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://pagespeedonline.googleapis.com/".to_string(),
             _root_url: "https://pagespeedonline.googleapis.com/".to_string(),
         }
@@ -132,7 +130,7 @@ impl<'a, > PagespeedInsights<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -166,10 +164,15 @@ impl<'a, > PagespeedInsights<> {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditRefs {
+    /// The conventional acronym for the audit/metric.
+    pub acronym: Option<String>,
     /// The category group that the audit belongs to (optional).
     pub group: Option<String>,
     /// The audit ref id.
     pub id: Option<String>,
+    /// Any audit IDs closely relevant to this one.
+    #[serde(rename="relevantAudits")]
+    pub relevant_audits: Option<Vec<String>>,
     /// The weight this audit's score has on the overall category score.
     pub weight: Option<f64>,
 }
@@ -309,6 +312,9 @@ pub struct LighthouseAuditResultV5 {
     pub explanation: Option<String>,
     /// The audit's id.
     pub id: Option<String>,
+    /// The unit of the numeric_value field. Used to format the numeric value for display.
+    #[serde(rename="numericUnit")]
+    pub numeric_unit: Option<String>,
     /// A numeric value that has a meaning specific to the audit, e.g. the number of nodes in the DOM or the timestamp of a specific load event. More information can be found in the audit details, if present.
     #[serde(rename="numericValue")]
     pub numeric_value: Option<f64>,
@@ -484,22 +490,52 @@ pub struct RendererFormattedStrings {
     /// The tooltip text on an expandable chevron icon.
     #[serde(rename="auditGroupExpandTooltip")]
     pub audit_group_expand_tooltip: Option<String>,
+    /// Text link pointing to the Lighthouse scoring calculator. This link immediately follows a sentence stating the performance score is calculated from the perf metrics.
+    #[serde(rename="calculatorLink")]
+    pub calculator_link: Option<String>,
     /// The label for the initial request in a critical request chain.
     #[serde(rename="crcInitialNavigation")]
     pub crc_initial_navigation: Option<String>,
     /// The label for values shown in the summary of critical request chains.
     #[serde(rename="crcLongestDurationLabel")]
     pub crc_longest_duration_label: Option<String>,
+    /// Option in a dropdown menu that copies the Lighthouse JSON object to the system clipboard.
+    #[serde(rename="dropdownCopyJSON")]
+    pub dropdown_copy_json: Option<String>,
+    /// Option in a dropdown menu that toggles the themeing of the report between Light(default) and Dark themes.
+    #[serde(rename="dropdownDarkTheme")]
+    pub dropdown_dark_theme: Option<String>,
+    /// Option in a dropdown menu that opens a full Lighthouse report in a print dialog.
+    #[serde(rename="dropdownPrintExpanded")]
+    pub dropdown_print_expanded: Option<String>,
+    /// Option in a dropdown menu that opens a small, summary report in a print dialog.
+    #[serde(rename="dropdownPrintSummary")]
+    pub dropdown_print_summary: Option<String>,
+    /// Option in a dropdown menu that saves the current report as a new GitHub Gist.
+    #[serde(rename="dropdownSaveGist")]
+    pub dropdown_save_gist: Option<String>,
+    /// Option in a dropdown menu that saves the Lighthouse report HTML locally to the system as a '.html' file.
+    #[serde(rename="dropdownSaveHTML")]
+    pub dropdown_save_html: Option<String>,
+    /// Option in a dropdown menu that saves the Lighthouse JSON object to the local system as a '.json' file.
+    #[serde(rename="dropdownSaveJSON")]
+    pub dropdown_save_json: Option<String>,
+    /// Option in a dropdown menu that opens the current report in the Lighthouse Viewer Application.
+    #[serde(rename="dropdownViewer")]
+    pub dropdown_viewer: Option<String>,
     /// The label shown next to an audit or metric that has had an error.
     #[serde(rename="errorLabel")]
     pub error_label: Option<String>,
     /// The error string shown next to an erroring audit.
     #[serde(rename="errorMissingAuditInfo")]
     pub error_missing_audit_info: Option<String>,
+    /// Label for button to create an issue against the Lighthouse GitHub project.
+    #[serde(rename="footerIssue")]
+    pub footer_issue: Option<String>,
     /// The title of the lab data performance category.
     #[serde(rename="labDataTitle")]
     pub lab_data_title: Option<String>,
-    /// The disclaimer shown under performance explaning that the network can vary.
+    /// The disclaimer shown under performance explaining that the network can vary.
     #[serde(rename="lsPerformanceCategoryDescription")]
     pub ls_performance_category_description: Option<String>,
     /// The heading shown above a list of audits that were not computerd in the run.
@@ -517,15 +553,81 @@ pub struct RendererFormattedStrings {
     /// The heading that is shown above a list of audits that are passing.
     #[serde(rename="passedAuditsGroupTitle")]
     pub passed_audits_group_title: Option<String>,
+    /// Descriptive explanation for emulation setting when emulating a generic desktop form factor, as opposed to a mobile-device like form factor.
+    #[serde(rename="runtimeDesktopEmulation")]
+    pub runtime_desktop_emulation: Option<String>,
+    /// Descriptive explanation for emulation setting when emulating a Nexus 5X mobile device.
+    #[serde(rename="runtimeMobileEmulation")]
+    pub runtime_mobile_emulation: Option<String>,
+    /// Descriptive explanation for emulation setting when no device emulation is set.
+    #[serde(rename="runtimeNoEmulation")]
+    pub runtime_no_emulation: Option<String>,
+    /// Label for a row in a table that shows the version of the Axe library used
+    #[serde(rename="runtimeSettingsAxeVersion")]
+    pub runtime_settings_axe_version: Option<String>,
+    /// Label for a row in a table that shows the estimated CPU power of the machine running Lighthouse. Example row values: 532, 1492, 783.
+    #[serde(rename="runtimeSettingsBenchmark")]
+    pub runtime_settings_benchmark: Option<String>,
+    /// Label for a row in a table that describes the CPU throttling conditions that were used during a Lighthouse run, if any.
+    #[serde(rename="runtimeSettingsCPUThrottling")]
+    pub runtime_settings_cpu_throttling: Option<String>,
+    /// Label for a row in a table that shows in what tool Lighthouse is being run (e.g. The lighthouse CLI, Chrome DevTools, Lightrider, WebPageTest, etc).
+    #[serde(rename="runtimeSettingsChannel")]
+    pub runtime_settings_channel: Option<String>,
+    /// Label for a row in a table that describes the kind of device that was emulated for the Lighthouse run. Example values for row elements: 'No Emulation', 'Emulated Desktop', etc.
+    #[serde(rename="runtimeSettingsDevice")]
+    pub runtime_settings_device: Option<String>,
+    /// Label for a row in a table that shows the time at which a Lighthouse run was conducted; formatted as a timestamp, e.g. Jan 1, 1970 12:00 AM UTC.
+    #[serde(rename="runtimeSettingsFetchTime")]
+    pub runtime_settings_fetch_time: Option<String>,
+    /// Label for a row in a table that describes the network throttling conditions that were used during a Lighthouse run, if any.
+    #[serde(rename="runtimeSettingsNetworkThrottling")]
+    pub runtime_settings_network_throttling: Option<String>,
+    /// Title of the Runtime settings table in a Lighthouse report. Runtime settings are the environment configurations that a specific report used at auditing time.
+    #[serde(rename="runtimeSettingsTitle")]
+    pub runtime_settings_title: Option<String>,
+    /// Label for a row in a table that shows the User Agent that was detected on the Host machine that ran Lighthouse.
+    #[serde(rename="runtimeSettingsUA")]
+    pub runtime_settings_ua: Option<String>,
+    /// Label for a row in a table that shows the User Agent that was used to send out all network requests during the Lighthouse run.
+    #[serde(rename="runtimeSettingsUANetwork")]
+    pub runtime_settings_ua_network: Option<String>,
+    /// Label for a row in a table that shows the URL that was audited during a Lighthouse run.
+    #[serde(rename="runtimeSettingsUrl")]
+    pub runtime_settings_url: Option<String>,
+    /// Descriptive explanation for a runtime setting that is set to an unknown value.
+    #[serde(rename="runtimeUnknown")]
+    pub runtime_unknown: Option<String>,
     /// The label that explains the score gauges scale (0-49, 50-89, 90-100).
     #[serde(rename="scorescaleLabel")]
     pub scorescale_label: Option<String>,
+    /// Label preceding a radio control for filtering the list of audits. The radio choices are various performance metrics (FCP, LCP, TBT), and if chosen, the audits in the report are hidden if they are not relevant to the selected metric.
+    #[serde(rename="showRelevantAudits")]
+    pub show_relevant_audits: Option<String>,
+    /// The label for the button to show only a few lines of a snippet
+    #[serde(rename="snippetCollapseButtonLabel")]
+    pub snippet_collapse_button_label: Option<String>,
+    /// The label for the button to show all lines of a snippet
+    #[serde(rename="snippetExpandButtonLabel")]
+    pub snippet_expand_button_label: Option<String>,
+    /// This label is for a filter checkbox above a table of items
+    #[serde(rename="thirdPartyResourcesLabel")]
+    pub third_party_resources_label: Option<String>,
+    /// Descriptive explanation for environment throttling that was provided by the runtime environment instead of provided by Lighthouse throttling.
+    #[serde(rename="throttlingProvided")]
+    pub throttling_provided: Option<String>,
     /// The label shown preceding important warnings that may have invalidated an entire report.
     #[serde(rename="toplevelWarningsMessage")]
     pub toplevel_warnings_message: Option<String>,
     /// The disclaimer shown below a performance metric value.
     #[serde(rename="varianceDisclaimer")]
     pub variance_disclaimer: Option<String>,
+    /// Label for a button that opens the Treemap App
+    #[serde(rename="viewTreemapLabel")]
+    pub view_treemap_label: Option<String>,
+    /// The heading that is shown above a list of audits that have warnings
+    #[serde(rename="warningAuditsGroupTitle")]
+    pub warning_audits_group_title: Option<String>,
     /// The label shown above a bulleted list of warnings.
     #[serde(rename="warningHeader")]
     pub warning_header: Option<String>,
@@ -622,18 +724,16 @@ impl client::Part for UserPageLoadMetricV5 {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_pagespeedonline5 as pagespeedonline5;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use pagespeedonline5::PagespeedInsights;
+/// use pagespeedonline5::{PagespeedInsights, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = PagespeedInsights::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -696,17 +796,15 @@ impl<'a> PagespeedapiMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_pagespeedonline5 as pagespeedonline5;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use pagespeedonline5::PagespeedInsights;
+/// # use pagespeedonline5::{PagespeedInsights, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = PagespeedInsights::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -838,22 +936,22 @@ impl<'a> PagespeedapiRunpagespeedCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

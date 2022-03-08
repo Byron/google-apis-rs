@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Logging* crate version *2.0.8+20210325*, where *20210325* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
+//! This documentation was generated from *Logging* crate version *3.0.0+20220225*, where *20220225* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
 //! 
 //! Everything else about the *Logging* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).
@@ -12,30 +12,32 @@
 //! Handle the following *Resources* with ease from the central [hub](Logging) ... 
 //! 
 //! * billing accounts
-//!  * [*buckets get*](api::BillingAccountBucketGetCall), [*buckets views get*](api::BillingAccountBucketViewGetCall), [*exclusions create*](api::BillingAccountExclusionCreateCall), [*exclusions delete*](api::BillingAccountExclusionDeleteCall), [*exclusions get*](api::BillingAccountExclusionGetCall), [*exclusions list*](api::BillingAccountExclusionListCall), [*exclusions patch*](api::BillingAccountExclusionPatchCall), [*locations buckets create*](api::BillingAccountLocationBucketCreateCall), [*locations buckets delete*](api::BillingAccountLocationBucketDeleteCall), [*locations buckets list*](api::BillingAccountLocationBucketListCall), [*locations buckets patch*](api::BillingAccountLocationBucketPatchCall), [*locations buckets undelete*](api::BillingAccountLocationBucketUndeleteCall), [*locations buckets views create*](api::BillingAccountLocationBucketViewCreateCall), [*locations buckets views delete*](api::BillingAccountLocationBucketViewDeleteCall), [*locations buckets views list*](api::BillingAccountLocationBucketViewListCall), [*locations buckets views patch*](api::BillingAccountLocationBucketViewPatchCall), [*locations get*](api::BillingAccountLocationGetCall), [*locations list*](api::BillingAccountLocationListCall), [*logs delete*](api::BillingAccountLogDeleteCall), [*logs list*](api::BillingAccountLogListCall), [*sinks create*](api::BillingAccountSinkCreateCall), [*sinks delete*](api::BillingAccountSinkDeleteCall), [*sinks get*](api::BillingAccountSinkGetCall), [*sinks list*](api::BillingAccountSinkListCall), [*sinks patch*](api::BillingAccountSinkPatchCall) and [*sinks update*](api::BillingAccountSinkUpdateCall)
+//!  * [*buckets get*](api::BillingAccountBucketGetCall), [*buckets views get*](api::BillingAccountBucketViewGetCall), [*exclusions create*](api::BillingAccountExclusionCreateCall), [*exclusions delete*](api::BillingAccountExclusionDeleteCall), [*exclusions get*](api::BillingAccountExclusionGetCall), [*exclusions list*](api::BillingAccountExclusionListCall), [*exclusions patch*](api::BillingAccountExclusionPatchCall), [*get cmek settings*](api::BillingAccountGetCmekSettingCall), [*get settings*](api::BillingAccountGetSettingCall), [*locations buckets create*](api::BillingAccountLocationBucketCreateCall), [*locations buckets delete*](api::BillingAccountLocationBucketDeleteCall), [*locations buckets list*](api::BillingAccountLocationBucketListCall), [*locations buckets patch*](api::BillingAccountLocationBucketPatchCall), [*locations buckets undelete*](api::BillingAccountLocationBucketUndeleteCall), [*locations buckets views create*](api::BillingAccountLocationBucketViewCreateCall), [*locations buckets views delete*](api::BillingAccountLocationBucketViewDeleteCall), [*locations buckets views list*](api::BillingAccountLocationBucketViewListCall), [*locations buckets views patch*](api::BillingAccountLocationBucketViewPatchCall), [*locations get*](api::BillingAccountLocationGetCall), [*locations list*](api::BillingAccountLocationListCall), [*locations operations cancel*](api::BillingAccountLocationOperationCancelCall), [*locations operations list*](api::BillingAccountLocationOperationListCall), [*logs delete*](api::BillingAccountLogDeleteCall), [*logs list*](api::BillingAccountLogListCall), [*operations get*](api::BillingAccountOperationGetCall), [*sinks create*](api::BillingAccountSinkCreateCall), [*sinks delete*](api::BillingAccountSinkDeleteCall), [*sinks get*](api::BillingAccountSinkGetCall), [*sinks list*](api::BillingAccountSinkListCall), [*sinks patch*](api::BillingAccountSinkPatchCall) and [*sinks update*](api::BillingAccountSinkUpdateCall)
 //! * entries
-//!  * [*list*](api::EntryListCall), [*tail*](api::EntryTailCall) and [*write*](api::EntryWriteCall)
+//!  * [*copy*](api::EntryCopyCall), [*list*](api::EntryListCall), [*tail*](api::EntryTailCall) and [*write*](api::EntryWriteCall)
 //! * exclusions
 //!  * [*create*](api::ExclusionCreateCall), [*delete*](api::ExclusionDeleteCall), [*get*](api::ExclusionGetCall), [*list*](api::ExclusionListCall) and [*patch*](api::ExclusionPatchCall)
 //! * folders
-//!  * [*exclusions create*](api::FolderExclusionCreateCall), [*exclusions delete*](api::FolderExclusionDeleteCall), [*exclusions get*](api::FolderExclusionGetCall), [*exclusions list*](api::FolderExclusionListCall), [*exclusions patch*](api::FolderExclusionPatchCall), [*locations buckets create*](api::FolderLocationBucketCreateCall), [*locations buckets delete*](api::FolderLocationBucketDeleteCall), [*locations buckets get*](api::FolderLocationBucketGetCall), [*locations buckets list*](api::FolderLocationBucketListCall), [*locations buckets patch*](api::FolderLocationBucketPatchCall), [*locations buckets undelete*](api::FolderLocationBucketUndeleteCall), [*locations buckets views create*](api::FolderLocationBucketViewCreateCall), [*locations buckets views delete*](api::FolderLocationBucketViewDeleteCall), [*locations buckets views get*](api::FolderLocationBucketViewGetCall), [*locations buckets views list*](api::FolderLocationBucketViewListCall), [*locations buckets views patch*](api::FolderLocationBucketViewPatchCall), [*locations get*](api::FolderLocationGetCall), [*locations list*](api::FolderLocationListCall), [*logs delete*](api::FolderLogDeleteCall), [*logs list*](api::FolderLogListCall), [*sinks create*](api::FolderSinkCreateCall), [*sinks delete*](api::FolderSinkDeleteCall), [*sinks get*](api::FolderSinkGetCall), [*sinks list*](api::FolderSinkListCall), [*sinks patch*](api::FolderSinkPatchCall) and [*sinks update*](api::FolderSinkUpdateCall)
+//!  * [*exclusions create*](api::FolderExclusionCreateCall), [*exclusions delete*](api::FolderExclusionDeleteCall), [*exclusions get*](api::FolderExclusionGetCall), [*exclusions list*](api::FolderExclusionListCall), [*exclusions patch*](api::FolderExclusionPatchCall), [*get cmek settings*](api::FolderGetCmekSettingCall), [*get settings*](api::FolderGetSettingCall), [*locations buckets create*](api::FolderLocationBucketCreateCall), [*locations buckets delete*](api::FolderLocationBucketDeleteCall), [*locations buckets get*](api::FolderLocationBucketGetCall), [*locations buckets list*](api::FolderLocationBucketListCall), [*locations buckets patch*](api::FolderLocationBucketPatchCall), [*locations buckets undelete*](api::FolderLocationBucketUndeleteCall), [*locations buckets views create*](api::FolderLocationBucketViewCreateCall), [*locations buckets views delete*](api::FolderLocationBucketViewDeleteCall), [*locations buckets views get*](api::FolderLocationBucketViewGetCall), [*locations buckets views list*](api::FolderLocationBucketViewListCall), [*locations buckets views patch*](api::FolderLocationBucketViewPatchCall), [*locations get*](api::FolderLocationGetCall), [*locations list*](api::FolderLocationListCall), [*locations operations cancel*](api::FolderLocationOperationCancelCall), [*locations operations get*](api::FolderLocationOperationGetCall), [*locations operations list*](api::FolderLocationOperationListCall), [*logs delete*](api::FolderLogDeleteCall), [*logs list*](api::FolderLogListCall), [*sinks create*](api::FolderSinkCreateCall), [*sinks delete*](api::FolderSinkDeleteCall), [*sinks get*](api::FolderSinkGetCall), [*sinks list*](api::FolderSinkListCall), [*sinks patch*](api::FolderSinkPatchCall), [*sinks update*](api::FolderSinkUpdateCall) and [*update settings*](api::FolderUpdateSettingCall)
 //! * [locations](api::Location)
-//!  * [*buckets create*](api::LocationBucketCreateCall), [*buckets delete*](api::LocationBucketDeleteCall), [*buckets get*](api::LocationBucketGetCall), [*buckets list*](api::LocationBucketListCall), [*buckets patch*](api::LocationBucketPatchCall), [*buckets undelete*](api::LocationBucketUndeleteCall), [*buckets views create*](api::LocationBucketViewCreateCall), [*buckets views delete*](api::LocationBucketViewDeleteCall), [*buckets views get*](api::LocationBucketViewGetCall), [*buckets views list*](api::LocationBucketViewListCall), [*buckets views patch*](api::LocationBucketViewPatchCall), [*get*](api::LocationGetCall) and [*list*](api::LocationListCall)
+//!  * [*buckets create*](api::LocationBucketCreateCall), [*buckets delete*](api::LocationBucketDeleteCall), [*buckets get*](api::LocationBucketGetCall), [*buckets list*](api::LocationBucketListCall), [*buckets patch*](api::LocationBucketPatchCall), [*buckets undelete*](api::LocationBucketUndeleteCall), [*buckets views create*](api::LocationBucketViewCreateCall), [*buckets views delete*](api::LocationBucketViewDeleteCall), [*buckets views get*](api::LocationBucketViewGetCall), [*buckets views list*](api::LocationBucketViewListCall), [*buckets views patch*](api::LocationBucketViewPatchCall), [*get*](api::LocationGetCall), [*list*](api::LocationListCall), [*operations cancel*](api::LocationOperationCancelCall), [*operations get*](api::LocationOperationGetCall) and [*operations list*](api::LocationOperationListCall)
 //! * logs
 //!  * [*delete*](api::LogDeleteCall) and [*list*](api::LogListCall)
 //! * [monitored resource descriptors](api::MonitoredResourceDescriptor)
 //!  * [*list*](api::MonitoredResourceDescriptorListCall)
 //! * organizations
-//!  * [*exclusions create*](api::OrganizationExclusionCreateCall), [*exclusions delete*](api::OrganizationExclusionDeleteCall), [*exclusions get*](api::OrganizationExclusionGetCall), [*exclusions list*](api::OrganizationExclusionListCall), [*exclusions patch*](api::OrganizationExclusionPatchCall), [*get cmek settings*](api::OrganizationGetCmekSettingCall), [*locations buckets create*](api::OrganizationLocationBucketCreateCall), [*locations buckets delete*](api::OrganizationLocationBucketDeleteCall), [*locations buckets get*](api::OrganizationLocationBucketGetCall), [*locations buckets list*](api::OrganizationLocationBucketListCall), [*locations buckets patch*](api::OrganizationLocationBucketPatchCall), [*locations buckets undelete*](api::OrganizationLocationBucketUndeleteCall), [*locations buckets views create*](api::OrganizationLocationBucketViewCreateCall), [*locations buckets views delete*](api::OrganizationLocationBucketViewDeleteCall), [*locations buckets views get*](api::OrganizationLocationBucketViewGetCall), [*locations buckets views list*](api::OrganizationLocationBucketViewListCall), [*locations buckets views patch*](api::OrganizationLocationBucketViewPatchCall), [*locations get*](api::OrganizationLocationGetCall), [*locations list*](api::OrganizationLocationListCall), [*logs delete*](api::OrganizationLogDeleteCall), [*logs list*](api::OrganizationLogListCall), [*sinks create*](api::OrganizationSinkCreateCall), [*sinks delete*](api::OrganizationSinkDeleteCall), [*sinks get*](api::OrganizationSinkGetCall), [*sinks list*](api::OrganizationSinkListCall), [*sinks patch*](api::OrganizationSinkPatchCall), [*sinks update*](api::OrganizationSinkUpdateCall) and [*update cmek settings*](api::OrganizationUpdateCmekSettingCall)
+//!  * [*exclusions create*](api::OrganizationExclusionCreateCall), [*exclusions delete*](api::OrganizationExclusionDeleteCall), [*exclusions get*](api::OrganizationExclusionGetCall), [*exclusions list*](api::OrganizationExclusionListCall), [*exclusions patch*](api::OrganizationExclusionPatchCall), [*get cmek settings*](api::OrganizationGetCmekSettingCall), [*get settings*](api::OrganizationGetSettingCall), [*locations buckets create*](api::OrganizationLocationBucketCreateCall), [*locations buckets delete*](api::OrganizationLocationBucketDeleteCall), [*locations buckets get*](api::OrganizationLocationBucketGetCall), [*locations buckets list*](api::OrganizationLocationBucketListCall), [*locations buckets patch*](api::OrganizationLocationBucketPatchCall), [*locations buckets undelete*](api::OrganizationLocationBucketUndeleteCall), [*locations buckets views create*](api::OrganizationLocationBucketViewCreateCall), [*locations buckets views delete*](api::OrganizationLocationBucketViewDeleteCall), [*locations buckets views get*](api::OrganizationLocationBucketViewGetCall), [*locations buckets views list*](api::OrganizationLocationBucketViewListCall), [*locations buckets views patch*](api::OrganizationLocationBucketViewPatchCall), [*locations get*](api::OrganizationLocationGetCall), [*locations list*](api::OrganizationLocationListCall), [*locations operations cancel*](api::OrganizationLocationOperationCancelCall), [*locations operations get*](api::OrganizationLocationOperationGetCall), [*locations operations list*](api::OrganizationLocationOperationListCall), [*logs delete*](api::OrganizationLogDeleteCall), [*logs list*](api::OrganizationLogListCall), [*sinks create*](api::OrganizationSinkCreateCall), [*sinks delete*](api::OrganizationSinkDeleteCall), [*sinks get*](api::OrganizationSinkGetCall), [*sinks list*](api::OrganizationSinkListCall), [*sinks patch*](api::OrganizationSinkPatchCall), [*sinks update*](api::OrganizationSinkUpdateCall), [*update cmek settings*](api::OrganizationUpdateCmekSettingCall) and [*update settings*](api::OrganizationUpdateSettingCall)
 //! * projects
-//!  * [*exclusions create*](api::ProjectExclusionCreateCall), [*exclusions delete*](api::ProjectExclusionDeleteCall), [*exclusions get*](api::ProjectExclusionGetCall), [*exclusions list*](api::ProjectExclusionListCall), [*exclusions patch*](api::ProjectExclusionPatchCall), [*locations buckets create*](api::ProjectLocationBucketCreateCall), [*locations buckets delete*](api::ProjectLocationBucketDeleteCall), [*locations buckets get*](api::ProjectLocationBucketGetCall), [*locations buckets list*](api::ProjectLocationBucketListCall), [*locations buckets patch*](api::ProjectLocationBucketPatchCall), [*locations buckets undelete*](api::ProjectLocationBucketUndeleteCall), [*locations buckets views create*](api::ProjectLocationBucketViewCreateCall), [*locations buckets views delete*](api::ProjectLocationBucketViewDeleteCall), [*locations buckets views get*](api::ProjectLocationBucketViewGetCall), [*locations buckets views list*](api::ProjectLocationBucketViewListCall), [*locations buckets views patch*](api::ProjectLocationBucketViewPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*logs delete*](api::ProjectLogDeleteCall), [*logs list*](api::ProjectLogListCall), [*metrics create*](api::ProjectMetricCreateCall), [*metrics delete*](api::ProjectMetricDeleteCall), [*metrics get*](api::ProjectMetricGetCall), [*metrics list*](api::ProjectMetricListCall), [*metrics update*](api::ProjectMetricUpdateCall), [*sinks create*](api::ProjectSinkCreateCall), [*sinks delete*](api::ProjectSinkDeleteCall), [*sinks get*](api::ProjectSinkGetCall), [*sinks list*](api::ProjectSinkListCall), [*sinks patch*](api::ProjectSinkPatchCall) and [*sinks update*](api::ProjectSinkUpdateCall)
+//!  * [*exclusions create*](api::ProjectExclusionCreateCall), [*exclusions delete*](api::ProjectExclusionDeleteCall), [*exclusions get*](api::ProjectExclusionGetCall), [*exclusions list*](api::ProjectExclusionListCall), [*exclusions patch*](api::ProjectExclusionPatchCall), [*get cmek settings*](api::ProjectGetCmekSettingCall), [*get settings*](api::ProjectGetSettingCall), [*locations buckets create*](api::ProjectLocationBucketCreateCall), [*locations buckets delete*](api::ProjectLocationBucketDeleteCall), [*locations buckets get*](api::ProjectLocationBucketGetCall), [*locations buckets list*](api::ProjectLocationBucketListCall), [*locations buckets patch*](api::ProjectLocationBucketPatchCall), [*locations buckets undelete*](api::ProjectLocationBucketUndeleteCall), [*locations buckets views create*](api::ProjectLocationBucketViewCreateCall), [*locations buckets views delete*](api::ProjectLocationBucketViewDeleteCall), [*locations buckets views get*](api::ProjectLocationBucketViewGetCall), [*locations buckets views list*](api::ProjectLocationBucketViewListCall), [*locations buckets views patch*](api::ProjectLocationBucketViewPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*logs delete*](api::ProjectLogDeleteCall), [*logs list*](api::ProjectLogListCall), [*metrics create*](api::ProjectMetricCreateCall), [*metrics delete*](api::ProjectMetricDeleteCall), [*metrics get*](api::ProjectMetricGetCall), [*metrics list*](api::ProjectMetricListCall), [*metrics update*](api::ProjectMetricUpdateCall), [*sinks create*](api::ProjectSinkCreateCall), [*sinks delete*](api::ProjectSinkDeleteCall), [*sinks get*](api::ProjectSinkGetCall), [*sinks list*](api::ProjectSinkListCall), [*sinks patch*](api::ProjectSinkPatchCall) and [*sinks update*](api::ProjectSinkUpdateCall)
 //! * sinks
 //!  * [*create*](api::SinkCreateCall), [*delete*](api::SinkDeleteCall), [*get*](api::SinkGetCall), [*list*](api::SinkListCall) and [*update*](api::SinkUpdateCall)
 //! 
 //! Other activities are ...
 //! 
 //! * [get cmek settings](api::MethodGetCmekSettingCall)
+//! * [get settings](api::MethodGetSettingCall)
 //! * [update cmek settings](api::MethodUpdateCmekSettingCall)
+//! * [update settings](api::MethodUpdateSettingCall)
 //! 
 //! 
 //! 
@@ -73,6 +75,7 @@
 //! let r = hub.billing_accounts().locations_buckets_views_delete(...).doit().await
 //! let r = hub.billing_accounts().locations_buckets_delete(...).doit().await
 //! let r = hub.billing_accounts().locations_buckets_undelete(...).doit().await
+//! let r = hub.billing_accounts().locations_operations_cancel(...).doit().await
 //! let r = hub.billing_accounts().logs_delete(...).doit().await
 //! let r = hub.billing_accounts().sinks_delete(...).doit().await
 //! let r = hub.exclusions().delete(...).doit().await
@@ -80,22 +83,26 @@
 //! let r = hub.folders().locations_buckets_views_delete(...).doit().await
 //! let r = hub.folders().locations_buckets_delete(...).doit().await
 //! let r = hub.folders().locations_buckets_undelete(...).doit().await
+//! let r = hub.folders().locations_operations_cancel(...).doit().await
 //! let r = hub.folders().logs_delete(...).doit().await
 //! let r = hub.folders().sinks_delete(...).doit().await
 //! let r = hub.locations().buckets_views_delete(...).doit().await
 //! let r = hub.locations().buckets_delete(...).doit().await
 //! let r = hub.locations().buckets_undelete(...).doit().await
+//! let r = hub.locations().operations_cancel(...).doit().await
 //! let r = hub.logs().delete(...).doit().await
 //! let r = hub.organizations().exclusions_delete(...).doit().await
 //! let r = hub.organizations().locations_buckets_views_delete(...).doit().await
 //! let r = hub.organizations().locations_buckets_delete(...).doit().await
 //! let r = hub.organizations().locations_buckets_undelete(...).doit().await
+//! let r = hub.organizations().locations_operations_cancel(...).doit().await
 //! let r = hub.organizations().logs_delete(...).doit().await
 //! let r = hub.organizations().sinks_delete(...).doit().await
 //! let r = hub.projects().exclusions_delete(...).doit().await
 //! let r = hub.projects().locations_buckets_views_delete(...).doit().await
 //! let r = hub.projects().locations_buckets_delete(...).doit().await
 //! let r = hub.projects().locations_buckets_undelete(...).doit().await
+//! let r = hub.projects().locations_operations_cancel(...).doit().await
 //! let r = hub.projects().logs_delete(...).doit().await
 //! let r = hub.projects().metrics_delete(...).doit().await
 //! let r = hub.projects().sinks_delete(...).doit().await
@@ -116,11 +123,8 @@
 //! ```toml
 //! [dependencies]
 //! google-logging2 = "*"
-//! hyper = "^0.14"
-//! hyper-rustls = "^0.22"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
-//! yup-oauth2 = "^5.0"
 //! ```
 //! 
 //! ## A complete example
@@ -128,14 +132,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate yup_oauth2 as oauth2;
 //! extern crate google_logging2 as logging2;
 //! use logging2::api::UndeleteBucketRequest;
 //! use logging2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use oauth2;
-//! use logging2::Logging;
+//! use logging2::{Logging, oauth2, hyper, hyper_rustls};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -145,9 +147,9 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let auth = oauth2::InstalledFlowAuthenticator::builder(
 //!         secret,
-//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
@@ -247,10 +249,13 @@
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
-extern crate yup_oauth2 as oauth2;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 

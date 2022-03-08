@@ -19,33 +19,37 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// See, edit, configure, and delete your Google Cloud Platform data
-    CloudPlatform,
+    /// See, edit, create, and delete all your Google Docs documents
+    Document,
 
-    /// View your data across Google Cloud Platform services
-    CloudPlatformReadOnly,
+    /// See all your Google Docs documents
+    DocumentReadonly,
 
-    /// View your DNS records hosted by Google Cloud DNS
-    NdevClouddnReadonly,
+    /// See, edit, create, and delete all of your Google Drive files
+    Drive,
 
-    /// View and manage your DNS records hosted by Google Cloud DNS
-    NdevClouddnReadwrite,
+    /// See, edit, create, and delete only the specific Google Drive files you use with this app
+    DriveFile,
+
+    /// See and download all your Google Drive files
+    DriveReadonly,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
-            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
-            Scope::NdevClouddnReadonly => "https://www.googleapis.com/auth/ndev.clouddns.readonly",
-            Scope::NdevClouddnReadwrite => "https://www.googleapis.com/auth/ndev.clouddns.readwrite",
+            Scope::Document => "https://www.googleapis.com/auth/documents",
+            Scope::DocumentReadonly => "https://www.googleapis.com/auth/documents.readonly",
+            Scope::Drive => "https://www.googleapis.com/auth/drive",
+            Scope::DriveFile => "https://www.googleapis.com/auth/drive.file",
+            Scope::DriveReadonly => "https://www.googleapis.com/auth/drive.readonly",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::NdevClouddnReadonly
+        Scope::DocumentReadonly
     }
 }
 
@@ -55,7 +59,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all Dns related resource activities
+/// Central instance to access all Docs related resource activities
 ///
 /// # Examples
 ///
@@ -64,13 +68,12 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// use dns1::{Result, Error};
+/// extern crate google_docs1 as docs1;
+/// use docs1::api::BatchUpdateDocumentRequest;
+/// use docs1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
+/// use docs1::{Docs, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -80,18 +83,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = Docs::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUpdateDocumentRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().list("project")
-///              .page_token("takimata")
-///              .max_results(-52)
-///              .dns_name("duo")
+/// let result = hub.documents().batch_update(req, "documentId")
 ///              .doit().await;
 /// 
 /// match result {
@@ -114,52 +119,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Dns<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Docs<> {
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Dns<> {}
+impl<'a, > client::Hub for Docs<> {}
 
-impl<'a, > Dns<> {
+impl<'a, > Docs<> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Dns<> {
-        Dns {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Docs<> {
+        Docs {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
-            _base_url: "https://dns.googleapis.com/".to_string(),
-            _root_url: "https://dns.googleapis.com/".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
+            _base_url: "https://docs.googleapis.com/".to_string(),
+            _root_url: "https://docs.googleapis.com/".to_string(),
         }
     }
 
-    pub fn changes(&'a self) -> ChangeMethods<'a> {
-        ChangeMethods { hub: &self }
-    }
-    pub fn dns_keys(&'a self) -> DnsKeyMethods<'a> {
-        DnsKeyMethods { hub: &self }
-    }
-    pub fn managed_zone_operations(&'a self) -> ManagedZoneOperationMethods<'a> {
-        ManagedZoneOperationMethods { hub: &self }
-    }
-    pub fn managed_zones(&'a self) -> ManagedZoneMethods<'a> {
-        ManagedZoneMethods { hub: &self }
-    }
-    pub fn policies(&'a self) -> PolicyMethods<'a> {
-        PolicyMethods { hub: &self }
-    }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
-        ProjectMethods { hub: &self }
-    }
-    pub fn resource_record_sets(&'a self) -> ResourceRecordSetMethods<'a> {
-        ResourceRecordSetMethods { hub: &self }
+    pub fn documents(&'a self) -> DocumentMethods<'a> {
+        DocumentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -167,7 +154,7 @@ impl<'a, > Dns<> {
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://dns.googleapis.com/`.
+    /// It defaults to `https://docs.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -175,7 +162,7 @@ impl<'a, > Dns<> {
     }
 
     /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://dns.googleapis.com/`.
+    /// It defaults to `https://docs.googleapis.com/`.
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
@@ -187,858 +174,3326 @@ impl<'a, > Dns<> {
 // ############
 // SCHEMAS ###
 // ##########
-/// A Change represents a set of ResourceRecordSet additions and deletions applied atomically to a ManagedZone. ResourceRecordSets within a ManagedZone are modified by creating a new Change element in the Changes collection. In turn the Changes collection also records the past modifications to the ResourceRecordSets in a ManagedZone. The current state of the ManagedZone is the sum effect of applying all Change elements in the Changes collection in sequence.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [create changes](ChangeCreateCall) (request|response)
-/// * [get changes](ChangeGetCall) (response)
-/// * [list changes](ChangeListCall) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Change {
-    /// Which ResourceRecordSets to add?
-    pub additions: Option<Vec<ResourceRecordSet>>,
-    /// Which ResourceRecordSets to remove? Must match existing data exactly.
-    pub deletions: Option<Vec<ResourceRecordSet>>,
-    /// Unique identifier for the resource; defined by the server (output only).
-    pub id: Option<String>,
-    /// If the DNS queries for the zone will be served.
-    #[serde(rename="isServing")]
-    pub is_serving: Option<bool>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The time that this operation was started by the server (output only). This is in RFC3339 text format.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Status of the operation (output only). A status of "done" means that the request to update the authoritative servers has been sent, but the servers might not be updated yet.
-    pub status: Option<String>,
-}
-
-impl client::RequestValue for Change {}
-impl client::Resource for Change {}
-impl client::ResponseResult for Change {}
-
-
-/// The response to a request to enumerate Changes to a ResourceRecordSets collection.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list changes](ChangeListCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChangesListResponse {
-    /// The requested changes.
-    pub changes: Option<Vec<Change>>,
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// Type of resource.
-    pub kind: Option<String>,
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token. This lets you retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned are an inconsistent view of the collection. You cannot retrieve a "snapshot" of collections larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-}
-
-impl client::ResponseResult for ChangesListResponse {}
-
-
-/// A DNSSEC key pair.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get dns keys](DnsKeyGetCall) (response)
-/// * [list dns keys](DnsKeyListCall) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKey {
-    /// String mnemonic specifying the DNSSEC algorithm of this key. Immutable after creation time.
-    pub algorithm: Option<String>,
-    /// The time that this resource was created in the control plane. This is in RFC3339 text format. Output only.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the resource's function.
-    pub description: Option<String>,
-    /// Cryptographic hashes of the DNSKEY resource record associated with this DnsKey. These digests are needed to construct a DS record that points at this DNS key. Output only.
-    pub digests: Option<Vec<DnsKeyDigest>>,
-    /// Unique identifier for the resource; defined by the server (output only).
-    pub id: Option<String>,
-    /// Active keys are used to sign subsequent changes to the ManagedZone. Inactive keys are still present as DNSKEY Resource Records for the use of resolvers validating existing signatures.
-    #[serde(rename="isActive")]
-    pub is_active: Option<bool>,
-    /// Length of the key in bits. Specified at creation time, and then immutable.
-    #[serde(rename="keyLength")]
-    pub key_length: Option<u32>,
-    /// The key tag is a non-cryptographic hash of the a DNSKEY resource record associated with this DnsKey. The key tag can be used to identify a DNSKEY more quickly (but it is not a unique identifier). In particular, the key tag is used in a parent zone's DS record to point at the DNSKEY in this child ManagedZone. The key tag is a number in the range [0, 65535] and the algorithm to calculate it is specified in RFC4034 Appendix B. Output only.
-    #[serde(rename="keyTag")]
-    pub key_tag: Option<i32>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// Base64 encoded public half of this key. Output only.
-    #[serde(rename="publicKey")]
-    pub public_key: Option<String>,
-    /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, are used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag is cleared, and this key is used to sign only resource record sets of other types. Immutable after creation time.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl client::Resource for DnsKey {}
-impl client::ResponseResult for DnsKey {}
-
-
-/// There is no detailed description.
+/// A ParagraphElement representing a spot in the text that is dynamically replaced with content that can change over time, like a page number.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKeyDigest {
-    /// The base-16 encoded bytes of this digest. Suitable for use in a DS resource record.
-    pub digest: Option<String>,
-    /// Specifies the algorithm used to calculate this digest.
+pub struct AutoText {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. An AutoText may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this AutoText, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this AutoText.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+    /// The type of this auto text.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for DnsKeyDigest {}
+impl client::Part for AutoText {}
 
 
-/// Parameters for DnsKey key generation. Used for generating initial keys for a new ManagedZone and as default when adding a new DnsKey.
+/// Represents the background of a document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKeySpec {
-    /// String mnemonic specifying the DNSSEC algorithm of this key.
-    pub algorithm: Option<String>,
-    /// Length of the keys in bits.
-    #[serde(rename="keyLength")]
-    pub key_length: Option<u32>,
-    /// Specifies whether this is a key signing key (KSK) or a zone signing key (ZSK). Key signing keys have the Secure Entry Point flag set and, when active, are only used to sign resource record sets of type DNSKEY. Zone signing keys do not have the Secure Entry Point flag set and are used to sign all other types of resource record sets.
-    #[serde(rename="keyType")]
-    pub key_type: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
+pub struct Background {
+    /// The background color.
+    pub color: Option<OptionalColor>,
 }
 
-impl client::Part for DnsKeySpec {}
+impl client::Part for Background {}
 
 
-/// The response to a request to enumerate DnsKeys in a ManagedZone.
+/// A mask that indicates which of the fields on the base Background have been changed in this suggestion. For any field set to true, the Backgound has a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BackgroundSuggestionState {
+    /// Indicates whether the current background color has been modified in this suggestion.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+}
+
+impl client::Part for BackgroundSuggestionState {}
+
+
+/// Request message for BatchUpdateDocument.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list dns keys](DnsKeyListCall) (response)
+/// * [batch update documents](DocumentBatchUpdateCall) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKeysListResponse {
-    /// The requested resources.
-    #[serde(rename="dnsKeys")]
-    pub dns_keys: Option<Vec<DnsKey>>,
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// Type of resource.
-    pub kind: Option<String>,
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token. In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned are an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
+pub struct BatchUpdateDocumentRequest {
+    /// A list of updates to apply to the document.
+    pub requests: Option<Vec<Request>>,
+    /// Provides control over how write requests are executed.
+    #[serde(rename="writeControl")]
+    pub write_control: Option<WriteControl>,
 }
 
-impl client::ResponseResult for DnsKeysListResponse {}
+impl client::RequestValue for BatchUpdateDocumentRequest {}
 
 
-/// A zone is a subtree of the DNS namespace under one administrative responsibility. A ManagedZone is a resource that represents a DNS zone hosted by the Cloud DNS service.
+/// Response message from a BatchUpdateDocument request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create managed zones](ManagedZoneCreateCall) (request|response)
-/// * [delete managed zones](ManagedZoneDeleteCall) (none)
-/// * [get managed zones](ManagedZoneGetCall) (response)
-/// * [list managed zones](ManagedZoneListCall) (none)
-/// * [patch managed zones](ManagedZonePatchCall) (request)
-/// * [update managed zones](ManagedZoneUpdateCall) (request)
+/// * [batch update documents](DocumentBatchUpdateCall) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZone {
-    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
-    pub description: Option<String>,
-    /// The DNS name of this managed zone, for instance "example.com.".
-    #[serde(rename="dnsName")]
-    pub dns_name: Option<String>,
-    /// DNSSEC configuration.
-    #[serde(rename="dnssecConfig")]
-    pub dnssec_config: Option<ManagedZoneDnsSecConfig>,
-    /// The presence for this field indicates that outbound forwarding is enabled for this zone. The value of this field contains the set of destinations to forward to.
-    #[serde(rename="forwardingConfig")]
-    pub forwarding_config: Option<ManagedZoneForwardingConfig>,
-    /// Unique identifier for the resource; defined by the server (output only)
-    pub id: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// User labels.
-    pub labels: Option<HashMap<String, String>>,
-    /// User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
+pub struct BatchUpdateDocumentResponse {
+    /// The ID of the document to which the updates were applied to.
+    #[serde(rename="documentId")]
+    pub document_id: Option<String>,
+    /// The reply of the updates. This maps 1:1 with the updates, although replies to some requests may be empty.
+    pub replies: Option<Vec<Response>>,
+    /// The updated write control after applying the request.
+    #[serde(rename="writeControl")]
+    pub write_control: Option<WriteControl>,
+}
+
+impl client::ResponseResult for BatchUpdateDocumentResponse {}
+
+
+/// The document body. The body typically contains the full document contents except for headers, footers and footnotes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Body {
+    /// The contents of the body. The indexes for the body's content begin at zero.
+    pub content: Option<Vec<StructuralElement>>,
+}
+
+impl client::Part for Body {}
+
+
+/// Describes the bullet of a paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Bullet {
+    /// The ID of the list this paragraph belongs to.
+    #[serde(rename="listId")]
+    pub list_id: Option<String>,
+    /// The nesting level of this paragraph in the list.
+    #[serde(rename="nestingLevel")]
+    pub nesting_level: Option<i32>,
+    /// The paragraph specific text style applied to this bullet.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for Bullet {}
+
+
+/// A mask that indicates which of the fields on the base Bullet have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BulletSuggestionState {
+    /// Indicates if there was a suggested change to the list_id.
+    #[serde(rename="listIdSuggested")]
+    pub list_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to the nesting_level.
+    #[serde(rename="nestingLevelSuggested")]
+    pub nesting_level_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in text style have been changed in this suggestion.
+    #[serde(rename="textStyleSuggestionState")]
+    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
+}
+
+impl client::Part for BulletSuggestionState {}
+
+
+/// A solid color.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Color {
+    /// The RGB color value.
+    #[serde(rename="rgbColor")]
+    pub rgb_color: Option<RgbColor>,
+}
+
+impl client::Part for Color {}
+
+
+/// A ParagraphElement representing a column break. A column break makes the subsequent text start at the top of the next column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ColumnBreak {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A ColumnBreak may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this ColumnBreak, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this ColumnBreak. Similar to text content, like text runs and footnote references, the text style of a column break can affect content layout as well as the styling of text inserted adjacent to it.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for ColumnBreak {}
+
+
+/// Creates a Footer. The new footer is applied to the SectionStyle at the location of the SectionBreak if specificed, otherwise it is applied to the DocumentStyle. If a footer of the specified type already exists, a 400 bad request error is returned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFooterRequest {
+    /// The location of the SectionBreak immediately preceding the section whose SectionStyle this footer should belong to. If this is unset or refers to the first section break in the document, the footer applies to the document style.
+    #[serde(rename="sectionBreakLocation")]
+    pub section_break_location: Option<Location>,
+    /// The type of footer to create.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for CreateFooterRequest {}
+
+
+/// The result of creating a footer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFooterResponse {
+    /// The ID of the created footer.
+    #[serde(rename="footerId")]
+    pub footer_id: Option<String>,
+}
+
+impl client::Part for CreateFooterResponse {}
+
+
+/// Creates a Footnote segment and inserts a new FootnoteReference to it at the given location. The new Footnote segment will contain a space followed by a newline character.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFootnoteRequest {
+    /// Inserts the footnote reference at the end of the document body. Footnote references cannot be inserted inside a header, footer or footnote. Since footnote references can only be inserted in the body, the segment ID field must be empty.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the footnote reference at a specific index in the document. The footnote reference must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). Footnote references cannot be inserted inside an equation, header, footer or footnote. Since footnote references can only be inserted in the body, the segment ID field must be empty.
+    pub location: Option<Location>,
+}
+
+impl client::Part for CreateFootnoteRequest {}
+
+
+/// The result of creating a footnote.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFootnoteResponse {
+    /// The ID of the created footnote.
+    #[serde(rename="footnoteId")]
+    pub footnote_id: Option<String>,
+}
+
+impl client::Part for CreateFootnoteResponse {}
+
+
+/// Creates a Header. The new header is applied to the SectionStyle at the location of the SectionBreak if specificed, otherwise it is applied to the DocumentStyle. If a header of the specified type already exists, a 400 bad request error is returned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateHeaderRequest {
+    /// The location of the SectionBreak which begins the section this header should belong to. If `section_break_location' is unset or if it refers to the first section break in the document body, the header applies to the DocumentStyle
+    #[serde(rename="sectionBreakLocation")]
+    pub section_break_location: Option<Location>,
+    /// The type of header to create.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for CreateHeaderRequest {}
+
+
+/// The result of creating a header.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateHeaderResponse {
+    /// The ID of the created header.
+    #[serde(rename="headerId")]
+    pub header_id: Option<String>,
+}
+
+impl client::Part for CreateHeaderResponse {}
+
+
+/// Creates a NamedRange referencing the given range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateNamedRangeRequest {
+    /// The name of the NamedRange. Names do not need to be unique. Names must be at least 1 character and no more than 256 characters, measured in UTF-16 code units.
     pub name: Option<String>,
-    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users leave this field unset. If you need to use this field, contact your account team.
-    #[serde(rename="nameServerSet")]
-    pub name_server_set: Option<String>,
-    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
-    #[serde(rename="nameServers")]
-    pub name_servers: Option<Vec<String>>,
-    /// The presence of this field indicates that DNS Peering is enabled for this zone. The value of this field contains the network to peer with.
-    #[serde(rename="peeringConfig")]
-    pub peering_config: Option<ManagedZonePeeringConfig>,
-    /// For privately visible zones, the set of Virtual Private Cloud resources that the zone is visible from.
-    #[serde(rename="privateVisibilityConfig")]
-    pub private_visibility_config: Option<ManagedZonePrivateVisibilityConfig>,
-    /// The presence of this field indicates that this is a managed reverse lookup zone and Cloud DNS resolves reverse lookup queries using automatically configured records for VPC resources. This only applies to networks listed under private_visibility_config.
-    #[serde(rename="reverseLookupConfig")]
-    pub reverse_lookup_config: Option<ManagedZoneReverseLookupConfig>,
-    /// This field links to the associated service directory namespace. Do not set this field for public zones or forwarding zones.
-    #[serde(rename="serviceDirectoryConfig")]
-    pub service_directory_config: Option<ManagedZoneServiceDirectoryConfig>,
-    /// The zone's visibility: public zones are exposed to the Internet, while private zones are visible only to Virtual Private Cloud resources.
-    pub visibility: Option<String>,
+    /// The range to apply the name to.
+    pub range: Option<Range>,
 }
 
-impl client::RequestValue for ManagedZone {}
-impl client::Resource for ManagedZone {}
-impl client::ResponseResult for ManagedZone {}
+impl client::Part for CreateNamedRangeRequest {}
 
 
-/// There is no detailed description.
+/// The result of creating a named range.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneDnsSecConfig {
-    /// Specifies parameters for generating initial DnsKeys for this ManagedZone. Can only be changed while the state is OFF.
-    #[serde(rename="defaultKeySpecs")]
-    pub default_key_specs: Option<Vec<DnsKeySpec>>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// Specifies the mechanism for authenticated denial-of-existence responses. Can only be changed while the state is OFF.
-    #[serde(rename="nonExistence")]
-    pub non_existence: Option<String>,
-    /// Specifies whether DNSSEC is enabled, and what mode it is in.
-    pub state: Option<String>,
+pub struct CreateNamedRangeResponse {
+    /// The ID of the created named range.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
 }
 
-impl client::Part for ManagedZoneDnsSecConfig {}
+impl client::Part for CreateNamedRangeResponse {}
 
 
-/// There is no detailed description.
+/// Creates bullets for all of the paragraphs that overlap with the given range. The nesting level of each paragraph will be determined by counting leading tabs in front of each paragraph. To avoid excess space between the bullet and the corresponding paragraph, these leading tabs are removed by this request. This may change the indices of parts of the text. If the paragraph immediately before paragraphs being updated is in a list with a matching preset, the paragraphs being updated are added to that preceding list.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneForwardingConfig {
-    /// no description provided
-    pub kind: Option<String>,
-    /// List of target name servers to forward to. Cloud DNS selects the best available name server if more than one target is given.
-    #[serde(rename="targetNameServers")]
-    pub target_name_servers: Option<Vec<ManagedZoneForwardingConfigNameServerTarget>>,
+pub struct CreateParagraphBulletsRequest {
+    /// The kinds of bullet glyphs to be used.
+    #[serde(rename="bulletPreset")]
+    pub bullet_preset: Option<String>,
+    /// The range to apply the bullet preset to.
+    pub range: Option<Range>,
 }
 
-impl client::Part for ManagedZoneForwardingConfig {}
+impl client::Part for CreateParagraphBulletsRequest {}
 
 
-/// There is no detailed description.
+/// The crop properties of an image. The crop rectangle is represented using fractional offsets from the original content's four edges. - If the offset is in the interval (0, 1), the corresponding edge of crop rectangle is positioned inside of the image's original bounding rectangle. - If the offset is negative or greater than 1, the corresponding edge of crop rectangle is positioned outside of the image's original bounding rectangle. - If all offsets and rotation angle are 0, the image is not cropped.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneForwardingConfigNameServerTarget {
-    /// Forwarding path for this NameServerTarget. If unset or set to DEFAULT, Cloud DNS makes forwarding decisions based on IP address ranges; that is, RFC1918 addresses go to the VPC network, non-RFC1918 addresses go to the internet. When set to PRIVATE, Cloud DNS always sends queries through the VPC network for this target.
-    #[serde(rename="forwardingPath")]
-    pub forwarding_path: Option<String>,
-    /// IPv4 address of a target name server.
-    #[serde(rename="ipv4Address")]
-    pub ipv4_address: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
+pub struct CropProperties {
+    /// The clockwise rotation angle of the crop rectangle around its center, in radians. Rotation is applied after the offsets.
+    pub angle: Option<f32>,
+    /// The offset specifies how far inwards the bottom edge of the crop rectangle is from the bottom edge of the original content as a fraction of the original content's height.
+    #[serde(rename="offsetBottom")]
+    pub offset_bottom: Option<f32>,
+    /// The offset specifies how far inwards the left edge of the crop rectangle is from the left edge of the original content as a fraction of the original content's width.
+    #[serde(rename="offsetLeft")]
+    pub offset_left: Option<f32>,
+    /// The offset specifies how far inwards the right edge of the crop rectangle is from the right edge of the original content as a fraction of the original content's width.
+    #[serde(rename="offsetRight")]
+    pub offset_right: Option<f32>,
+    /// The offset specifies how far inwards the top edge of the crop rectangle is from the top edge of the original content as a fraction of the original content's height.
+    #[serde(rename="offsetTop")]
+    pub offset_top: Option<f32>,
 }
 
-impl client::Part for ManagedZoneForwardingConfigNameServerTarget {}
+impl client::Part for CropProperties {}
 
 
-/// There is no detailed description.
+/// A mask that indicates which of the fields on the base CropProperties have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CropPropertiesSuggestionState {
+    /// Indicates if there was a suggested change to angle.
+    #[serde(rename="angleSuggested")]
+    pub angle_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_bottom.
+    #[serde(rename="offsetBottomSuggested")]
+    pub offset_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_left.
+    #[serde(rename="offsetLeftSuggested")]
+    pub offset_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_right.
+    #[serde(rename="offsetRightSuggested")]
+    pub offset_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_top.
+    #[serde(rename="offsetTopSuggested")]
+    pub offset_top_suggested: Option<bool>,
+}
+
+impl client::Part for CropPropertiesSuggestionState {}
+
+
+/// Deletes content from the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteContentRangeRequest {
+    /// The range of content to delete. Deleting text that crosses a paragraph boundary may result in changes to paragraph styles, lists, positioned objects and bookmarks as the two paragraphs are merged. Attempting to delete certain ranges can result in an invalid document structure in which case a 400 bad request error is returned. Some examples of invalid delete requests include: * Deleting one code unit of a surrogate pair. * Deleting the last newline character of a Body, Header, Footer, Footnote, TableCell or TableOfContents. * Deleting the start or end of a Table, TableOfContents or Equation without deleting the entire element. * Deleting the newline character before a Table, TableOfContents or SectionBreak without deleting the element. * Deleting individual rows or cells of a table. Deleting the content within a table cell is allowed.
+    pub range: Option<Range>,
+}
+
+impl client::Part for DeleteContentRangeRequest {}
+
+
+/// Deletes a Footer from the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteFooterRequest {
+    /// The id of the footer to delete. If this footer is defined on DocumentStyle, the reference to this footer is removed, resulting in no footer of that type for the first section of the document. If this footer is defined on a SectionStyle, the reference to this footer is removed and the footer of that type is now continued from the previous section.
+    #[serde(rename="footerId")]
+    pub footer_id: Option<String>,
+}
+
+impl client::Part for DeleteFooterRequest {}
+
+
+/// Deletes a Header from the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteHeaderRequest {
+    /// The id of the header to delete. If this header is defined on DocumentStyle, the reference to this header is removed, resulting in no header of that type for the first section of the document. If this header is defined on a SectionStyle, the reference to this header is removed and the header of that type is now continued from the previous section.
+    #[serde(rename="headerId")]
+    pub header_id: Option<String>,
+}
+
+impl client::Part for DeleteHeaderRequest {}
+
+
+/// Deletes a NamedRange.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteNamedRangeRequest {
+    /// The name of the range(s) to delete. All named ranges with the given name will be deleted.
+    pub name: Option<String>,
+    /// The ID of the named range to delete.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+}
+
+impl client::Part for DeleteNamedRangeRequest {}
+
+
+/// Deletes bullets from all of the paragraphs that overlap with the given range. The nesting level of each paragraph will be visually preserved by adding indent to the start of the corresponding paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteParagraphBulletsRequest {
+    /// The range to delete bullets from.
+    pub range: Option<Range>,
+}
+
+impl client::Part for DeleteParagraphBulletsRequest {}
+
+
+/// Deletes a PositionedObject from the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeletePositionedObjectRequest {
+    /// The ID of the positioned object to delete.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+}
+
+impl client::Part for DeletePositionedObjectRequest {}
+
+
+/// Deletes a column from a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteTableColumnRequest {
+    /// The reference table cell location from which the column will be deleted. The column this cell spans will be deleted. If this is a merged cell that spans multiple columns, all columns that the cell spans will be deleted. If no columns remain in the table after this deletion, the whole table is deleted.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+}
+
+impl client::Part for DeleteTableColumnRequest {}
+
+
+/// Deletes a row from a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteTableRowRequest {
+    /// The reference table cell location from which the row will be deleted. The row this cell spans will be deleted. If this is a merged cell that spans multiple rows, all rows that the cell spans will be deleted. If no rows remain in the table after this deletion, the whole table is deleted.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+}
+
+impl client::Part for DeleteTableRowRequest {}
+
+
+/// A magnitude in a single direction in the specified units.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Dimension {
+    /// The magnitude.
+    pub magnitude: Option<f64>,
+    /// The units for magnitude.
+    pub unit: Option<String>,
+}
+
+impl client::Part for Dimension {}
+
+
+/// A Google Docs document.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list managed zone operations](ManagedZoneOperationListCall) (response)
+/// * [batch update documents](DocumentBatchUpdateCall) (none)
+/// * [create documents](DocumentCreateCall) (request|response)
+/// * [get documents](DocumentGetCall) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneOperationsListResponse {
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token. This lets you retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned are an inconsistent view of the collection. You cannot retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The operation resources.
-    pub operations: Option<Vec<Operation>>,
+pub struct Document {
+    /// Output only. The main body of the document.
+    pub body: Option<Body>,
+    /// Output only. The ID of the document.
+    #[serde(rename="documentId")]
+    pub document_id: Option<String>,
+    /// Output only. The style of the document.
+    #[serde(rename="documentStyle")]
+    pub document_style: Option<DocumentStyle>,
+    /// Output only. The footers in the document, keyed by footer ID.
+    pub footers: Option<HashMap<String, Footer>>,
+    /// Output only. The footnotes in the document, keyed by footnote ID.
+    pub footnotes: Option<HashMap<String, Footnote>>,
+    /// Output only. The headers in the document, keyed by header ID.
+    pub headers: Option<HashMap<String, Header>>,
+    /// Output only. The inline objects in the document, keyed by object ID.
+    #[serde(rename="inlineObjects")]
+    pub inline_objects: Option<HashMap<String, InlineObject>>,
+    /// Output only. The lists in the document, keyed by list ID.
+    pub lists: Option<HashMap<String, List>>,
+    /// Output only. The named ranges in the document, keyed by name.
+    #[serde(rename="namedRanges")]
+    pub named_ranges: Option<HashMap<String, NamedRanges>>,
+    /// Output only. The named styles of the document.
+    #[serde(rename="namedStyles")]
+    pub named_styles: Option<NamedStyles>,
+    /// Output only. The positioned objects in the document, keyed by object ID.
+    #[serde(rename="positionedObjects")]
+    pub positioned_objects: Option<HashMap<String, PositionedObject>>,
+    /// Output only. The revision ID of the document. Can be used in update requests to specify which revision of a document to apply updates to and how the request should behave if the document has been edited since that revision. Only populated if the user has edit access to the document. The format of the revision ID may change over time, so it should be treated opaquely. A returned revision ID is only guaranteed to be valid for 24 hours after it has been returned and cannot be shared across users. If the revision ID is unchanged between calls, then the document has not changed. Conversely, a changed ID (for the same document and user) usually means the document has been updated; however, a changed ID can also be due to internal factors such as ID format changes.
+    #[serde(rename="revisionId")]
+    pub revision_id: Option<String>,
+    /// Output only. The suggested changes to the style of the document, keyed by suggestion ID.
+    #[serde(rename="suggestedDocumentStyleChanges")]
+    pub suggested_document_style_changes: Option<HashMap<String, SuggestedDocumentStyle>>,
+    /// Output only. The suggested changes to the named styles of the document, keyed by suggestion ID.
+    #[serde(rename="suggestedNamedStylesChanges")]
+    pub suggested_named_styles_changes: Option<HashMap<String, SuggestedNamedStyles>>,
+    /// Output only. The suggestions view mode applied to the document. Note: When editing a document, changes must be based on a document with SUGGESTIONS_INLINE.
+    #[serde(rename="suggestionsViewMode")]
+    pub suggestions_view_mode: Option<String>,
+    /// The title of the document.
+    pub title: Option<String>,
 }
 
-impl client::ResponseResult for ManagedZoneOperationsListResponse {}
+impl client::RequestValue for Document {}
+impl client::Resource for Document {}
+impl client::ResponseResult for Document {}
 
 
-/// There is no detailed description.
+/// The style of the document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonePeeringConfig {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The network with which to peer.
-    #[serde(rename="targetNetwork")]
-    pub target_network: Option<ManagedZonePeeringConfigTargetNetwork>,
+pub struct DocumentStyle {
+    /// The background of the document. Documents cannot have a transparent background color.
+    pub background: Option<Background>,
+    /// The ID of the default footer. If not set, there is no default footer. This property is read-only.
+    #[serde(rename="defaultFooterId")]
+    pub default_footer_id: Option<String>,
+    /// The ID of the default header. If not set, there is no default header. This property is read-only.
+    #[serde(rename="defaultHeaderId")]
+    pub default_header_id: Option<String>,
+    /// The ID of the footer used only for even pages. The value of use_even_page_header_footer determines whether to use the default_footer_id or this value for the footer on even pages. If not set, there is no even page footer. This property is read-only.
+    #[serde(rename="evenPageFooterId")]
+    pub even_page_footer_id: Option<String>,
+    /// The ID of the header used only for even pages. The value of use_even_page_header_footer determines whether to use the default_header_id or this value for the header on even pages. If not set, there is no even page header. This property is read-only.
+    #[serde(rename="evenPageHeaderId")]
+    pub even_page_header_id: Option<String>,
+    /// The ID of the footer used only for the first page. If not set then a unique footer for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_footer_id or this value for the footer on the first page. If not set, there is no first page footer. This property is read-only.
+    #[serde(rename="firstPageFooterId")]
+    pub first_page_footer_id: Option<String>,
+    /// The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_header_id or this value for the header on the first page. If not set, there is no first page header. This property is read-only.
+    #[serde(rename="firstPageHeaderId")]
+    pub first_page_header_id: Option<String>,
+    /// The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles.
+    #[serde(rename="marginBottom")]
+    pub margin_bottom: Option<Dimension>,
+    /// The amount of space between the bottom of the page and the contents of the footer.
+    #[serde(rename="marginFooter")]
+    pub margin_footer: Option<Dimension>,
+    /// The amount of space between the top of the page and the contents of the header.
+    #[serde(rename="marginHeader")]
+    pub margin_header: Option<Dimension>,
+    /// The left page margin. Updating the left page margin on the document style clears the left page margin on all section styles. It may also cause columns to resize in all sections.
+    #[serde(rename="marginLeft")]
+    pub margin_left: Option<Dimension>,
+    /// The right page margin. Updating the right page margin on the document style clears the right page margin on all section styles. It may also cause columns to resize in all sections.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
+    /// The top page margin. Updating the top page margin on the document style clears the top page margin on all section styles.
+    #[serde(rename="marginTop")]
+    pub margin_top: Option<Dimension>,
+    /// The page number from which to start counting the number of pages.
+    #[serde(rename="pageNumberStart")]
+    pub page_number_start: Option<i32>,
+    /// The size of a page in the document.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<Size>,
+    /// Indicates whether DocumentStyle margin_header, SectionStyle margin_header and DocumentStyle margin_footer, SectionStyle margin_footer are respected. When false, the default values in the Docs editor for header and footer margin are used. This property is read-only.
+    #[serde(rename="useCustomHeaderFooterMargins")]
+    pub use_custom_header_footer_margins: Option<bool>,
+    /// Indicates whether to use the even page header / footer IDs for the even pages.
+    #[serde(rename="useEvenPageHeaderFooter")]
+    pub use_even_page_header_footer: Option<bool>,
+    /// Indicates whether to use the first page header / footer IDs for the first page.
+    #[serde(rename="useFirstPageHeaderFooter")]
+    pub use_first_page_header_footer: Option<bool>,
 }
 
-impl client::Part for ManagedZonePeeringConfig {}
+impl client::Part for DocumentStyle {}
 
 
-/// There is no detailed description.
+/// A mask that indicates which of the fields on the base DocumentStyle have been changed in this suggestion. For any field set to true, there is a new suggested value.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonePeeringConfigTargetNetwork {
-    /// The time at which the zone was deactivated, in RFC 3339 date-time format. An empty string indicates that the peering connection is active. The producer network can deactivate a zone. The zone is automatically deactivated if the producer network that the zone targeted is deleted. Output only.
-    #[serde(rename="deactivateTime")]
-    pub deactivate_time: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The fully qualified URL of the VPC network to forward queries to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}
-    #[serde(rename="networkUrl")]
-    pub network_url: Option<String>,
+pub struct DocumentStyleSuggestionState {
+    /// A mask that indicates which of the fields in background have been changed in this suggestion.
+    #[serde(rename="backgroundSuggestionState")]
+    pub background_suggestion_state: Option<BackgroundSuggestionState>,
+    /// Indicates if there was a suggested change to default_footer_id.
+    #[serde(rename="defaultFooterIdSuggested")]
+    pub default_footer_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to default_header_id.
+    #[serde(rename="defaultHeaderIdSuggested")]
+    pub default_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to even_page_footer_id.
+    #[serde(rename="evenPageFooterIdSuggested")]
+    pub even_page_footer_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to even_page_header_id.
+    #[serde(rename="evenPageHeaderIdSuggested")]
+    pub even_page_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to first_page_footer_id.
+    #[serde(rename="firstPageFooterIdSuggested")]
+    pub first_page_footer_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to first_page_header_id.
+    #[serde(rename="firstPageHeaderIdSuggested")]
+    pub first_page_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_bottom.
+    #[serde(rename="marginBottomSuggested")]
+    pub margin_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_footer.
+    #[serde(rename="marginFooterSuggested")]
+    pub margin_footer_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_header.
+    #[serde(rename="marginHeaderSuggested")]
+    pub margin_header_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_left.
+    #[serde(rename="marginLeftSuggested")]
+    pub margin_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_right.
+    #[serde(rename="marginRightSuggested")]
+    pub margin_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_top.
+    #[serde(rename="marginTopSuggested")]
+    pub margin_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to page_number_start.
+    #[serde(rename="pageNumberStartSuggested")]
+    pub page_number_start_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in size have been changed in this suggestion.
+    #[serde(rename="pageSizeSuggestionState")]
+    pub page_size_suggestion_state: Option<SizeSuggestionState>,
+    /// Indicates if there was a suggested change to use_custom_header_footer_margins.
+    #[serde(rename="useCustomHeaderFooterMarginsSuggested")]
+    pub use_custom_header_footer_margins_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to use_even_page_header_footer.
+    #[serde(rename="useEvenPageHeaderFooterSuggested")]
+    pub use_even_page_header_footer_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to use_first_page_header_footer.
+    #[serde(rename="useFirstPageHeaderFooterSuggested")]
+    pub use_first_page_header_footer_suggested: Option<bool>,
 }
 
-impl client::Part for ManagedZonePeeringConfigTargetNetwork {}
+impl client::Part for DocumentStyleSuggestionState {}
 
 
-/// There is no detailed description.
+/// The properties of an embedded drawing.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonePrivateVisibilityConfig {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The list of VPC networks that can see this zone.
-    pub networks: Option<Vec<ManagedZonePrivateVisibilityConfigNetwork>>,
-}
+pub struct EmbeddedDrawingProperties { _never_set: Option<bool> }
 
-impl client::Part for ManagedZonePrivateVisibilityConfig {}
+impl client::Part for EmbeddedDrawingProperties {}
 
 
-/// There is no detailed description.
+/// A mask that indicates which of the fields on the base EmbeddedDrawingProperties have been changed in this suggestion. For any field set to true, there is a new suggested value.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonePrivateVisibilityConfigNetwork {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The fully qualified URL of the VPC network to bind to. Format this URL like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}
-    #[serde(rename="networkUrl")]
-    pub network_url: Option<String>,
-}
+pub struct EmbeddedDrawingPropertiesSuggestionState { _never_set: Option<bool> }
 
-impl client::Part for ManagedZonePrivateVisibilityConfigNetwork {}
+impl client::Part for EmbeddedDrawingPropertiesSuggestionState {}
 
 
-/// There is no detailed description.
+/// An embedded object in the document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneReverseLookupConfig {
-    /// no description provided
-    pub kind: Option<String>,
-}
-
-impl client::Part for ManagedZoneReverseLookupConfig {}
-
-
-/// Contains information about Service Directory-backed zones.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneServiceDirectoryConfig {
-    /// no description provided
-    pub kind: Option<String>,
-    /// Contains information about the namespace associated with the zone.
-    pub namespace: Option<ManagedZoneServiceDirectoryConfigNamespace>,
-}
-
-impl client::Part for ManagedZoneServiceDirectoryConfig {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneServiceDirectoryConfigNamespace {
-    /// The time that the namespace backing this zone was deleted; an empty string if it still exists. This is in RFC3339 text format. Output only.
-    #[serde(rename="deletionTime")]
-    pub deletion_time: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The fully qualified URL of the namespace associated with the zone. Format must be https://servicedirectory.googleapis.com/v1/projects/{project}/locations/{location}/namespaces/{namespace}
-    #[serde(rename="namespaceUrl")]
-    pub namespace_url: Option<String>,
-}
-
-impl client::Part for ManagedZoneServiceDirectoryConfigNamespace {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list managed zones](ManagedZoneListCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonesListResponse {
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// Type of resource.
-    pub kind: Option<String>,
-    /// The managed zone resources.
-    #[serde(rename="managedZones")]
-    pub managed_zones: Option<Vec<ManagedZone>>,
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token. This lets you the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned are an inconsistent view of the collection. You cannot retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-}
-
-impl client::ResponseResult for ManagedZonesListResponse {}
-
-
-/// An operation represents a successful mutation performed on a Cloud DNS resource. Operations provide: - An audit log of server resource mutations. - A way to recover/retry API calls in the case where the response is never received by the caller. Use the caller specified client_operation_id.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get managed zone operations](ManagedZoneOperationGetCall) (response)
-/// * [patch managed zones](ManagedZonePatchCall) (response)
-/// * [update managed zones](ManagedZoneUpdateCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// Only populated if the operation targeted a DnsKey (output only).
-    #[serde(rename="dnsKeyContext")]
-    pub dns_key_context: Option<OperationDnsKeyContext>,
-    /// Unique identifier for the resource. This is the client_operation_id if the client specified it when the mutation was initiated, otherwise, it is generated by the server. The name must be 1-63 characters long and match the regular expression [-a-z0-9]? (output only)
-    pub id: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The time that this operation was started by the server. This is in RFC3339 text format (output only).
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only). A status of "DONE" means that the request to update the authoritative servers has been sent, but the servers might not be updated yet.
-    pub status: Option<String>,
-    /// Type of the operation. Operations include insert, update, and delete (output only).
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// User who requested the operation, for example: user@example.com. cloud-dns-system for operations automatically done by the system. (output only)
-    pub user: Option<String>,
-    /// Only populated if the operation targeted a ManagedZone (output only).
-    #[serde(rename="zoneContext")]
-    pub zone_context: Option<OperationManagedZoneContext>,
-}
-
-impl client::ResponseResult for Operation {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OperationDnsKeyContext {
-    /// The post-operation DnsKey resource.
-    #[serde(rename="newValue")]
-    pub new_value: Option<DnsKey>,
-    /// The pre-operation DnsKey resource.
-    #[serde(rename="oldValue")]
-    pub old_value: Option<DnsKey>,
-}
-
-impl client::Part for OperationDnsKeyContext {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OperationManagedZoneContext {
-    /// The post-operation ManagedZone resource.
-    #[serde(rename="newValue")]
-    pub new_value: Option<ManagedZone>,
-    /// The pre-operation ManagedZone resource.
-    #[serde(rename="oldValue")]
-    pub old_value: Option<ManagedZone>,
-}
-
-impl client::Part for OperationManagedZoneContext {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list policies](PolicyListCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PoliciesListResponse {
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// Type of resource.
-    pub kind: Option<String>,
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token. This lets you the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned are an inconsistent view of the collection. You cannot retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The policy resources.
-    pub policies: Option<Vec<Policy>>,
-}
-
-impl client::ResponseResult for PoliciesListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch policies](PolicyPatchCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PoliciesPatchResponse {
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// no description provided
-    pub policy: Option<Policy>,
-}
-
-impl client::ResponseResult for PoliciesPatchResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [update policies](PolicyUpdateCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PoliciesUpdateResponse {
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// no description provided
-    pub policy: Option<Policy>,
-}
-
-impl client::ResponseResult for PoliciesUpdateResponse {}
-
-
-/// A policy is a collection of DNS rules applied to one or more Virtual Private Cloud resources.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [create policies](PolicyCreateCall) (request|response)
-/// * [get policies](PolicyGetCall) (response)
-/// * [patch policies](PolicyPatchCall) (request)
-/// * [update policies](PolicyUpdateCall) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Sets an alternative name server for the associated networks. When specified, all DNS queries are forwarded to a name server that you choose. Names such as .internal are not available when an alternative name server is specified.
-    #[serde(rename="alternativeNameServerConfig")]
-    pub alternative_name_server_config: Option<PolicyAlternativeNameServerConfig>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the policy's function.
+pub struct EmbeddedObject {
+    /// The description of the embedded object. The `title` and `description` are both combined to display alt text.
     pub description: Option<String>,
-    /// Allows networks bound to this policy to receive DNS queries sent by VMs or applications over VPN connections. When enabled, a virtual IP address is allocated from each of the subnetworks that are bound to this policy.
-    #[serde(rename="enableInboundForwarding")]
-    pub enable_inbound_forwarding: Option<bool>,
-    /// Controls whether logging is enabled for the networks bound to this policy. Defaults to no logging if not set.
-    #[serde(rename="enableLogging")]
-    pub enable_logging: Option<bool>,
-    /// Unique identifier for the resource; defined by the server (output only).
-    pub id: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// User-assigned name for this policy.
+    /// The properties of an embedded drawing.
+    #[serde(rename="embeddedDrawingProperties")]
+    pub embedded_drawing_properties: Option<EmbeddedDrawingProperties>,
+    /// The border of the embedded object.
+    #[serde(rename="embeddedObjectBorder")]
+    pub embedded_object_border: Option<EmbeddedObjectBorder>,
+    /// The properties of an image.
+    #[serde(rename="imageProperties")]
+    pub image_properties: Option<ImageProperties>,
+    /// A reference to the external linked source content. For example, it contains a reference to the source Sheets chart when the embedded object is a linked chart. If unset, then the embedded object is not linked.
+    #[serde(rename="linkedContentReference")]
+    pub linked_content_reference: Option<LinkedContentReference>,
+    /// The bottom margin of the embedded object.
+    #[serde(rename="marginBottom")]
+    pub margin_bottom: Option<Dimension>,
+    /// The left margin of the embedded object.
+    #[serde(rename="marginLeft")]
+    pub margin_left: Option<Dimension>,
+    /// The right margin of the embedded object.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
+    /// The top margin of the embedded object.
+    #[serde(rename="marginTop")]
+    pub margin_top: Option<Dimension>,
+    /// The visible size of the image after cropping.
+    pub size: Option<Size>,
+    /// The title of the embedded object. The `title` and `description` are both combined to display alt text.
+    pub title: Option<String>,
+}
+
+impl client::Part for EmbeddedObject {}
+
+
+/// A border around an EmbeddedObject.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbeddedObjectBorder {
+    /// The color of the border.
+    pub color: Option<OptionalColor>,
+    /// The dash style of the border.
+    #[serde(rename="dashStyle")]
+    pub dash_style: Option<String>,
+    /// The property state of the border property.
+    #[serde(rename="propertyState")]
+    pub property_state: Option<String>,
+    /// The width of the border.
+    pub width: Option<Dimension>,
+}
+
+impl client::Part for EmbeddedObjectBorder {}
+
+
+/// A mask that indicates which of the fields on the base EmbeddedObjectBorder have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbeddedObjectBorderSuggestionState {
+    /// Indicates if there was a suggested change to color.
+    #[serde(rename="colorSuggested")]
+    pub color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to dash_style.
+    #[serde(rename="dashStyleSuggested")]
+    pub dash_style_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to property_state.
+    #[serde(rename="propertyStateSuggested")]
+    pub property_state_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to width.
+    #[serde(rename="widthSuggested")]
+    pub width_suggested: Option<bool>,
+}
+
+impl client::Part for EmbeddedObjectBorderSuggestionState {}
+
+
+/// A mask that indicates which of the fields on the base EmbeddedObject have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbeddedObjectSuggestionState {
+    /// Indicates if there was a suggested change to description.
+    #[serde(rename="descriptionSuggested")]
+    pub description_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in embedded_drawing_properties have been changed in this suggestion.
+    #[serde(rename="embeddedDrawingPropertiesSuggestionState")]
+    pub embedded_drawing_properties_suggestion_state: Option<EmbeddedDrawingPropertiesSuggestionState>,
+    /// A mask that indicates which of the fields in embedded_object_border have been changed in this suggestion.
+    #[serde(rename="embeddedObjectBorderSuggestionState")]
+    pub embedded_object_border_suggestion_state: Option<EmbeddedObjectBorderSuggestionState>,
+    /// A mask that indicates which of the fields in image_properties have been changed in this suggestion.
+    #[serde(rename="imagePropertiesSuggestionState")]
+    pub image_properties_suggestion_state: Option<ImagePropertiesSuggestionState>,
+    /// A mask that indicates which of the fields in linked_content_reference have been changed in this suggestion.
+    #[serde(rename="linkedContentReferenceSuggestionState")]
+    pub linked_content_reference_suggestion_state: Option<LinkedContentReferenceSuggestionState>,
+    /// Indicates if there was a suggested change to margin_bottom.
+    #[serde(rename="marginBottomSuggested")]
+    pub margin_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_left.
+    #[serde(rename="marginLeftSuggested")]
+    pub margin_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_right.
+    #[serde(rename="marginRightSuggested")]
+    pub margin_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_top.
+    #[serde(rename="marginTopSuggested")]
+    pub margin_top_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in size have been changed in this suggestion.
+    #[serde(rename="sizeSuggestionState")]
+    pub size_suggestion_state: Option<SizeSuggestionState>,
+    /// Indicates if there was a suggested change to title.
+    #[serde(rename="titleSuggested")]
+    pub title_suggested: Option<bool>,
+}
+
+impl client::Part for EmbeddedObjectSuggestionState {}
+
+
+/// Location at the end of a body, header, footer or footnote. The location is immediately before the last newline in the document segment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EndOfSegmentLocation {
+    /// The ID of the header, footer or footnote the location is in. An empty segment ID signifies the document's body.
+    #[serde(rename="segmentId")]
+    pub segment_id: Option<String>,
+}
+
+impl client::Part for EndOfSegmentLocation {}
+
+
+/// A ParagraphElement representing an equation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Equation {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A Equation may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl client::Part for Equation {}
+
+
+/// A document footer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Footer {
+    /// The contents of the footer. The indexes for a footer's content begin at zero.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The ID of the footer.
+    #[serde(rename="footerId")]
+    pub footer_id: Option<String>,
+}
+
+impl client::Part for Footer {}
+
+
+/// A document footnote.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Footnote {
+    /// The contents of the footnote. The indexes for a footnote's content begin at zero.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The ID of the footnote.
+    #[serde(rename="footnoteId")]
+    pub footnote_id: Option<String>,
+}
+
+impl client::Part for Footnote {}
+
+
+/// A ParagraphElement representing a footnote reference. A footnote reference is the inline content rendered with a number and is used to identify the footnote.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FootnoteReference {
+    /// The ID of the footnote that contains the content of this footnote reference.
+    #[serde(rename="footnoteId")]
+    pub footnote_id: Option<String>,
+    /// The rendered number of this footnote.
+    #[serde(rename="footnoteNumber")]
+    pub footnote_number: Option<String>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A FootnoteReference may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this FootnoteReference, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this FootnoteReference.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for FootnoteReference {}
+
+
+/// A document header.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Header {
+    /// The contents of the header. The indexes for a header's content begin at zero.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The ID of the header.
+    #[serde(rename="headerId")]
+    pub header_id: Option<String>,
+}
+
+impl client::Part for Header {}
+
+
+/// A ParagraphElement representing a horizontal line.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HorizontalRule {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A HorizontalRule may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this HorizontalRule, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this HorizontalRule. Similar to text content, like text runs and footnote references, the text style of a horizontal rule can affect content layout as well as the styling of text inserted adjacent to it.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for HorizontalRule {}
+
+
+/// The properties of an image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImageProperties {
+    /// The clockwise rotation angle of the image, in radians.
+    pub angle: Option<f32>,
+    /// The brightness effect of the image. The value should be in the interval [-1.0, 1.0], where 0 means no effect.
+    pub brightness: Option<f32>,
+    /// A URI to the image with a default lifetime of 30 minutes. This URI is tagged with the account of the requester. Anyone with the URI effectively accesses the image as the original requester. Access to the image may be lost if the document's sharing settings change.
+    #[serde(rename="contentUri")]
+    pub content_uri: Option<String>,
+    /// The contrast effect of the image. The value should be in the interval [-1.0, 1.0], where 0 means no effect.
+    pub contrast: Option<f32>,
+    /// The crop properties of the image.
+    #[serde(rename="cropProperties")]
+    pub crop_properties: Option<CropProperties>,
+    /// The source URI is the URI used to insert the image. The source URI can be empty.
+    #[serde(rename="sourceUri")]
+    pub source_uri: Option<String>,
+    /// The transparency effect of the image. The value should be in the interval [0.0, 1.0], where 0 means no effect and 1 means completely transparent.
+    pub transparency: Option<f32>,
+}
+
+impl client::Part for ImageProperties {}
+
+
+/// A mask that indicates which of the fields on the base ImageProperties have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImagePropertiesSuggestionState {
+    /// Indicates if there was a suggested change to angle.
+    #[serde(rename="angleSuggested")]
+    pub angle_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to brightness.
+    #[serde(rename="brightnessSuggested")]
+    pub brightness_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to content_uri.
+    #[serde(rename="contentUriSuggested")]
+    pub content_uri_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to contrast.
+    #[serde(rename="contrastSuggested")]
+    pub contrast_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in crop_properties have been changed in this suggestion.
+    #[serde(rename="cropPropertiesSuggestionState")]
+    pub crop_properties_suggestion_state: Option<CropPropertiesSuggestionState>,
+    /// Indicates if there was a suggested change to source_uri.
+    #[serde(rename="sourceUriSuggested")]
+    pub source_uri_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to transparency.
+    #[serde(rename="transparencySuggested")]
+    pub transparency_suggested: Option<bool>,
+}
+
+impl client::Part for ImagePropertiesSuggestionState {}
+
+
+/// An object that appears inline with text. An InlineObject contains an EmbeddedObject such as an image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InlineObject {
+    /// The properties of this inline object.
+    #[serde(rename="inlineObjectProperties")]
+    pub inline_object_properties: Option<InlineObjectProperties>,
+    /// The ID of this inline object.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested changes to the inline object properties, keyed by suggestion ID.
+    #[serde(rename="suggestedInlineObjectPropertiesChanges")]
+    pub suggested_inline_object_properties_changes: Option<HashMap<String, SuggestedInlineObjectProperties>>,
+    /// The suggested insertion ID. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+}
+
+impl client::Part for InlineObject {}
+
+
+/// A ParagraphElement that contains an InlineObject.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InlineObjectElement {
+    /// The ID of the InlineObject this element contains.
+    #[serde(rename="inlineObjectId")]
+    pub inline_object_id: Option<String>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. An InlineObjectElement may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this InlineObject, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this InlineObjectElement. Similar to text content, like text runs and footnote references, the text style of an inline object element can affect content layout as well as the styling of text inserted adjacent to it.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for InlineObjectElement {}
+
+
+/// Properties of an InlineObject.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InlineObjectProperties {
+    /// The embedded object of this inline object.
+    #[serde(rename="embeddedObject")]
+    pub embedded_object: Option<EmbeddedObject>,
+}
+
+impl client::Part for InlineObjectProperties {}
+
+
+/// A mask that indicates which of the fields on the base InlineObjectProperties have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InlineObjectPropertiesSuggestionState {
+    /// A mask that indicates which of the fields in embedded_object have been changed in this suggestion.
+    #[serde(rename="embeddedObjectSuggestionState")]
+    pub embedded_object_suggestion_state: Option<EmbeddedObjectSuggestionState>,
+}
+
+impl client::Part for InlineObjectPropertiesSuggestionState {}
+
+
+/// Inserts an InlineObject containing an image at the given location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertInlineImageRequest {
+    /// Inserts the text at the end of a header, footer or the document body. Inline images cannot be inserted inside a footnote.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the image at a specific index in the document. The image must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). Inline images cannot be inserted inside a footnote or equation.
+    pub location: Option<Location>,
+    /// The size that the image should appear as in the document. This property is optional and the final size of the image in the document is determined by the following rules: * If neither width nor height is specified, then a default size of the image is calculated based on its resolution. * If one dimension is specified then the other dimension is calculated to preserve the aspect ratio of the image. * If both width and height are specified, the image is scaled to fit within the provided dimensions while maintaining its aspect ratio.
+    #[serde(rename="objectSize")]
+    pub object_size: Option<Size>,
+    /// The image URI. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format. The provided URI can be at most 2 kB in length. The URI itself is saved with the image, and exposed via the ImageProperties.content_uri field.
+    pub uri: Option<String>,
+}
+
+impl client::Part for InsertInlineImageRequest {}
+
+
+/// The result of inserting an inline image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertInlineImageResponse {
+    /// The ID of the created InlineObject.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+}
+
+impl client::Part for InsertInlineImageResponse {}
+
+
+/// The result of inserting an embedded Google Sheets chart.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertInlineSheetsChartResponse {
+    /// The object ID of the inserted chart.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+}
+
+impl client::Part for InsertInlineSheetsChartResponse {}
+
+
+/// Inserts a page break followed by a newline at the specified location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertPageBreakRequest {
+    /// Inserts the page break at the end of the document body. Page breaks cannot be inserted inside a footnote, header or footer. Since page breaks can only be inserted inside the body, the segment ID field must be empty.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the page break at a specific index in the document. The page break must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). Page breaks cannot be inserted inside a table, equation, footnote, header or footer. Since page breaks can only be inserted inside the body, the segment ID field must be empty.
+    pub location: Option<Location>,
+}
+
+impl client::Part for InsertPageBreakRequest {}
+
+
+/// Inserts a section break at the given location. A newline character will be inserted before the section break.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertSectionBreakRequest {
+    /// Inserts a newline and a section break at the end of the document body. Section breaks cannot be inserted inside a footnote, header or footer. Because section breaks can only be inserted inside the body, the segment ID field must be empty.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts a newline and a section break at a specific index in the document. The section break must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). Section breaks cannot be inserted inside a table, equation, footnote, header, or footer. Since section breaks can only be inserted inside the body, the segment ID field must be empty.
+    pub location: Option<Location>,
+    /// The type of section to insert.
+    #[serde(rename="sectionType")]
+    pub section_type: Option<String>,
+}
+
+impl client::Part for InsertSectionBreakRequest {}
+
+
+/// Inserts an empty column into a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertTableColumnRequest {
+    /// Whether to insert new column to the right of the reference cell location. - `True`: insert to the right. - `False`: insert to the left.
+    #[serde(rename="insertRight")]
+    pub insert_right: Option<bool>,
+    /// The reference table cell location from which columns will be inserted. A new column will be inserted to the left (or right) of the column where the reference cell is. If the reference cell is a merged cell, a new column will be inserted to the left (or right) of the merged cell.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+}
+
+impl client::Part for InsertTableColumnRequest {}
+
+
+/// Inserts a table at the specified location. A newline character will be inserted before the inserted table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertTableRequest {
+    /// The number of columns in the table.
+    pub columns: Option<i32>,
+    /// Inserts the table at the end of the given header, footer or document body. A newline character will be inserted before the inserted table. Tables cannot be inserted inside a footnote.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the table at a specific model index. A newline character will be inserted before the inserted table, therefore the table start index will be at the specified location index + 1. The table must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between an existing table and its preceding paragraph). Tables cannot be inserted inside a footnote or equation.
+    pub location: Option<Location>,
+    /// The number of rows in the table.
+    pub rows: Option<i32>,
+}
+
+impl client::Part for InsertTableRequest {}
+
+
+/// Inserts an empty row into a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertTableRowRequest {
+    /// Whether to insert new row below the reference cell location. - `True`: insert below the cell. - `False`: insert above the cell.
+    #[serde(rename="insertBelow")]
+    pub insert_below: Option<bool>,
+    /// The reference table cell location from which rows will be inserted. A new row will be inserted above (or below) the row where the reference cell is. If the reference cell is a merged cell, a new row will be inserted above (or below) the merged cell.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+}
+
+impl client::Part for InsertTableRowRequest {}
+
+
+/// Inserts text at the specified location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertTextRequest {
+    /// Inserts the text at the end of a header, footer, footnote or the document body.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the text at a specific index in the document. Text must be inserted inside the bounds of an existing Paragraph. For instance, text cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). The text must be inserted in the preceding paragraph.
+    pub location: Option<Location>,
+    /// The text to be inserted. Inserting a newline character will implicitly create a new Paragraph at that index. The paragraph style of the new paragraph will be copied from the paragraph at the current insertion index, including lists and bullets. Text styles for inserted text will be determined automatically, generally preserving the styling of neighboring text. In most cases, the text style for the inserted text will match the text immediately before the insertion index. Some control characters (U+0000-U+0008, U+000C-U+001F) and characters from the Unicode Basic Multilingual Plane Private Use Area (U+E000-U+F8FF) will be stripped out of the inserted text.
+    pub text: Option<String>,
+}
+
+impl client::Part for InsertTextRequest {}
+
+
+/// A reference to another portion of a document or an external URL resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Link {
+    /// The ID of a bookmark in this document.
+    #[serde(rename="bookmarkId")]
+    pub bookmark_id: Option<String>,
+    /// The ID of a heading in this document.
+    #[serde(rename="headingId")]
+    pub heading_id: Option<String>,
+    /// An external URL.
+    pub url: Option<String>,
+}
+
+impl client::Part for Link {}
+
+
+/// A reference to the external linked source content.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LinkedContentReference {
+    /// A reference to the linked chart.
+    #[serde(rename="sheetsChartReference")]
+    pub sheets_chart_reference: Option<SheetsChartReference>,
+}
+
+impl client::Part for LinkedContentReference {}
+
+
+/// A mask that indicates which of the fields on the base LinkedContentReference have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LinkedContentReferenceSuggestionState {
+    /// A mask that indicates which of the fields in sheets_chart_reference have been changed in this suggestion.
+    #[serde(rename="sheetsChartReferenceSuggestionState")]
+    pub sheets_chart_reference_suggestion_state: Option<SheetsChartReferenceSuggestionState>,
+}
+
+impl client::Part for LinkedContentReferenceSuggestionState {}
+
+
+/// A List represents the list attributes for a group of paragraphs that all belong to the same list. A paragraph that is part of a list has a reference to the list's ID in its bullet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct List {
+    /// The properties of the list.
+    #[serde(rename="listProperties")]
+    pub list_properties: Option<ListProperties>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this list.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion ID. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+    /// The suggested changes to the list properties, keyed by suggestion ID.
+    #[serde(rename="suggestedListPropertiesChanges")]
+    pub suggested_list_properties_changes: Option<HashMap<String, SuggestedListProperties>>,
+}
+
+impl client::Part for List {}
+
+
+/// The properties of a list which describe the look and feel of bullets belonging to paragraphs associated with a list.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListProperties {
+    /// Describes the properties of the bullets at the associated level. A list has at most nine levels of nesting with nesting level 0 corresponding to the top-most level and nesting level 8 corresponding to the most nested level. The nesting levels are returned in ascending order with the least nested returned first.
+    #[serde(rename="nestingLevels")]
+    pub nesting_levels: Option<Vec<NestingLevel>>,
+}
+
+impl client::Part for ListProperties {}
+
+
+/// A mask that indicates which of the fields on the base ListProperties have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListPropertiesSuggestionState {
+    /// A mask that indicates which of the fields on the corresponding NestingLevel in nesting_levels have been changed in this suggestion. The nesting level suggestion states are returned in ascending order of the nesting level with the least nested returned first.
+    #[serde(rename="nestingLevelsSuggestionStates")]
+    pub nesting_levels_suggestion_states: Option<Vec<NestingLevelSuggestionState>>,
+}
+
+impl client::Part for ListPropertiesSuggestionState {}
+
+
+/// A particular location in the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Location {
+    /// The zero-based index, in UTF-16 code units. The index is relative to the beginning of the segment specified by segment_id.
+    pub index: Option<i32>,
+    /// The ID of the header, footer or footnote the location is in. An empty segment ID signifies the document's body.
+    #[serde(rename="segmentId")]
+    pub segment_id: Option<String>,
+}
+
+impl client::Part for Location {}
+
+
+/// Merges cells in a Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MergeTableCellsRequest {
+    /// The table range specifying which cells of the table to merge. Any text in the cells being merged will be concatenated and stored in the "head" cell of the range. This is the upper-left cell of the range when the content direction is left to right, and the upper-right cell of the range otherwise. If the range is non-rectangular (which can occur in some cases where the range covers cells that are already merged or where the table is non-rectangular), a 400 bad request error is returned.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
+}
+
+impl client::Part for MergeTableCellsRequest {}
+
+
+/// A collection of Ranges with the same named range ID. Named ranges allow developers to associate parts of a document with an arbitrary user-defined label so their contents can be programmatically read or edited at a later time. A document can contain multiple named ranges with the same name, but every named range has a unique ID. A named range is created with a single Range, and content inserted inside a named range generally expands that range. However, certain document changes can cause the range to be split into multiple ranges. Named ranges are not private. All applications and collaborators that have access to the document can see its named ranges.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedRange {
+    /// The name of the named range.
     pub name: Option<String>,
-    /// List of network names specifying networks to which this policy is applied.
-    pub networks: Option<Vec<PolicyNetwork>>,
+    /// The ID of the named range.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The ranges that belong to this named range.
+    pub ranges: Option<Vec<Range>>,
 }
 
-impl client::RequestValue for Policy {}
-impl client::ResponseResult for Policy {}
+impl client::Part for NamedRange {}
 
 
-/// There is no detailed description.
+/// A collection of all the NamedRanges in the document that share a given name.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PolicyAlternativeNameServerConfig {
-    /// no description provided
-    pub kind: Option<String>,
-    /// Sets an alternative name server for the associated networks. When specified, all DNS queries are forwarded to a name server that you choose. Names such as .internal are not available when an alternative name server is specified.
-    #[serde(rename="targetNameServers")]
-    pub target_name_servers: Option<Vec<PolicyAlternativeNameServerConfigTargetNameServer>>,
-}
-
-impl client::Part for PolicyAlternativeNameServerConfig {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PolicyAlternativeNameServerConfigTargetNameServer {
-    /// Forwarding path for this TargetNameServer. If unset or set to DEFAULT, Cloud DNS makes forwarding decisions based on address ranges; that is, RFC1918 addresses go to the VPC network, non-RFC1918 addresses go to the internet. When set to PRIVATE, Cloud DNS always sends queries through the VPC network for this target.
-    #[serde(rename="forwardingPath")]
-    pub forwarding_path: Option<String>,
-    /// IPv4 address to forward to.
-    #[serde(rename="ipv4Address")]
-    pub ipv4_address: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-}
-
-impl client::Part for PolicyAlternativeNameServerConfigTargetNameServer {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PolicyNetwork {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The fully qualified URL of the VPC network to bind to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}
-    #[serde(rename="networkUrl")]
-    pub network_url: Option<String>,
-}
-
-impl client::Part for PolicyNetwork {}
-
-
-/// A project resource. The project is a top level container for resources including Cloud DNS ManagedZones. Projects can be created only in the APIs console. Next tag: 7.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [managed zones rrsets create projects](ProjectManagedZoneRrsetCreateCall) (none)
-/// * [managed zones rrsets delete projects](ProjectManagedZoneRrsetDeleteCall) (none)
-/// * [managed zones rrsets get projects](ProjectManagedZoneRrsetGetCall) (none)
-/// * [managed zones rrsets patch projects](ProjectManagedZoneRrsetPatchCall) (none)
-/// * [get projects](ProjectGetCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Project {
-    /// User assigned unique identifier for the resource (output only).
-    pub id: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// Unique numeric identifier for the resource; defined by the server (output only).
-    pub number: Option<String>,
-    /// Quotas assigned to this project (output only).
-    pub quota: Option<Quota>,
-}
-
-impl client::Resource for Project {}
-impl client::ResponseResult for Project {}
-
-
-/// Limits associated with a Project.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Quota {
-    /// Maximum allowed number of DnsKeys per ManagedZone.
-    #[serde(rename="dnsKeysPerManagedZone")]
-    pub dns_keys_per_managed_zone: Option<i32>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// Maximum allowed number of managed zones in the project.
-    #[serde(rename="managedZones")]
-    pub managed_zones: Option<i32>,
-    /// Maximum allowed number of managed zones which can be attached to a network.
-    #[serde(rename="managedZonesPerNetwork")]
-    pub managed_zones_per_network: Option<i32>,
-    /// Maximum allowed number of networks to which a privately scoped zone can be attached.
-    #[serde(rename="networksPerManagedZone")]
-    pub networks_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of networks per policy.
-    #[serde(rename="networksPerPolicy")]
-    pub networks_per_policy: Option<i32>,
-    /// Maximum allowed number of policies per project.
-    pub policies: Option<i32>,
-    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
-    #[serde(rename="resourceRecordsPerRrset")]
-    pub resource_records_per_rrset: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
-    #[serde(rename="rrsetAdditionsPerChange")]
-    pub rrset_additions_per_change: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
-    #[serde(rename="rrsetDeletionsPerChange")]
-    pub rrset_deletions_per_change: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets per zone in the project.
-    #[serde(rename="rrsetsPerManagedZone")]
-    pub rrsets_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of target name servers per managed forwarding zone.
-    #[serde(rename="targetNameServersPerManagedZone")]
-    pub target_name_servers_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of alternative target name servers per policy.
-    #[serde(rename="targetNameServersPerPolicy")]
-    pub target_name_servers_per_policy: Option<i32>,
-    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
-    #[serde(rename="totalRrdataSizePerChange")]
-    pub total_rrdata_size_per_change: Option<i32>,
-    /// DNSSEC algorithm and key length types that can be used for DnsKeys.
-    #[serde(rename="whitelistedKeySpecs")]
-    pub whitelisted_key_specs: Option<Vec<DnsKeySpec>>,
-}
-
-impl client::Part for Quota {}
-
-
-/// A unit of data that is returned by the DNS servers.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [managed zones rrsets create projects](ProjectManagedZoneRrsetCreateCall) (request|response)
-/// * [managed zones rrsets get projects](ProjectManagedZoneRrsetGetCall) (response)
-/// * [managed zones rrsets patch projects](ProjectManagedZoneRrsetPatchCall) (request|response)
-/// * [list resource record sets](ResourceRecordSetListCall) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecordSet {
-    /// no description provided
-    pub kind: Option<String>,
-    /// For example, www.example.com.
+pub struct NamedRanges {
+    /// The name that all the named ranges share.
     pub name: Option<String>,
-    /// As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1) -- see examples.
-    pub rrdatas: Option<Vec<String>>,
-    /// As defined in RFC 4034 (section 3.2).
-    #[serde(rename="signatureRrdatas")]
-    pub signature_rrdatas: Option<Vec<String>>,
-    /// Number of seconds that this ResourceRecordSet can be cached by resolvers.
-    pub ttl: Option<i32>,
-    /// The identifier of a supported record type. See the list of Supported DNS record types.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    /// The NamedRanges that share the same name.
+    #[serde(rename="namedRanges")]
+    pub named_ranges: Option<Vec<NamedRange>>,
 }
 
-impl client::RequestValue for ResourceRecordSet {}
-impl client::Resource for ResourceRecordSet {}
-impl client::ResponseResult for ResourceRecordSet {}
+impl client::Part for NamedRanges {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [managed zones rrsets delete projects](ProjectManagedZoneRrsetDeleteCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecordSetsDeleteResponse { _never_set: Option<bool> }
-
-impl client::ResponseResult for ResourceRecordSetsDeleteResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list resource record sets](ResourceRecordSetListCall) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecordSetsListResponse {
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// Type of resource.
-    pub kind: Option<String>,
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token. This lets you retrieve complete contents of even larger collections, one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of elements returned are an inconsistent view of the collection. You cannot retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The resource record set resources.
-    pub rrsets: Option<Vec<ResourceRecordSet>>,
-}
-
-impl client::ResponseResult for ResourceRecordSetsListResponse {}
-
-
-/// Elements common to every response.
+/// A named style. Paragraphs in the document can inherit their TextStyle and ParagraphStyle from this named style when they have the same named style type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResponseHeader {
-    /// For mutating operation requests that completed successfully. This is the client_operation_id if the client specified it, otherwise it is generated by the server (output only).
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+pub struct NamedStyle {
+    /// The type of this named style.
+    #[serde(rename="namedStyleType")]
+    pub named_style_type: Option<String>,
+    /// The paragraph style of this named style.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+    /// The text style of this named style.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
 }
 
-impl client::Part for ResponseHeader {}
+impl client::Part for NamedStyle {}
+
+
+/// A suggestion state of a NamedStyle message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedStyleSuggestionState {
+    /// The named style type that this suggestion state corresponds to. This field is provided as a convenience for matching the NamedStyleSuggestionState with its corresponding NamedStyle.
+    #[serde(rename="namedStyleType")]
+    pub named_style_type: Option<String>,
+    /// A mask that indicates which of the fields in paragraph style have been changed in this suggestion.
+    #[serde(rename="paragraphStyleSuggestionState")]
+    pub paragraph_style_suggestion_state: Option<ParagraphStyleSuggestionState>,
+    /// A mask that indicates which of the fields in text style have been changed in this suggestion.
+    #[serde(rename="textStyleSuggestionState")]
+    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
+}
+
+impl client::Part for NamedStyleSuggestionState {}
+
+
+/// The named styles. Paragraphs in the document can inherit their TextStyle and ParagraphStyle from these named styles.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedStyles {
+    /// The named styles. There is an entry for each of the possible named style types.
+    pub styles: Option<Vec<NamedStyle>>,
+}
+
+impl client::Part for NamedStyles {}
+
+
+/// The suggestion state of a NamedStyles message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedStylesSuggestionState {
+    /// A mask that indicates which of the fields on the corresponding NamedStyle in styles have been changed in this suggestion. The order of these named style suggestion states match the order of the corresponding named style within the named styles suggestion.
+    #[serde(rename="stylesSuggestionStates")]
+    pub styles_suggestion_states: Option<Vec<NamedStyleSuggestionState>>,
+}
+
+impl client::Part for NamedStylesSuggestionState {}
+
+
+/// Contains properties describing the look and feel of a list bullet at a given level of nesting.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NestingLevel {
+    /// The alignment of the bullet within the space allotted for rendering the bullet.
+    #[serde(rename="bulletAlignment")]
+    pub bullet_alignment: Option<String>,
+    /// The format string used by bullets at this level of nesting. The glyph format contains one or more placeholders, and these placeholder are replaced with the appropriate values depending on the glyph_type or glyph_symbol. The placeholders follow the pattern `%[nesting_level]`. Furthermore, placeholders can have prefixes and suffixes. Thus, the glyph format follows the pattern `%[nesting_level]`. Note that the prefix and suffix are optional and can be arbitrary strings. For example, the glyph format `%0.` indicates that the rendered glyph will replace the placeholder with the corresponding glyph for nesting level 0 followed by a period as the suffix. So a list with a glyph type of UPPER_ALPHA and glyph format `%0.` at nesting level 0 will result in a list with rendered glyphs `A.` `B.` `C.` The glyph format can contain placeholders for the current nesting level as well as placeholders for parent nesting levels. For example, a list can have a glyph format of `%0.` at nesting level 0 and a glyph format of `%0.%1.` at nesting level 1. Assuming both nesting levels have DECIMAL glyph types, this would result in a list with rendered glyphs `1.` `2.` ` 2.1.` ` 2.2.` `3.` For nesting levels that are ordered, the string that replaces a placeholder in the glyph format for a particular paragraph depends on the paragraph's order within the list.
+    #[serde(rename="glyphFormat")]
+    pub glyph_format: Option<String>,
+    /// A custom glyph symbol used by bullets when paragraphs at this level of nesting are unordered. The glyph symbol replaces placeholders within the glyph_format. For example, if the glyph_symbol is the solid circle corresponding to Unicode U+25cf code point and the glyph_format is `%0`, the rendered glyph would be the solid circle.
+    #[serde(rename="glyphSymbol")]
+    pub glyph_symbol: Option<String>,
+    /// The type of glyph used by bullets when paragraphs at this level of nesting are ordered. The glyph type determines the type of glyph used to replace placeholders within the glyph_format when paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph format with a number corresponding to list item's order within the list.
+    #[serde(rename="glyphType")]
+    pub glyph_type: Option<String>,
+    /// The amount of indentation for the first line of paragraphs at this level of nesting.
+    #[serde(rename="indentFirstLine")]
+    pub indent_first_line: Option<Dimension>,
+    /// The amount of indentation for paragraphs at this level of nesting. Applied to the side that corresponds to the start of the text, based on the paragraph's content direction.
+    #[serde(rename="indentStart")]
+    pub indent_start: Option<Dimension>,
+    /// The number of the first list item at this nesting level. A value of 0 is treated as a value of 1 for lettered lists and roman numeraled lists, i.e. for values of both 0 and 1, lettered and roman numeraled lists will begin at `a` and `i` respectively. This value is ignored for nesting levels with unordered glyphs.
+    #[serde(rename="startNumber")]
+    pub start_number: Option<i32>,
+    /// The text style of bullets at this level of nesting.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for NestingLevel {}
+
+
+/// A mask that indicates which of the fields on the base NestingLevel have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NestingLevelSuggestionState {
+    /// Indicates if there was a suggested change to bullet_alignment.
+    #[serde(rename="bulletAlignmentSuggested")]
+    pub bullet_alignment_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to glyph_format.
+    #[serde(rename="glyphFormatSuggested")]
+    pub glyph_format_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to glyph_symbol.
+    #[serde(rename="glyphSymbolSuggested")]
+    pub glyph_symbol_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to glyph_type.
+    #[serde(rename="glyphTypeSuggested")]
+    pub glyph_type_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_first_line.
+    #[serde(rename="indentFirstLineSuggested")]
+    pub indent_first_line_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_start.
+    #[serde(rename="indentStartSuggested")]
+    pub indent_start_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to start_number.
+    #[serde(rename="startNumberSuggested")]
+    pub start_number_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in text style have been changed in this suggestion.
+    #[serde(rename="textStyleSuggestionState")]
+    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
+}
+
+impl client::Part for NestingLevelSuggestionState {}
+
+
+/// A collection of object IDs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObjectReferences {
+    /// The object IDs.
+    #[serde(rename="objectIds")]
+    pub object_ids: Option<Vec<String>>,
+}
+
+impl client::Part for ObjectReferences {}
+
+
+/// A color that can either be fully opaque or fully transparent.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OptionalColor {
+    /// If set, this will be used as an opaque color. If unset, this represents a transparent color.
+    pub color: Option<Color>,
+}
+
+impl client::Part for OptionalColor {}
+
+
+/// A ParagraphElement representing a page break. A page break makes the subsequent text start at the top of the next page.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PageBreak {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A PageBreak may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this PageBreak, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this PageBreak. Similar to text content, like text runs and footnote references, the text style of a page break can affect content layout as well as the styling of text inserted adjacent to it.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for PageBreak {}
+
+
+/// A StructuralElement representing a paragraph. A paragraph is a range of content that is terminated with a newline character.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Paragraph {
+    /// The bullet for this paragraph. If not present, the paragraph does not belong to a list.
+    pub bullet: Option<Bullet>,
+    /// The content of the paragraph broken down into its component parts.
+    pub elements: Option<Vec<ParagraphElement>>,
+    /// The style of this paragraph.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+    /// The IDs of the positioned objects tethered to this paragraph.
+    #[serde(rename="positionedObjectIds")]
+    pub positioned_object_ids: Option<Vec<String>>,
+    /// The suggested changes to this paragraph's bullet.
+    #[serde(rename="suggestedBulletChanges")]
+    pub suggested_bullet_changes: Option<HashMap<String, SuggestedBullet>>,
+    /// The suggested paragraph style changes to this paragraph, keyed by suggestion ID.
+    #[serde(rename="suggestedParagraphStyleChanges")]
+    pub suggested_paragraph_style_changes: Option<HashMap<String, SuggestedParagraphStyle>>,
+    /// The IDs of the positioned objects that are suggested to be attached to this paragraph, keyed by suggestion ID.
+    #[serde(rename="suggestedPositionedObjectIds")]
+    pub suggested_positioned_object_ids: Option<HashMap<String, ObjectReferences>>,
+}
+
+impl client::Part for Paragraph {}
+
+
+/// A border around a paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphBorder {
+    /// The color of the border.
+    pub color: Option<OptionalColor>,
+    /// The dash style of the border.
+    #[serde(rename="dashStyle")]
+    pub dash_style: Option<String>,
+    /// The padding of the border.
+    pub padding: Option<Dimension>,
+    /// The width of the border.
+    pub width: Option<Dimension>,
+}
+
+impl client::Part for ParagraphBorder {}
+
+
+/// A ParagraphElement describes content within a Paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphElement {
+    /// An auto text paragraph element.
+    #[serde(rename="autoText")]
+    pub auto_text: Option<AutoText>,
+    /// A column break paragraph element.
+    #[serde(rename="columnBreak")]
+    pub column_break: Option<ColumnBreak>,
+    /// The zero-base end index of this paragraph element, exclusive, in UTF-16 code units.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// An equation paragraph element.
+    pub equation: Option<Equation>,
+    /// A footnote reference paragraph element.
+    #[serde(rename="footnoteReference")]
+    pub footnote_reference: Option<FootnoteReference>,
+    /// A horizontal rule paragraph element.
+    #[serde(rename="horizontalRule")]
+    pub horizontal_rule: Option<HorizontalRule>,
+    /// An inline object paragraph element.
+    #[serde(rename="inlineObjectElement")]
+    pub inline_object_element: Option<InlineObjectElement>,
+    /// A page break paragraph element.
+    #[serde(rename="pageBreak")]
+    pub page_break: Option<PageBreak>,
+    /// A paragraph element that links to a person or email address.
+    pub person: Option<Person>,
+    /// A paragraph element that links to a Google resource (such as a file in Drive, a Youtube video, a Calendar event, etc.)
+    #[serde(rename="richLink")]
+    pub rich_link: Option<RichLink>,
+    /// The zero-based start index of this paragraph element, in UTF-16 code units.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// A text run paragraph element.
+    #[serde(rename="textRun")]
+    pub text_run: Option<TextRun>,
+}
+
+impl client::Part for ParagraphElement {}
+
+
+/// Styles that apply to a whole paragraph. Inherited paragraph styles are represented as unset fields in this message. A paragraph style's parent depends on where the paragraph style is defined: * The ParagraphStyle on a Paragraph inherits from the paragraph's corresponding named style type. * The ParagraphStyle on a named style inherits from the normal text named style. * The ParagraphStyle of the normal text named style inherits from the default paragraph style in the Docs editor. * The ParagraphStyle on a Paragraph element that is contained in a table may inherit its paragraph style from the table style. If the paragraph style does not inherit from a parent, unsetting fields will revert the style to a value matching the defaults in the Docs editor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphStyle {
+    /// The text alignment for this paragraph.
+    pub alignment: Option<String>,
+    /// Whether to avoid widows and orphans for the paragraph. If unset, the value is inherited from the parent.
+    #[serde(rename="avoidWidowAndOrphan")]
+    pub avoid_widow_and_orphan: Option<bool>,
+    /// The border between this paragraph and the next and previous paragraphs. If unset, the value is inherited from the parent. The between border is rendered when the adjacent paragraph has the same border and indent properties. Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must be specified in its entirety.
+    #[serde(rename="borderBetween")]
+    pub border_between: Option<ParagraphBorder>,
+    /// The border at the bottom of this paragraph. If unset, the value is inherited from the parent. The bottom border is rendered when the paragraph below has different border and indent properties. Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must be specified in its entirety.
+    #[serde(rename="borderBottom")]
+    pub border_bottom: Option<ParagraphBorder>,
+    /// The border to the left of this paragraph. If unset, the value is inherited from the parent. Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must be specified in its entirety.
+    #[serde(rename="borderLeft")]
+    pub border_left: Option<ParagraphBorder>,
+    /// The border to the right of this paragraph. If unset, the value is inherited from the parent. Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must be specified in its entirety.
+    #[serde(rename="borderRight")]
+    pub border_right: Option<ParagraphBorder>,
+    /// The border at the top of this paragraph. If unset, the value is inherited from the parent. The top border is rendered when the paragraph above has different border and indent properties. Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must be specified in its entirety.
+    #[serde(rename="borderTop")]
+    pub border_top: Option<ParagraphBorder>,
+    /// The text direction of this paragraph. If unset, the value defaults to LEFT_TO_RIGHT since paragraph direction is not inherited.
+    pub direction: Option<String>,
+    /// The heading ID of the paragraph. If empty, then this paragraph is not a heading. This property is read-only.
+    #[serde(rename="headingId")]
+    pub heading_id: Option<String>,
+    /// The amount of indentation for the paragraph on the side that corresponds to the end of the text, based on the current paragraph direction. If unset, the value is inherited from the parent.
+    #[serde(rename="indentEnd")]
+    pub indent_end: Option<Dimension>,
+    /// The amount of indentation for the first line of the paragraph. If unset, the value is inherited from the parent.
+    #[serde(rename="indentFirstLine")]
+    pub indent_first_line: Option<Dimension>,
+    /// The amount of indentation for the paragraph on the side that corresponds to the start of the text, based on the current paragraph direction. If unset, the value is inherited from the parent.
+    #[serde(rename="indentStart")]
+    pub indent_start: Option<Dimension>,
+    /// Whether all lines of the paragraph should be laid out on the same page or column if possible. If unset, the value is inherited from the parent.
+    #[serde(rename="keepLinesTogether")]
+    pub keep_lines_together: Option<bool>,
+    /// Whether at least a part of this paragraph should be laid out on the same page or column as the next paragraph if possible. If unset, the value is inherited from the parent.
+    #[serde(rename="keepWithNext")]
+    pub keep_with_next: Option<bool>,
+    /// The amount of space between lines, as a percentage of normal, where normal is represented as 100.0. If unset, the value is inherited from the parent.
+    #[serde(rename="lineSpacing")]
+    pub line_spacing: Option<f32>,
+    /// The named style type of the paragraph. Since updating the named style type affects other properties within ParagraphStyle, the named style type is applied before the other properties are updated.
+    #[serde(rename="namedStyleType")]
+    pub named_style_type: Option<String>,
+    /// The shading of the paragraph. If unset, the value is inherited from the parent.
+    pub shading: Option<Shading>,
+    /// The amount of extra space above the paragraph. If unset, the value is inherited from the parent.
+    #[serde(rename="spaceAbove")]
+    pub space_above: Option<Dimension>,
+    /// The amount of extra space below the paragraph. If unset, the value is inherited from the parent.
+    #[serde(rename="spaceBelow")]
+    pub space_below: Option<Dimension>,
+    /// The spacing mode for the paragraph.
+    #[serde(rename="spacingMode")]
+    pub spacing_mode: Option<String>,
+    /// A list of the tab stops for this paragraph. The list of tab stops is not inherited. This property is read-only.
+    #[serde(rename="tabStops")]
+    pub tab_stops: Option<Vec<TabStop>>,
+}
+
+impl client::Part for ParagraphStyle {}
+
+
+/// A mask that indicates which of the fields on the base ParagraphStyle have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphStyleSuggestionState {
+    /// Indicates if there was a suggested change to alignment.
+    #[serde(rename="alignmentSuggested")]
+    pub alignment_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to avoid_widow_and_orphan.
+    #[serde(rename="avoidWidowAndOrphanSuggested")]
+    pub avoid_widow_and_orphan_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_between.
+    #[serde(rename="borderBetweenSuggested")]
+    pub border_between_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_bottom.
+    #[serde(rename="borderBottomSuggested")]
+    pub border_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_left.
+    #[serde(rename="borderLeftSuggested")]
+    pub border_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_right.
+    #[serde(rename="borderRightSuggested")]
+    pub border_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_top.
+    #[serde(rename="borderTopSuggested")]
+    pub border_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to direction.
+    #[serde(rename="directionSuggested")]
+    pub direction_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to heading_id.
+    #[serde(rename="headingIdSuggested")]
+    pub heading_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_end.
+    #[serde(rename="indentEndSuggested")]
+    pub indent_end_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_first_line.
+    #[serde(rename="indentFirstLineSuggested")]
+    pub indent_first_line_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_start.
+    #[serde(rename="indentStartSuggested")]
+    pub indent_start_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to keep_lines_together.
+    #[serde(rename="keepLinesTogetherSuggested")]
+    pub keep_lines_together_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to keep_with_next.
+    #[serde(rename="keepWithNextSuggested")]
+    pub keep_with_next_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to line_spacing.
+    #[serde(rename="lineSpacingSuggested")]
+    pub line_spacing_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to named_style_type.
+    #[serde(rename="namedStyleTypeSuggested")]
+    pub named_style_type_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in shading have been changed in this suggestion.
+    #[serde(rename="shadingSuggestionState")]
+    pub shading_suggestion_state: Option<ShadingSuggestionState>,
+    /// Indicates if there was a suggested change to space_above.
+    #[serde(rename="spaceAboveSuggested")]
+    pub space_above_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to space_below.
+    #[serde(rename="spaceBelowSuggested")]
+    pub space_below_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to spacing_mode.
+    #[serde(rename="spacingModeSuggested")]
+    pub spacing_mode_suggested: Option<bool>,
+}
+
+impl client::Part for ParagraphStyleSuggestionState {}
+
+
+/// A person or email address mentioned in a document. These mentions behave as a single, immutable element containing the person's name or email address.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Person {
+    /// Output only. The unique ID of this link.
+    #[serde(rename="personId")]
+    pub person_id: Option<String>,
+    /// Output only. The properties of this Person. This field is always present.
+    #[serde(rename="personProperties")]
+    pub person_properties: Option<PersonProperties>,
+    /// IDs for suggestions that remove this person link from the document. A Person might have multiple deletion IDs if, for example, multiple users suggest to delete it. If empty, then this person link isn't suggested for deletion.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// IDs for suggestions that insert this person link into the document. A Person might have multiple insertion IDs if it is a nested suggested change (a suggestion within a suggestion made by a different user, for example). If empty, then this person link isn't a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this Person, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this Person.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for Person {}
+
+
+/// Properties specific to a linked Person.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PersonProperties {
+    /// Output only. The email address linked to this Person. This field is always present.
+    pub email: Option<String>,
+    /// Output only. The name of the person if it is displayed in the link text instead of the person's email address.
+    pub name: Option<String>,
+}
+
+impl client::Part for PersonProperties {}
+
+
+/// An object that is tethered to a Paragraph and positioned relative to the beginning of the paragraph. A PositionedObject contains an EmbeddedObject such as an image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObject {
+    /// The ID of this positioned object.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The properties of this positioned object.
+    #[serde(rename="positionedObjectProperties")]
+    pub positioned_object_properties: Option<PositionedObjectProperties>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion ID. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+    /// The suggested changes to the positioned object properties, keyed by suggestion ID.
+    #[serde(rename="suggestedPositionedObjectPropertiesChanges")]
+    pub suggested_positioned_object_properties_changes: Option<HashMap<String, SuggestedPositionedObjectProperties>>,
+}
+
+impl client::Part for PositionedObject {}
+
+
+/// The positioning of a PositionedObject. The positioned object is positioned relative to the beginning of the Paragraph it is tethered to.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectPositioning {
+    /// The layout of this positioned object.
+    pub layout: Option<String>,
+    /// The offset of the left edge of the positioned object relative to the beginning of the Paragraph it is tethered to. The exact positioning of the object can depend on other content in the document and the document's styling.
+    #[serde(rename="leftOffset")]
+    pub left_offset: Option<Dimension>,
+    /// The offset of the top edge of the positioned object relative to the beginning of the Paragraph it is tethered to. The exact positioning of the object can depend on other content in the document and the document's styling.
+    #[serde(rename="topOffset")]
+    pub top_offset: Option<Dimension>,
+}
+
+impl client::Part for PositionedObjectPositioning {}
+
+
+/// A mask that indicates which of the fields on the base PositionedObjectPositioning have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectPositioningSuggestionState {
+    /// Indicates if there was a suggested change to layout.
+    #[serde(rename="layoutSuggested")]
+    pub layout_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to left_offset.
+    #[serde(rename="leftOffsetSuggested")]
+    pub left_offset_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to top_offset.
+    #[serde(rename="topOffsetSuggested")]
+    pub top_offset_suggested: Option<bool>,
+}
+
+impl client::Part for PositionedObjectPositioningSuggestionState {}
+
+
+/// Properties of a PositionedObject.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectProperties {
+    /// The embedded object of this positioned object.
+    #[serde(rename="embeddedObject")]
+    pub embedded_object: Option<EmbeddedObject>,
+    /// The positioning of this positioned object relative to the newline of the Paragraph that references this positioned object.
+    pub positioning: Option<PositionedObjectPositioning>,
+}
+
+impl client::Part for PositionedObjectProperties {}
+
+
+/// A mask that indicates which of the fields on the base PositionedObjectProperties have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectPropertiesSuggestionState {
+    /// A mask that indicates which of the fields in embedded_object have been changed in this suggestion.
+    #[serde(rename="embeddedObjectSuggestionState")]
+    pub embedded_object_suggestion_state: Option<EmbeddedObjectSuggestionState>,
+    /// A mask that indicates which of the fields in positioning have been changed in this suggestion.
+    #[serde(rename="positioningSuggestionState")]
+    pub positioning_suggestion_state: Option<PositionedObjectPositioningSuggestionState>,
+}
+
+impl client::Part for PositionedObjectPropertiesSuggestionState {}
+
+
+/// Specifies a contiguous range of text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Range {
+    /// The zero-based end index of this range, exclusive, in UTF-16 code units. In all current uses, an end index must be provided. This field is an Int32Value in order to accommodate future use cases with open-ended ranges.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// The ID of the header, footer or footnote that this range is contained in. An empty segment ID signifies the document's body.
+    #[serde(rename="segmentId")]
+    pub segment_id: Option<String>,
+    /// The zero-based start index of this range, in UTF-16 code units. In all current uses, a start index must be provided. This field is an Int32Value in order to accommodate future use cases with open-ended ranges.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+}
+
+impl client::Part for Range {}
+
+
+/// Replaces all instances of text matching a criteria with replace text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceAllTextRequest {
+    /// Finds text in the document matching this substring.
+    #[serde(rename="containsText")]
+    pub contains_text: Option<SubstringMatchCriteria>,
+    /// The text that will replace the matched text.
+    #[serde(rename="replaceText")]
+    pub replace_text: Option<String>,
+}
+
+impl client::Part for ReplaceAllTextRequest {}
+
+
+/// The result of replacing text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceAllTextResponse {
+    /// The number of occurrences changed by replacing all text.
+    #[serde(rename="occurrencesChanged")]
+    pub occurrences_changed: Option<i32>,
+}
+
+impl client::Part for ReplaceAllTextResponse {}
+
+
+/// Replaces an existing image with a new image. Replacing an image removes some image effects from the existing image in order to mirror the behavior of the Docs editor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceImageRequest {
+    /// The ID of the existing image that will be replaced.
+    #[serde(rename="imageObjectId")]
+    pub image_object_id: Option<String>,
+    /// The replacement method.
+    #[serde(rename="imageReplaceMethod")]
+    pub image_replace_method: Option<String>,
+    /// The URI of the new image. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format. The provided URI can be at most 2 kB in length. The URI itself is saved with the image, and exposed via the ImageProperties.source_uri field.
+    pub uri: Option<String>,
+}
+
+impl client::Part for ReplaceImageRequest {}
+
+
+/// Replaces the contents of the specified NamedRange or NamedRanges with the given replacement content. Note that an individual NamedRange may consist of multiple discontinuous ranges. In this case, only the content in the first range will be replaced. The other ranges and their content will be deleted. In cases where replacing or deleting any ranges would result in an invalid document structure, a 400 bad request error is returned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceNamedRangeContentRequest {
+    /// The ID of the named range whose content will be replaced. If there is no named range with the given ID a 400 bad request error is returned.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The name of the NamedRanges whose content will be replaced. If there are multiple named ranges with the given name, then the content of each one will be replaced. If there are no named ranges with the given name, then the request will be a no-op.
+    #[serde(rename="namedRangeName")]
+    pub named_range_name: Option<String>,
+    /// Replaces the content of the specified named range(s) with the given text.
+    pub text: Option<String>,
+}
+
+impl client::Part for ReplaceNamedRangeContentRequest {}
+
+
+/// A single update to apply to a document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Request {
+    /// Creates a footer.
+    #[serde(rename="createFooter")]
+    pub create_footer: Option<CreateFooterRequest>,
+    /// Creates a footnote.
+    #[serde(rename="createFootnote")]
+    pub create_footnote: Option<CreateFootnoteRequest>,
+    /// Creates a header.
+    #[serde(rename="createHeader")]
+    pub create_header: Option<CreateHeaderRequest>,
+    /// Creates a named range.
+    #[serde(rename="createNamedRange")]
+    pub create_named_range: Option<CreateNamedRangeRequest>,
+    /// Creates bullets for paragraphs.
+    #[serde(rename="createParagraphBullets")]
+    pub create_paragraph_bullets: Option<CreateParagraphBulletsRequest>,
+    /// Deletes content from the document.
+    #[serde(rename="deleteContentRange")]
+    pub delete_content_range: Option<DeleteContentRangeRequest>,
+    /// Deletes a footer from the document.
+    #[serde(rename="deleteFooter")]
+    pub delete_footer: Option<DeleteFooterRequest>,
+    /// Deletes a header from the document.
+    #[serde(rename="deleteHeader")]
+    pub delete_header: Option<DeleteHeaderRequest>,
+    /// Deletes a named range.
+    #[serde(rename="deleteNamedRange")]
+    pub delete_named_range: Option<DeleteNamedRangeRequest>,
+    /// Deletes bullets from paragraphs.
+    #[serde(rename="deleteParagraphBullets")]
+    pub delete_paragraph_bullets: Option<DeleteParagraphBulletsRequest>,
+    /// Deletes a positioned object from the document.
+    #[serde(rename="deletePositionedObject")]
+    pub delete_positioned_object: Option<DeletePositionedObjectRequest>,
+    /// Deletes a column from a table.
+    #[serde(rename="deleteTableColumn")]
+    pub delete_table_column: Option<DeleteTableColumnRequest>,
+    /// Deletes a row from a table.
+    #[serde(rename="deleteTableRow")]
+    pub delete_table_row: Option<DeleteTableRowRequest>,
+    /// Inserts an inline image at the specified location.
+    #[serde(rename="insertInlineImage")]
+    pub insert_inline_image: Option<InsertInlineImageRequest>,
+    /// Inserts a page break at the specified location.
+    #[serde(rename="insertPageBreak")]
+    pub insert_page_break: Option<InsertPageBreakRequest>,
+    /// Inserts a section break at the specified location.
+    #[serde(rename="insertSectionBreak")]
+    pub insert_section_break: Option<InsertSectionBreakRequest>,
+    /// Inserts a table at the specified location.
+    #[serde(rename="insertTable")]
+    pub insert_table: Option<InsertTableRequest>,
+    /// Inserts an empty column into a table.
+    #[serde(rename="insertTableColumn")]
+    pub insert_table_column: Option<InsertTableColumnRequest>,
+    /// Inserts an empty row into a table.
+    #[serde(rename="insertTableRow")]
+    pub insert_table_row: Option<InsertTableRowRequest>,
+    /// Inserts text at the specified location.
+    #[serde(rename="insertText")]
+    pub insert_text: Option<InsertTextRequest>,
+    /// Merges cells in a table.
+    #[serde(rename="mergeTableCells")]
+    pub merge_table_cells: Option<MergeTableCellsRequest>,
+    /// Replaces all instances of the specified text.
+    #[serde(rename="replaceAllText")]
+    pub replace_all_text: Option<ReplaceAllTextRequest>,
+    /// Replaces an image in the document.
+    #[serde(rename="replaceImage")]
+    pub replace_image: Option<ReplaceImageRequest>,
+    /// Replaces the content in a named range.
+    #[serde(rename="replaceNamedRangeContent")]
+    pub replace_named_range_content: Option<ReplaceNamedRangeContentRequest>,
+    /// Unmerges cells in a table.
+    #[serde(rename="unmergeTableCells")]
+    pub unmerge_table_cells: Option<UnmergeTableCellsRequest>,
+    /// Updates the style of the document.
+    #[serde(rename="updateDocumentStyle")]
+    pub update_document_style: Option<UpdateDocumentStyleRequest>,
+    /// Updates the paragraph style at the specified range.
+    #[serde(rename="updateParagraphStyle")]
+    pub update_paragraph_style: Option<UpdateParagraphStyleRequest>,
+    /// Updates the section style of the specified range.
+    #[serde(rename="updateSectionStyle")]
+    pub update_section_style: Option<UpdateSectionStyleRequest>,
+    /// Updates the style of table cells.
+    #[serde(rename="updateTableCellStyle")]
+    pub update_table_cell_style: Option<UpdateTableCellStyleRequest>,
+    /// Updates the properties of columns in a table.
+    #[serde(rename="updateTableColumnProperties")]
+    pub update_table_column_properties: Option<UpdateTableColumnPropertiesRequest>,
+    /// Updates the row style in a table.
+    #[serde(rename="updateTableRowStyle")]
+    pub update_table_row_style: Option<UpdateTableRowStyleRequest>,
+    /// Updates the text style at the specified range.
+    #[serde(rename="updateTextStyle")]
+    pub update_text_style: Option<UpdateTextStyleRequest>,
+}
+
+impl client::Part for Request {}
+
+
+/// A single response from an update.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Response {
+    /// The result of creating a footer.
+    #[serde(rename="createFooter")]
+    pub create_footer: Option<CreateFooterResponse>,
+    /// The result of creating a footnote.
+    #[serde(rename="createFootnote")]
+    pub create_footnote: Option<CreateFootnoteResponse>,
+    /// The result of creating a header.
+    #[serde(rename="createHeader")]
+    pub create_header: Option<CreateHeaderResponse>,
+    /// The result of creating a named range.
+    #[serde(rename="createNamedRange")]
+    pub create_named_range: Option<CreateNamedRangeResponse>,
+    /// The result of inserting an inline image.
+    #[serde(rename="insertInlineImage")]
+    pub insert_inline_image: Option<InsertInlineImageResponse>,
+    /// The result of inserting an inline Google Sheets chart.
+    #[serde(rename="insertInlineSheetsChart")]
+    pub insert_inline_sheets_chart: Option<InsertInlineSheetsChartResponse>,
+    /// The result of replacing text.
+    #[serde(rename="replaceAllText")]
+    pub replace_all_text: Option<ReplaceAllTextResponse>,
+}
+
+impl client::Part for Response {}
+
+
+/// An RGB color.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RgbColor {
+    /// The blue component of the color, from 0.0 to 1.0.
+    pub blue: Option<f32>,
+    /// The green component of the color, from 0.0 to 1.0.
+    pub green: Option<f32>,
+    /// The red component of the color, from 0.0 to 1.0.
+    pub red: Option<f32>,
+}
+
+impl client::Part for RgbColor {}
+
+
+/// A link to a Google resource (e.g., a file in Drive, a YouTube video, a Calendar event, etc.).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RichLink {
+    /// Output only. The ID of this link.
+    #[serde(rename="richLinkId")]
+    pub rich_link_id: Option<String>,
+    /// Output only. The properties of this RichLink. This field is always present.
+    #[serde(rename="richLinkProperties")]
+    pub rich_link_properties: Option<RichLinkProperties>,
+    /// IDs for suggestions that remove this link from the document. A RichLink might have multiple deletion IDs if, for example, multiple users suggest to delete it. If empty, then this person link isn't suggested for deletion.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// IDs for suggestions that insert this link into the document. A RichLink might have multiple insertion IDs if it is a nested suggested change (a suggestion within a suggestion made by a different user, for example). If empty, then this person link isn't a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this RichLink, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this RichLink.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for RichLink {}
+
+
+/// Properties specific to a RichLink.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RichLinkProperties {
+    /// Output only. The [MIME type](https://developers.google.com/drive/api/v3/mime-types) of the RichLink, if there is one (i.e., when it is a file in Drive).
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Output only. The title of the RichLink as displayed in the link. This title matches the title of the linked resource at the time of the insertion or last update of the link. This field is always present.
+    pub title: Option<String>,
+    /// Output only. The URI to the RichLink. This is always present.
+    pub uri: Option<String>,
+}
+
+impl client::Part for RichLinkProperties {}
+
+
+/// A StructuralElement representing a section break. A section is a range of content which has the same SectionStyle. A section break represents the start of a new section, and the section style applies to the section after the section break. The document body always begins with a section break.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SectionBreak {
+    /// The style of the section after this section break.
+    #[serde(rename="sectionStyle")]
+    pub section_style: Option<SectionStyle>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A SectionBreak may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl client::Part for SectionBreak {}
+
+
+/// Properties that apply to a section's column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SectionColumnProperties {
+    /// The padding at the end of the column.
+    #[serde(rename="paddingEnd")]
+    pub padding_end: Option<Dimension>,
+    /// Output only. The width of the column.
+    pub width: Option<Dimension>,
+}
+
+impl client::Part for SectionColumnProperties {}
+
+
+/// The styling that applies to a section.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SectionStyle {
+    /// The section's columns properties. If empty, the section contains one column with the default properties in the Docs editor. A section can be updated to have no more than three columns. When updating this property, setting a concrete value is required. Unsetting this property will result in a 400 bad request error.
+    #[serde(rename="columnProperties")]
+    pub column_properties: Option<Vec<SectionColumnProperties>>,
+    /// The style of column separators. This style can be set even when there is one column in the section. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="columnSeparatorStyle")]
+    pub column_separator_style: Option<String>,
+    /// The content direction of this section. If unset, the value defaults to LEFT_TO_RIGHT. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="contentDirection")]
+    pub content_direction: Option<String>,
+    /// The ID of the default footer. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_footer_id. This property is read-only.
+    #[serde(rename="defaultFooterId")]
+    pub default_footer_id: Option<String>,
+    /// The ID of the default header. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_header_id. This property is read-only.
+    #[serde(rename="defaultHeaderId")]
+    pub default_header_id: Option<String>,
+    /// The ID of the footer used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the footers on even pages in the section. If it is false, the footers on even pages uses the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_footer_id. This property is read-only.
+    #[serde(rename="evenPageFooterId")]
+    pub even_page_footer_id: Option<String>,
+    /// The ID of the header used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the headers on even pages in the section. If it is false, the headers on even pages uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_header_id. This property is read-only.
+    #[serde(rename="evenPageHeaderId")]
+    pub even_page_header_id: Option<String>,
+    /// The ID of the footer used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the footer on the first page of the section. If it is false, the footer on the first page of the section uses the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_footer_id. This property is read-only.
+    #[serde(rename="firstPageFooterId")]
+    pub first_page_footer_id: Option<String>,
+    /// The ID of the header used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the header on the first page of the section. If it is false, the header on the first page of the section uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_header_id. This property is read-only.
+    #[serde(rename="firstPageHeaderId")]
+    pub first_page_header_id: Option<String>,
+    /// The bottom page margin of the section. If unset, uses margin_bottom from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginBottom")]
+    pub margin_bottom: Option<Dimension>,
+    /// The footer margin of the section. If unset, uses margin_footer from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a footer margin is being respected for this section When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginFooter")]
+    pub margin_footer: Option<Dimension>,
+    /// The header margin of the section. If unset, uses margin_header from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a header margin is being respected for this section. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginHeader")]
+    pub margin_header: Option<Dimension>,
+    /// The left page margin of the section. If unset, uses margin_left from DocumentStyle. Updating left margin causes columns in this section to resize. Since the margin affects column width, it is applied before column properties. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginLeft")]
+    pub margin_left: Option<Dimension>,
+    /// The right page margin of the section. If unset, uses margin_right from DocumentStyle. Updating right margin causes columns in this section to resize. Since the margin affects column width, it is applied before column properties. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
+    /// The top page margin of the section. If unset, uses margin_top from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginTop")]
+    pub margin_top: Option<Dimension>,
+    /// The page number from which to start counting the number of pages for this section. If unset, page numbering continues from the previous section. If the value is unset in the first SectionBreak, refer to DocumentStyle's page_number_start. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="pageNumberStart")]
+    pub page_number_start: Option<i32>,
+    /// Output only. The type of section.
+    #[serde(rename="sectionType")]
+    pub section_type: Option<String>,
+    /// Indicates whether to use the first page header / footer IDs for the first page of the section. If unset, it inherits from DocumentStyle's use_first_page_header_footer for the first section. If the value is unset for subsequent sectors, it should be interpreted as false. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="useFirstPageHeaderFooter")]
+    pub use_first_page_header_footer: Option<bool>,
+}
+
+impl client::Part for SectionStyle {}
+
+
+/// The shading of a paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Shading {
+    /// The background color of this paragraph shading.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<OptionalColor>,
+}
+
+impl client::Part for Shading {}
+
+
+/// A mask that indicates which of the fields on the base Shading have been changed in this suggested change. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ShadingSuggestionState {
+    /// Indicates if there was a suggested change to the Shading.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+}
+
+impl client::Part for ShadingSuggestionState {}
+
+
+/// A reference to a linked chart embedded from Google Sheets.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SheetsChartReference {
+    /// The ID of the specific chart in the Google Sheets spreadsheet that is embedded.
+    #[serde(rename="chartId")]
+    pub chart_id: Option<i32>,
+    /// The ID of the Google Sheets spreadsheet that contains the source chart.
+    #[serde(rename="spreadsheetId")]
+    pub spreadsheet_id: Option<String>,
+}
+
+impl client::Part for SheetsChartReference {}
+
+
+/// A mask that indicates which of the fields on the base SheetsChartReference have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SheetsChartReferenceSuggestionState {
+    /// Indicates if there was a suggested change to chart_id.
+    #[serde(rename="chartIdSuggested")]
+    pub chart_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to spreadsheet_id.
+    #[serde(rename="spreadsheetIdSuggested")]
+    pub spreadsheet_id_suggested: Option<bool>,
+}
+
+impl client::Part for SheetsChartReferenceSuggestionState {}
+
+
+/// A width and height.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Size {
+    /// The height of the object.
+    pub height: Option<Dimension>,
+    /// The width of the object.
+    pub width: Option<Dimension>,
+}
+
+impl client::Part for Size {}
+
+
+/// A mask that indicates which of the fields on the base Size have been changed in this suggestion. For any field set to true, the Size has a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SizeSuggestionState {
+    /// Indicates if there was a suggested change to height.
+    #[serde(rename="heightSuggested")]
+    pub height_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to width.
+    #[serde(rename="widthSuggested")]
+    pub width_suggested: Option<bool>,
+}
+
+impl client::Part for SizeSuggestionState {}
+
+
+/// A StructuralElement describes content that provides structure to the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StructuralElement {
+    /// The zero-based end index of this structural element, exclusive, in UTF-16 code units.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// A paragraph type of structural element.
+    pub paragraph: Option<Paragraph>,
+    /// A section break type of structural element.
+    #[serde(rename="sectionBreak")]
+    pub section_break: Option<SectionBreak>,
+    /// The zero-based start index of this structural element, in UTF-16 code units.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// A table type of structural element.
+    pub table: Option<Table>,
+    /// A table of contents type of structural element.
+    #[serde(rename="tableOfContents")]
+    pub table_of_contents: Option<TableOfContents>,
+}
+
+impl client::Part for StructuralElement {}
+
+
+/// A criteria that matches a specific string of text in the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubstringMatchCriteria {
+    /// Indicates whether the search should respect case: - `True`: the search is case sensitive. - `False`: the search is case insensitive.
+    #[serde(rename="matchCase")]
+    pub match_case: Option<bool>,
+    /// The text to search for in the document.
+    pub text: Option<String>,
+}
+
+impl client::Part for SubstringMatchCriteria {}
+
+
+/// A suggested change to a Bullet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedBullet {
+    /// A Bullet that only includes the changes made in this suggestion. This can be used along with the bullet_suggestion_state to see which fields have changed and their new values.
+    pub bullet: Option<Bullet>,
+    /// A mask that indicates which of the fields on the base Bullet have been changed in this suggestion.
+    #[serde(rename="bulletSuggestionState")]
+    pub bullet_suggestion_state: Option<BulletSuggestionState>,
+}
+
+impl client::Part for SuggestedBullet {}
+
+
+/// A suggested change to the DocumentStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedDocumentStyle {
+    /// A DocumentStyle that only includes the changes made in this suggestion. This can be used along with the document_style_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="documentStyle")]
+    pub document_style: Option<DocumentStyle>,
+    /// A mask that indicates which of the fields on the base DocumentStyle have been changed in this suggestion.
+    #[serde(rename="documentStyleSuggestionState")]
+    pub document_style_suggestion_state: Option<DocumentStyleSuggestionState>,
+}
+
+impl client::Part for SuggestedDocumentStyle {}
+
+
+/// A suggested change to InlineObjectProperties.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedInlineObjectProperties {
+    /// An InlineObjectProperties that only includes the changes made in this suggestion. This can be used along with the inline_object_properties_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="inlineObjectProperties")]
+    pub inline_object_properties: Option<InlineObjectProperties>,
+    /// A mask that indicates which of the fields on the base InlineObjectProperties have been changed in this suggestion.
+    #[serde(rename="inlineObjectPropertiesSuggestionState")]
+    pub inline_object_properties_suggestion_state: Option<InlineObjectPropertiesSuggestionState>,
+}
+
+impl client::Part for SuggestedInlineObjectProperties {}
+
+
+/// A suggested change to ListProperties.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedListProperties {
+    /// A ListProperties that only includes the changes made in this suggestion. This can be used along with the list_properties_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="listProperties")]
+    pub list_properties: Option<ListProperties>,
+    /// A mask that indicates which of the fields on the base ListProperties have been changed in this suggestion.
+    #[serde(rename="listPropertiesSuggestionState")]
+    pub list_properties_suggestion_state: Option<ListPropertiesSuggestionState>,
+}
+
+impl client::Part for SuggestedListProperties {}
+
+
+/// A suggested change to the NamedStyles.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedNamedStyles {
+    /// A NamedStyles that only includes the changes made in this suggestion. This can be used along with the named_styles_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="namedStyles")]
+    pub named_styles: Option<NamedStyles>,
+    /// A mask that indicates which of the fields on the base NamedStyles have been changed in this suggestion.
+    #[serde(rename="namedStylesSuggestionState")]
+    pub named_styles_suggestion_state: Option<NamedStylesSuggestionState>,
+}
+
+impl client::Part for SuggestedNamedStyles {}
+
+
+/// A suggested change to a ParagraphStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedParagraphStyle {
+    /// A ParagraphStyle that only includes the changes made in this suggestion. This can be used along with the paragraph_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+    /// A mask that indicates which of the fields on the base ParagraphStyle have been changed in this suggestion.
+    #[serde(rename="paragraphStyleSuggestionState")]
+    pub paragraph_style_suggestion_state: Option<ParagraphStyleSuggestionState>,
+}
+
+impl client::Part for SuggestedParagraphStyle {}
+
+
+/// A suggested change to PositionedObjectProperties.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedPositionedObjectProperties {
+    /// A PositionedObjectProperties that only includes the changes made in this suggestion. This can be used along with the positioned_object_properties_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="positionedObjectProperties")]
+    pub positioned_object_properties: Option<PositionedObjectProperties>,
+    /// A mask that indicates which of the fields on the base PositionedObjectProperties have been changed in this suggestion.
+    #[serde(rename="positionedObjectPropertiesSuggestionState")]
+    pub positioned_object_properties_suggestion_state: Option<PositionedObjectPropertiesSuggestionState>,
+}
+
+impl client::Part for SuggestedPositionedObjectProperties {}
+
+
+/// A suggested change to a TableCellStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedTableCellStyle {
+    /// A TableCellStyle that only includes the changes made in this suggestion. This can be used along with the table_cell_style_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="tableCellStyle")]
+    pub table_cell_style: Option<TableCellStyle>,
+    /// A mask that indicates which of the fields on the base TableCellStyle have been changed in this suggestion.
+    #[serde(rename="tableCellStyleSuggestionState")]
+    pub table_cell_style_suggestion_state: Option<TableCellStyleSuggestionState>,
+}
+
+impl client::Part for SuggestedTableCellStyle {}
+
+
+/// A suggested change to a TableRowStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedTableRowStyle {
+    /// A TableRowStyle that only includes the changes made in this suggestion. This can be used along with the table_row_style_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="tableRowStyle")]
+    pub table_row_style: Option<TableRowStyle>,
+    /// A mask that indicates which of the fields on the base TableRowStyle have been changed in this suggestion.
+    #[serde(rename="tableRowStyleSuggestionState")]
+    pub table_row_style_suggestion_state: Option<TableRowStyleSuggestionState>,
+}
+
+impl client::Part for SuggestedTableRowStyle {}
+
+
+/// A suggested change to a TextStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedTextStyle {
+    /// A TextStyle that only includes the changes made in this suggestion. This can be used along with the text_style_suggestion_state to see which fields have changed and their new values.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+    /// A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion.
+    #[serde(rename="textStyleSuggestionState")]
+    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
+}
+
+impl client::Part for SuggestedTextStyle {}
+
+
+/// A tab stop within a paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TabStop {
+    /// The alignment of this tab stop. If unset, the value defaults to START.
+    pub alignment: Option<String>,
+    /// The offset between this tab stop and the start margin.
+    pub offset: Option<Dimension>,
+}
+
+impl client::Part for TabStop {}
+
+
+/// A StructuralElement representing a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Table {
+    /// Number of columns in the table. It is possible for a table to be non-rectangular, so some rows may have a different number of cells.
+    pub columns: Option<i32>,
+    /// Number of rows in the table.
+    pub rows: Option<i32>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A Table may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The contents and style of each row.
+    #[serde(rename="tableRows")]
+    pub table_rows: Option<Vec<TableRow>>,
+    /// The style of the table.
+    #[serde(rename="tableStyle")]
+    pub table_style: Option<TableStyle>,
+}
+
+impl client::Part for Table {}
+
+
+/// The contents and style of a cell in a Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCell {
+    /// The content of the cell.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The zero-based end index of this cell, exclusive, in UTF-16 code units.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// The zero-based start index of this cell, in UTF-16 code units.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TableCell may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested changes to the table cell style, keyed by suggestion ID.
+    #[serde(rename="suggestedTableCellStyleChanges")]
+    pub suggested_table_cell_style_changes: Option<HashMap<String, SuggestedTableCellStyle>>,
+    /// The style of the cell.
+    #[serde(rename="tableCellStyle")]
+    pub table_cell_style: Option<TableCellStyle>,
+}
+
+impl client::Part for TableCell {}
+
+
+/// A border around a table cell. Table cell borders cannot be transparent. To hide a table cell border, make its width 0.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellBorder {
+    /// The color of the border. This color cannot be transparent.
+    pub color: Option<OptionalColor>,
+    /// The dash style of the border.
+    #[serde(rename="dashStyle")]
+    pub dash_style: Option<String>,
+    /// The width of the border.
+    pub width: Option<Dimension>,
+}
+
+impl client::Part for TableCellBorder {}
+
+
+/// Location of a single cell within a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellLocation {
+    /// The zero-based column index. For example, the second column in the table has a column index of 1.
+    #[serde(rename="columnIndex")]
+    pub column_index: Option<i32>,
+    /// The zero-based row index. For example, the second row in the table has a row index of 1.
+    #[serde(rename="rowIndex")]
+    pub row_index: Option<i32>,
+    /// The location where the table starts in the document.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl client::Part for TableCellLocation {}
+
+
+/// The style of a TableCell. Inherited table cell styles are represented as unset fields in this message. A table cell style can inherit from the table's style.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellStyle {
+    /// The background color of the cell.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<OptionalColor>,
+    /// The bottom border of the cell.
+    #[serde(rename="borderBottom")]
+    pub border_bottom: Option<TableCellBorder>,
+    /// The left border of the cell.
+    #[serde(rename="borderLeft")]
+    pub border_left: Option<TableCellBorder>,
+    /// The right border of the cell.
+    #[serde(rename="borderRight")]
+    pub border_right: Option<TableCellBorder>,
+    /// The top border of the cell.
+    #[serde(rename="borderTop")]
+    pub border_top: Option<TableCellBorder>,
+    /// The column span of the cell. This property is read-only.
+    #[serde(rename="columnSpan")]
+    pub column_span: Option<i32>,
+    /// The alignment of the content in the table cell. The default alignment matches the alignment for newly created table cells in the Docs editor.
+    #[serde(rename="contentAlignment")]
+    pub content_alignment: Option<String>,
+    /// The bottom padding of the cell.
+    #[serde(rename="paddingBottom")]
+    pub padding_bottom: Option<Dimension>,
+    /// The left padding of the cell.
+    #[serde(rename="paddingLeft")]
+    pub padding_left: Option<Dimension>,
+    /// The right padding of the cell.
+    #[serde(rename="paddingRight")]
+    pub padding_right: Option<Dimension>,
+    /// The top padding of the cell.
+    #[serde(rename="paddingTop")]
+    pub padding_top: Option<Dimension>,
+    /// The row span of the cell. This property is read-only.
+    #[serde(rename="rowSpan")]
+    pub row_span: Option<i32>,
+}
+
+impl client::Part for TableCellStyle {}
+
+
+/// A mask that indicates which of the fields on the base TableCellStyle have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellStyleSuggestionState {
+    /// Indicates if there was a suggested change to background_color.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_bottom.
+    #[serde(rename="borderBottomSuggested")]
+    pub border_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_left.
+    #[serde(rename="borderLeftSuggested")]
+    pub border_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_right.
+    #[serde(rename="borderRightSuggested")]
+    pub border_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_top.
+    #[serde(rename="borderTopSuggested")]
+    pub border_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to column_span.
+    #[serde(rename="columnSpanSuggested")]
+    pub column_span_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to content_alignment.
+    #[serde(rename="contentAlignmentSuggested")]
+    pub content_alignment_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_bottom.
+    #[serde(rename="paddingBottomSuggested")]
+    pub padding_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_left.
+    #[serde(rename="paddingLeftSuggested")]
+    pub padding_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_right.
+    #[serde(rename="paddingRightSuggested")]
+    pub padding_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_top.
+    #[serde(rename="paddingTopSuggested")]
+    pub padding_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to row_span.
+    #[serde(rename="rowSpanSuggested")]
+    pub row_span_suggested: Option<bool>,
+}
+
+impl client::Part for TableCellStyleSuggestionState {}
+
+
+/// The properties of a column in a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableColumnProperties {
+    /// The width of the column. Set when the column's `width_type` is FIXED_WIDTH.
+    pub width: Option<Dimension>,
+    /// The width type of the column.
+    #[serde(rename="widthType")]
+    pub width_type: Option<String>,
+}
+
+impl client::Part for TableColumnProperties {}
+
+
+/// A StructuralElement representing a table of contents.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableOfContents {
+    /// The content of the table of contents.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TableOfContents may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl client::Part for TableOfContents {}
+
+
+/// A table range represents a reference to a subset of a table. It's important to note that the cells specified by a table range do not necessarily form a rectangle. For example, let's say we have a 3 x 3 table where all the cells of the last row are merged together. The table looks like this: [ ] A table range with table cell location = (table_start_location, row = 0, column = 0), row span = 3 and column span = 2 specifies the following cells: x x [ x x x ]
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableRange {
+    /// The column span of the table range.
+    #[serde(rename="columnSpan")]
+    pub column_span: Option<i32>,
+    /// The row span of the table range.
+    #[serde(rename="rowSpan")]
+    pub row_span: Option<i32>,
+    /// The cell location where the table range starts.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+}
+
+impl client::Part for TableRange {}
+
+
+/// The contents and style of a row in a Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableRow {
+    /// The zero-based end index of this row, exclusive, in UTF-16 code units.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// The zero-based start index of this row, in UTF-16 code units.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TableRow may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested style changes to this row, keyed by suggestion ID.
+    #[serde(rename="suggestedTableRowStyleChanges")]
+    pub suggested_table_row_style_changes: Option<HashMap<String, SuggestedTableRowStyle>>,
+    /// The contents and style of each cell in this row. It is possible for a table to be non-rectangular, so some rows may have a different number of cells than other rows in the same table.
+    #[serde(rename="tableCells")]
+    pub table_cells: Option<Vec<TableCell>>,
+    /// The style of the table row.
+    #[serde(rename="tableRowStyle")]
+    pub table_row_style: Option<TableRowStyle>,
+}
+
+impl client::Part for TableRow {}
+
+
+/// Styles that apply to a table row.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableRowStyle {
+    /// The minimum height of the row. The row will be rendered in the Docs editor at a height equal to or greater than this value in order to show all the content in the row's cells.
+    #[serde(rename="minRowHeight")]
+    pub min_row_height: Option<Dimension>,
+}
+
+impl client::Part for TableRowStyle {}
+
+
+/// A mask that indicates which of the fields on the base TableRowStyle have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableRowStyleSuggestionState {
+    /// Indicates if there was a suggested change to min_row_height.
+    #[serde(rename="minRowHeightSuggested")]
+    pub min_row_height_suggested: Option<bool>,
+}
+
+impl client::Part for TableRowStyleSuggestionState {}
+
+
+/// Styles that apply to a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableStyle {
+    /// The properties of each column. Note that in Docs, tables contain rows and rows contain cells, similar to HTML. So the properties for a row can be found on the row's table_row_style.
+    #[serde(rename="tableColumnProperties")]
+    pub table_column_properties: Option<Vec<TableColumnProperties>>,
+}
+
+impl client::Part for TableStyle {}
+
+
+/// A ParagraphElement that represents a run of text that all has the same styling.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextRun {
+    /// The text of this run. Any non-text elements in the run are replaced with the Unicode character U+E907.
+    pub content: Option<String>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TextRun may have multiple insertion IDs if it is a nested suggested change. If empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this run, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The text style of this run.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for TextRun {}
+
+
+/// Represents the styling that can be applied to text. Inherited text styles are represented as unset fields in this message. A text style's parent depends on where the text style is defined: * The TextStyle of text in a Paragraph inherits from the paragraph's corresponding named style type. * The TextStyle on a named style inherits from the normal text named style. * The TextStyle of the normal text named style inherits from the default text style in the Docs editor. * The TextStyle on a Paragraph element that is contained in a table may inherit its text style from the table style. If the text style does not inherit from a parent, unsetting fields will revert the style to a value matching the defaults in the Docs editor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextStyle {
+    /// The background color of the text. If set, the color is either an RGB color or transparent, depending on the `color` field.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<OptionalColor>,
+    /// The text's vertical offset from its normal position. Text with `SUPERSCRIPT` or `SUBSCRIPT` baseline offsets is automatically rendered in a smaller font size, computed based on the `font_size` field. The `font_size` itself is not affected by changes in this field.
+    #[serde(rename="baselineOffset")]
+    pub baseline_offset: Option<String>,
+    /// Whether or not the text is rendered as bold.
+    pub bold: Option<bool>,
+    /// The size of the text's font.
+    #[serde(rename="fontSize")]
+    pub font_size: Option<Dimension>,
+    /// The foreground color of the text. If set, the color is either an RGB color or transparent, depending on the `color` field.
+    #[serde(rename="foregroundColor")]
+    pub foreground_color: Option<OptionalColor>,
+    /// Whether or not the text is italicized.
+    pub italic: Option<bool>,
+    /// The hyperlink destination of the text. If unset, there is no link. Links are not inherited from parent text. Changing the link in an update request causes some other changes to the text style of the range: * When setting a link, the text foreground color will be updated to the default link color and the text will be underlined. If these fields are modified in the same request, those values will be used instead of the link defaults. * Setting a link on a text range that overlaps with an existing link will also update the existing link to point to the new URL. * Links are not settable on newline characters. As a result, setting a link on a text range that crosses a paragraph boundary, such as `"ABC\n123"`, will separate the newline character(s) into their own text runs. The link will be applied separately to the runs before and after the newline. * Removing a link will update the text style of the range to match the style of the preceding text (or the default text styles if the preceding text is another link) unless different styles are being set in the same request.
+    pub link: Option<Link>,
+    /// Whether or not the text is in small capital letters.
+    #[serde(rename="smallCaps")]
+    pub small_caps: Option<bool>,
+    /// Whether or not the text is struck through.
+    pub strikethrough: Option<bool>,
+    /// Whether or not the text is underlined.
+    pub underline: Option<bool>,
+    /// The font family and rendered weight of the text. If an update request specifies values for both `weighted_font_family` and `bold`, the `weighted_font_family` is applied first, then `bold`. If `weighted_font_family#weight` is not set, it defaults to `400`. If `weighted_font_family` is set, then `weighted_font_family#font_family` must also be set with a non-empty value. Otherwise, a 400 bad request error is returned.
+    #[serde(rename="weightedFontFamily")]
+    pub weighted_font_family: Option<WeightedFontFamily>,
+}
+
+impl client::Part for TextStyle {}
+
+
+/// A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextStyleSuggestionState {
+    /// Indicates if there was a suggested change to background_color.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to baseline_offset.
+    #[serde(rename="baselineOffsetSuggested")]
+    pub baseline_offset_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to bold.
+    #[serde(rename="boldSuggested")]
+    pub bold_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to font_size.
+    #[serde(rename="fontSizeSuggested")]
+    pub font_size_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to foreground_color.
+    #[serde(rename="foregroundColorSuggested")]
+    pub foreground_color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to italic.
+    #[serde(rename="italicSuggested")]
+    pub italic_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to link.
+    #[serde(rename="linkSuggested")]
+    pub link_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to small_caps.
+    #[serde(rename="smallCapsSuggested")]
+    pub small_caps_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to strikethrough.
+    #[serde(rename="strikethroughSuggested")]
+    pub strikethrough_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to underline.
+    #[serde(rename="underlineSuggested")]
+    pub underline_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to weighted_font_family.
+    #[serde(rename="weightedFontFamilySuggested")]
+    pub weighted_font_family_suggested: Option<bool>,
+}
+
+impl client::Part for TextStyleSuggestionState {}
+
+
+/// Unmerges cells in a Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnmergeTableCellsRequest {
+    /// The table range specifying which cells of the table to unmerge. All merged cells in this range will be unmerged, and cells that are already unmerged will not be affected. If the range has no merged cells, the request will do nothing. If there is text in any of the merged cells, the text will remain in the "head" cell of the resulting block of unmerged cells. The "head" cell is the upper-left cell when the content direction is from left to right, and the upper-right otherwise.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
+}
+
+impl client::Part for UnmergeTableCellsRequest {}
+
+
+/// Updates the DocumentStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateDocumentStyleRequest {
+    /// The styles to set on the document. Certain document style changes may cause other changes in order to mirror the behavior of the Docs editor. See the documentation of DocumentStyle for more information.
+    #[serde(rename="documentStyle")]
+    pub document_style: Option<DocumentStyle>,
+    /// The fields that should be updated. At least one field must be specified. The root `document_style` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field. For example to update the background, set `fields` to `"background"`.
+    pub fields: Option<String>,
+}
+
+impl client::Part for UpdateDocumentStyleRequest {}
+
+
+/// Update the styling of all paragraphs that overlap with the given range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateParagraphStyleRequest {
+    /// The fields that should be updated. At least one field must be specified. The root `paragraph_style` is implied and should not be specified. For example, to update the paragraph style's alignment property, set `fields` to `"alignment"`. To reset a property to its default value, include its field name in the field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The styles to set on the paragraphs. Certain paragraph style changes may cause other changes in order to mirror the behavior of the Docs editor. See the documentation of ParagraphStyle for more information.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+    /// The range overlapping the paragraphs to style.
+    pub range: Option<Range>,
+}
+
+impl client::Part for UpdateParagraphStyleRequest {}
+
+
+/// Updates the SectionStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSectionStyleRequest {
+    /// The fields that should be updated. At least one field must be specified. The root `section_style` is implied and must not be specified. A single `"*"` can be used as short-hand for listing every field. For example to update the left margin, set `fields` to `"margin_left"`.
+    pub fields: Option<String>,
+    /// The range overlapping the sections to style. Because section breaks can only be inserted inside the body, the segment ID field must be empty.
+    pub range: Option<Range>,
+    /// The styles to be set on the section. Certain section style changes may cause other changes in order to mirror the behavior of the Docs editor. See the documentation of SectionStyle for more information.
+    #[serde(rename="sectionStyle")]
+    pub section_style: Option<SectionStyle>,
+}
+
+impl client::Part for UpdateSectionStyleRequest {}
+
+
+/// Updates the style of a range of table cells.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTableCellStyleRequest {
+    /// The fields that should be updated. At least one field must be specified. The root `tableCellStyle` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field. For example to update the table cell background color, set `fields` to `"backgroundColor"`. To reset a property to its default value, include its field name in the field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The style to set on the table cells. When updating borders, if a cell shares a border with an adjacent cell, the corresponding border property of the adjacent cell is updated as well. Borders that are merged and invisible are not updated. Since updating a border shared by adjacent cells in the same request can cause conflicting border updates, border updates are applied in the following order: - `border_right` - `border_left` - `border_bottom` - `border_top`
+    #[serde(rename="tableCellStyle")]
+    pub table_cell_style: Option<TableCellStyle>,
+    /// The table range representing the subset of the table to which the updates are applied.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
+    /// The location where the table starts in the document. When specified, the updates are applied to all the cells in the table.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl client::Part for UpdateTableCellStyleRequest {}
+
+
+/// Updates the TableColumnProperties of columns in a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTableColumnPropertiesRequest {
+    /// The list of zero-based column indices whose property should be updated. If no indices are specified, all columns will be updated.
+    #[serde(rename="columnIndices")]
+    pub column_indices: Option<Vec<i32>>,
+    /// The fields that should be updated. At least one field must be specified. The root `tableColumnProperties` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field. For example to update the column width, set `fields` to `"width"`.
+    pub fields: Option<String>,
+    /// The table column properties to update. If the value of `table_column_properties#width` is less than 5 points (5/72 inch), a 400 bad request error is returned.
+    #[serde(rename="tableColumnProperties")]
+    pub table_column_properties: Option<TableColumnProperties>,
+    /// The location where the table starts in the document.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl client::Part for UpdateTableColumnPropertiesRequest {}
+
+
+/// Updates the TableRowStyle of rows in a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTableRowStyleRequest {
+    /// The fields that should be updated. At least one field must be specified. The root `tableRowStyle` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field. For example to update the minimum row height, set `fields` to `"min_row_height"`.
+    pub fields: Option<String>,
+    /// The list of zero-based row indices whose style should be updated. If no indices are specified, all rows will be updated.
+    #[serde(rename="rowIndices")]
+    pub row_indices: Option<Vec<i32>>,
+    /// The styles to be set on the rows.
+    #[serde(rename="tableRowStyle")]
+    pub table_row_style: Option<TableRowStyle>,
+    /// The location where the table starts in the document.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl client::Part for UpdateTableRowStyleRequest {}
+
+
+/// Update the styling of text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTextStyleRequest {
+    /// The fields that should be updated. At least one field must be specified. The root `text_style` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field. For example, to update the text style to bold, set `fields` to `"bold"`. To reset a property to its default value, include its field name in the field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The range of text to style. The range may be extended to include adjacent newlines. If the range fully contains a paragraph belonging to a list, the paragraph's bullet is also updated with the matching text style. Ranges cannot be inserted inside a relative UpdateTextStyleRequest.
+    pub range: Option<Range>,
+    /// The styles to set on the text. If the value for a particular style matches that of the parent, that style will be set to inherit. Certain text style changes may cause other changes in order to to mirror the behavior of the Docs editor. See the documentation of TextStyle for more information.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl client::Part for UpdateTextStyleRequest {}
+
+
+/// Represents a font family and weight of text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WeightedFontFamily {
+    /// The font family of the text. The font family can be any font from the Font menu in Docs or from [Google Fonts] (https://fonts.google.com/). If the font name is unrecognized, the text is rendered in `Arial`.
+    #[serde(rename="fontFamily")]
+    pub font_family: Option<String>,
+    /// The weight of the font. This field can have any value that is a multiple of `100` between `100` and `900`, inclusive. This range corresponds to the numerical values described in the CSS 2.1 Specification, [section 15.6](https://www.w3.org/TR/CSS21/fonts.html#font-boldness), with non-numerical values disallowed. The default value is `400` ("normal"). The font weight makes up just one component of the rendered font weight. The rendered weight is determined by a combination of the `weight` and the text style's resolved `bold` value, after accounting for inheritance: * If the text is bold and the weight is less than `400`, the rendered weight is 400. * If the text is bold and the weight is greater than or equal to `400` but is less than `700`, the rendered weight is `700`. * If the weight is greater than or equal to `700`, the rendered weight is equal to the weight. * If the text is not bold, the rendered weight is equal to the weight.
+    pub weight: Option<i32>,
+}
+
+impl client::Part for WeightedFontFamily {}
+
+
+/// Provides control over how write requests are executed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WriteControl {
+    /// The revision ID of the document that the write request will be applied to. If this is not the latest revision of the document, the request will not be processed and will return a 400 bad request error. When a required revision ID is returned in a response, it indicates the revision ID of the document after the request was applied.
+    #[serde(rename="requiredRevisionId")]
+    pub required_revision_id: Option<String>,
+    /// The target revision ID of the document that the write request will be applied to. If collaborator changes have occurred after the document was read using the API, the changes produced by this write request will be transformed against the collaborator changes. This results in a new revision of the document which incorporates both the changes in the request and the collaborator changes, and the Docs server will resolve conflicting changes. When using `target_revision_id`, the API client can be thought of as another collaborator of the document. The target revision ID may only be used to write to recent versions of a document. If the target revision is too far behind the latest revision, the request will not be processed and will return a 400 bad request error and the request should be retried after reading the latest version of the document. In most cases a `revision_id` will remain valid for use as a target revision for several minutes after it is read, but for frequently-edited documents this window may be shorter.
+    #[serde(rename="targetRevisionId")]
+    pub target_revision_id: Option<String>,
+}
+
+impl client::Part for WriteControl {}
 
 
 
@@ -1046,8 +3501,8 @@ impl client::Part for ResponseHeader {}
 // MethodBuilders ###
 // #################
 
-/// A builder providing access to all methods supported on *change* resources.
-/// It is not used directly, but through the `Dns` hub.
+/// A builder providing access to all methods supported on *document* resources.
+/// It is not used directly, but through the `Docs` hub.
 ///
 /// # Example
 ///
@@ -1056,52 +3511,47 @@ impl client::Part for ResponseHeader {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
+/// extern crate google_docs1 as docs1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
+/// use docs1::{Docs, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = Docs::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `get(...)` and `list(...)`
+/// // like `batch_update(...)`, `create(...)` and `get(...)`
 /// // to build up your call.
-/// let rb = hub.changes();
+/// let rb = hub.documents();
 /// # }
 /// ```
-pub struct ChangeMethods<'a>
+pub struct DocumentMethods<'a>
     where  {
 
-    hub: &'a Dns<>,
+    hub: &'a Docs<>,
 }
 
-impl<'a> client::MethodsBuilder for ChangeMethods<'a> {}
+impl<'a> client::MethodsBuilder for DocumentMethods<'a> {}
 
-impl<'a> ChangeMethods<'a> {
+impl<'a> DocumentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Atomically updates the ResourceRecordSet collection.
+    /// Applies one or more updates to the document. Each request is validated before being applied. If any request is not valid, then the entire request will fail and nothing will be applied. Some requests have replies to give you some information about how they are applied. Other requests do not need to return information; these each return an empty reply. The order of replies matches that of the requests. For example, suppose you call batchUpdate with four updates, and only the third one returns information. The response would have two empty replies, the reply to the third request, and another empty reply, in that order. Because other users may be editing the document, the document might not exactly reflect your changes: your changes may be altered with respect to collaborator changes. If there are no collaborators, the document should reflect your changes. In any case, the updates in your request are guaranteed to be applied together atomically.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn create(&self, request: Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a> {
-        ChangeCreateCall {
+    /// * `documentId` - The ID of the document to update.
+    pub fn batch_update(&self, request: BatchUpdateDocumentRequest, document_id: &str) -> DocumentBatchUpdateCall<'a> {
+        DocumentBatchUpdateCall {
             hub: self.hub,
             _request: request,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _client_operation_id: Default::default(),
+            _document_id: document_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1110,281 +3560,15 @@ impl<'a> ChangeMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches the representation of an existing Change.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
-    pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a> {
-        ChangeGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _change_id: change_id.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Enumerates Changes to a ResourceRecordSet collection.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a> {
-        ChangeListCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _sort_order: Default::default(),
-            _sort_by: Default::default(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *dnsKey* resources.
-/// It is not used directly, but through the `Dns` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)` and `list(...)`
-/// // to build up your call.
-/// let rb = hub.dns_keys();
-/// # }
-/// ```
-pub struct DnsKeyMethods<'a>
-    where  {
-
-    hub: &'a Dns<>,
-}
-
-impl<'a> client::MethodsBuilder for DnsKeyMethods<'a> {}
-
-impl<'a> DnsKeyMethods<'a> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Fetches the representation of an existing DnsKey.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    /// * `dnsKeyId` - The identifier of the requested DnsKey.
-    pub fn get(&self, project: &str, managed_zone: &str, dns_key_id: &str) -> DnsKeyGetCall<'a> {
-        DnsKeyGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _dns_key_id: dns_key_id.to_string(),
-            _digest_type: Default::default(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Enumerates DnsKeys to a ResourceRecordSet collection.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn list(&self, project: &str, managed_zone: &str) -> DnsKeyListCall<'a> {
-        DnsKeyListCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _digest_type: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *managedZoneOperation* resources.
-/// It is not used directly, but through the `Dns` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)` and `list(...)`
-/// // to build up your call.
-/// let rb = hub.managed_zone_operations();
-/// # }
-/// ```
-pub struct ManagedZoneOperationMethods<'a>
-    where  {
-
-    hub: &'a Dns<>,
-}
-
-impl<'a> client::MethodsBuilder for ManagedZoneOperationMethods<'a> {}
-
-impl<'a> ManagedZoneOperationMethods<'a> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Fetches the representation of an existing Operation.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request.
-    /// * `operation` - Identifies the operation addressed by this request (ID of the operation).
-    pub fn get(&self, project: &str, managed_zone: &str, operation: &str) -> ManagedZoneOperationGetCall<'a> {
-        ManagedZoneOperationGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _operation: operation.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Enumerates Operations for the given ManagedZone.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request.
-    pub fn list(&self, project: &str, managed_zone: &str) -> ManagedZoneOperationListCall<'a> {
-        ManagedZoneOperationListCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _sort_by: Default::default(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *managedZone* resources.
-/// It is not used directly, but through the `Dns` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)` and `update(...)`
-/// // to build up your call.
-/// let rb = hub.managed_zones();
-/// # }
-/// ```
-pub struct ManagedZoneMethods<'a>
-    where  {
-
-    hub: &'a Dns<>,
-}
-
-impl<'a> client::MethodsBuilder for ManagedZoneMethods<'a> {}
-
-impl<'a> ManagedZoneMethods<'a> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates a new ManagedZone.
+    /// Creates a blank document using the title given in the request. Other fields in the request, including any provided content, are ignored. Returns the created document.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    pub fn create(&self, request: ManagedZone, project: &str) -> ManagedZoneCreateCall<'a> {
-        ManagedZoneCreateCall {
+    pub fn create(&self, request: Document) -> DocumentCreateCall<'a> {
+        DocumentCreateCall {
             hub: self.hub,
             _request: request,
-            _project: project.to_string(),
-            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1393,491 +3577,16 @@ impl<'a> ManagedZoneMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a previously created ManagedZone.
+    /// Gets the latest version of the specified document.
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn delete(&self, project: &str, managed_zone: &str) -> ManagedZoneDeleteCall<'a> {
-        ManagedZoneDeleteCall {
+    /// * `documentId` - The ID of the document to retrieve.
+    pub fn get(&self, document_id: &str) -> DocumentGetCall<'a> {
+        DocumentGetCall {
             hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Fetches the representation of an existing ManagedZone.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn get(&self, project: &str, managed_zone: &str) -> ManagedZoneGetCall<'a> {
-        ManagedZoneGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Enumerates ManagedZones that have been created but not yet deleted.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    pub fn list(&self, project: &str) -> ManagedZoneListCall<'a> {
-        ManagedZoneListCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _dns_name: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Applies a partial update to an existing ManagedZone.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn patch(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZonePatchCall<'a> {
-        ManagedZonePatchCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates an existing ManagedZone.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn update(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZoneUpdateCall<'a> {
-        ManagedZoneUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *policy* resources.
-/// It is not used directly, but through the `Dns` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)` and `update(...)`
-/// // to build up your call.
-/// let rb = hub.policies();
-/// # }
-/// ```
-pub struct PolicyMethods<'a>
-    where  {
-
-    hub: &'a Dns<>,
-}
-
-impl<'a> client::MethodsBuilder for PolicyMethods<'a> {}
-
-impl<'a> PolicyMethods<'a> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates a new Policy.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    pub fn create(&self, request: Policy, project: &str) -> PolicyCreateCall<'a> {
-        PolicyCreateCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a previously created Policy. Fails if the policy is still being referenced by a network.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
-    pub fn delete(&self, project: &str, policy: &str) -> PolicyDeleteCall<'a> {
-        PolicyDeleteCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _policy: policy.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Fetches the representation of an existing Policy.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
-    pub fn get(&self, project: &str, policy: &str) -> PolicyGetCall<'a> {
-        PolicyGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _policy: policy.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Enumerates all Policies associated with a project.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    pub fn list(&self, project: &str) -> PolicyListCall<'a> {
-        PolicyListCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Applies a partial update to an existing Policy.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
-    pub fn patch(&self, request: Policy, project: &str, policy: &str) -> PolicyPatchCall<'a> {
-        PolicyPatchCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _policy: policy.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates an existing Policy.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
-    pub fn update(&self, request: Policy, project: &str, policy: &str) -> PolicyUpdateCall<'a> {
-        PolicyUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _policy: policy.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *project* resources.
-/// It is not used directly, but through the `Dns` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `managed_zones_rrsets_create(...)`, `managed_zones_rrsets_delete(...)`, `managed_zones_rrsets_get(...)` and `managed_zones_rrsets_patch(...)`
-/// // to build up your call.
-/// let rb = hub.projects();
-/// # }
-/// ```
-pub struct ProjectMethods<'a>
-    where  {
-
-    hub: &'a Dns<>,
-}
-
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
-
-impl<'a> ProjectMethods<'a> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates a new ResourceRecordSet.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn managed_zones_rrsets_create(&self, request: ResourceRecordSet, project: &str, managed_zone: &str) -> ProjectManagedZoneRrsetCreateCall<'a> {
-        ProjectManagedZoneRrsetCreateCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a previously created ResourceRecordSet.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    /// * `name` - Fully qualified domain name.
-    /// * `type` - RRSet type.
-    pub fn managed_zones_rrsets_delete(&self, project: &str, managed_zone: &str, name: &str, type_: &str) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        ProjectManagedZoneRrsetDeleteCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _name: name.to_string(),
-            _type_: type_.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Fetches the representation of an existing ResourceRecordSet.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    /// * `name` - Fully qualified domain name.
-    /// * `type` - RRSet type.
-    pub fn managed_zones_rrsets_get(&self, project: &str, managed_zone: &str, name: &str, type_: &str) -> ProjectManagedZoneRrsetGetCall<'a> {
-        ProjectManagedZoneRrsetGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _name: name.to_string(),
-            _type_: type_.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Applies a partial update to an existing ResourceRecordSet.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    /// * `name` - Fully qualified domain name.
-    /// * `type` - RRSet type.
-    pub fn managed_zones_rrsets_patch(&self, request: ResourceRecordSet, project: &str, managed_zone: &str, name: &str, type_: &str) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        ProjectManagedZoneRrsetPatchCall {
-            hub: self.hub,
-            _request: request,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _name: name.to_string(),
-            _type_: type_.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Fetches the representation of an existing Project.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    pub fn get(&self, project: &str) -> ProjectGetCall<'a> {
-        ProjectGetCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _client_operation_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *resourceRecordSet* resources.
-/// It is not used directly, but through the `Dns` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_dns1 as dns1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use oauth2;
-/// use dns1::Dns;
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `list(...)`
-/// // to build up your call.
-/// let rb = hub.resource_record_sets();
-/// # }
-/// ```
-pub struct ResourceRecordSetMethods<'a>
-    where  {
-
-    hub: &'a Dns<>,
-}
-
-impl<'a> client::MethodsBuilder for ResourceRecordSetMethods<'a> {}
-
-impl<'a> ResourceRecordSetMethods<'a> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Enumerates ResourceRecordSets that you have created but not yet deleted.
-    /// 
-    /// # Arguments
-    ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    pub fn list(&self, project: &str, managed_zone: &str) -> ResourceRecordSetListCall<'a> {
-        ResourceRecordSetListCall {
-            hub: self.hub,
-            _project: project.to_string(),
-            _managed_zone: managed_zone.to_string(),
-            _type_: Default::default(),
-            _page_token: Default::default(),
-            _name: Default::default(),
-            _max_results: Default::default(),
+            _document_id: document_id.to_string(),
+            _suggestions_view_mode: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1893,10 +3602,10 @@ impl<'a> ResourceRecordSetMethods<'a> {
 // CallBuilders   ###
 // #################
 
-/// Atomically updates the ResourceRecordSet collection.
+/// Applies one or more updates to the document. Each request is validated before being applied. If any request is not valid, then the entire request will fail and nothing will be applied. Some requests have replies to give you some information about how they are applied. Other requests do not need to return information; these each return an empty reply. The order of replies matches that of the requests. For example, suppose you call batchUpdate with four updates, and only the third one returns information. The response would have two empty replies, the reply to the third request, and another empty reply, in that order. Because other users may be editing the document, the document might not exactly reflect your changes: your changes may be altered with respect to collaborator changes. If there are no collaborators, the document should reflect your changes. In any case, the updates in your request are guaranteed to be applied together atomically.
 ///
-/// A builder for the *create* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
+/// A builder for the *batchUpdate* method supported by a *document* resource.
+/// It is not used directly, but through a `DocumentMethods` instance.
 ///
 /// # Example
 ///
@@ -1905,53 +3614,48 @@ impl<'a> ResourceRecordSetMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::Change;
+/// # extern crate google_docs1 as docs1;
+/// use docs1::api::BatchUpdateDocumentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
+/// # use docs1::{Docs, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Docs::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Change::default();
+/// let mut req = BatchUpdateDocumentRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().create(req, "project", "managedZone")
-///              .client_operation_id("Lorem")
+/// let result = hub.documents().batch_update(req, "documentId")
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeCreateCall<'a>
+pub struct DocumentBatchUpdateCall<'a>
     where  {
 
-    hub: &'a Dns<>,
-    _request: Change,
-    _project: String,
-    _managed_zone: String,
-    _client_operation_id: Option<String>,
+    hub: &'a Docs<>,
+    _request: BatchUpdateDocumentRequest,
+    _document_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChangeCreateCall<'a> {}
+impl<'a> client::CallBuilder for DocumentBatchUpdateCall<'a> {}
 
-impl<'a> ChangeCreateCall<'a> {
+impl<'a> DocumentBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Change)> {
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchUpdateDocumentResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         use client::ToParts;
@@ -1960,2679 +3664,11 @@ impl<'a> ChangeCreateCall<'a> {
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(client::MethodInfo { id: "dns.changes.create",
+        dlg.begin(client::MethodInfo { id: "docs.documents.batchUpdate",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/changes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Change) -> ChangeCreateCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ChangeCreateCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeCreateCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeCreateCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing Change.
-///
-/// A builder for the *get* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().get("project", "managedZone", "changeId")
-///              .client_operation_id("ea")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ChangeGetCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _change_id: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ChangeGetCall<'a> {}
-
-impl<'a> ChangeGetCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Change)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.changes.get",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("changeId", self._change_id.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "changeId", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/changes/{changeId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{changeId}", "changeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["changeId", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
-    ///
-    /// Sets the *change id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a> {
-        self._change_id = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ChangeGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeGetCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Enumerates Changes to a ResourceRecordSet collection.
-///
-/// A builder for the *list* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().list("project", "managedZone")
-///              .sort_order("amet")
-///              .sort_by("duo")
-///              .page_token("ipsum")
-///              .max_results(-93)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ChangeListCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _sort_order: Option<String>,
-    _sort_by: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ChangeListCall<'a> {}
-
-impl<'a> ChangeListCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ChangesListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.changes.list",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._sort_order {
-            params.push(("sortOrder", value.to_string()));
-        }
-        if let Some(value) = self._sort_by {
-            params.push(("sortBy", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "sortOrder", "sortBy", "pageToken", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/changes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ChangeListCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Sorting order direction: 'ascending' or 'descending'.
-    ///
-    /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a> {
-        self._sort_order = Some(new_value.to_string());
-        self
-    }
-    /// Sorting criterion. The only supported value is change sequence.
-    ///
-    /// Sets the *sort by* query property to the given value.
-    pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a> {
-        self._sort_by = Some(new_value.to_string());
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server decides how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeListCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing DnsKey.
-///
-/// A builder for the *get* method supported by a *dnsKey* resource.
-/// It is not used directly, but through a `DnsKeyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.dns_keys().get("project", "managedZone", "dnsKeyId")
-///              .digest_type("est")
-///              .client_operation_id("ipsum")
-///              .doit().await;
-/// # }
-/// ```
-pub struct DnsKeyGetCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _dns_key_id: String,
-    _digest_type: Option<String>,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for DnsKeyGetCall<'a> {}
-
-impl<'a> DnsKeyGetCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DnsKey)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.dnsKeys.get",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("dnsKeyId", self._dns_key_id.to_string()));
-        if let Some(value) = self._digest_type {
-            params.push(("digestType", value.to_string()));
-        }
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "dnsKeyId", "digestType", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/dnsKeys/{dnsKeyId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{dnsKeyId}", "dnsKeyId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["dnsKeyId", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DnsKeyGetCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> DnsKeyGetCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// The identifier of the requested DnsKey.
-    ///
-    /// Sets the *dns key id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn dns_key_id(mut self, new_value: &str) -> DnsKeyGetCall<'a> {
-        self._dns_key_id = new_value.to_string();
-        self
-    }
-    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type is computed and displayed.
-    ///
-    /// Sets the *digest type* query property to the given value.
-    pub fn digest_type(mut self, new_value: &str) -> DnsKeyGetCall<'a> {
-        self._digest_type = Some(new_value.to_string());
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> DnsKeyGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DnsKeyGetCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DnsKeyGetCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DnsKeyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Enumerates DnsKeys to a ResourceRecordSet collection.
-///
-/// A builder for the *list* method supported by a *dnsKey* resource.
-/// It is not used directly, but through a `DnsKeyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.dns_keys().list("project", "managedZone")
-///              .page_token("gubergren")
-///              .max_results(-17)
-///              .digest_type("dolor")
-///              .doit().await;
-/// # }
-/// ```
-pub struct DnsKeyListCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _digest_type: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for DnsKeyListCall<'a> {}
-
-impl<'a> DnsKeyListCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DnsKeysListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.dnsKeys.list",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._digest_type {
-            params.push(("digestType", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "pageToken", "maxResults", "digestType"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/dnsKeys";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DnsKeyListCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> DnsKeyListCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DnsKeyListCall<'a> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server decides how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> DnsKeyListCall<'a> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type is computed and displayed.
-    ///
-    /// Sets the *digest type* query property to the given value.
-    pub fn digest_type(mut self, new_value: &str) -> DnsKeyListCall<'a> {
-        self._digest_type = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DnsKeyListCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DnsKeyListCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DnsKeyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing Operation.
-///
-/// A builder for the *get* method supported by a *managedZoneOperation* resource.
-/// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zone_operations().get("project", "managedZone", "operation")
-///              .client_operation_id("sed")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneOperationGetCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _operation: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneOperationGetCall<'a> {}
-
-impl<'a> ManagedZoneOperationGetCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZoneOperations.get",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("operation", self._operation.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "operation", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/operations/{operation}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{operation}", "operation")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["operation", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Identifies the operation addressed by this request (ID of the operation).
-    ///
-    /// Sets the *operation* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a> {
-        self._operation = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneOperationGetCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneOperationGetCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Enumerates Operations for the given ManagedZone.
-///
-/// A builder for the *list* method supported by a *managedZoneOperation* resource.
-/// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zone_operations().list("project", "managedZone")
-///              .sort_by("no")
-///              .page_token("Stet")
-///              .max_results(-13)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneOperationListCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _sort_by: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneOperationListCall<'a> {}
-
-impl<'a> ManagedZoneOperationListCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ManagedZoneOperationsListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZoneOperations.list",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._sort_by {
-            params.push(("sortBy", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "sortBy", "pageToken", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/operations";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Sorting criterion. The only supported values are START_TIME and ID.
-    ///
-    /// Sets the *sort by* query property to the given value.
-    pub fn sort_by(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a> {
-        self._sort_by = Some(new_value.to_string());
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server decides how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ManagedZoneOperationListCall<'a> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneOperationListCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneOperationListCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Creates a new ManagedZone.
-///
-/// A builder for the *create* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::ManagedZone;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ManagedZone::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().create(req, "project")
-///              .client_operation_id("sed")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneCreateCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: ManagedZone,
-    _project: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneCreateCall<'a> {}
-
-impl<'a> ManagedZoneCreateCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ManagedZone)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZones.create",
-                               http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ManagedZone) -> ManagedZoneCreateCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneCreateCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneCreateCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneCreateCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneCreateCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes a previously created ManagedZone.
-///
-/// A builder for the *delete* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().delete("project", "managedZone")
-///              .client_operation_id("vero")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneDeleteCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneDeleteCall<'a> {}
-
-impl<'a> ManagedZoneDeleteCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZones.delete",
-                               http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["project", "managedZone", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneDeleteCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneDeleteCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing ManagedZone.
-///
-/// A builder for the *get* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().get("project", "managedZone")
-///              .client_operation_id("duo")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneGetCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneGetCall<'a> {}
-
-impl<'a> ManagedZoneGetCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ManagedZone)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZones.get",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
+        params.push(("documentId", self._document_id.to_string()));
+        for &field in ["alt", "documentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -4644,298 +3680,12 @@ impl<'a> ManagedZoneGetCall<'a> {
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}";
+        let mut url = self.hub._base_url.clone() + "v1/documents/{documentId}:batchUpdate";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Document.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneGetCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneGetCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneGetCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneGetCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Enumerates ManagedZones that have been created but not yet deleted.
-///
-/// A builder for the *list* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().list("project")
-///              .page_token("et")
-///              .max_results(-28)
-///              .dns_name("amet.")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneListCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _dns_name: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneListCall<'a> {}
-
-impl<'a> ManagedZoneListCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ManagedZonesListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZones.list",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._dns_name {
-            params.push(("dnsName", value.to_string()));
-        }
-        for &field in ["alt", "project", "pageToken", "maxResults", "dnsName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project")].iter() {
+        for &(find_this, param_name) in [("{documentId}", "documentId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -4947,910 +3697,7 @@ impl<'a> ManagedZoneListCall<'a> {
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneListCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server decides how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// Restricts the list to return only zones with this domain name.
-    ///
-    /// Sets the *dns name* query property to the given value.
-    pub fn dns_name(mut self, new_value: &str) -> ManagedZoneListCall<'a> {
-        self._dns_name = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneListCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneListCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Applies a partial update to an existing ManagedZone.
-///
-/// A builder for the *patch* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::ManagedZone;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ManagedZone::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().patch(req, "project", "managedZone")
-///              .client_operation_id("dolor")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZonePatchCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: ManagedZone,
-    _project: String,
-    _managed_zone: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZonePatchCall<'a> {}
-
-impl<'a> ManagedZonePatchCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZones.patch",
-                               http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ManagedZone) -> ManagedZonePatchCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZonePatchCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZonePatchCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZonePatchCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZonePatchCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZonePatchCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZonePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates an existing ManagedZone.
-///
-/// A builder for the *update* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::ManagedZone;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ManagedZone::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().update(req, "project", "managedZone")
-///              .client_operation_id("sadipscing")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ManagedZoneUpdateCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: ManagedZone,
-    _project: String,
-    _managed_zone: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ManagedZoneUpdateCall<'a> {}
-
-impl<'a> ManagedZoneUpdateCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.managedZones.update",
-                               http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ManagedZone) -> ManagedZoneUpdateCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedZoneUpdateCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneUpdateCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Creates a new Policy.
-///
-/// A builder for the *create* method supported by a *policy* resource.
-/// It is not used directly, but through a `PolicyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::Policy;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Policy::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.policies().create(req, "project")
-///              .client_operation_id("dolor")
-///              .doit().await;
-/// # }
-/// ```
-pub struct PolicyCreateCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: Policy,
-    _project: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for PolicyCreateCall<'a> {}
-
-impl<'a> PolicyCreateCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Policy)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.policies.create",
-                               http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/policies";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
+            for param_name in ["documentId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -5917,22 +3764,22 @@ impl<'a> PolicyCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -5960,25 +3807,18 @@ impl<'a> PolicyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Policy) -> PolicyCreateCall<'a> {
+    pub fn request(mut self, new_value: BatchUpdateDocumentRequest) -> DocumentBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
+    /// The ID of the document to update.
     ///
-    /// Sets the *project* path property to the given value.
+    /// Sets the *document id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> PolicyCreateCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> PolicyCreateCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
+    pub fn document_id(mut self, new_value: &str) -> DocumentBatchUpdateCall<'a> {
+        self._document_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5987,7 +3827,7 @@ impl<'a> PolicyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6012,7 +3852,7 @@ impl<'a> PolicyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6021,7 +3861,7 @@ impl<'a> PolicyCreateCall<'a> {
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Document`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6032,7 +3872,7 @@ impl<'a> PolicyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyCreateCall<'a>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6044,277 +3884,10 @@ impl<'a> PolicyCreateCall<'a> {
 }
 
 
-/// Deletes a previously created Policy. Fails if the policy is still being referenced by a network.
+/// Creates a blank document using the title given in the request. Other fields in the request, including any provided content, are ignored. Returns the created document.
 ///
-/// A builder for the *delete* method supported by a *policy* resource.
-/// It is not used directly, but through a `PolicyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.policies().delete("project", "policy")
-///              .client_operation_id("vero")
-///              .doit().await;
-/// # }
-/// ```
-pub struct PolicyDeleteCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _policy: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for PolicyDeleteCall<'a> {}
-
-impl<'a> PolicyDeleteCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.policies.delete",
-                               http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("policy", self._policy.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["project", "policy", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/policies/{policy}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{policy}", "policy")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["policy", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> PolicyDeleteCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// User given friendly name of the policy addressed by this request.
-    ///
-    /// Sets the *policy* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn policy(mut self, new_value: &str) -> PolicyDeleteCall<'a> {
-        self._policy = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> PolicyDeleteCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyDeleteCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyDeleteCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing Policy.
-///
-/// A builder for the *get* method supported by a *policy* resource.
-/// It is not used directly, but through a `PolicyMethods` instance.
+/// A builder for the *create* method supported by a *document* resource.
+/// It is not used directly, but through a `DocumentMethods` instance.
 ///
 /// # Example
 ///
@@ -6323,609 +3896,47 @@ impl<'a> PolicyDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
+/// # extern crate google_docs1 as docs1;
+/// use docs1::api::Document;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
+/// # use docs1::{Docs, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.policies().get("project", "policy")
-///              .client_operation_id("vero")
-///              .doit().await;
-/// # }
-/// ```
-pub struct PolicyGetCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _policy: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for PolicyGetCall<'a> {}
-
-impl<'a> PolicyGetCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Policy)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.policies.get",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("policy", self._policy.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "policy", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/policies/{policy}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{policy}", "policy")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["policy", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> PolicyGetCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// User given friendly name of the policy addressed by this request.
-    ///
-    /// Sets the *policy* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn policy(mut self, new_value: &str) -> PolicyGetCall<'a> {
-        self._policy = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> PolicyGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyGetCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyGetCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Enumerates all Policies associated with a project.
-///
-/// A builder for the *list* method supported by a *policy* resource.
-/// It is not used directly, but through a `PolicyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.policies().list("project")
-///              .page_token("Lorem")
-///              .max_results(-29)
-///              .doit().await;
-/// # }
-/// ```
-pub struct PolicyListCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for PolicyListCall<'a> {}
-
-impl<'a> PolicyListCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, PoliciesListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.policies.list",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "project", "pageToken", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/policies";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> PolicyListCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PolicyListCall<'a> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server decides how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> PolicyListCall<'a> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyListCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyListCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Applies a partial update to an existing Policy.
-///
-/// A builder for the *patch* method supported by a *policy* resource.
-/// It is not used directly, but through a `PolicyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::Policy;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Docs::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Policy::default();
+/// let mut req = Document::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.policies().patch(req, "project", "policy")
-///              .client_operation_id("accusam")
+/// let result = hub.documents().create(req)
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicyPatchCall<'a>
+pub struct DocumentCreateCall<'a>
     where  {
 
-    hub: &'a Dns<>,
-    _request: Policy,
-    _project: String,
-    _policy: String,
-    _client_operation_id: Option<String>,
+    hub: &'a Docs<>,
+    _request: Document,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PolicyPatchCall<'a> {}
+impl<'a> client::CallBuilder for DocumentCreateCall<'a> {}
 
-impl<'a> PolicyPatchCall<'a> {
+impl<'a> DocumentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, PoliciesPatchResponse)> {
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Document)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         use client::ToParts;
@@ -6934,631 +3945,10 @@ impl<'a> PolicyPatchCall<'a> {
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(client::MethodInfo { id: "dns.policies.patch",
-                               http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("policy", self._policy.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "policy", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/policies/{policy}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{policy}", "policy")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["policy", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Policy) -> PolicyPatchCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> PolicyPatchCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// User given friendly name of the policy addressed by this request.
-    ///
-    /// Sets the *policy* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn policy(mut self, new_value: &str) -> PolicyPatchCall<'a> {
-        self._policy = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> PolicyPatchCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyPatchCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyPatchCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates an existing Policy.
-///
-/// A builder for the *update* method supported by a *policy* resource.
-/// It is not used directly, but through a `PolicyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::Policy;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Policy::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.policies().update(req, "project", "policy")
-///              .client_operation_id("voluptua.")
-///              .doit().await;
-/// # }
-/// ```
-pub struct PolicyUpdateCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: Policy,
-    _project: String,
-    _policy: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for PolicyUpdateCall<'a> {}
-
-impl<'a> PolicyUpdateCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, PoliciesUpdateResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.policies.update",
-                               http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("policy", self._policy.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "policy", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/policies/{policy}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{policy}", "policy")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["policy", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Policy) -> PolicyUpdateCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> PolicyUpdateCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// User given friendly name of the policy addressed by this request.
-    ///
-    /// Sets the *policy* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn policy(mut self, new_value: &str) -> PolicyUpdateCall<'a> {
-        self._policy = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> PolicyUpdateCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyUpdateCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyUpdateCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Creates a new ResourceRecordSet.
-///
-/// A builder for the *managedZones.rrsets.create* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::ResourceRecordSet;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ResourceRecordSet::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().managed_zones_rrsets_create(req, "project", "managedZone")
-///              .client_operation_id("consetetur")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectManagedZoneRrsetCreateCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: ResourceRecordSet,
-    _project: String,
-    _managed_zone: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ProjectManagedZoneRrsetCreateCall<'a> {}
-
-impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ResourceRecordSet)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.projects.managedZones.rrsets.create",
+        dlg.begin(client::MethodInfo { id: "docs.documents.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -7570,32 +3960,11 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/rrsets";
+        let mut url = self.hub._base_url.clone() + "v1/documents";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Document.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
 
@@ -7654,22 +4023,22 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -7697,44 +4066,17 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResourceRecordSet) -> ProjectManagedZoneRrsetCreateCall<'a> {
+    pub fn request(mut self, new_value: Document) -> DocumentCreateCall<'a> {
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectManagedZoneRrsetCreateCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ProjectManagedZoneRrsetCreateCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ProjectManagedZoneRrsetCreateCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectManagedZoneRrsetCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7759,7 +4101,7 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectManagedZoneRrsetCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7768,7 +4110,7 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Document`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7779,7 +4121,7 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectManagedZoneRrsetCreateCall<'a>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7791,312 +4133,10 @@ impl<'a> ProjectManagedZoneRrsetCreateCall<'a> {
 }
 
 
-/// Deletes a previously created ResourceRecordSet.
+/// Gets the latest version of the specified document.
 ///
-/// A builder for the *managedZones.rrsets.delete* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().managed_zones_rrsets_delete("project", "managedZone", "name", "type")
-///              .client_operation_id("gubergren")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectManagedZoneRrsetDeleteCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _name: String,
-    _type_: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ProjectManagedZoneRrsetDeleteCall<'a> {}
-
-impl<'a> ProjectManagedZoneRrsetDeleteCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ResourceRecordSetsDeleteResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.projects.managedZones.rrsets.delete",
-                               http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("name", self._name.to_string()));
-        params.push(("type", self._type_.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "name", "type", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{name}", "name"), ("{type}", "type")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
-            for param_name in ["type", "name", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Fully qualified domain name.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// RRSet type.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectManagedZoneRrsetDeleteCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectManagedZoneRrsetDeleteCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectManagedZoneRrsetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing ResourceRecordSet.
-///
-/// A builder for the *managedZones.rrsets.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
+/// A builder for the *get* method supported by a *document* resource.
+/// It is not used directly, but through a `DocumentMethods` instance.
 ///
 /// # Example
 ///
@@ -8105,48 +4145,43 @@ impl<'a> ProjectManagedZoneRrsetDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
+/// # extern crate google_docs1 as docs1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
+/// # use docs1::{Docs, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Docs::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().managed_zones_rrsets_get("project", "managedZone", "name", "type")
-///              .client_operation_id("dolore")
+/// let result = hub.documents().get("documentId")
+///              .suggestions_view_mode("At")
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectManagedZoneRrsetGetCall<'a>
+pub struct DocumentGetCall<'a>
     where  {
 
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _name: String,
-    _type_: String,
-    _client_operation_id: Option<String>,
+    hub: &'a Docs<>,
+    _document_id: String,
+    _suggestions_view_mode: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectManagedZoneRrsetGetCall<'a> {}
+impl<'a> client::CallBuilder for DocumentGetCall<'a> {}
 
-impl<'a> ProjectManagedZoneRrsetGetCall<'a> {
+impl<'a> DocumentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ResourceRecordSet)> {
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Document)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         use client::ToParts;
@@ -8155,645 +4190,14 @@ impl<'a> ProjectManagedZoneRrsetGetCall<'a> {
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(client::MethodInfo { id: "dns.projects.managedZones.rrsets.get",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("name", self._name.to_string()));
-        params.push(("type", self._type_.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "name", "type", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{name}", "name"), ("{type}", "type")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
-            for param_name in ["type", "name", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectManagedZoneRrsetGetCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ProjectManagedZoneRrsetGetCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Fully qualified domain name.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectManagedZoneRrsetGetCall<'a> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// RRSet type.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectManagedZoneRrsetGetCall<'a> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ProjectManagedZoneRrsetGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectManagedZoneRrsetGetCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectManagedZoneRrsetGetCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectManagedZoneRrsetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Applies a partial update to an existing ResourceRecordSet.
-///
-/// A builder for the *managedZones.rrsets.patch* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// use dns1::api::ResourceRecordSet;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ResourceRecordSet::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().managed_zones_rrsets_patch(req, "project", "managedZone", "name", "type")
-///              .client_operation_id("sadipscing")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectManagedZoneRrsetPatchCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _request: ResourceRecordSet,
-    _project: String,
-    _managed_zone: String,
-    _name: String,
-    _type_: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ProjectManagedZoneRrsetPatchCall<'a> {}
-
-impl<'a> ProjectManagedZoneRrsetPatchCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ResourceRecordSet)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.projects.managedZones.rrsets.patch",
-                               http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("name", self._name.to_string()));
-        params.push(("type", self._type_.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "name", "type", "clientOperationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/rrsets/{name}/{type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{name}", "name"), ("{type}", "type")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
-            for param_name in ["type", "name", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResourceRecordSet) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._request = new_value;
-        self
-    }
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Fully qualified domain name.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// RRSet type.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
-    ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectManagedZoneRrsetPatchCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectManagedZoneRrsetPatchCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectManagedZoneRrsetPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetches the representation of an existing Project.
-///
-/// A builder for the *get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().get("project")
-///              .client_operation_id("invidunt")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectGetCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _client_operation_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ProjectGetCall<'a> {}
-
-impl<'a> ProjectGetCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Project)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.projects.get",
+        dlg.begin(client::MethodInfo { id: "docs.documents.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        if let Some(value) = self._client_operation_id {
-            params.push(("clientOperationId", value.to_string()));
+        params.push(("documentId", self._document_id.to_string()));
+        if let Some(value) = self._suggestions_view_mode {
+            params.push(("suggestionsViewMode", value.to_string()));
         }
-        for &field in ["alt", "project", "clientOperationId"].iter() {
+        for &field in ["alt", "documentId", "suggestionsViewMode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -8805,12 +4209,12 @@ impl<'a> ProjectGetCall<'a> {
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}";
+        let mut url = self.hub._base_url.clone() + "v1/documents/{documentId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DocumentReadonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{project}", "project")].iter() {
+        for &(find_this, param_name) in [("{documentId}", "documentId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8822,7 +4226,7 @@ impl<'a> ProjectGetCall<'a> {
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
+            for param_name in ["documentId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8875,22 +4279,22 @@ impl<'a> ProjectGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -8913,21 +4317,21 @@ impl<'a> ProjectGetCall<'a> {
     }
 
 
-    /// Identifies the project addressed by this request.
+    /// The ID of the document to retrieve.
     ///
-    /// Sets the *project* path property to the given value.
+    /// Sets the *document id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectGetCall<'a> {
-        self._project = new_value.to_string();
+    pub fn document_id(mut self, new_value: &str) -> DocumentGetCall<'a> {
+        self._document_id = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    /// The suggestions view mode to apply to the document. This allows viewing the document with all suggestions inline, accepted or rejected. If one is not specified, DEFAULT_FOR_CURRENT_ACCESS is used.
     ///
-    /// Sets the *client operation id* query property to the given value.
-    pub fn client_operation_id(mut self, new_value: &str) -> ProjectGetCall<'a> {
-        self._client_operation_id = Some(new_value.to_string());
+    /// Sets the *suggestions view mode* query property to the given value.
+    pub fn suggestions_view_mode(mut self, new_value: &str) -> DocumentGetCall<'a> {
+        self._suggestions_view_mode = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8936,7 +4340,7 @@ impl<'a> ProjectGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8961,7 +4365,7 @@ impl<'a> ProjectGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8970,7 +4374,7 @@ impl<'a> ProjectGetCall<'a> {
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
+    /// `Scope::DocumentReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8981,321 +4385,7 @@ impl<'a> ProjectGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Enumerates ResourceRecordSets that you have created but not yet deleted.
-///
-/// A builder for the *list* method supported by a *resourceRecordSet* resource.
-/// It is not used directly, but through a `ResourceRecordSetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use oauth2;
-/// # use dns1::Dns;
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.resource_record_sets().list("project", "managedZone")
-///              .type_("At")
-///              .page_token("sed")
-///              .name("sit")
-///              .max_results(-35)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ResourceRecordSetListCall<'a>
-    where  {
-
-    hub: &'a Dns<>,
-    _project: String,
-    _managed_zone: String,
-    _type_: Option<String>,
-    _page_token: Option<String>,
-    _name: Option<String>,
-    _max_results: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a> client::CallBuilder for ResourceRecordSetListCall<'a> {}
-
-impl<'a> ResourceRecordSetListCall<'a> {
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ResourceRecordSetsListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(client::MethodInfo { id: "dns.resourceRecordSets.list",
-                               http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._type_ {
-            params.push(("type", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._name {
-            params.push(("name", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "type", "pageToken", "name", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "dns/v1/projects/{project}/managedZones/{managedZone}/rrsets";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = url::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-                
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ResourceRecordSetListCall<'a> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or ID.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ResourceRecordSetListCall<'a> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.
-    ///
-    /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a> {
-        self._type_ = Some(new_value.to_string());
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Restricts the list to return only records with this fully qualified domain name.
-    ///
-    /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a> {
-        self._name = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server decides how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResourceRecordSetListCall<'a> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ResourceRecordSetListCall<'a>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ResourceRecordSetListCall<'a>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

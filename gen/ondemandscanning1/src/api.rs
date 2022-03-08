@@ -19,7 +19,7 @@ use crate::client;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// See, edit, configure, and delete your Google Cloud Platform data
+    /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
 }
 
@@ -52,13 +52,11 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_ondemandscanning1 as ondemandscanning1;
 /// use ondemandscanning1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use ondemandscanning1::OnDemandScanning;
+/// use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -68,9 +66,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -101,8 +99,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct OnDemandScanning<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -116,7 +114,7 @@ impl<'a, > OnDemandScanning<> {
         OnDemandScanning {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/3.0.0".to_string(),
             _base_url: "https://ondemandscanning.googleapis.com/".to_string(),
             _root_url: "https://ondemandscanning.googleapis.com/".to_string(),
         }
@@ -127,7 +125,7 @@ impl<'a, > OnDemandScanning<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/3.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -181,6 +179,9 @@ impl client::Part for AliasContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzePackagesRequestV1 {
+    /// [DEPRECATED] Whether to include OSV data in the scan. For backwards compatibility reasons, this field can be neither removed nor renamed.
+    #[serde(rename="includeOsvData")]
+    pub include_osv_data: Option<bool>,
     /// The packages to analyze.
     pub packages: Option<Vec<PackageData>>,
     /// Required. The resource URI of the container image being scanned.
@@ -232,7 +233,13 @@ impl client::Part for AttestationOccurrence {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildOccurrence {
-    /// Required. The actual provenance for the build.
+    /// Deprecated. See InTotoStatement for the replacement. In-toto Provenance representation as defined in spec.
+    #[serde(rename="intotoProvenance")]
+    pub intoto_provenance: Option<InTotoProvenance>,
+    /// In-toto Statement representation as defined in spec. The intoto_statement can contain any type of provenance. The serialized payload of the statement can be stored and signed in the Occurrence's envelope.
+    #[serde(rename="intotoStatement")]
+    pub intoto_statement: Option<InTotoStatement>,
+    /// The actual provenance for the build.
     pub provenance: Option<BuildProvenance>,
     /// Serialized JSON representation of the provenance, used in generating the build signature in the corresponding build note. After verifying the signature, `provenance_bytes` can be unmarshalled and compared to the provenance to confirm that it is unchanged. A base64-encoded string representation of the provenance bytes is used for the signature in order to interoperate with openssl which expects this format for signature verification. The serialized form is captured both to avoid ambiguity in how the provenance is marshalled to json as well to prevent incompatibilities with future changes.
     #[serde(rename="provenanceBytes")]
@@ -287,6 +294,64 @@ pub struct BuildProvenance {
 }
 
 impl client::Part for BuildProvenance {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuilderConfig {
+    /// no description provided
+    pub id: Option<String>,
+}
+
+impl client::Part for BuilderConfig {}
+
+
+/// Common Vulnerability Scoring System. For details, see https://www.first.org/cvss/specification-document This is a message we will try to use for storing multiple versions of CVSS. The intention is that as new versions of CVSS scores get added, we will be able to modify this message rather than adding new protos for each new version of the score.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CVSS {
+    /// no description provided
+    #[serde(rename="attackComplexity")]
+    pub attack_complexity: Option<String>,
+    /// Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.
+    #[serde(rename="attackVector")]
+    pub attack_vector: Option<String>,
+    /// no description provided
+    pub authentication: Option<String>,
+    /// no description provided
+    #[serde(rename="availabilityImpact")]
+    pub availability_impact: Option<String>,
+    /// The base score is a function of the base metric scores.
+    #[serde(rename="baseScore")]
+    pub base_score: Option<f32>,
+    /// no description provided
+    #[serde(rename="confidentialityImpact")]
+    pub confidentiality_impact: Option<String>,
+    /// no description provided
+    #[serde(rename="exploitabilityScore")]
+    pub exploitability_score: Option<f32>,
+    /// no description provided
+    #[serde(rename="impactScore")]
+    pub impact_score: Option<f32>,
+    /// no description provided
+    #[serde(rename="integrityImpact")]
+    pub integrity_impact: Option<String>,
+    /// no description provided
+    #[serde(rename="privilegesRequired")]
+    pub privileges_required: Option<String>,
+    /// no description provided
+    pub scope: Option<String>,
+    /// no description provided
+    #[serde(rename="userInteraction")]
+    pub user_interaction: Option<String>,
+}
+
+impl client::Part for CVSS {}
 
 
 /// The category to which the update belongs.
@@ -349,6 +414,55 @@ pub struct Command {
 impl client::Part for Command {}
 
 
+/// Indicates that the builder claims certain fields in this message to be complete.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Completeness {
+    /// If true, the builder claims that recipe.arguments is complete, meaning that all external inputs are properly captured in the recipe.
+    pub arguments: Option<bool>,
+    /// If true, the builder claims that recipe.environment is claimed to be complete.
+    pub environment: Option<bool>,
+    /// If true, the builder claims that materials are complete, usually through some controls to prevent network access. Sometimes called "hermetic".
+    pub materials: Option<bool>,
+}
+
+impl client::Part for Completeness {}
+
+
+/// An indication that the compliance checks in the associated ComplianceNote were not satisfied for particular resources or a specified reason.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ComplianceOccurrence {
+    /// no description provided
+    #[serde(rename="nonComplianceReason")]
+    pub non_compliance_reason: Option<String>,
+    /// no description provided
+    #[serde(rename="nonCompliantFiles")]
+    pub non_compliant_files: Option<Vec<NonCompliantFile>>,
+}
+
+impl client::Part for ComplianceOccurrence {}
+
+
+/// Deprecated. Prefer to use a regular Occurrence, and populate the Envelope at the top level of the Occurrence.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DSSEAttestationOccurrence {
+    /// If doing something security critical, make sure to verify the signatures in this metadata.
+    pub envelope: Option<Envelope>,
+    /// no description provided
+    pub statement: Option<InTotoStatement>,
+}
+
+impl client::Part for DSSEAttestationOccurrence {}
+
+
 /// The period during which some deployable was active in a runtime.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -390,6 +504,9 @@ pub struct DiscoveryOccurrence {
     /// When an error is encountered this will contain a LocalizedMessage under details to show to the user. The LocalizedMessage is output only and populated by the API.
     #[serde(rename="analysisStatusError")]
     pub analysis_status_error: Option<Status>,
+    /// Output only. The time occurrences related to this discovery occurrence were archived.
+    #[serde(rename="archiveTime")]
+    pub archive_time: Option<String>,
     /// Whether the resource is continuously analyzed.
     #[serde(rename="continuousAnalysis")]
     pub continuous_analysis: Option<String>,
@@ -417,6 +534,39 @@ impl client::Part for DiscoveryOccurrence {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl client::ResponseResult for Empty {}
+
+
+/// MUST match https://github.com/secure-systems-lab/dsse/blob/master/envelope.proto. An authenticated message of arbitrary type.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Envelope {
+    /// no description provided
+    pub payload: Option<String>,
+    /// no description provided
+    #[serde(rename="payloadType")]
+    pub payload_type: Option<String>,
+    /// no description provided
+    pub signatures: Option<Vec<EnvelopeSignature>>,
+}
+
+impl client::Part for Envelope {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnvelopeSignature {
+    /// no description provided
+    pub keyid: Option<String>,
+    /// no description provided
+    pub sig: Option<String>,
+}
+
+impl client::Part for EnvelopeSignature {}
 
 
 /// Container message for hashes of byte content of files, used in source messages to verify integrity of source input to the build.
@@ -550,6 +700,49 @@ impl client::Part for ImageOccurrence {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InTotoProvenance {
+    /// required
+    #[serde(rename="builderConfig")]
+    pub builder_config: Option<BuilderConfig>,
+    /// The collection of artifacts that influenced the build including sources, dependencies, build tools, base images, and so on. This is considered to be incomplete unless metadata.completeness.materials is true. Unset or null is equivalent to empty.
+    pub materials: Option<Vec<String>>,
+    /// no description provided
+    pub metadata: Option<Metadata>,
+    /// Identifies the configuration used for the build. When combined with materials, this SHOULD fully describe the build, such that re-running this recipe results in bit-for-bit identical output (if the build is reproducible). required
+    pub recipe: Option<Recipe>,
+}
+
+impl client::Part for InTotoProvenance {}
+
+
+/// Spec defined at https://github.com/in-toto/attestation/tree/main/spec#statement The serialized InTotoStatement will be stored as Envelope.payload. Envelope.payloadType is always "application/vnd.in-toto+json".
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InTotoStatement {
+    /// Always `https://in-toto.io/Statement/v0.1`.
+    pub _type: Option<String>,
+    /// `https://slsa.dev/provenance/v0.1` for SlsaProvenance.
+    #[serde(rename="predicateType")]
+    pub predicate_type: Option<String>,
+    /// no description provided
+    pub provenance: Option<InTotoProvenance>,
+    /// no description provided
+    #[serde(rename="slsaProvenance")]
+    pub slsa_provenance: Option<SlsaProvenance>,
+    /// no description provided
+    pub subject: Option<Vec<Subject>>,
+}
+
+impl client::Part for InTotoStatement {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Jwt {
     /// The compact encoding of a JWS, which is always three base64 encoded strings joined by periods. For details, see: https://tools.ietf.org/html/rfc7515.html#section-3.1
     #[serde(rename="compactJwt")]
@@ -634,6 +827,63 @@ pub struct Location {
 impl client::Part for Location {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Material {
+    /// no description provided
+    pub digest: Option<HashMap<String, String>>,
+    /// no description provided
+    pub uri: Option<String>,
+}
+
+impl client::Part for Material {}
+
+
+/// Other properties of the build.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Metadata {
+    /// The timestamp of when the build completed.
+    #[serde(rename="buildFinishedOn")]
+    pub build_finished_on: Option<String>,
+    /// Identifies the particular build invocation, which can be useful for finding associated logs or other ad-hoc analysis. The value SHOULD be globally unique, per in-toto Provenance spec.
+    #[serde(rename="buildInvocationId")]
+    pub build_invocation_id: Option<String>,
+    /// The timestamp of when the build started.
+    #[serde(rename="buildStartedOn")]
+    pub build_started_on: Option<String>,
+    /// Indicates that the builder claims certain fields in this message to be complete.
+    pub completeness: Option<Completeness>,
+    /// If true, the builder claims that running the recipe on materials will produce bit-for-bit identical output.
+    pub reproducible: Option<bool>,
+}
+
+impl client::Part for Metadata {}
+
+
+/// Details about files that caused a compliance check to fail. display_command is a single command that can be used to display a list of non compliant files. When there is no such command, we can also iterate a list of non compliant file using 'path'.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NonCompliantFile {
+    /// Command to display the non-compliant files.
+    #[serde(rename="displayCommand")]
+    pub display_command: Option<String>,
+    /// Empty if `display_command` is set.
+    pub path: Option<String>,
+    /// Explains why a file is non compliant for a CIS check.
+    pub reason: Option<String>,
+}
+
+impl client::Part for NonCompliantFile {}
+
+
 /// An instance of an analysis type that has been found on a resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -644,6 +894,8 @@ pub struct Occurrence {
     pub attestation: Option<AttestationOccurrence>,
     /// Describes a verifiable build.
     pub build: Option<BuildOccurrence>,
+    /// Describes a compliance violation on a linked resource.
+    pub compliance: Option<ComplianceOccurrence>,
     /// Output only. The time this occurrence was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
@@ -651,6 +903,11 @@ pub struct Occurrence {
     pub deployment: Option<DeploymentOccurrence>,
     /// Describes when a resource was discovered.
     pub discovery: Option<DiscoveryOccurrence>,
+    /// Describes an attestation of an artifact using dsse.
+    #[serde(rename="dsseAttestation")]
+    pub dsse_attestation: Option<DSSEAttestationOccurrence>,
+    /// https://github.com/secure-systems-lab/dsse
+    pub envelope: Option<Envelope>,
     /// Describes how this resource derives from the basis in the associated note.
     pub image: Option<ImageOccurrence>,
     /// Output only. This explicitly denotes which of the occurrence details are specified. This field can be used as a filter in list requests.
@@ -723,6 +980,11 @@ pub struct PackageData {
     pub os_version: Option<String>,
     /// The package being analysed for vulnerabilities
     pub package: Option<String>,
+    /// The type of package: os, maven, go, etc.
+    #[serde(rename="packageType")]
+    pub package_type: Option<String>,
+    /// no description provided
+    pub unused: Option<String>,
     /// The version of the package being analysed
     pub version: Option<String>,
 }
@@ -745,6 +1007,9 @@ pub struct PackageIssue {
     /// Required. The version of the package that is installed on the resource affected by this vulnerability.
     #[serde(rename="affectedVersion")]
     pub affected_version: Option<Version>,
+    /// Output only. The distro or language system assigned severity for this vulnerability when that is available and note provider assigned severity when it is not available.
+    #[serde(rename="effectiveSeverity")]
+    pub effective_severity: Option<String>,
     /// Output only. Whether a fix is available for this package.
     #[serde(rename="fixAvailable")]
     pub fix_available: Option<bool>,
@@ -757,6 +1022,9 @@ pub struct PackageIssue {
     /// Required. The version of the package this vulnerability was fixed in. Setting this to VersionKind.MAXIMUM means no fix is yet available.
     #[serde(rename="fixedVersion")]
     pub fixed_version: Option<Version>,
+    /// The type of package (e.g. OS, MAVEN, GO).
+    #[serde(rename="packageType")]
+    pub package_type: Option<String>,
 }
 
 impl client::Part for PackageIssue {}
@@ -792,6 +1060,30 @@ pub struct ProjectRepoId {
 }
 
 impl client::Part for ProjectRepoId {}
+
+
+/// Steps taken to build the artifact. For a TaskRun, typically each container corresponds to one step in the recipe.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Recipe {
+    /// Collection of all external inputs that influenced the build on top of recipe.definedInMaterial and recipe.entryPoint. For example, if the recipe type were "make", then this might be the flags passed to make aside from the target, which is captured in recipe.entryPoint. Since the arguments field can greatly vary in structure, depending on the builder and recipe type, this is of form "Any".
+    pub arguments: Option<Vec<HashMap<String, String>>>,
+    /// Index in materials containing the recipe steps that are not implied by recipe.type. For example, if the recipe type were "make", then this would point to the source containing the Makefile, not the make program itself. Set to -1 if the recipe doesn't come from a material, as zero is default unset value for int64.
+    #[serde(rename="definedInMaterial")]
+    pub defined_in_material: Option<String>,
+    /// String identifying the entry point into the build. This is often a path to a configuration file and/or a target label within that file. The syntax and meaning are defined by recipe.type. For example, if the recipe type were "make", then this would reference the directory in which to run make as well as which target to use.
+    #[serde(rename="entryPoint")]
+    pub entry_point: Option<String>,
+    /// Any other builder-controlled inputs necessary for correctly evaluating the recipe. Usually only needed for reproducing the build but not evaluated as part of policy. Since the environment field can greatly vary in structure, depending on the builder and recipe type, this is of form "Any".
+    pub environment: Option<Vec<HashMap<String, String>>>,
+    /// URI indicating what type of recipe was performed. It determines the meaning of recipe.entryPoint, recipe.arguments, recipe.environment, and materials.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for Recipe {}
 
 
 /// Metadata for any related URL information.
@@ -839,6 +1131,103 @@ pub struct Signature {
 }
 
 impl client::Part for Signature {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaBuilder {
+    /// no description provided
+    pub id: Option<String>,
+}
+
+impl client::Part for SlsaBuilder {}
+
+
+/// Indicates that the builder claims certain fields in this message to be complete.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaCompleteness {
+    /// If true, the builder claims that recipe.arguments is complete, meaning that all external inputs are properly captured in the recipe.
+    pub arguments: Option<bool>,
+    /// If true, the builder claims that recipe.environment is claimed to be complete.
+    pub environment: Option<bool>,
+    /// If true, the builder claims that materials are complete, usually through some controls to prevent network access. Sometimes called "hermetic".
+    pub materials: Option<bool>,
+}
+
+impl client::Part for SlsaCompleteness {}
+
+
+/// Other properties of the build.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaMetadata {
+    /// The timestamp of when the build completed.
+    #[serde(rename="buildFinishedOn")]
+    pub build_finished_on: Option<String>,
+    /// Identifies the particular build invocation, which can be useful for finding associated logs or other ad-hoc analysis. The value SHOULD be globally unique, per in-toto Provenance spec.
+    #[serde(rename="buildInvocationId")]
+    pub build_invocation_id: Option<String>,
+    /// The timestamp of when the build started.
+    #[serde(rename="buildStartedOn")]
+    pub build_started_on: Option<String>,
+    /// Indicates that the builder claims certain fields in this message to be complete.
+    pub completeness: Option<SlsaCompleteness>,
+    /// If true, the builder claims that running the recipe on materials will produce bit-for-bit identical output.
+    pub reproducible: Option<bool>,
+}
+
+impl client::Part for SlsaMetadata {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaProvenance {
+    /// required
+    pub builder: Option<SlsaBuilder>,
+    /// The collection of artifacts that influenced the build including sources, dependencies, build tools, base images, and so on. This is considered to be incomplete unless metadata.completeness.materials is true. Unset or null is equivalent to empty.
+    pub materials: Option<Vec<Material>>,
+    /// no description provided
+    pub metadata: Option<SlsaMetadata>,
+    /// Identifies the configuration used for the build. When combined with materials, this SHOULD fully describe the build, such that re-running this recipe results in bit-for-bit identical output (if the build is reproducible). required
+    pub recipe: Option<SlsaRecipe>,
+}
+
+impl client::Part for SlsaProvenance {}
+
+
+/// Steps taken to build the artifact. For a TaskRun, typically each container corresponds to one step in the recipe.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaRecipe {
+    /// Collection of all external inputs that influenced the build on top of recipe.definedInMaterial and recipe.entryPoint. For example, if the recipe type were "make", then this might be the flags passed to make aside from the target, which is captured in recipe.entryPoint. Depending on the recipe Type, the structure may be different.
+    pub arguments: Option<HashMap<String, String>>,
+    /// Index in materials containing the recipe steps that are not implied by recipe.type. For example, if the recipe type were "make", then this would point to the source containing the Makefile, not the make program itself. Set to -1 if the recipe doesn't come from a material, as zero is default unset value for int64.
+    #[serde(rename="definedInMaterial")]
+    pub defined_in_material: Option<String>,
+    /// String identifying the entry point into the build. This is often a path to a configuration file and/or a target label within that file. The syntax and meaning are defined by recipe.type. For example, if the recipe type were "make", then this would reference the directory in which to run make as well as which target to use.
+    #[serde(rename="entryPoint")]
+    pub entry_point: Option<String>,
+    /// Any other builder-controlled inputs necessary for correctly evaluating the recipe. Usually only needed for reproducing the build but not evaluated as part of policy. Depending on the recipe Type, the structure may be different.
+    pub environment: Option<HashMap<String, String>>,
+    /// URI indicating what type of recipe was performed. It determines the meaning of recipe.entryPoint, recipe.arguments, recipe.environment, and materials.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl client::Part for SlsaRecipe {}
 
 
 /// Source describes the location of the source used for the build.
@@ -898,6 +1287,21 @@ pub struct Status {
 }
 
 impl client::Part for Status {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Subject {
+    /// `"": ""` Algorithms can be e.g. sha256, sha512 See https://github.com/in-toto/attestation/blob/main/spec/field_types.md#DigestSet
+    pub digest: Option<HashMap<String, String>>,
+    /// no description provided
+    pub name: Option<String>,
+}
+
+impl client::Part for Subject {}
 
 
 /// The Upgrade Distribution represents metadata about the Upgrade for each operating system (CPE). Some distributions have additional metadata around updates, classifying them into various categories and severities.
@@ -974,7 +1378,9 @@ pub struct VulnerabilityOccurrence {
     /// Output only. The CVSS score of this vulnerability. CVSS score is on a scale of 0 - 10 where 0 indicates low severity and 10 indicates high severity.
     #[serde(rename="cvssScore")]
     pub cvss_score: Option<f32>,
-    /// The distro assigned severity for this vulnerability when it is available, otherwise this is the note provider assigned severity.
+    /// The cvss v3 score for the vulnerability.
+    pub cvssv3: Option<CVSS>,
+    /// The distro assigned severity for this vulnerability when it is available, otherwise this is the note provider assigned severity. When there are multiple PackageIssues for this vulnerability, they can have different effective severities because some might be provided by the distro while others are provided by the language ecosystem for a language pack. For this reason, it is advised to use the effective severity on the PackageIssue level. In the case where multiple PackageIssues have differing effective severities, this field should be the highest severity for any of the PackageIssues.
     #[serde(rename="effectiveSeverity")]
     pub effective_severity: Option<String>,
     /// Output only. Whether at least one of the affected packages has a fix available.
@@ -1045,18 +1451,16 @@ impl client::Part for WindowsUpdate {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_ondemandscanning1 as ondemandscanning1;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use ondemandscanning1::OnDemandScanning;
+/// use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -1223,17 +1627,15 @@ impl<'a> ProjectMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1358,22 +1760,22 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1481,17 +1883,15 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1616,22 +2016,22 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1739,17 +2139,15 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -1874,22 +2272,22 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -1997,17 +2395,15 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2147,22 +2543,22 @@ impl<'a> ProjectLocationOperationListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2291,17 +2687,15 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2431,22 +2825,22 @@ impl<'a> ProjectLocationOperationWaitCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2561,17 +2955,15 @@ impl<'a> ProjectLocationOperationWaitCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2706,22 +3098,22 @@ impl<'a> ProjectLocationScanVulnerabilityListCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {
@@ -2843,18 +3235,16 @@ impl<'a> ProjectLocationScanVulnerabilityListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ondemandscanning1 as ondemandscanning1;
 /// use ondemandscanning1::api::AnalyzePackagesRequestV1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use ondemandscanning1::OnDemandScanning;
+/// # use ondemandscanning1::{OnDemandScanning, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = OnDemandScanning::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -2999,22 +3389,22 @@ impl<'a> ProjectLocationScanAnalyzePackageCall<'a> {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         dlg.finished(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     let result_value = {

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdExchangeBuyerII* API at revision *20210331*. The CLI is at version *2.0.8*.
+This documentation was generated from the *AdExchangeBuyerII* API at revision *20220307*. The CLI is at version *3.0.0*.
 
 ```bash
 adexchangebuyer2-v2-beta1 [options]
@@ -50,6 +50,8 @@ adexchangebuyer2-v2-beta1 [options]
                 creatives-update <account-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-watch <account-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 finalized-proposals-list <account-id> [-p <v>]... [-o <out>]
+                finalized-proposals-pause <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                finalized-proposals-resume <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 products-get <account-id> <product-id> [-p <v>]... [-o <out>]
                 products-list <account-id> [-p <v>]... [-o <out>]
                 proposals-accept <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
