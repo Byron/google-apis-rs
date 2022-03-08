@@ -1,0 +1,29 @@
+site_name: Cloud Memorystore for Memcached v3.0.0+20220224
+site_url: http://byron.github.io/google-apis-rs/google-memcache1-cli
+site_description: A complete library to interact with Cloud Memorystore for Memcached (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/memcache1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-instances-apply-parameters.md', 'Projects', 'Locations Instances Apply Parameters']
+- ['projects_locations-instances-create.md', 'Projects', 'Locations Instances Create']
+- ['projects_locations-instances-delete.md', 'Projects', 'Locations Instances Delete']
+- ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
+- ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
+- ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']
+- ['projects_locations-instances-update-parameters.md', 'Projects', 'Locations Instances Update Parameters']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

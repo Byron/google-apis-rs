@@ -1,0 +1,19 @@
+site_name: My Business Lodging v3.0.0+20220305
+site_url: http://byron.github.io/google-apis-rs/google-mybusinesslodging1-cli
+site_description: A complete library to interact with My Business Lodging (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinesslodging1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['locations_get-lodging.md', 'Locations', 'Get Lodging']
+- ['locations_lodging-get-google-updated.md', 'Locations', 'Lodging Get Google Updated']
+- ['locations_update-lodging.md', 'Locations', 'Update Lodging']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

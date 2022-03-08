@@ -1,0 +1,25 @@
+site_name: Remote Build Execution v3.0.0+20210329
+site_url: http://byron.github.io/google-apis-rs/google-remotebuildexecution2-cli
+site_description: A complete library to interact with Remote Build Execution (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/remotebuildexecution2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['action-results_get.md', 'Action Results', 'Get']
+- ['action-results_update.md', 'Action Results', 'Update']
+- ['actions_execute.md', 'Actions', 'Execute']
+- ['blobs_batch-read.md', 'Blobs', 'Batch Read']
+- ['blobs_batch-update.md', 'Blobs', 'Batch Update']
+- ['blobs_find-missing.md', 'Blobs', 'Find Missing']
+- ['blobs_get-tree.md', 'Blobs', 'Get Tree']
+- ['methods_get-capabilities.md', 'Methods', 'Get Capabilities']
+- ['operations_wait-execution.md', 'Operations', 'Wait Execution']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

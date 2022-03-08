@@ -1,0 +1,18 @@
+site_name: Comment Analyzer v3.0.0+20200405
+site_url: http://byron.github.io/google-apis-rs/google-commentanalyzer1_alpha1-cli
+site_description: A complete library to interact with Comment Analyzer (protocol v1alpha1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/commentanalyzer1_alpha1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['comments_analyze.md', 'Comments', 'Analyze']
+- ['comments_suggestscore.md', 'Comments', 'Suggestscore']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

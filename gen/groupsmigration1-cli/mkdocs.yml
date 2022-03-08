@@ -1,0 +1,17 @@
+site_name: Groups Migration v3.0.0+20220226
+site_url: http://byron.github.io/google-apis-rs/google-groupsmigration1-cli
+site_description: A complete library to interact with Groups Migration (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/groupsmigration1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['archive_insert.md', 'Archive', 'Insert']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

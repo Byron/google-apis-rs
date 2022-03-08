@@ -1,0 +1,17 @@
+site_name: Policy Analyzer v3.0.0+20220227
+site_url: http://byron.github.io/google-apis-rs/google-policyanalyzer1-cli
+site_description: A complete library to interact with Policy Analyzer (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/policyanalyzer1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-activity-types-activities-query.md', 'Projects', 'Locations Activity Types Activities Query']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

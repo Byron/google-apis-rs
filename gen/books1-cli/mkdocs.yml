@@ -1,0 +1,67 @@
+site_name: books v3.0.0+20220301
+site_url: http://byron.github.io/google-apis-rs/google-books1-cli
+site_description: A complete library to interact with books (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/books1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['bookshelves_get.md', 'Bookshelves', 'Get']
+- ['bookshelves_list.md', 'Bookshelves', 'List']
+- ['bookshelves_volumes-list.md', 'Bookshelves', 'Volumes List']
+- ['cloudloading_add-book.md', 'Cloudloading', 'Add Book']
+- ['cloudloading_delete-book.md', 'Cloudloading', 'Delete Book']
+- ['cloudloading_update-book.md', 'Cloudloading', 'Update Book']
+- ['dictionary_list-offline-metadata.md', 'Dictionary', 'List Offline Metadata']
+- ['familysharing_get-family-info.md', 'Familysharing', 'Get Family Info']
+- ['familysharing_share.md', 'Familysharing', 'Share']
+- ['familysharing_unshare.md', 'Familysharing', 'Unshare']
+- ['layers_annotation-data-get.md', 'Layers', 'Annotation Data Get']
+- ['layers_annotation-data-list.md', 'Layers', 'Annotation Data List']
+- ['layers_get.md', 'Layers', 'Get']
+- ['layers_list.md', 'Layers', 'List']
+- ['layers_volume-annotations-get.md', 'Layers', 'Volume Annotations Get']
+- ['layers_volume-annotations-list.md', 'Layers', 'Volume Annotations List']
+- ['myconfig_get-user-settings.md', 'Myconfig', 'Get User Settings']
+- ['myconfig_release-download-access.md', 'Myconfig', 'Release Download Access']
+- ['myconfig_request-access.md', 'Myconfig', 'Request Access']
+- ['myconfig_sync-volume-licenses.md', 'Myconfig', 'Sync Volume Licenses']
+- ['myconfig_update-user-settings.md', 'Myconfig', 'Update User Settings']
+- ['mylibrary_annotations-delete.md', 'Mylibrary', 'Annotations Delete']
+- ['mylibrary_annotations-insert.md', 'Mylibrary', 'Annotations Insert']
+- ['mylibrary_annotations-list.md', 'Mylibrary', 'Annotations List']
+- ['mylibrary_annotations-summary.md', 'Mylibrary', 'Annotations Summary']
+- ['mylibrary_annotations-update.md', 'Mylibrary', 'Annotations Update']
+- ['mylibrary_bookshelves-add-volume.md', 'Mylibrary', 'Bookshelves Add Volume']
+- ['mylibrary_bookshelves-clear-volumes.md', 'Mylibrary', 'Bookshelves Clear Volumes']
+- ['mylibrary_bookshelves-get.md', 'Mylibrary', 'Bookshelves Get']
+- ['mylibrary_bookshelves-list.md', 'Mylibrary', 'Bookshelves List']
+- ['mylibrary_bookshelves-move-volume.md', 'Mylibrary', 'Bookshelves Move Volume']
+- ['mylibrary_bookshelves-remove-volume.md', 'Mylibrary', 'Bookshelves Remove Volume']
+- ['mylibrary_bookshelves-volumes-list.md', 'Mylibrary', 'Bookshelves Volumes List']
+- ['mylibrary_readingpositions-get.md', 'Mylibrary', 'Readingpositions Get']
+- ['mylibrary_readingpositions-set-position.md', 'Mylibrary', 'Readingpositions Set Position']
+- ['notification_get.md', 'Notification', 'Get']
+- ['onboarding_list-categories.md', 'Onboarding', 'List Categories']
+- ['onboarding_list-category-volumes.md', 'Onboarding', 'List Category Volumes']
+- ['personalizedstream_get.md', 'Personalizedstream', 'Get']
+- ['promooffer_accept.md', 'Promooffer', 'Accept']
+- ['promooffer_dismiss.md', 'Promooffer', 'Dismiss']
+- ['promooffer_get.md', 'Promooffer', 'Get']
+- ['series_get.md', 'Series', 'Get']
+- ['series_membership-get.md', 'Series', 'Membership Get']
+- ['volumes_associated-list.md', 'Volumes', 'Associated List']
+- ['volumes_get.md', 'Volumes', 'Get']
+- ['volumes_list.md', 'Volumes', 'List']
+- ['volumes_mybooks-list.md', 'Volumes', 'Mybooks List']
+- ['volumes_recommended-list.md', 'Volumes', 'Recommended List']
+- ['volumes_recommended-rate.md', 'Volumes', 'Recommended Rate']
+- ['volumes_useruploaded-list.md', 'Volumes', 'Useruploaded List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

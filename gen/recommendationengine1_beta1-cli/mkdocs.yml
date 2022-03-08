@@ -1,0 +1,38 @@
+site_name: Recommendations AI v3.0.0+20220224
+site_url: http://byron.github.io/google-apis-rs/google-recommendationengine1_beta1-cli
+site_description: A complete library to interact with Recommendations AI (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/recommendationengine1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-catalogs-catalog-items-create.md', 'Projects', 'Locations Catalogs Catalog Items Create']
+- ['projects_locations-catalogs-catalog-items-delete.md', 'Projects', 'Locations Catalogs Catalog Items Delete']
+- ['projects_locations-catalogs-catalog-items-get.md', 'Projects', 'Locations Catalogs Catalog Items Get']
+- ['projects_locations-catalogs-catalog-items-import.md', 'Projects', 'Locations Catalogs Catalog Items Import']
+- ['projects_locations-catalogs-catalog-items-list.md', 'Projects', 'Locations Catalogs Catalog Items List']
+- ['projects_locations-catalogs-catalog-items-patch.md', 'Projects', 'Locations Catalogs Catalog Items Patch']
+- ['projects_locations-catalogs-event-stores-operations-get.md', 'Projects', 'Locations Catalogs Event Stores Operations Get']
+- ['projects_locations-catalogs-event-stores-operations-list.md', 'Projects', 'Locations Catalogs Event Stores Operations List']
+- ['projects_locations-catalogs-event-stores-placements-predict.md', 'Projects', 'Locations Catalogs Event Stores Placements Predict']
+- ['projects_locations-catalogs-event-stores-prediction-api-key-registrations-create.md', 'Projects', 'Locations Catalogs Event Stores Prediction Api Key Registrations Create']
+- ['projects_locations-catalogs-event-stores-prediction-api-key-registrations-delete.md', 'Projects', 'Locations Catalogs Event Stores Prediction Api Key Registrations Delete']
+- ['projects_locations-catalogs-event-stores-prediction-api-key-registrations-list.md', 'Projects', 'Locations Catalogs Event Stores Prediction Api Key Registrations List']
+- ['projects_locations-catalogs-event-stores-user-events-collect.md', 'Projects', 'Locations Catalogs Event Stores User Events Collect']
+- ['projects_locations-catalogs-event-stores-user-events-import.md', 'Projects', 'Locations Catalogs Event Stores User Events Import']
+- ['projects_locations-catalogs-event-stores-user-events-list.md', 'Projects', 'Locations Catalogs Event Stores User Events List']
+- ['projects_locations-catalogs-event-stores-user-events-purge.md', 'Projects', 'Locations Catalogs Event Stores User Events Purge']
+- ['projects_locations-catalogs-event-stores-user-events-rejoin.md', 'Projects', 'Locations Catalogs Event Stores User Events Rejoin']
+- ['projects_locations-catalogs-event-stores-user-events-write.md', 'Projects', 'Locations Catalogs Event Stores User Events Write']
+- ['projects_locations-catalogs-list.md', 'Projects', 'Locations Catalogs List']
+- ['projects_locations-catalogs-operations-get.md', 'Projects', 'Locations Catalogs Operations Get']
+- ['projects_locations-catalogs-operations-list.md', 'Projects', 'Locations Catalogs Operations List']
+- ['projects_locations-catalogs-patch.md', 'Projects', 'Locations Catalogs Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

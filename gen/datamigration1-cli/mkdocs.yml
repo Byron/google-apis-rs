@@ -1,0 +1,45 @@
+site_name: Database Migration Service v3.0.0+20220216
+site_url: http://byron.github.io/google-apis-rs/google-datamigration1-cli
+site_description: A complete library to interact with Database Migration Service (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datamigration1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-connection-profiles-create.md', 'Projects', 'Locations Connection Profiles Create']
+- ['projects_locations-connection-profiles-delete.md', 'Projects', 'Locations Connection Profiles Delete']
+- ['projects_locations-connection-profiles-get.md', 'Projects', 'Locations Connection Profiles Get']
+- ['projects_locations-connection-profiles-get-iam-policy.md', 'Projects', 'Locations Connection Profiles Get Iam Policy']
+- ['projects_locations-connection-profiles-list.md', 'Projects', 'Locations Connection Profiles List']
+- ['projects_locations-connection-profiles-patch.md', 'Projects', 'Locations Connection Profiles Patch']
+- ['projects_locations-connection-profiles-set-iam-policy.md', 'Projects', 'Locations Connection Profiles Set Iam Policy']
+- ['projects_locations-connection-profiles-test-iam-permissions.md', 'Projects', 'Locations Connection Profiles Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-migration-jobs-create.md', 'Projects', 'Locations Migration Jobs Create']
+- ['projects_locations-migration-jobs-delete.md', 'Projects', 'Locations Migration Jobs Delete']
+- ['projects_locations-migration-jobs-generate-ssh-script.md', 'Projects', 'Locations Migration Jobs Generate Ssh Script']
+- ['projects_locations-migration-jobs-get.md', 'Projects', 'Locations Migration Jobs Get']
+- ['projects_locations-migration-jobs-get-iam-policy.md', 'Projects', 'Locations Migration Jobs Get Iam Policy']
+- ['projects_locations-migration-jobs-list.md', 'Projects', 'Locations Migration Jobs List']
+- ['projects_locations-migration-jobs-patch.md', 'Projects', 'Locations Migration Jobs Patch']
+- ['projects_locations-migration-jobs-promote.md', 'Projects', 'Locations Migration Jobs Promote']
+- ['projects_locations-migration-jobs-restart.md', 'Projects', 'Locations Migration Jobs Restart']
+- ['projects_locations-migration-jobs-resume.md', 'Projects', 'Locations Migration Jobs Resume']
+- ['projects_locations-migration-jobs-set-iam-policy.md', 'Projects', 'Locations Migration Jobs Set Iam Policy']
+- ['projects_locations-migration-jobs-start.md', 'Projects', 'Locations Migration Jobs Start']
+- ['projects_locations-migration-jobs-stop.md', 'Projects', 'Locations Migration Jobs Stop']
+- ['projects_locations-migration-jobs-test-iam-permissions.md', 'Projects', 'Locations Migration Jobs Test Iam Permissions']
+- ['projects_locations-migration-jobs-verify.md', 'Projects', 'Locations Migration Jobs Verify']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,29 @@
+site_name: Logging v3.0.0+20190325
+site_url: http://byron.github.io/google-apis-rs/google-logging2_beta1-cli
+site_description: A complete library to interact with Logging (protocol v2beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/logging2_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['entries_list.md', 'Entries', 'List']
+- ['entries_write.md', 'Entries', 'Write']
+- ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
+- ['projects_metrics-create.md', 'Projects', 'Metrics Create']
+- ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
+- ['projects_metrics-get.md', 'Projects', 'Metrics Get']
+- ['projects_metrics-list.md', 'Projects', 'Metrics List']
+- ['projects_metrics-update.md', 'Projects', 'Metrics Update']
+- ['projects_sinks-create.md', 'Projects', 'Sinks Create']
+- ['projects_sinks-delete.md', 'Projects', 'Sinks Delete']
+- ['projects_sinks-get.md', 'Projects', 'Sinks Get']
+- ['projects_sinks-list.md', 'Projects', 'Sinks List']
+- ['projects_sinks-update.md', 'Projects', 'Sinks Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

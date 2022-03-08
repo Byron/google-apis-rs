@@ -1,0 +1,71 @@
+site_name: Data Catalog v3.0.0+20220224
+site_url: http://byron.github.io/google-apis-rs/google-datacatalog1_beta1-cli
+site_description: A complete library to interact with Data Catalog (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datacatalog1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['catalog_search.md', 'Catalog', 'Search']
+- ['entries_lookup.md', 'Entries', 'Lookup']
+- ['projects_locations-entry-groups-create.md', 'Projects', 'Locations Entry Groups Create']
+- ['projects_locations-entry-groups-delete.md', 'Projects', 'Locations Entry Groups Delete']
+- ['projects_locations-entry-groups-entries-create.md', 'Projects', 'Locations Entry Groups Entries Create']
+- ['projects_locations-entry-groups-entries-delete.md', 'Projects', 'Locations Entry Groups Entries Delete']
+- ['projects_locations-entry-groups-entries-get.md', 'Projects', 'Locations Entry Groups Entries Get']
+- ['projects_locations-entry-groups-entries-get-iam-policy.md', 'Projects', 'Locations Entry Groups Entries Get Iam Policy']
+- ['projects_locations-entry-groups-entries-list.md', 'Projects', 'Locations Entry Groups Entries List']
+- ['projects_locations-entry-groups-entries-patch.md', 'Projects', 'Locations Entry Groups Entries Patch']
+- ['projects_locations-entry-groups-entries-tags-create.md', 'Projects', 'Locations Entry Groups Entries Tags Create']
+- ['projects_locations-entry-groups-entries-tags-delete.md', 'Projects', 'Locations Entry Groups Entries Tags Delete']
+- ['projects_locations-entry-groups-entries-tags-list.md', 'Projects', 'Locations Entry Groups Entries Tags List']
+- ['projects_locations-entry-groups-entries-tags-patch.md', 'Projects', 'Locations Entry Groups Entries Tags Patch']
+- ['projects_locations-entry-groups-entries-test-iam-permissions.md', 'Projects', 'Locations Entry Groups Entries Test Iam Permissions']
+- ['projects_locations-entry-groups-get.md', 'Projects', 'Locations Entry Groups Get']
+- ['projects_locations-entry-groups-get-iam-policy.md', 'Projects', 'Locations Entry Groups Get Iam Policy']
+- ['projects_locations-entry-groups-list.md', 'Projects', 'Locations Entry Groups List']
+- ['projects_locations-entry-groups-patch.md', 'Projects', 'Locations Entry Groups Patch']
+- ['projects_locations-entry-groups-set-iam-policy.md', 'Projects', 'Locations Entry Groups Set Iam Policy']
+- ['projects_locations-entry-groups-tags-create.md', 'Projects', 'Locations Entry Groups Tags Create']
+- ['projects_locations-entry-groups-tags-delete.md', 'Projects', 'Locations Entry Groups Tags Delete']
+- ['projects_locations-entry-groups-tags-list.md', 'Projects', 'Locations Entry Groups Tags List']
+- ['projects_locations-entry-groups-tags-patch.md', 'Projects', 'Locations Entry Groups Tags Patch']
+- ['projects_locations-entry-groups-test-iam-permissions.md', 'Projects', 'Locations Entry Groups Test Iam Permissions']
+- ['projects_locations-tag-templates-create.md', 'Projects', 'Locations Tag Templates Create']
+- ['projects_locations-tag-templates-delete.md', 'Projects', 'Locations Tag Templates Delete']
+- ['projects_locations-tag-templates-fields-create.md', 'Projects', 'Locations Tag Templates Fields Create']
+- ['projects_locations-tag-templates-fields-delete.md', 'Projects', 'Locations Tag Templates Fields Delete']
+- ['projects_locations-tag-templates-fields-enum-values-rename.md', 'Projects', 'Locations Tag Templates Fields Enum Values Rename']
+- ['projects_locations-tag-templates-fields-patch.md', 'Projects', 'Locations Tag Templates Fields Patch']
+- ['projects_locations-tag-templates-fields-rename.md', 'Projects', 'Locations Tag Templates Fields Rename']
+- ['projects_locations-tag-templates-get.md', 'Projects', 'Locations Tag Templates Get']
+- ['projects_locations-tag-templates-get-iam-policy.md', 'Projects', 'Locations Tag Templates Get Iam Policy']
+- ['projects_locations-tag-templates-patch.md', 'Projects', 'Locations Tag Templates Patch']
+- ['projects_locations-tag-templates-set-iam-policy.md', 'Projects', 'Locations Tag Templates Set Iam Policy']
+- ['projects_locations-tag-templates-test-iam-permissions.md', 'Projects', 'Locations Tag Templates Test Iam Permissions']
+- ['projects_locations-taxonomies-create.md', 'Projects', 'Locations Taxonomies Create']
+- ['projects_locations-taxonomies-delete.md', 'Projects', 'Locations Taxonomies Delete']
+- ['projects_locations-taxonomies-export.md', 'Projects', 'Locations Taxonomies Export']
+- ['projects_locations-taxonomies-get.md', 'Projects', 'Locations Taxonomies Get']
+- ['projects_locations-taxonomies-get-iam-policy.md', 'Projects', 'Locations Taxonomies Get Iam Policy']
+- ['projects_locations-taxonomies-import.md', 'Projects', 'Locations Taxonomies Import']
+- ['projects_locations-taxonomies-list.md', 'Projects', 'Locations Taxonomies List']
+- ['projects_locations-taxonomies-patch.md', 'Projects', 'Locations Taxonomies Patch']
+- ['projects_locations-taxonomies-policy-tags-create.md', 'Projects', 'Locations Taxonomies Policy Tags Create']
+- ['projects_locations-taxonomies-policy-tags-delete.md', 'Projects', 'Locations Taxonomies Policy Tags Delete']
+- ['projects_locations-taxonomies-policy-tags-get.md', 'Projects', 'Locations Taxonomies Policy Tags Get']
+- ['projects_locations-taxonomies-policy-tags-get-iam-policy.md', 'Projects', 'Locations Taxonomies Policy Tags Get Iam Policy']
+- ['projects_locations-taxonomies-policy-tags-list.md', 'Projects', 'Locations Taxonomies Policy Tags List']
+- ['projects_locations-taxonomies-policy-tags-patch.md', 'Projects', 'Locations Taxonomies Policy Tags Patch']
+- ['projects_locations-taxonomies-policy-tags-set-iam-policy.md', 'Projects', 'Locations Taxonomies Policy Tags Set Iam Policy']
+- ['projects_locations-taxonomies-policy-tags-test-iam-permissions.md', 'Projects', 'Locations Taxonomies Policy Tags Test Iam Permissions']
+- ['projects_locations-taxonomies-set-iam-policy.md', 'Projects', 'Locations Taxonomies Set Iam Policy']
+- ['projects_locations-taxonomies-test-iam-permissions.md', 'Projects', 'Locations Taxonomies Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

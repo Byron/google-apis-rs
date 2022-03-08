@@ -1,0 +1,25 @@
+site_name: Cloud Shell v3.0.0+20220301
+site_url: http://byron.github.io/google-apis-rs/google-cloudshell1-cli
+site_description: A complete library to interact with Cloud Shell (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudshell1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+- ['users_environments-add-public-key.md', 'Users', 'Environments Add Public Key']
+- ['users_environments-authorize.md', 'Users', 'Environments Authorize']
+- ['users_environments-get.md', 'Users', 'Environments Get']
+- ['users_environments-remove-public-key.md', 'Users', 'Environments Remove Public Key']
+- ['users_environments-start.md', 'Users', 'Environments Start']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

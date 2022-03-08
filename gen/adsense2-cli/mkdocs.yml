@@ -1,0 +1,38 @@
+site_name: adsense v3.0.0+20220304
+site_url: http://byron.github.io/google-apis-rs/google-adsense2-cli
+site_description: A complete library to interact with adsense (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adsense2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_adclients-adunits-get.md', 'Accounts', 'Adclients Adunits Get']
+- ['accounts_adclients-adunits-get-adcode.md', 'Accounts', 'Adclients Adunits Get Adcode']
+- ['accounts_adclients-adunits-list.md', 'Accounts', 'Adclients Adunits List']
+- ['accounts_adclients-adunits-list-linked-custom-channels.md', 'Accounts', 'Adclients Adunits List Linked Custom Channels']
+- ['accounts_adclients-customchannels-get.md', 'Accounts', 'Adclients Customchannels Get']
+- ['accounts_adclients-customchannels-list.md', 'Accounts', 'Adclients Customchannels List']
+- ['accounts_adclients-customchannels-list-linked-ad-units.md', 'Accounts', 'Adclients Customchannels List Linked Ad Units']
+- ['accounts_adclients-get-adcode.md', 'Accounts', 'Adclients Get Adcode']
+- ['accounts_adclients-list.md', 'Accounts', 'Adclients List']
+- ['accounts_adclients-urlchannels-list.md', 'Accounts', 'Adclients Urlchannels List']
+- ['accounts_alerts-list.md', 'Accounts', 'Alerts List']
+- ['accounts_get.md', 'Accounts', 'Get']
+- ['accounts_list.md', 'Accounts', 'List']
+- ['accounts_list-child-accounts.md', 'Accounts', 'List Child Accounts']
+- ['accounts_payments-list.md', 'Accounts', 'Payments List']
+- ['accounts_reports-generate.md', 'Accounts', 'Reports Generate']
+- ['accounts_reports-generate-csv.md', 'Accounts', 'Reports Generate Csv']
+- ['accounts_reports-saved-generate.md', 'Accounts', 'Reports Saved Generate']
+- ['accounts_reports-saved-generate-csv.md', 'Accounts', 'Reports Saved Generate Csv']
+- ['accounts_reports-saved-list.md', 'Accounts', 'Reports Saved List']
+- ['accounts_sites-get.md', 'Accounts', 'Sites Get']
+- ['accounts_sites-list.md', 'Accounts', 'Sites List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

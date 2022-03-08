@@ -1,0 +1,53 @@
+site_name: calendar v3.0.0+20220217
+site_url: http://byron.github.io/google-apis-rs/google-calendar3-cli
+site_description: A complete library to interact with calendar (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/calendar3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['acl_delete.md', 'Acl', 'Delete']
+- ['acl_get.md', 'Acl', 'Get']
+- ['acl_insert.md', 'Acl', 'Insert']
+- ['acl_list.md', 'Acl', 'List']
+- ['acl_patch.md', 'Acl', 'Patch']
+- ['acl_update.md', 'Acl', 'Update']
+- ['acl_watch.md', 'Acl', 'Watch']
+- ['calendar-list_delete.md', 'Calendar List', 'Delete']
+- ['calendar-list_get.md', 'Calendar List', 'Get']
+- ['calendar-list_insert.md', 'Calendar List', 'Insert']
+- ['calendar-list_list.md', 'Calendar List', 'List']
+- ['calendar-list_patch.md', 'Calendar List', 'Patch']
+- ['calendar-list_update.md', 'Calendar List', 'Update']
+- ['calendar-list_watch.md', 'Calendar List', 'Watch']
+- ['calendars_clear.md', 'Calendars', 'Clear']
+- ['calendars_delete.md', 'Calendars', 'Delete']
+- ['calendars_get.md', 'Calendars', 'Get']
+- ['calendars_insert.md', 'Calendars', 'Insert']
+- ['calendars_patch.md', 'Calendars', 'Patch']
+- ['calendars_update.md', 'Calendars', 'Update']
+- ['channels_stop.md', 'Channels', 'Stop']
+- ['colors_get.md', 'Colors', 'Get']
+- ['events_delete.md', 'Events', 'Delete']
+- ['events_get.md', 'Events', 'Get']
+- ['events_import.md', 'Events', 'Import']
+- ['events_insert.md', 'Events', 'Insert']
+- ['events_instances.md', 'Events', 'Instances']
+- ['events_list.md', 'Events', 'List']
+- ['events_move.md', 'Events', 'Move']
+- ['events_patch.md', 'Events', 'Patch']
+- ['events_quick-add.md', 'Events', 'Quick Add']
+- ['events_update.md', 'Events', 'Update']
+- ['events_watch.md', 'Events', 'Watch']
+- ['freebusy_query.md', 'Freebusy', 'Query']
+- ['settings_get.md', 'Settings', 'Get']
+- ['settings_list.md', 'Settings', 'List']
+- ['settings_watch.md', 'Settings', 'Watch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

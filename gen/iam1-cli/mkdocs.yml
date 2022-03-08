@@ -1,0 +1,73 @@
+site_name: Iam v3.0.0+20220224
+site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
+site_description: A complete library to interact with Iam (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/iam1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['iam-policies_lint-policy.md', 'Iam Policies', 'Lint Policy']
+- ['iam-policies_query-auditable-services.md', 'Iam Policies', 'Query Auditable Services']
+- ['locations_workforce-pools-operations-get.md', 'Locations', 'Workforce Pools Operations Get']
+- ['locations_workforce-pools-providers-operations-get.md', 'Locations', 'Workforce Pools Providers Operations Get']
+- ['locations_workforce-pools-subjects-operations-get.md', 'Locations', 'Workforce Pools Subjects Operations Get']
+- ['organizations_roles-create.md', 'Organizations', 'Roles Create']
+- ['organizations_roles-delete.md', 'Organizations', 'Roles Delete']
+- ['organizations_roles-get.md', 'Organizations', 'Roles Get']
+- ['organizations_roles-list.md', 'Organizations', 'Roles List']
+- ['organizations_roles-patch.md', 'Organizations', 'Roles Patch']
+- ['organizations_roles-undelete.md', 'Organizations', 'Roles Undelete']
+- ['permissions_query-testable-permissions.md', 'Permissions', 'Query Testable Permissions']
+- ['projects_locations-workload-identity-pools-create.md', 'Projects', 'Locations Workload Identity Pools Create']
+- ['projects_locations-workload-identity-pools-delete.md', 'Projects', 'Locations Workload Identity Pools Delete']
+- ['projects_locations-workload-identity-pools-get.md', 'Projects', 'Locations Workload Identity Pools Get']
+- ['projects_locations-workload-identity-pools-list.md', 'Projects', 'Locations Workload Identity Pools List']
+- ['projects_locations-workload-identity-pools-operations-get.md', 'Projects', 'Locations Workload Identity Pools Operations Get']
+- ['projects_locations-workload-identity-pools-patch.md', 'Projects', 'Locations Workload Identity Pools Patch']
+- ['projects_locations-workload-identity-pools-providers-create.md', 'Projects', 'Locations Workload Identity Pools Providers Create']
+- ['projects_locations-workload-identity-pools-providers-delete.md', 'Projects', 'Locations Workload Identity Pools Providers Delete']
+- ['projects_locations-workload-identity-pools-providers-get.md', 'Projects', 'Locations Workload Identity Pools Providers Get']
+- ['projects_locations-workload-identity-pools-providers-keys-operations-get.md', 'Projects', 'Locations Workload Identity Pools Providers Keys Operations Get']
+- ['projects_locations-workload-identity-pools-providers-list.md', 'Projects', 'Locations Workload Identity Pools Providers List']
+- ['projects_locations-workload-identity-pools-providers-operations-get.md', 'Projects', 'Locations Workload Identity Pools Providers Operations Get']
+- ['projects_locations-workload-identity-pools-providers-patch.md', 'Projects', 'Locations Workload Identity Pools Providers Patch']
+- ['projects_locations-workload-identity-pools-providers-undelete.md', 'Projects', 'Locations Workload Identity Pools Providers Undelete']
+- ['projects_locations-workload-identity-pools-undelete.md', 'Projects', 'Locations Workload Identity Pools Undelete']
+- ['projects_roles-create.md', 'Projects', 'Roles Create']
+- ['projects_roles-delete.md', 'Projects', 'Roles Delete']
+- ['projects_roles-get.md', 'Projects', 'Roles Get']
+- ['projects_roles-list.md', 'Projects', 'Roles List']
+- ['projects_roles-patch.md', 'Projects', 'Roles Patch']
+- ['projects_roles-undelete.md', 'Projects', 'Roles Undelete']
+- ['projects_service-accounts-create.md', 'Projects', 'Service Accounts Create']
+- ['projects_service-accounts-delete.md', 'Projects', 'Service Accounts Delete']
+- ['projects_service-accounts-disable.md', 'Projects', 'Service Accounts Disable']
+- ['projects_service-accounts-enable.md', 'Projects', 'Service Accounts Enable']
+- ['projects_service-accounts-get.md', 'Projects', 'Service Accounts Get']
+- ['projects_service-accounts-get-iam-policy.md', 'Projects', 'Service Accounts Get Iam Policy']
+- ['projects_service-accounts-keys-create.md', 'Projects', 'Service Accounts Keys Create']
+- ['projects_service-accounts-keys-delete.md', 'Projects', 'Service Accounts Keys Delete']
+- ['projects_service-accounts-keys-disable.md', 'Projects', 'Service Accounts Keys Disable']
+- ['projects_service-accounts-keys-enable.md', 'Projects', 'Service Accounts Keys Enable']
+- ['projects_service-accounts-keys-get.md', 'Projects', 'Service Accounts Keys Get']
+- ['projects_service-accounts-keys-list.md', 'Projects', 'Service Accounts Keys List']
+- ['projects_service-accounts-keys-upload.md', 'Projects', 'Service Accounts Keys Upload']
+- ['projects_service-accounts-list.md', 'Projects', 'Service Accounts List']
+- ['projects_service-accounts-patch.md', 'Projects', 'Service Accounts Patch']
+- ['projects_service-accounts-set-iam-policy.md', 'Projects', 'Service Accounts Set Iam Policy']
+- ['projects_service-accounts-sign-blob.md', 'Projects', 'Service Accounts Sign Blob']
+- ['projects_service-accounts-sign-jwt.md', 'Projects', 'Service Accounts Sign Jwt']
+- ['projects_service-accounts-test-iam-permissions.md', 'Projects', 'Service Accounts Test Iam Permissions']
+- ['projects_service-accounts-undelete.md', 'Projects', 'Service Accounts Undelete']
+- ['projects_service-accounts-update.md', 'Projects', 'Service Accounts Update']
+- ['roles_get.md', 'Roles', 'Get']
+- ['roles_list.md', 'Roles', 'List']
+- ['roles_query-grantable-roles.md', 'Roles', 'Query Grantable Roles']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

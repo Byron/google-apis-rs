@@ -1,0 +1,28 @@
+site_name: Recaptcha Enterprise v3.0.0+20220226
+site_url: http://byron.github.io/google-apis-rs/google-recaptchaenterprise1-cli
+site_description: A complete library to interact with Recaptcha Enterprise (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/recaptchaenterprise1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_assessments-annotate.md', 'Projects', 'Assessments Annotate']
+- ['projects_assessments-create.md', 'Projects', 'Assessments Create']
+- ['projects_keys-create.md', 'Projects', 'Keys Create']
+- ['projects_keys-delete.md', 'Projects', 'Keys Delete']
+- ['projects_keys-get.md', 'Projects', 'Keys Get']
+- ['projects_keys-get-metrics.md', 'Projects', 'Keys Get Metrics']
+- ['projects_keys-list.md', 'Projects', 'Keys List']
+- ['projects_keys-migrate.md', 'Projects', 'Keys Migrate']
+- ['projects_keys-patch.md', 'Projects', 'Keys Patch']
+- ['projects_relatedaccountgroupmemberships-search.md', 'Projects', 'Relatedaccountgroupmemberships Search']
+- ['projects_relatedaccountgroups-list.md', 'Projects', 'Relatedaccountgroups List']
+- ['projects_relatedaccountgroups-memberships-list.md', 'Projects', 'Relatedaccountgroups Memberships List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

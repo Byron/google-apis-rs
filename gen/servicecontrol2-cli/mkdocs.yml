@@ -1,0 +1,18 @@
+site_name: Service Control v3.0.0+20220227
+site_url: http://byron.github.io/google-apis-rs/google-servicecontrol2-cli
+site_description: A complete library to interact with Service Control (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/servicecontrol2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['services_check.md', 'Services', 'Check']
+- ['services_report.md', 'Services', 'Report']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

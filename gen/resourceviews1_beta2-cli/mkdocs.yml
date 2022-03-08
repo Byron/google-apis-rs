@@ -1,0 +1,27 @@
+site_name: resourceviews v3.0.0+20160512
+site_url: http://byron.github.io/google-apis-rs/google-resourceviews1_beta2-cli
+site_description: A complete library to interact with resourceviews (protocol v1beta2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/resourceviews1_beta2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['zone-operations_get.md', 'Zone Operations', 'Get']
+- ['zone-operations_list.md', 'Zone Operations', 'List']
+- ['zone-views_add-resources.md', 'Zone Views', 'Add Resources']
+- ['zone-views_delete.md', 'Zone Views', 'Delete']
+- ['zone-views_get.md', 'Zone Views', 'Get']
+- ['zone-views_get-service.md', 'Zone Views', 'Get Service']
+- ['zone-views_insert.md', 'Zone Views', 'Insert']
+- ['zone-views_list.md', 'Zone Views', 'List']
+- ['zone-views_list-resources.md', 'Zone Views', 'List Resources']
+- ['zone-views_remove-resources.md', 'Zone Views', 'Remove Resources']
+- ['zone-views_set-service.md', 'Zone Views', 'Set Service']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

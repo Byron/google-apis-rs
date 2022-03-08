@@ -1,0 +1,67 @@
+site_name: Cloud Resource Manager v3.0.0+20220306
+site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager3-cli
+site_description: A complete library to interact with Cloud Resource Manager (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourcemanager3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['folders_create.md', 'Folders', 'Create']
+- ['folders_delete.md', 'Folders', 'Delete']
+- ['folders_get.md', 'Folders', 'Get']
+- ['folders_get-iam-policy.md', 'Folders', 'Get Iam Policy']
+- ['folders_list.md', 'Folders', 'List']
+- ['folders_move.md', 'Folders', 'Move']
+- ['folders_patch.md', 'Folders', 'Patch']
+- ['folders_search.md', 'Folders', 'Search']
+- ['folders_set-iam-policy.md', 'Folders', 'Set Iam Policy']
+- ['folders_test-iam-permissions.md', 'Folders', 'Test Iam Permissions']
+- ['folders_undelete.md', 'Folders', 'Undelete']
+- ['liens_create.md', 'Liens', 'Create']
+- ['liens_delete.md', 'Liens', 'Delete']
+- ['liens_get.md', 'Liens', 'Get']
+- ['liens_list.md', 'Liens', 'List']
+- ['operations_get.md', 'Operations', 'Get']
+- ['organizations_get.md', 'Organizations', 'Get']
+- ['organizations_get-iam-policy.md', 'Organizations', 'Get Iam Policy']
+- ['organizations_search.md', 'Organizations', 'Search']
+- ['organizations_set-iam-policy.md', 'Organizations', 'Set Iam Policy']
+- ['organizations_test-iam-permissions.md', 'Organizations', 'Test Iam Permissions']
+- ['projects_create.md', 'Projects', 'Create']
+- ['projects_delete.md', 'Projects', 'Delete']
+- ['projects_get.md', 'Projects', 'Get']
+- ['projects_get-iam-policy.md', 'Projects', 'Get Iam Policy']
+- ['projects_list.md', 'Projects', 'List']
+- ['projects_move.md', 'Projects', 'Move']
+- ['projects_patch.md', 'Projects', 'Patch']
+- ['projects_search.md', 'Projects', 'Search']
+- ['projects_set-iam-policy.md', 'Projects', 'Set Iam Policy']
+- ['projects_test-iam-permissions.md', 'Projects', 'Test Iam Permissions']
+- ['projects_undelete.md', 'Projects', 'Undelete']
+- ['tag-bindings_create.md', 'Tag Bindings', 'Create']
+- ['tag-bindings_delete.md', 'Tag Bindings', 'Delete']
+- ['tag-bindings_list.md', 'Tag Bindings', 'List']
+- ['tag-keys_create.md', 'Tag Keys', 'Create']
+- ['tag-keys_delete.md', 'Tag Keys', 'Delete']
+- ['tag-keys_get.md', 'Tag Keys', 'Get']
+- ['tag-keys_get-iam-policy.md', 'Tag Keys', 'Get Iam Policy']
+- ['tag-keys_list.md', 'Tag Keys', 'List']
+- ['tag-keys_patch.md', 'Tag Keys', 'Patch']
+- ['tag-keys_set-iam-policy.md', 'Tag Keys', 'Set Iam Policy']
+- ['tag-keys_test-iam-permissions.md', 'Tag Keys', 'Test Iam Permissions']
+- ['tag-values_create.md', 'Tag Values', 'Create']
+- ['tag-values_delete.md', 'Tag Values', 'Delete']
+- ['tag-values_get.md', 'Tag Values', 'Get']
+- ['tag-values_get-iam-policy.md', 'Tag Values', 'Get Iam Policy']
+- ['tag-values_list.md', 'Tag Values', 'List']
+- ['tag-values_patch.md', 'Tag Values', 'Patch']
+- ['tag-values_set-iam-policy.md', 'Tag Values', 'Set Iam Policy']
+- ['tag-values_test-iam-permissions.md', 'Tag Values', 'Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

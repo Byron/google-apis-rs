@@ -1,0 +1,18 @@
+site_name: Texttospeech v3.0.0+20220228
+site_url: http://byron.github.io/google-apis-rs/google-texttospeech1-cli
+site_description: A complete library to interact with Texttospeech (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/texttospeech1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['text_synthesize.md', 'Text', 'Synthesize']
+- ['voices_list.md', 'Voices', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

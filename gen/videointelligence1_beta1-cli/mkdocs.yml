@@ -1,0 +1,17 @@
+site_name: Cloud Video Intelligence v3.0.0+20171122
+site_url: http://byron.github.io/google-apis-rs/google-videointelligence1_beta1-cli
+site_description: A complete library to interact with Cloud Video Intelligence (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/videointelligence1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['videos_annotate.md', 'Videos', 'Annotate']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

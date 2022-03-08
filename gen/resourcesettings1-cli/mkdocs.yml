@@ -1,0 +1,25 @@
+site_name: Resource Settings v3.0.0+20220305
+site_url: http://byron.github.io/google-apis-rs/google-resourcesettings1-cli
+site_description: A complete library to interact with Resource Settings (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/resourcesettings1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['folders_settings-get.md', 'Folders', 'Settings Get']
+- ['folders_settings-list.md', 'Folders', 'Settings List']
+- ['folders_settings-patch.md', 'Folders', 'Settings Patch']
+- ['organizations_settings-get.md', 'Organizations', 'Settings Get']
+- ['organizations_settings-list.md', 'Organizations', 'Settings List']
+- ['organizations_settings-patch.md', 'Organizations', 'Settings Patch']
+- ['projects_settings-get.md', 'Projects', 'Settings Get']
+- ['projects_settings-list.md', 'Projects', 'Settings List']
+- ['projects_settings-patch.md', 'Projects', 'Settings Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

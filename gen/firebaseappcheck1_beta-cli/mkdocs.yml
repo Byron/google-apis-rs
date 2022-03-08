@@ -1,0 +1,50 @@
+site_name: Firebaseappcheck v3.0.0+20220225
+site_url: http://byron.github.io/google-apis-rs/google-firebaseappcheck1_beta-cli
+site_description: A complete library to interact with Firebaseappcheck (protocol v1beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebaseappcheck1_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['jwks_get.md', 'Jwks', 'Get']
+- ['projects_apps-app-attest-config-batch-get.md', 'Projects', 'Apps App Attest Config Batch Get']
+- ['projects_apps-app-attest-config-get.md', 'Projects', 'Apps App Attest Config Get']
+- ['projects_apps-app-attest-config-patch.md', 'Projects', 'Apps App Attest Config Patch']
+- ['projects_apps-debug-tokens-create.md', 'Projects', 'Apps Debug Tokens Create']
+- ['projects_apps-debug-tokens-delete.md', 'Projects', 'Apps Debug Tokens Delete']
+- ['projects_apps-debug-tokens-get.md', 'Projects', 'Apps Debug Tokens Get']
+- ['projects_apps-debug-tokens-list.md', 'Projects', 'Apps Debug Tokens List']
+- ['projects_apps-debug-tokens-patch.md', 'Projects', 'Apps Debug Tokens Patch']
+- ['projects_apps-device-check-config-batch-get.md', 'Projects', 'Apps Device Check Config Batch Get']
+- ['projects_apps-device-check-config-get.md', 'Projects', 'Apps Device Check Config Get']
+- ['projects_apps-device-check-config-patch.md', 'Projects', 'Apps Device Check Config Patch']
+- ['projects_apps-exchange-app-attest-assertion.md', 'Projects', 'Apps Exchange App Attest Assertion']
+- ['projects_apps-exchange-app-attest-attestation.md', 'Projects', 'Apps Exchange App Attest Attestation']
+- ['projects_apps-exchange-custom-token.md', 'Projects', 'Apps Exchange Custom Token']
+- ['projects_apps-exchange-debug-token.md', 'Projects', 'Apps Exchange Debug Token']
+- ['projects_apps-exchange-device-check-token.md', 'Projects', 'Apps Exchange Device Check Token']
+- ['projects_apps-exchange-recaptcha-enterprise-token.md', 'Projects', 'Apps Exchange Recaptcha Enterprise Token']
+- ['projects_apps-exchange-recaptcha-token.md', 'Projects', 'Apps Exchange Recaptcha Token']
+- ['projects_apps-exchange-safety-net-token.md', 'Projects', 'Apps Exchange Safety Net Token']
+- ['projects_apps-generate-app-attest-challenge.md', 'Projects', 'Apps Generate App Attest Challenge']
+- ['projects_apps-recaptcha-config-batch-get.md', 'Projects', 'Apps Recaptcha Config Batch Get']
+- ['projects_apps-recaptcha-config-get.md', 'Projects', 'Apps Recaptcha Config Get']
+- ['projects_apps-recaptcha-config-patch.md', 'Projects', 'Apps Recaptcha Config Patch']
+- ['projects_apps-recaptcha-enterprise-config-batch-get.md', 'Projects', 'Apps Recaptcha Enterprise Config Batch Get']
+- ['projects_apps-recaptcha-enterprise-config-get.md', 'Projects', 'Apps Recaptcha Enterprise Config Get']
+- ['projects_apps-recaptcha-enterprise-config-patch.md', 'Projects', 'Apps Recaptcha Enterprise Config Patch']
+- ['projects_apps-safety-net-config-batch-get.md', 'Projects', 'Apps Safety Net Config Batch Get']
+- ['projects_apps-safety-net-config-get.md', 'Projects', 'Apps Safety Net Config Get']
+- ['projects_apps-safety-net-config-patch.md', 'Projects', 'Apps Safety Net Config Patch']
+- ['projects_services-batch-update.md', 'Projects', 'Services Batch Update']
+- ['projects_services-get.md', 'Projects', 'Services Get']
+- ['projects_services-list.md', 'Projects', 'Services List']
+- ['projects_services-patch.md', 'Projects', 'Services Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

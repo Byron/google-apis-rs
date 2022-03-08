@@ -1,0 +1,56 @@
+site_name: Managed Service for Microsoft Active Directory Consumer API v3.0.0+20220216
+site_url: http://byron.github.io/google-apis-rs/google-managedidentities1-cli
+site_description: A complete library to interact with Managed Service for Microsoft Active Directory Consumer API (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/managedidentities1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-global-domains-attach-trust.md', 'Projects', 'Locations Global Domains Attach Trust']
+- ['projects_locations-global-domains-backups-create.md', 'Projects', 'Locations Global Domains Backups Create']
+- ['projects_locations-global-domains-backups-delete.md', 'Projects', 'Locations Global Domains Backups Delete']
+- ['projects_locations-global-domains-backups-get.md', 'Projects', 'Locations Global Domains Backups Get']
+- ['projects_locations-global-domains-backups-get-iam-policy.md', 'Projects', 'Locations Global Domains Backups Get Iam Policy']
+- ['projects_locations-global-domains-backups-list.md', 'Projects', 'Locations Global Domains Backups List']
+- ['projects_locations-global-domains-backups-patch.md', 'Projects', 'Locations Global Domains Backups Patch']
+- ['projects_locations-global-domains-backups-set-iam-policy.md', 'Projects', 'Locations Global Domains Backups Set Iam Policy']
+- ['projects_locations-global-domains-backups-test-iam-permissions.md', 'Projects', 'Locations Global Domains Backups Test Iam Permissions']
+- ['projects_locations-global-domains-create.md', 'Projects', 'Locations Global Domains Create']
+- ['projects_locations-global-domains-delete.md', 'Projects', 'Locations Global Domains Delete']
+- ['projects_locations-global-domains-detach-trust.md', 'Projects', 'Locations Global Domains Detach Trust']
+- ['projects_locations-global-domains-get.md', 'Projects', 'Locations Global Domains Get']
+- ['projects_locations-global-domains-get-iam-policy.md', 'Projects', 'Locations Global Domains Get Iam Policy']
+- ['projects_locations-global-domains-get-ldapssettings.md', 'Projects', 'Locations Global Domains Get Ldapssettings']
+- ['projects_locations-global-domains-list.md', 'Projects', 'Locations Global Domains List']
+- ['projects_locations-global-domains-patch.md', 'Projects', 'Locations Global Domains Patch']
+- ['projects_locations-global-domains-reconfigure-trust.md', 'Projects', 'Locations Global Domains Reconfigure Trust']
+- ['projects_locations-global-domains-reset-admin-password.md', 'Projects', 'Locations Global Domains Reset Admin Password']
+- ['projects_locations-global-domains-restore.md', 'Projects', 'Locations Global Domains Restore']
+- ['projects_locations-global-domains-set-iam-policy.md', 'Projects', 'Locations Global Domains Set Iam Policy']
+- ['projects_locations-global-domains-sql-integrations-get.md', 'Projects', 'Locations Global Domains Sql Integrations Get']
+- ['projects_locations-global-domains-sql-integrations-list.md', 'Projects', 'Locations Global Domains Sql Integrations List']
+- ['projects_locations-global-domains-test-iam-permissions.md', 'Projects', 'Locations Global Domains Test Iam Permissions']
+- ['projects_locations-global-domains-update-ldapssettings.md', 'Projects', 'Locations Global Domains Update Ldapssettings']
+- ['projects_locations-global-domains-validate-trust.md', 'Projects', 'Locations Global Domains Validate Trust']
+- ['projects_locations-global-operations-cancel.md', 'Projects', 'Locations Global Operations Cancel']
+- ['projects_locations-global-operations-delete.md', 'Projects', 'Locations Global Operations Delete']
+- ['projects_locations-global-operations-get.md', 'Projects', 'Locations Global Operations Get']
+- ['projects_locations-global-operations-list.md', 'Projects', 'Locations Global Operations List']
+- ['projects_locations-global-peerings-create.md', 'Projects', 'Locations Global Peerings Create']
+- ['projects_locations-global-peerings-delete.md', 'Projects', 'Locations Global Peerings Delete']
+- ['projects_locations-global-peerings-get.md', 'Projects', 'Locations Global Peerings Get']
+- ['projects_locations-global-peerings-get-iam-policy.md', 'Projects', 'Locations Global Peerings Get Iam Policy']
+- ['projects_locations-global-peerings-list.md', 'Projects', 'Locations Global Peerings List']
+- ['projects_locations-global-peerings-patch.md', 'Projects', 'Locations Global Peerings Patch']
+- ['projects_locations-global-peerings-set-iam-policy.md', 'Projects', 'Locations Global Peerings Set Iam Policy']
+- ['projects_locations-global-peerings-test-iam-permissions.md', 'Projects', 'Locations Global Peerings Test Iam Permissions']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

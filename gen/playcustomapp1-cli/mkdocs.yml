@@ -1,0 +1,17 @@
+site_name: playcustomapp v3.0.0+20220305
+site_url: http://byron.github.io/google-apis-rs/google-playcustomapp1-cli
+site_description: A complete library to interact with playcustomapp (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/playcustomapp1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_custom-apps-create.md', 'Accounts', 'Custom Apps Create']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

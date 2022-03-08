@@ -1,0 +1,45 @@
+site_name: Cloud Retail v3.0.0+20220224
+site_url: http://byron.github.io/google-apis-rs/google-retail2-cli
+site_description: A complete library to interact with Cloud Retail (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-catalogs-branches-operations-get.md', 'Projects', 'Locations Catalogs Branches Operations Get']
+- ['projects_locations-catalogs-branches-products-add-fulfillment-places.md', 'Projects', 'Locations Catalogs Branches Products Add Fulfillment Places']
+- ['projects_locations-catalogs-branches-products-create.md', 'Projects', 'Locations Catalogs Branches Products Create']
+- ['projects_locations-catalogs-branches-products-delete.md', 'Projects', 'Locations Catalogs Branches Products Delete']
+- ['projects_locations-catalogs-branches-products-get.md', 'Projects', 'Locations Catalogs Branches Products Get']
+- ['projects_locations-catalogs-branches-products-import.md', 'Projects', 'Locations Catalogs Branches Products Import']
+- ['projects_locations-catalogs-branches-products-list.md', 'Projects', 'Locations Catalogs Branches Products List']
+- ['projects_locations-catalogs-branches-products-patch.md', 'Projects', 'Locations Catalogs Branches Products Patch']
+- ['projects_locations-catalogs-branches-products-remove-fulfillment-places.md', 'Projects', 'Locations Catalogs Branches Products Remove Fulfillment Places']
+- ['projects_locations-catalogs-branches-products-set-inventory.md', 'Projects', 'Locations Catalogs Branches Products Set Inventory']
+- ['projects_locations-catalogs-complete-query.md', 'Projects', 'Locations Catalogs Complete Query']
+- ['projects_locations-catalogs-completion-data-import.md', 'Projects', 'Locations Catalogs Completion Data Import']
+- ['projects_locations-catalogs-get-default-branch.md', 'Projects', 'Locations Catalogs Get Default Branch']
+- ['projects_locations-catalogs-list.md', 'Projects', 'Locations Catalogs List']
+- ['projects_locations-catalogs-operations-get.md', 'Projects', 'Locations Catalogs Operations Get']
+- ['projects_locations-catalogs-operations-list.md', 'Projects', 'Locations Catalogs Operations List']
+- ['projects_locations-catalogs-patch.md', 'Projects', 'Locations Catalogs Patch']
+- ['projects_locations-catalogs-placements-predict.md', 'Projects', 'Locations Catalogs Placements Predict']
+- ['projects_locations-catalogs-placements-search.md', 'Projects', 'Locations Catalogs Placements Search']
+- ['projects_locations-catalogs-set-default-branch.md', 'Projects', 'Locations Catalogs Set Default Branch']
+- ['projects_locations-catalogs-user-events-collect.md', 'Projects', 'Locations Catalogs User Events Collect']
+- ['projects_locations-catalogs-user-events-import.md', 'Projects', 'Locations Catalogs User Events Import']
+- ['projects_locations-catalogs-user-events-purge.md', 'Projects', 'Locations Catalogs User Events Purge']
+- ['projects_locations-catalogs-user-events-rejoin.md', 'Projects', 'Locations Catalogs User Events Rejoin']
+- ['projects_locations-catalogs-user-events-write.md', 'Projects', 'Locations Catalogs User Events Write']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+- ['projects_operations-list.md', 'Projects', 'Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,41 @@
+site_name: networkconnectivity v3.0.0+20220210
+site_url: http://byron.github.io/google-apis-rs/google-networkconnectivity1-cli
+site_description: A complete library to interact with networkconnectivity (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/networkconnectivity1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-global-hubs-create.md', 'Projects', 'Locations Global Hubs Create']
+- ['projects_locations-global-hubs-delete.md', 'Projects', 'Locations Global Hubs Delete']
+- ['projects_locations-global-hubs-get.md', 'Projects', 'Locations Global Hubs Get']
+- ['projects_locations-global-hubs-get-iam-policy.md', 'Projects', 'Locations Global Hubs Get Iam Policy']
+- ['projects_locations-global-hubs-list.md', 'Projects', 'Locations Global Hubs List']
+- ['projects_locations-global-hubs-patch.md', 'Projects', 'Locations Global Hubs Patch']
+- ['projects_locations-global-hubs-set-iam-policy.md', 'Projects', 'Locations Global Hubs Set Iam Policy']
+- ['projects_locations-global-hubs-test-iam-permissions.md', 'Projects', 'Locations Global Hubs Test Iam Permissions']
+- ['projects_locations-global-policy-based-routes-get-iam-policy.md', 'Projects', 'Locations Global Policy Based Routes Get Iam Policy']
+- ['projects_locations-global-policy-based-routes-set-iam-policy.md', 'Projects', 'Locations Global Policy Based Routes Set Iam Policy']
+- ['projects_locations-global-policy-based-routes-test-iam-permissions.md', 'Projects', 'Locations Global Policy Based Routes Test Iam Permissions']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-spokes-create.md', 'Projects', 'Locations Spokes Create']
+- ['projects_locations-spokes-delete.md', 'Projects', 'Locations Spokes Delete']
+- ['projects_locations-spokes-get.md', 'Projects', 'Locations Spokes Get']
+- ['projects_locations-spokes-get-iam-policy.md', 'Projects', 'Locations Spokes Get Iam Policy']
+- ['projects_locations-spokes-list.md', 'Projects', 'Locations Spokes List']
+- ['projects_locations-spokes-patch.md', 'Projects', 'Locations Spokes Patch']
+- ['projects_locations-spokes-set-iam-policy.md', 'Projects', 'Locations Spokes Set Iam Policy']
+- ['projects_locations-spokes-test-iam-permissions.md', 'Projects', 'Locations Spokes Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

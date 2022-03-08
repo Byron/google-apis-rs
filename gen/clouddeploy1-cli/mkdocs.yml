@@ -1,0 +1,46 @@
+site_name: Cloud Deploy v3.0.0+20220223
+site_url: http://byron.github.io/google-apis-rs/google-clouddeploy1-cli
+site_description: A complete library to interact with Cloud Deploy (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-delivery-pipelines-create.md', 'Projects', 'Locations Delivery Pipelines Create']
+- ['projects_locations-delivery-pipelines-delete.md', 'Projects', 'Locations Delivery Pipelines Delete']
+- ['projects_locations-delivery-pipelines-get.md', 'Projects', 'Locations Delivery Pipelines Get']
+- ['projects_locations-delivery-pipelines-get-iam-policy.md', 'Projects', 'Locations Delivery Pipelines Get Iam Policy']
+- ['projects_locations-delivery-pipelines-list.md', 'Projects', 'Locations Delivery Pipelines List']
+- ['projects_locations-delivery-pipelines-patch.md', 'Projects', 'Locations Delivery Pipelines Patch']
+- ['projects_locations-delivery-pipelines-releases-create.md', 'Projects', 'Locations Delivery Pipelines Releases Create']
+- ['projects_locations-delivery-pipelines-releases-get.md', 'Projects', 'Locations Delivery Pipelines Releases Get']
+- ['projects_locations-delivery-pipelines-releases-list.md', 'Projects', 'Locations Delivery Pipelines Releases List']
+- ['projects_locations-delivery-pipelines-releases-rollouts-approve.md', 'Projects', 'Locations Delivery Pipelines Releases Rollouts Approve']
+- ['projects_locations-delivery-pipelines-releases-rollouts-create.md', 'Projects', 'Locations Delivery Pipelines Releases Rollouts Create']
+- ['projects_locations-delivery-pipelines-releases-rollouts-get.md', 'Projects', 'Locations Delivery Pipelines Releases Rollouts Get']
+- ['projects_locations-delivery-pipelines-releases-rollouts-list.md', 'Projects', 'Locations Delivery Pipelines Releases Rollouts List']
+- ['projects_locations-delivery-pipelines-set-iam-policy.md', 'Projects', 'Locations Delivery Pipelines Set Iam Policy']
+- ['projects_locations-delivery-pipelines-test-iam-permissions.md', 'Projects', 'Locations Delivery Pipelines Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-get-config.md', 'Projects', 'Locations Get Config']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-targets-create.md', 'Projects', 'Locations Targets Create']
+- ['projects_locations-targets-delete.md', 'Projects', 'Locations Targets Delete']
+- ['projects_locations-targets-get.md', 'Projects', 'Locations Targets Get']
+- ['projects_locations-targets-get-iam-policy.md', 'Projects', 'Locations Targets Get Iam Policy']
+- ['projects_locations-targets-list.md', 'Projects', 'Locations Targets List']
+- ['projects_locations-targets-patch.md', 'Projects', 'Locations Targets Patch']
+- ['projects_locations-targets-set-iam-policy.md', 'Projects', 'Locations Targets Set Iam Policy']
+- ['projects_locations-targets-test-iam-permissions.md', 'Projects', 'Locations Targets Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

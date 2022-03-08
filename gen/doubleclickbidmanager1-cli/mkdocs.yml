@@ -1,0 +1,25 @@
+site_name: DoubleClick Bid Manager v3.0.0+20210323
+site_url: http://byron.github.io/google-apis-rs/google-doubleclickbidmanager1-cli
+site_description: A complete library to interact with DoubleClick Bid Manager (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/doubleclickbidmanager1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['lineitems_downloadlineitems.md', 'Lineitems', 'Downloadlineitems']
+- ['lineitems_uploadlineitems.md', 'Lineitems', 'Uploadlineitems']
+- ['queries_createquery.md', 'Queries', 'Createquery']
+- ['queries_deletequery.md', 'Queries', 'Deletequery']
+- ['queries_getquery.md', 'Queries', 'Getquery']
+- ['queries_listqueries.md', 'Queries', 'Listqueries']
+- ['queries_runquery.md', 'Queries', 'Runquery']
+- ['reports_listreports.md', 'Reports', 'Listreports']
+- ['sdf_download.md', 'Sdf', 'Download']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

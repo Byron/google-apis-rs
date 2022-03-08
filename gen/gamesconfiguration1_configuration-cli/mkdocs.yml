@@ -1,0 +1,27 @@
+site_name: Games Configuration v3.0.0+20220217
+site_url: http://byron.github.io/google-apis-rs/google-gamesconfiguration1_configuration-cli
+site_description: A complete library to interact with Games Configuration (protocol v1configuration)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/gamesconfiguration1_configuration-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['achievement-configurations_delete.md', 'Achievement Configurations', 'Delete']
+- ['achievement-configurations_get.md', 'Achievement Configurations', 'Get']
+- ['achievement-configurations_insert.md', 'Achievement Configurations', 'Insert']
+- ['achievement-configurations_list.md', 'Achievement Configurations', 'List']
+- ['achievement-configurations_update.md', 'Achievement Configurations', 'Update']
+- ['image-configurations_upload.md', 'Image Configurations', 'Upload']
+- ['leaderboard-configurations_delete.md', 'Leaderboard Configurations', 'Delete']
+- ['leaderboard-configurations_get.md', 'Leaderboard Configurations', 'Get']
+- ['leaderboard-configurations_insert.md', 'Leaderboard Configurations', 'Insert']
+- ['leaderboard-configurations_list.md', 'Leaderboard Configurations', 'List']
+- ['leaderboard-configurations_update.md', 'Leaderboard Configurations', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

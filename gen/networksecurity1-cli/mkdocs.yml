@@ -1,0 +1,46 @@
+site_name: NetworkSecurity v3.0.0+20220223
+site_url: http://byron.github.io/google-apis-rs/google-networksecurity1-cli
+site_description: A complete library to interact with NetworkSecurity (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/networksecurity1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-authorization-policies-create.md', 'Projects', 'Locations Authorization Policies Create']
+- ['projects_locations-authorization-policies-delete.md', 'Projects', 'Locations Authorization Policies Delete']
+- ['projects_locations-authorization-policies-get.md', 'Projects', 'Locations Authorization Policies Get']
+- ['projects_locations-authorization-policies-get-iam-policy.md', 'Projects', 'Locations Authorization Policies Get Iam Policy']
+- ['projects_locations-authorization-policies-list.md', 'Projects', 'Locations Authorization Policies List']
+- ['projects_locations-authorization-policies-patch.md', 'Projects', 'Locations Authorization Policies Patch']
+- ['projects_locations-authorization-policies-set-iam-policy.md', 'Projects', 'Locations Authorization Policies Set Iam Policy']
+- ['projects_locations-authorization-policies-test-iam-permissions.md', 'Projects', 'Locations Authorization Policies Test Iam Permissions']
+- ['projects_locations-client-tls-policies-create.md', 'Projects', 'Locations Client Tls Policies Create']
+- ['projects_locations-client-tls-policies-delete.md', 'Projects', 'Locations Client Tls Policies Delete']
+- ['projects_locations-client-tls-policies-get.md', 'Projects', 'Locations Client Tls Policies Get']
+- ['projects_locations-client-tls-policies-get-iam-policy.md', 'Projects', 'Locations Client Tls Policies Get Iam Policy']
+- ['projects_locations-client-tls-policies-list.md', 'Projects', 'Locations Client Tls Policies List']
+- ['projects_locations-client-tls-policies-patch.md', 'Projects', 'Locations Client Tls Policies Patch']
+- ['projects_locations-client-tls-policies-set-iam-policy.md', 'Projects', 'Locations Client Tls Policies Set Iam Policy']
+- ['projects_locations-client-tls-policies-test-iam-permissions.md', 'Projects', 'Locations Client Tls Policies Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-server-tls-policies-create.md', 'Projects', 'Locations Server Tls Policies Create']
+- ['projects_locations-server-tls-policies-delete.md', 'Projects', 'Locations Server Tls Policies Delete']
+- ['projects_locations-server-tls-policies-get.md', 'Projects', 'Locations Server Tls Policies Get']
+- ['projects_locations-server-tls-policies-get-iam-policy.md', 'Projects', 'Locations Server Tls Policies Get Iam Policy']
+- ['projects_locations-server-tls-policies-list.md', 'Projects', 'Locations Server Tls Policies List']
+- ['projects_locations-server-tls-policies-patch.md', 'Projects', 'Locations Server Tls Policies Patch']
+- ['projects_locations-server-tls-policies-set-iam-policy.md', 'Projects', 'Locations Server Tls Policies Set Iam Policy']
+- ['projects_locations-server-tls-policies-test-iam-permissions.md', 'Projects', 'Locations Server Tls Policies Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

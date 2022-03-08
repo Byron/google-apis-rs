@@ -1,0 +1,53 @@
+site_name: Dns v3.0.0+20220217
+site_url: http://byron.github.io/google-apis-rs/google-dns2-cli
+site_description: A complete library to interact with Dns (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/dns2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['changes_create.md', 'Changes', 'Create']
+- ['changes_get.md', 'Changes', 'Get']
+- ['changes_list.md', 'Changes', 'List']
+- ['dns-keys_get.md', 'Dns Keys', 'Get']
+- ['dns-keys_list.md', 'Dns Keys', 'List']
+- ['managed-zone-operations_get.md', 'Managed Zone Operations', 'Get']
+- ['managed-zone-operations_list.md', 'Managed Zone Operations', 'List']
+- ['managed-zones_create.md', 'Managed Zones', 'Create']
+- ['managed-zones_delete.md', 'Managed Zones', 'Delete']
+- ['managed-zones_get.md', 'Managed Zones', 'Get']
+- ['managed-zones_list.md', 'Managed Zones', 'List']
+- ['managed-zones_patch.md', 'Managed Zones', 'Patch']
+- ['managed-zones_update.md', 'Managed Zones', 'Update']
+- ['policies_create.md', 'Policies', 'Create']
+- ['policies_delete.md', 'Policies', 'Delete']
+- ['policies_get.md', 'Policies', 'Get']
+- ['policies_list.md', 'Policies', 'List']
+- ['policies_patch.md', 'Policies', 'Patch']
+- ['policies_update.md', 'Policies', 'Update']
+- ['projects_get.md', 'Projects', 'Get']
+- ['resource-record-sets_create.md', 'Resource Record Sets', 'Create']
+- ['resource-record-sets_delete.md', 'Resource Record Sets', 'Delete']
+- ['resource-record-sets_get.md', 'Resource Record Sets', 'Get']
+- ['resource-record-sets_list.md', 'Resource Record Sets', 'List']
+- ['resource-record-sets_patch.md', 'Resource Record Sets', 'Patch']
+- ['response-policies_create.md', 'Response Policies', 'Create']
+- ['response-policies_delete.md', 'Response Policies', 'Delete']
+- ['response-policies_get.md', 'Response Policies', 'Get']
+- ['response-policies_list.md', 'Response Policies', 'List']
+- ['response-policies_patch.md', 'Response Policies', 'Patch']
+- ['response-policies_update.md', 'Response Policies', 'Update']
+- ['response-policy-rules_create.md', 'Response Policy Rules', 'Create']
+- ['response-policy-rules_delete.md', 'Response Policy Rules', 'Delete']
+- ['response-policy-rules_get.md', 'Response Policy Rules', 'Get']
+- ['response-policy-rules_list.md', 'Response Policy Rules', 'List']
+- ['response-policy-rules_patch.md', 'Response Policy Rules', 'Patch']
+- ['response-policy-rules_update.md', 'Response Policy Rules', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

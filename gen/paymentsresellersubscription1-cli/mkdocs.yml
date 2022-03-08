@@ -1,0 +1,25 @@
+site_name: Payments Reseller Subscription v3.0.0+20220307
+site_url: http://byron.github.io/google-apis-rs/google-paymentsresellersubscription1-cli
+site_description: A complete library to interact with Payments Reseller Subscription (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/paymentsresellersubscription1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['partners_products-list.md', 'Partners', 'Products List']
+- ['partners_promotions-list.md', 'Partners', 'Promotions List']
+- ['partners_subscriptions-cancel.md', 'Partners', 'Subscriptions Cancel']
+- ['partners_subscriptions-create.md', 'Partners', 'Subscriptions Create']
+- ['partners_subscriptions-entitle.md', 'Partners', 'Subscriptions Entitle']
+- ['partners_subscriptions-extend.md', 'Partners', 'Subscriptions Extend']
+- ['partners_subscriptions-get.md', 'Partners', 'Subscriptions Get']
+- ['partners_subscriptions-provision.md', 'Partners', 'Subscriptions Provision']
+- ['partners_subscriptions-undo-cancel.md', 'Partners', 'Subscriptions Undo Cancel']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

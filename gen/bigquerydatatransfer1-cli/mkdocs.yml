@@ -1,0 +1,48 @@
+site_name: BigQuery Data Transfer v3.0.0+20220225
+site_url: http://byron.github.io/google-apis-rs/google-bigquerydatatransfer1-cli
+site_description: A complete library to interact with BigQuery Data Transfer (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigquerydatatransfer1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_data-sources-check-valid-creds.md', 'Projects', 'Data Sources Check Valid Creds']
+- ['projects_data-sources-get.md', 'Projects', 'Data Sources Get']
+- ['projects_data-sources-list.md', 'Projects', 'Data Sources List']
+- ['projects_enroll-data-sources.md', 'Projects', 'Enroll Data Sources']
+- ['projects_locations-data-sources-check-valid-creds.md', 'Projects', 'Locations Data Sources Check Valid Creds']
+- ['projects_locations-data-sources-get.md', 'Projects', 'Locations Data Sources Get']
+- ['projects_locations-data-sources-list.md', 'Projects', 'Locations Data Sources List']
+- ['projects_locations-enroll-data-sources.md', 'Projects', 'Locations Enroll Data Sources']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-transfer-configs-create.md', 'Projects', 'Locations Transfer Configs Create']
+- ['projects_locations-transfer-configs-delete.md', 'Projects', 'Locations Transfer Configs Delete']
+- ['projects_locations-transfer-configs-get.md', 'Projects', 'Locations Transfer Configs Get']
+- ['projects_locations-transfer-configs-list.md', 'Projects', 'Locations Transfer Configs List']
+- ['projects_locations-transfer-configs-patch.md', 'Projects', 'Locations Transfer Configs Patch']
+- ['projects_locations-transfer-configs-runs-delete.md', 'Projects', 'Locations Transfer Configs Runs Delete']
+- ['projects_locations-transfer-configs-runs-get.md', 'Projects', 'Locations Transfer Configs Runs Get']
+- ['projects_locations-transfer-configs-runs-list.md', 'Projects', 'Locations Transfer Configs Runs List']
+- ['projects_locations-transfer-configs-runs-transfer-logs-list.md', 'Projects', 'Locations Transfer Configs Runs Transfer Logs List']
+- ['projects_locations-transfer-configs-schedule-runs.md', 'Projects', 'Locations Transfer Configs Schedule Runs']
+- ['projects_locations-transfer-configs-start-manual-runs.md', 'Projects', 'Locations Transfer Configs Start Manual Runs']
+- ['projects_transfer-configs-create.md', 'Projects', 'Transfer Configs Create']
+- ['projects_transfer-configs-delete.md', 'Projects', 'Transfer Configs Delete']
+- ['projects_transfer-configs-get.md', 'Projects', 'Transfer Configs Get']
+- ['projects_transfer-configs-list.md', 'Projects', 'Transfer Configs List']
+- ['projects_transfer-configs-patch.md', 'Projects', 'Transfer Configs Patch']
+- ['projects_transfer-configs-runs-delete.md', 'Projects', 'Transfer Configs Runs Delete']
+- ['projects_transfer-configs-runs-get.md', 'Projects', 'Transfer Configs Runs Get']
+- ['projects_transfer-configs-runs-list.md', 'Projects', 'Transfer Configs Runs List']
+- ['projects_transfer-configs-runs-transfer-logs-list.md', 'Projects', 'Transfer Configs Runs Transfer Logs List']
+- ['projects_transfer-configs-schedule-runs.md', 'Projects', 'Transfer Configs Schedule Runs']
+- ['projects_transfer-configs-start-manual-runs.md', 'Projects', 'Transfer Configs Start Manual Runs']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

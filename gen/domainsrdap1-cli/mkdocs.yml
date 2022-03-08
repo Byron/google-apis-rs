@@ -1,0 +1,26 @@
+site_name: Domains RDAP v3.0.0+20220307
+site_url: http://byron.github.io/google-apis-rs/google-domainsrdap1-cli
+site_description: A complete library to interact with Domains RDAP (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/domainsrdap1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['autnum_get.md', 'Autnum', 'Get']
+- ['domain_get.md', 'Domain', 'Get']
+- ['entity_get.md', 'Entity', 'Get']
+- ['ip_get.md', 'Ip', 'Get']
+- ['methods_get-domains.md', 'Methods', 'Get Domains']
+- ['methods_get-entities.md', 'Methods', 'Get Entities']
+- ['methods_get-help.md', 'Methods', 'Get Help']
+- ['methods_get-ip.md', 'Methods', 'Get Ip']
+- ['methods_get-nameservers.md', 'Methods', 'Get Nameservers']
+- ['nameserver_get.md', 'Nameserver', 'Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,46 @@
+site_name: Document v3.0.0+20220226
+site_url: http://byron.github.io/google-apis-rs/google-documentai1-cli
+site_description: A complete library to interact with Document (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/documentai1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['projects_locations-fetch-processor-types.md', 'Projects', 'Locations Fetch Processor Types']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-processors-batch-process.md', 'Projects', 'Locations Processors Batch Process']
+- ['projects_locations-processors-create.md', 'Projects', 'Locations Processors Create']
+- ['projects_locations-processors-delete.md', 'Projects', 'Locations Processors Delete']
+- ['projects_locations-processors-disable.md', 'Projects', 'Locations Processors Disable']
+- ['projects_locations-processors-enable.md', 'Projects', 'Locations Processors Enable']
+- ['projects_locations-processors-get.md', 'Projects', 'Locations Processors Get']
+- ['projects_locations-processors-human-review-config-review-document.md', 'Projects', 'Locations Processors Human Review Config Review Document']
+- ['projects_locations-processors-list.md', 'Projects', 'Locations Processors List']
+- ['projects_locations-processors-process.md', 'Projects', 'Locations Processors Process']
+- ['projects_locations-processors-processor-versions-batch-process.md', 'Projects', 'Locations Processors Processor Versions Batch Process']
+- ['projects_locations-processors-processor-versions-delete.md', 'Projects', 'Locations Processors Processor Versions Delete']
+- ['projects_locations-processors-processor-versions-deploy.md', 'Projects', 'Locations Processors Processor Versions Deploy']
+- ['projects_locations-processors-processor-versions-get.md', 'Projects', 'Locations Processors Processor Versions Get']
+- ['projects_locations-processors-processor-versions-list.md', 'Projects', 'Locations Processors Processor Versions List']
+- ['projects_locations-processors-processor-versions-process.md', 'Projects', 'Locations Processors Processor Versions Process']
+- ['projects_locations-processors-processor-versions-undeploy.md', 'Projects', 'Locations Processors Processor Versions Undeploy']
+- ['projects_locations-processors-set-default-processor-version.md', 'Projects', 'Locations Processors Set Default Processor Version']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+- ['uiv1beta3_projects-locations-get.md', 'Uiv1beta3', 'Projects Locations Get']
+- ['uiv1beta3_projects-locations-list.md', 'Uiv1beta3', 'Projects Locations List']
+- ['uiv1beta3_projects-locations-operations-cancel.md', 'Uiv1beta3', 'Projects Locations Operations Cancel']
+- ['uiv1beta3_projects-locations-operations-get.md', 'Uiv1beta3', 'Projects Locations Operations Get']
+- ['uiv1beta3_projects-locations-operations-list.md', 'Uiv1beta3', 'Projects Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

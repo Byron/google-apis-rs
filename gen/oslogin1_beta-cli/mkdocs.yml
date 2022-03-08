@@ -1,0 +1,23 @@
+site_name: Cloud OS Login v3.0.0+20220228
+site_url: http://byron.github.io/google-apis-rs/google-oslogin1_beta-cli
+site_description: A complete library to interact with Cloud OS Login (protocol v1beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/oslogin1_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['users_get-login-profile.md', 'Users', 'Get Login Profile']
+- ['users_import-ssh-public-key.md', 'Users', 'Import Ssh Public Key']
+- ['users_projects-delete.md', 'Users', 'Projects Delete']
+- ['users_ssh-public-keys-create.md', 'Users', 'Ssh Public Keys Create']
+- ['users_ssh-public-keys-delete.md', 'Users', 'Ssh Public Keys Delete']
+- ['users_ssh-public-keys-get.md', 'Users', 'Ssh Public Keys Get']
+- ['users_ssh-public-keys-patch.md', 'Users', 'Ssh Public Keys Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,30 @@
+site_name: Cloud Run v3.0.0+20220225
+site_url: http://byron.github.io/google-apis-rs/google-run2-cli
+site_description: A complete library to interact with Cloud Run (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/run2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-services-create.md', 'Projects', 'Locations Services Create']
+- ['projects_locations-services-delete.md', 'Projects', 'Locations Services Delete']
+- ['projects_locations-services-get.md', 'Projects', 'Locations Services Get']
+- ['projects_locations-services-get-iam-policy.md', 'Projects', 'Locations Services Get Iam Policy']
+- ['projects_locations-services-list.md', 'Projects', 'Locations Services List']
+- ['projects_locations-services-patch.md', 'Projects', 'Locations Services Patch']
+- ['projects_locations-services-revisions-delete.md', 'Projects', 'Locations Services Revisions Delete']
+- ['projects_locations-services-revisions-get.md', 'Projects', 'Locations Services Revisions Get']
+- ['projects_locations-services-revisions-list.md', 'Projects', 'Locations Services Revisions List']
+- ['projects_locations-services-set-iam-policy.md', 'Projects', 'Locations Services Set Iam Policy']
+- ['projects_locations-services-test-iam-permissions.md', 'Projects', 'Locations Services Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

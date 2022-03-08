@@ -1,0 +1,60 @@
+site_name: Certificate Authority Service v3.0.0+20220209
+site_url: http://byron.github.io/google-apis-rs/google-privateca1-cli
+site_description: A complete library to interact with Certificate Authority Service (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/privateca1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-ca-pools-certificate-authorities-activate.md', 'Projects', 'Locations Ca Pools Certificate Authorities Activate']
+- ['projects_locations-ca-pools-certificate-authorities-certificate-revocation-lists-get.md', 'Projects', 'Locations Ca Pools Certificate Authorities Certificate Revocation Lists Get']
+- ['projects_locations-ca-pools-certificate-authorities-certificate-revocation-lists-get-iam-policy.md', 'Projects', 'Locations Ca Pools Certificate Authorities Certificate Revocation Lists Get Iam Policy']
+- ['projects_locations-ca-pools-certificate-authorities-certificate-revocation-lists-list.md', 'Projects', 'Locations Ca Pools Certificate Authorities Certificate Revocation Lists List']
+- ['projects_locations-ca-pools-certificate-authorities-certificate-revocation-lists-patch.md', 'Projects', 'Locations Ca Pools Certificate Authorities Certificate Revocation Lists Patch']
+- ['projects_locations-ca-pools-certificate-authorities-certificate-revocation-lists-set-iam-policy.md', 'Projects', 'Locations Ca Pools Certificate Authorities Certificate Revocation Lists Set Iam Policy']
+- ['projects_locations-ca-pools-certificate-authorities-certificate-revocation-lists-test-iam-permissions.md', 'Projects', 'Locations Ca Pools Certificate Authorities Certificate Revocation Lists Test Iam Permissions']
+- ['projects_locations-ca-pools-certificate-authorities-create.md', 'Projects', 'Locations Ca Pools Certificate Authorities Create']
+- ['projects_locations-ca-pools-certificate-authorities-delete.md', 'Projects', 'Locations Ca Pools Certificate Authorities Delete']
+- ['projects_locations-ca-pools-certificate-authorities-disable.md', 'Projects', 'Locations Ca Pools Certificate Authorities Disable']
+- ['projects_locations-ca-pools-certificate-authorities-enable.md', 'Projects', 'Locations Ca Pools Certificate Authorities Enable']
+- ['projects_locations-ca-pools-certificate-authorities-fetch.md', 'Projects', 'Locations Ca Pools Certificate Authorities Fetch']
+- ['projects_locations-ca-pools-certificate-authorities-get.md', 'Projects', 'Locations Ca Pools Certificate Authorities Get']
+- ['projects_locations-ca-pools-certificate-authorities-list.md', 'Projects', 'Locations Ca Pools Certificate Authorities List']
+- ['projects_locations-ca-pools-certificate-authorities-patch.md', 'Projects', 'Locations Ca Pools Certificate Authorities Patch']
+- ['projects_locations-ca-pools-certificate-authorities-undelete.md', 'Projects', 'Locations Ca Pools Certificate Authorities Undelete']
+- ['projects_locations-ca-pools-certificates-create.md', 'Projects', 'Locations Ca Pools Certificates Create']
+- ['projects_locations-ca-pools-certificates-get.md', 'Projects', 'Locations Ca Pools Certificates Get']
+- ['projects_locations-ca-pools-certificates-list.md', 'Projects', 'Locations Ca Pools Certificates List']
+- ['projects_locations-ca-pools-certificates-patch.md', 'Projects', 'Locations Ca Pools Certificates Patch']
+- ['projects_locations-ca-pools-certificates-revoke.md', 'Projects', 'Locations Ca Pools Certificates Revoke']
+- ['projects_locations-ca-pools-create.md', 'Projects', 'Locations Ca Pools Create']
+- ['projects_locations-ca-pools-delete.md', 'Projects', 'Locations Ca Pools Delete']
+- ['projects_locations-ca-pools-fetch-ca-certs.md', 'Projects', 'Locations Ca Pools Fetch Ca Certs']
+- ['projects_locations-ca-pools-get.md', 'Projects', 'Locations Ca Pools Get']
+- ['projects_locations-ca-pools-get-iam-policy.md', 'Projects', 'Locations Ca Pools Get Iam Policy']
+- ['projects_locations-ca-pools-list.md', 'Projects', 'Locations Ca Pools List']
+- ['projects_locations-ca-pools-patch.md', 'Projects', 'Locations Ca Pools Patch']
+- ['projects_locations-ca-pools-set-iam-policy.md', 'Projects', 'Locations Ca Pools Set Iam Policy']
+- ['projects_locations-ca-pools-test-iam-permissions.md', 'Projects', 'Locations Ca Pools Test Iam Permissions']
+- ['projects_locations-certificate-templates-create.md', 'Projects', 'Locations Certificate Templates Create']
+- ['projects_locations-certificate-templates-delete.md', 'Projects', 'Locations Certificate Templates Delete']
+- ['projects_locations-certificate-templates-get.md', 'Projects', 'Locations Certificate Templates Get']
+- ['projects_locations-certificate-templates-get-iam-policy.md', 'Projects', 'Locations Certificate Templates Get Iam Policy']
+- ['projects_locations-certificate-templates-list.md', 'Projects', 'Locations Certificate Templates List']
+- ['projects_locations-certificate-templates-patch.md', 'Projects', 'Locations Certificate Templates Patch']
+- ['projects_locations-certificate-templates-set-iam-policy.md', 'Projects', 'Locations Certificate Templates Set Iam Policy']
+- ['projects_locations-certificate-templates-test-iam-permissions.md', 'Projects', 'Locations Certificate Templates Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

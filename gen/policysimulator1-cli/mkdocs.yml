@@ -1,0 +1,27 @@
+site_name: Policy Simulator v3.0.0+20220227
+site_url: http://byron.github.io/google-apis-rs/google-policysimulator1-cli
+site_description: A complete library to interact with Policy Simulator (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/policysimulator1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['folders_locations-replays-create.md', 'Folders', 'Locations Replays Create']
+- ['folders_locations-replays-get.md', 'Folders', 'Locations Replays Get']
+- ['folders_locations-replays-results-list.md', 'Folders', 'Locations Replays Results List']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+- ['organizations_locations-replays-create.md', 'Organizations', 'Locations Replays Create']
+- ['organizations_locations-replays-get.md', 'Organizations', 'Locations Replays Get']
+- ['organizations_locations-replays-results-list.md', 'Organizations', 'Locations Replays Results List']
+- ['projects_locations-replays-create.md', 'Projects', 'Locations Replays Create']
+- ['projects_locations-replays-get.md', 'Projects', 'Locations Replays Get']
+- ['projects_locations-replays-results-list.md', 'Projects', 'Locations Replays Results List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

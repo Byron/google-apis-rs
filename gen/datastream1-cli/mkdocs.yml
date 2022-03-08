@@ -1,0 +1,47 @@
+site_name: Datastream v3.0.0+20220207
+site_url: http://byron.github.io/google-apis-rs/google-datastream1-cli
+site_description: A complete library to interact with Datastream (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datastream1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-connection-profiles-create.md', 'Projects', 'Locations Connection Profiles Create']
+- ['projects_locations-connection-profiles-delete.md', 'Projects', 'Locations Connection Profiles Delete']
+- ['projects_locations-connection-profiles-discover.md', 'Projects', 'Locations Connection Profiles Discover']
+- ['projects_locations-connection-profiles-get.md', 'Projects', 'Locations Connection Profiles Get']
+- ['projects_locations-connection-profiles-list.md', 'Projects', 'Locations Connection Profiles List']
+- ['projects_locations-connection-profiles-patch.md', 'Projects', 'Locations Connection Profiles Patch']
+- ['projects_locations-fetch-static-ips.md', 'Projects', 'Locations Fetch Static Ips']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-private-connections-create.md', 'Projects', 'Locations Private Connections Create']
+- ['projects_locations-private-connections-delete.md', 'Projects', 'Locations Private Connections Delete']
+- ['projects_locations-private-connections-get.md', 'Projects', 'Locations Private Connections Get']
+- ['projects_locations-private-connections-list.md', 'Projects', 'Locations Private Connections List']
+- ['projects_locations-private-connections-routes-create.md', 'Projects', 'Locations Private Connections Routes Create']
+- ['projects_locations-private-connections-routes-delete.md', 'Projects', 'Locations Private Connections Routes Delete']
+- ['projects_locations-private-connections-routes-get.md', 'Projects', 'Locations Private Connections Routes Get']
+- ['projects_locations-private-connections-routes-list.md', 'Projects', 'Locations Private Connections Routes List']
+- ['projects_locations-streams-create.md', 'Projects', 'Locations Streams Create']
+- ['projects_locations-streams-delete.md', 'Projects', 'Locations Streams Delete']
+- ['projects_locations-streams-get.md', 'Projects', 'Locations Streams Get']
+- ['projects_locations-streams-list.md', 'Projects', 'Locations Streams List']
+- ['projects_locations-streams-objects-get.md', 'Projects', 'Locations Streams Objects Get']
+- ['projects_locations-streams-objects-list.md', 'Projects', 'Locations Streams Objects List']
+- ['projects_locations-streams-objects-lookup.md', 'Projects', 'Locations Streams Objects Lookup']
+- ['projects_locations-streams-objects-start-backfill-job.md', 'Projects', 'Locations Streams Objects Start Backfill Job']
+- ['projects_locations-streams-objects-stop-backfill-job.md', 'Projects', 'Locations Streams Objects Stop Backfill Job']
+- ['projects_locations-streams-patch.md', 'Projects', 'Locations Streams Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

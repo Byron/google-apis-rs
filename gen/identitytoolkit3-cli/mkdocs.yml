@@ -1,0 +1,36 @@
+site_name: Identity Toolkit v3.0.0+20180723
+site_url: http://byron.github.io/google-apis-rs/google-identitytoolkit3-cli
+site_description: A complete library to interact with Identity Toolkit (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/identitytoolkit3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['relyingparty_create-auth-uri.md', 'Relyingparty', 'Create Auth Uri']
+- ['relyingparty_delete-account.md', 'Relyingparty', 'Delete Account']
+- ['relyingparty_download-account.md', 'Relyingparty', 'Download Account']
+- ['relyingparty_email-link-signin.md', 'Relyingparty', 'Email Link Signin']
+- ['relyingparty_get-account-info.md', 'Relyingparty', 'Get Account Info']
+- ['relyingparty_get-oob-confirmation-code.md', 'Relyingparty', 'Get Oob Confirmation Code']
+- ['relyingparty_get-project-config.md', 'Relyingparty', 'Get Project Config']
+- ['relyingparty_get-public-keys.md', 'Relyingparty', 'Get Public Keys']
+- ['relyingparty_get-recaptcha-param.md', 'Relyingparty', 'Get Recaptcha Param']
+- ['relyingparty_reset-password.md', 'Relyingparty', 'Reset Password']
+- ['relyingparty_send-verification-code.md', 'Relyingparty', 'Send Verification Code']
+- ['relyingparty_set-account-info.md', 'Relyingparty', 'Set Account Info']
+- ['relyingparty_set-project-config.md', 'Relyingparty', 'Set Project Config']
+- ['relyingparty_sign-out-user.md', 'Relyingparty', 'Sign Out User']
+- ['relyingparty_signup-new-user.md', 'Relyingparty', 'Signup New User']
+- ['relyingparty_upload-account.md', 'Relyingparty', 'Upload Account']
+- ['relyingparty_verify-assertion.md', 'Relyingparty', 'Verify Assertion']
+- ['relyingparty_verify-custom-token.md', 'Relyingparty', 'Verify Custom Token']
+- ['relyingparty_verify-password.md', 'Relyingparty', 'Verify Password']
+- ['relyingparty_verify-phone-number.md', 'Relyingparty', 'Verify Phone Number']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

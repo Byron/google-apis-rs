@@ -1,0 +1,53 @@
+site_name: Contactcenterinsights v3.0.0+20220227
+site_url: http://byron.github.io/google-apis-rs/google-contactcenterinsights1-cli
+site_description: A complete library to interact with Contactcenterinsights (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/contactcenterinsights1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-conversations-analyses-create.md', 'Projects', 'Locations Conversations Analyses Create']
+- ['projects_locations-conversations-analyses-delete.md', 'Projects', 'Locations Conversations Analyses Delete']
+- ['projects_locations-conversations-analyses-get.md', 'Projects', 'Locations Conversations Analyses Get']
+- ['projects_locations-conversations-analyses-list.md', 'Projects', 'Locations Conversations Analyses List']
+- ['projects_locations-conversations-calculate-stats.md', 'Projects', 'Locations Conversations Calculate Stats']
+- ['projects_locations-conversations-create.md', 'Projects', 'Locations Conversations Create']
+- ['projects_locations-conversations-delete.md', 'Projects', 'Locations Conversations Delete']
+- ['projects_locations-conversations-get.md', 'Projects', 'Locations Conversations Get']
+- ['projects_locations-conversations-list.md', 'Projects', 'Locations Conversations List']
+- ['projects_locations-conversations-patch.md', 'Projects', 'Locations Conversations Patch']
+- ['projects_locations-get-settings.md', 'Projects', 'Locations Get Settings']
+- ['projects_locations-insightsdata-export.md', 'Projects', 'Locations Insightsdata Export']
+- ['projects_locations-issue-models-calculate-issue-model-stats.md', 'Projects', 'Locations Issue Models Calculate Issue Model Stats']
+- ['projects_locations-issue-models-create.md', 'Projects', 'Locations Issue Models Create']
+- ['projects_locations-issue-models-delete.md', 'Projects', 'Locations Issue Models Delete']
+- ['projects_locations-issue-models-deploy.md', 'Projects', 'Locations Issue Models Deploy']
+- ['projects_locations-issue-models-get.md', 'Projects', 'Locations Issue Models Get']
+- ['projects_locations-issue-models-issues-get.md', 'Projects', 'Locations Issue Models Issues Get']
+- ['projects_locations-issue-models-issues-list.md', 'Projects', 'Locations Issue Models Issues List']
+- ['projects_locations-issue-models-issues-patch.md', 'Projects', 'Locations Issue Models Issues Patch']
+- ['projects_locations-issue-models-list.md', 'Projects', 'Locations Issue Models List']
+- ['projects_locations-issue-models-patch.md', 'Projects', 'Locations Issue Models Patch']
+- ['projects_locations-issue-models-undeploy.md', 'Projects', 'Locations Issue Models Undeploy']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-phrase-matchers-create.md', 'Projects', 'Locations Phrase Matchers Create']
+- ['projects_locations-phrase-matchers-delete.md', 'Projects', 'Locations Phrase Matchers Delete']
+- ['projects_locations-phrase-matchers-get.md', 'Projects', 'Locations Phrase Matchers Get']
+- ['projects_locations-phrase-matchers-list.md', 'Projects', 'Locations Phrase Matchers List']
+- ['projects_locations-phrase-matchers-patch.md', 'Projects', 'Locations Phrase Matchers Patch']
+- ['projects_locations-update-settings.md', 'Projects', 'Locations Update Settings']
+- ['projects_locations-views-create.md', 'Projects', 'Locations Views Create']
+- ['projects_locations-views-delete.md', 'Projects', 'Locations Views Delete']
+- ['projects_locations-views-get.md', 'Projects', 'Locations Views Get']
+- ['projects_locations-views-list.md', 'Projects', 'Locations Views List']
+- ['projects_locations-views-patch.md', 'Projects', 'Locations Views Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

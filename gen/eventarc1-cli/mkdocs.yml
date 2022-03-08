@@ -1,0 +1,38 @@
+site_name: Eventarc v3.0.0+20220301
+site_url: http://byron.github.io/google-apis-rs/google-eventarc1-cli
+site_description: A complete library to interact with Eventarc (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/eventarc1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-channel-connections-get-iam-policy.md', 'Projects', 'Locations Channel Connections Get Iam Policy']
+- ['projects_locations-channel-connections-set-iam-policy.md', 'Projects', 'Locations Channel Connections Set Iam Policy']
+- ['projects_locations-channel-connections-test-iam-permissions.md', 'Projects', 'Locations Channel Connections Test Iam Permissions']
+- ['projects_locations-channels-get-iam-policy.md', 'Projects', 'Locations Channels Get Iam Policy']
+- ['projects_locations-channels-set-iam-policy.md', 'Projects', 'Locations Channels Set Iam Policy']
+- ['projects_locations-channels-test-iam-permissions.md', 'Projects', 'Locations Channels Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-providers-get.md', 'Projects', 'Locations Providers Get']
+- ['projects_locations-providers-list.md', 'Projects', 'Locations Providers List']
+- ['projects_locations-triggers-create.md', 'Projects', 'Locations Triggers Create']
+- ['projects_locations-triggers-delete.md', 'Projects', 'Locations Triggers Delete']
+- ['projects_locations-triggers-get.md', 'Projects', 'Locations Triggers Get']
+- ['projects_locations-triggers-get-iam-policy.md', 'Projects', 'Locations Triggers Get Iam Policy']
+- ['projects_locations-triggers-list.md', 'Projects', 'Locations Triggers List']
+- ['projects_locations-triggers-patch.md', 'Projects', 'Locations Triggers Patch']
+- ['projects_locations-triggers-set-iam-policy.md', 'Projects', 'Locations Triggers Set Iam Policy']
+- ['projects_locations-triggers-test-iam-permissions.md', 'Projects', 'Locations Triggers Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

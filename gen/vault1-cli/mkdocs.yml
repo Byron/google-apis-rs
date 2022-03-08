@@ -1,0 +1,49 @@
+site_name: Vault v3.0.0+20220222
+site_url: http://byron.github.io/google-apis-rs/google-vault1-cli
+site_description: A complete library to interact with Vault (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/vault1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['matters_add-permissions.md', 'Matters', 'Add Permissions']
+- ['matters_close.md', 'Matters', 'Close']
+- ['matters_count.md', 'Matters', 'Count']
+- ['matters_create.md', 'Matters', 'Create']
+- ['matters_delete.md', 'Matters', 'Delete']
+- ['matters_exports-create.md', 'Matters', 'Exports Create']
+- ['matters_exports-delete.md', 'Matters', 'Exports Delete']
+- ['matters_exports-get.md', 'Matters', 'Exports Get']
+- ['matters_exports-list.md', 'Matters', 'Exports List']
+- ['matters_get.md', 'Matters', 'Get']
+- ['matters_holds-accounts-create.md', 'Matters', 'Holds Accounts Create']
+- ['matters_holds-accounts-delete.md', 'Matters', 'Holds Accounts Delete']
+- ['matters_holds-accounts-list.md', 'Matters', 'Holds Accounts List']
+- ['matters_holds-add-held-accounts.md', 'Matters', 'Holds Add Held Accounts']
+- ['matters_holds-create.md', 'Matters', 'Holds Create']
+- ['matters_holds-delete.md', 'Matters', 'Holds Delete']
+- ['matters_holds-get.md', 'Matters', 'Holds Get']
+- ['matters_holds-list.md', 'Matters', 'Holds List']
+- ['matters_holds-remove-held-accounts.md', 'Matters', 'Holds Remove Held Accounts']
+- ['matters_holds-update.md', 'Matters', 'Holds Update']
+- ['matters_list.md', 'Matters', 'List']
+- ['matters_remove-permissions.md', 'Matters', 'Remove Permissions']
+- ['matters_reopen.md', 'Matters', 'Reopen']
+- ['matters_saved-queries-create.md', 'Matters', 'Saved Queries Create']
+- ['matters_saved-queries-delete.md', 'Matters', 'Saved Queries Delete']
+- ['matters_saved-queries-get.md', 'Matters', 'Saved Queries Get']
+- ['matters_saved-queries-list.md', 'Matters', 'Saved Queries List']
+- ['matters_undelete.md', 'Matters', 'Undelete']
+- ['matters_update.md', 'Matters', 'Update']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

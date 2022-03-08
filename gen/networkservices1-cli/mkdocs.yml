@@ -1,0 +1,39 @@
+site_name: NetworkServices v3.0.0+20220222
+site_url: http://byron.github.io/google-apis-rs/google-networkservices1-cli
+site_description: A complete library to interact with NetworkServices (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/networkservices1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-edge-cache-keysets-get-iam-policy.md', 'Projects', 'Locations Edge Cache Keysets Get Iam Policy']
+- ['projects_locations-edge-cache-keysets-set-iam-policy.md', 'Projects', 'Locations Edge Cache Keysets Set Iam Policy']
+- ['projects_locations-edge-cache-keysets-test-iam-permissions.md', 'Projects', 'Locations Edge Cache Keysets Test Iam Permissions']
+- ['projects_locations-edge-cache-origins-get-iam-policy.md', 'Projects', 'Locations Edge Cache Origins Get Iam Policy']
+- ['projects_locations-edge-cache-origins-set-iam-policy.md', 'Projects', 'Locations Edge Cache Origins Set Iam Policy']
+- ['projects_locations-edge-cache-origins-test-iam-permissions.md', 'Projects', 'Locations Edge Cache Origins Test Iam Permissions']
+- ['projects_locations-edge-cache-services-get-iam-policy.md', 'Projects', 'Locations Edge Cache Services Get Iam Policy']
+- ['projects_locations-edge-cache-services-set-iam-policy.md', 'Projects', 'Locations Edge Cache Services Set Iam Policy']
+- ['projects_locations-edge-cache-services-test-iam-permissions.md', 'Projects', 'Locations Edge Cache Services Test Iam Permissions']
+- ['projects_locations-endpoint-policies-create.md', 'Projects', 'Locations Endpoint Policies Create']
+- ['projects_locations-endpoint-policies-delete.md', 'Projects', 'Locations Endpoint Policies Delete']
+- ['projects_locations-endpoint-policies-get.md', 'Projects', 'Locations Endpoint Policies Get']
+- ['projects_locations-endpoint-policies-get-iam-policy.md', 'Projects', 'Locations Endpoint Policies Get Iam Policy']
+- ['projects_locations-endpoint-policies-list.md', 'Projects', 'Locations Endpoint Policies List']
+- ['projects_locations-endpoint-policies-patch.md', 'Projects', 'Locations Endpoint Policies Patch']
+- ['projects_locations-endpoint-policies-set-iam-policy.md', 'Projects', 'Locations Endpoint Policies Set Iam Policy']
+- ['projects_locations-endpoint-policies-test-iam-permissions.md', 'Projects', 'Locations Endpoint Policies Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

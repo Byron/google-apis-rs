@@ -1,0 +1,72 @@
+site_name: Cloud Build v3.0.0+20220218
+site_url: http://byron.github.io/google-apis-rs/google-cloudbuild1-cli
+site_description: A complete library to interact with Cloud Build (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudbuild1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['locations_regional-webhook.md', 'Locations', 'Regional Webhook']
+- ['methods_webhook.md', 'Methods', 'Webhook']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_get.md', 'Operations', 'Get']
+- ['projects_builds-approve.md', 'Projects', 'Builds Approve']
+- ['projects_builds-cancel.md', 'Projects', 'Builds Cancel']
+- ['projects_builds-create.md', 'Projects', 'Builds Create']
+- ['projects_builds-get.md', 'Projects', 'Builds Get']
+- ['projects_builds-list.md', 'Projects', 'Builds List']
+- ['projects_builds-retry.md', 'Projects', 'Builds Retry']
+- ['projects_github-enterprise-configs-create.md', 'Projects', 'Github Enterprise Configs Create']
+- ['projects_github-enterprise-configs-delete.md', 'Projects', 'Github Enterprise Configs Delete']
+- ['projects_github-enterprise-configs-get.md', 'Projects', 'Github Enterprise Configs Get']
+- ['projects_github-enterprise-configs-list.md', 'Projects', 'Github Enterprise Configs List']
+- ['projects_github-enterprise-configs-patch.md', 'Projects', 'Github Enterprise Configs Patch']
+- ['projects_locations-bitbucket-server-configs-add-bitbucket-server-connected-repository.md', 'Projects', 'Locations Bitbucket Server Configs Add Bitbucket Server Connected Repository']
+- ['projects_locations-bitbucket-server-configs-connected-repositories-batch-create.md', 'Projects', 'Locations Bitbucket Server Configs Connected Repositories Batch Create']
+- ['projects_locations-bitbucket-server-configs-create.md', 'Projects', 'Locations Bitbucket Server Configs Create']
+- ['projects_locations-bitbucket-server-configs-delete.md', 'Projects', 'Locations Bitbucket Server Configs Delete']
+- ['projects_locations-bitbucket-server-configs-get.md', 'Projects', 'Locations Bitbucket Server Configs Get']
+- ['projects_locations-bitbucket-server-configs-list.md', 'Projects', 'Locations Bitbucket Server Configs List']
+- ['projects_locations-bitbucket-server-configs-patch.md', 'Projects', 'Locations Bitbucket Server Configs Patch']
+- ['projects_locations-bitbucket-server-configs-remove-bitbucket-server-connected-repository.md', 'Projects', 'Locations Bitbucket Server Configs Remove Bitbucket Server Connected Repository']
+- ['projects_locations-bitbucket-server-configs-repos-list.md', 'Projects', 'Locations Bitbucket Server Configs Repos List']
+- ['projects_locations-builds-approve.md', 'Projects', 'Locations Builds Approve']
+- ['projects_locations-builds-cancel.md', 'Projects', 'Locations Builds Cancel']
+- ['projects_locations-builds-create.md', 'Projects', 'Locations Builds Create']
+- ['projects_locations-builds-get.md', 'Projects', 'Locations Builds Get']
+- ['projects_locations-builds-list.md', 'Projects', 'Locations Builds List']
+- ['projects_locations-builds-retry.md', 'Projects', 'Locations Builds Retry']
+- ['projects_locations-github-enterprise-configs-create.md', 'Projects', 'Locations Github Enterprise Configs Create']
+- ['projects_locations-github-enterprise-configs-delete.md', 'Projects', 'Locations Github Enterprise Configs Delete']
+- ['projects_locations-github-enterprise-configs-get.md', 'Projects', 'Locations Github Enterprise Configs Get']
+- ['projects_locations-github-enterprise-configs-list.md', 'Projects', 'Locations Github Enterprise Configs List']
+- ['projects_locations-github-enterprise-configs-patch.md', 'Projects', 'Locations Github Enterprise Configs Patch']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-triggers-create.md', 'Projects', 'Locations Triggers Create']
+- ['projects_locations-triggers-delete.md', 'Projects', 'Locations Triggers Delete']
+- ['projects_locations-triggers-get.md', 'Projects', 'Locations Triggers Get']
+- ['projects_locations-triggers-list.md', 'Projects', 'Locations Triggers List']
+- ['projects_locations-triggers-patch.md', 'Projects', 'Locations Triggers Patch']
+- ['projects_locations-triggers-run.md', 'Projects', 'Locations Triggers Run']
+- ['projects_locations-triggers-webhook.md', 'Projects', 'Locations Triggers Webhook']
+- ['projects_locations-worker-pools-create.md', 'Projects', 'Locations Worker Pools Create']
+- ['projects_locations-worker-pools-delete.md', 'Projects', 'Locations Worker Pools Delete']
+- ['projects_locations-worker-pools-get.md', 'Projects', 'Locations Worker Pools Get']
+- ['projects_locations-worker-pools-list.md', 'Projects', 'Locations Worker Pools List']
+- ['projects_locations-worker-pools-patch.md', 'Projects', 'Locations Worker Pools Patch']
+- ['projects_triggers-create.md', 'Projects', 'Triggers Create']
+- ['projects_triggers-delete.md', 'Projects', 'Triggers Delete']
+- ['projects_triggers-get.md', 'Projects', 'Triggers Get']
+- ['projects_triggers-list.md', 'Projects', 'Triggers List']
+- ['projects_triggers-patch.md', 'Projects', 'Triggers Patch']
+- ['projects_triggers-run.md', 'Projects', 'Triggers Run']
+- ['projects_triggers-webhook.md', 'Projects', 'Triggers Webhook']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

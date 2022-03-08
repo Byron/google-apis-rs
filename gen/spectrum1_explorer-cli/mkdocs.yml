@@ -1,0 +1,22 @@
+site_name: spectrum v3.0.0+20170306
+site_url: http://byron.github.io/google-apis-rs/google-spectrum1_explorer-cli
+site_description: A complete library to interact with spectrum (protocol v1explorer)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/spectrum1_explorer-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['paws_get-spectrum.md', 'Paws', 'Get Spectrum']
+- ['paws_get-spectrum-batch.md', 'Paws', 'Get Spectrum Batch']
+- ['paws_init.md', 'Paws', 'Init']
+- ['paws_notify-spectrum-use.md', 'Paws', 'Notify Spectrum Use']
+- ['paws_register.md', 'Paws', 'Register']
+- ['paws_verify-device.md', 'Paws', 'Verify Device']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

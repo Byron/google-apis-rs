@@ -1,0 +1,33 @@
+site_name: Sheets v3.0.0+20220221
+site_url: http://byron.github.io/google-apis-rs/google-sheets4-cli
+site_description: A complete library to interact with Sheets (protocol v4)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/sheets4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['spreadsheets_batch-update.md', 'Spreadsheets', 'Batch Update']
+- ['spreadsheets_create.md', 'Spreadsheets', 'Create']
+- ['spreadsheets_developer-metadata-get.md', 'Spreadsheets', 'Developer Metadata Get']
+- ['spreadsheets_developer-metadata-search.md', 'Spreadsheets', 'Developer Metadata Search']
+- ['spreadsheets_get.md', 'Spreadsheets', 'Get']
+- ['spreadsheets_get-by-data-filter.md', 'Spreadsheets', 'Get By Data Filter']
+- ['spreadsheets_sheets-copy-to.md', 'Spreadsheets', 'Sheets Copy To']
+- ['spreadsheets_values-append.md', 'Spreadsheets', 'Values Append']
+- ['spreadsheets_values-batch-clear.md', 'Spreadsheets', 'Values Batch Clear']
+- ['spreadsheets_values-batch-clear-by-data-filter.md', 'Spreadsheets', 'Values Batch Clear By Data Filter']
+- ['spreadsheets_values-batch-get.md', 'Spreadsheets', 'Values Batch Get']
+- ['spreadsheets_values-batch-get-by-data-filter.md', 'Spreadsheets', 'Values Batch Get By Data Filter']
+- ['spreadsheets_values-batch-update.md', 'Spreadsheets', 'Values Batch Update']
+- ['spreadsheets_values-batch-update-by-data-filter.md', 'Spreadsheets', 'Values Batch Update By Data Filter']
+- ['spreadsheets_values-clear.md', 'Spreadsheets', 'Values Clear']
+- ['spreadsheets_values-get.md', 'Spreadsheets', 'Values Get']
+- ['spreadsheets_values-update.md', 'Spreadsheets', 'Values Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

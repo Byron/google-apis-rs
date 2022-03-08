@@ -1,0 +1,33 @@
+site_name: Cloud User Accounts v3.0.0+20160316
+site_url: http://byron.github.io/google-apis-rs/google-clouduseraccountsvm_beta-cli
+site_description: A complete library to interact with Cloud User Accounts (protocol vm_beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/clouduseraccountsvm_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['global-accounts-operations_delete.md', 'Global Accounts Operations', 'Delete']
+- ['global-accounts-operations_get.md', 'Global Accounts Operations', 'Get']
+- ['global-accounts-operations_list.md', 'Global Accounts Operations', 'List']
+- ['groups_add-member.md', 'Groups', 'Add Member']
+- ['groups_delete.md', 'Groups', 'Delete']
+- ['groups_get.md', 'Groups', 'Get']
+- ['groups_insert.md', 'Groups', 'Insert']
+- ['groups_list.md', 'Groups', 'List']
+- ['groups_remove-member.md', 'Groups', 'Remove Member']
+- ['linux_get-authorized-keys-view.md', 'Linux', 'Get Authorized Keys View']
+- ['linux_get-linux-account-views.md', 'Linux', 'Get Linux Account Views']
+- ['users_add-public-key.md', 'Users', 'Add Public Key']
+- ['users_delete.md', 'Users', 'Delete']
+- ['users_get.md', 'Users', 'Get']
+- ['users_insert.md', 'Users', 'Insert']
+- ['users_list.md', 'Users', 'List']
+- ['users_remove-public-key.md', 'Users', 'Remove Public Key']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

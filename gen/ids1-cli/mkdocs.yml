@@ -1,0 +1,29 @@
+site_name: IDS v3.0.0+20220221
+site_url: http://byron.github.io/google-apis-rs/google-ids1-cli
+site_description: A complete library to interact with IDS (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ids1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-endpoints-create.md', 'Projects', 'Locations Endpoints Create']
+- ['projects_locations-endpoints-delete.md', 'Projects', 'Locations Endpoints Delete']
+- ['projects_locations-endpoints-get.md', 'Projects', 'Locations Endpoints Get']
+- ['projects_locations-endpoints-get-iam-policy.md', 'Projects', 'Locations Endpoints Get Iam Policy']
+- ['projects_locations-endpoints-list.md', 'Projects', 'Locations Endpoints List']
+- ['projects_locations-endpoints-set-iam-policy.md', 'Projects', 'Locations Endpoints Set Iam Policy']
+- ['projects_locations-endpoints-test-iam-permissions.md', 'Projects', 'Locations Endpoints Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

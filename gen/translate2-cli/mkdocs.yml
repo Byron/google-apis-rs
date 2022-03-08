@@ -1,0 +1,21 @@
+site_name: Translate v3.0.0+20170525
+site_url: http://byron.github.io/google-apis-rs/google-translate2-cli
+site_description: A complete library to interact with Translate (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/translate2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['detections_detect.md', 'Detections', 'Detect']
+- ['detections_list.md', 'Detections', 'List']
+- ['languages_list.md', 'Languages', 'List']
+- ['translations_list.md', 'Translations', 'List']
+- ['translations_translate.md', 'Translations', 'Translate']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

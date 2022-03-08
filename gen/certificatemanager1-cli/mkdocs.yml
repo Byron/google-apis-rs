@@ -1,0 +1,42 @@
+site_name: Certificate Manager v3.0.0+20220214
+site_url: http://byron.github.io/google-apis-rs/google-certificatemanager1-cli
+site_description: A complete library to interact with Certificate Manager (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/certificatemanager1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-certificate-maps-certificate-map-entries-create.md', 'Projects', 'Locations Certificate Maps Certificate Map Entries Create']
+- ['projects_locations-certificate-maps-certificate-map-entries-delete.md', 'Projects', 'Locations Certificate Maps Certificate Map Entries Delete']
+- ['projects_locations-certificate-maps-certificate-map-entries-get.md', 'Projects', 'Locations Certificate Maps Certificate Map Entries Get']
+- ['projects_locations-certificate-maps-certificate-map-entries-list.md', 'Projects', 'Locations Certificate Maps Certificate Map Entries List']
+- ['projects_locations-certificate-maps-certificate-map-entries-patch.md', 'Projects', 'Locations Certificate Maps Certificate Map Entries Patch']
+- ['projects_locations-certificate-maps-create.md', 'Projects', 'Locations Certificate Maps Create']
+- ['projects_locations-certificate-maps-delete.md', 'Projects', 'Locations Certificate Maps Delete']
+- ['projects_locations-certificate-maps-get.md', 'Projects', 'Locations Certificate Maps Get']
+- ['projects_locations-certificate-maps-list.md', 'Projects', 'Locations Certificate Maps List']
+- ['projects_locations-certificate-maps-patch.md', 'Projects', 'Locations Certificate Maps Patch']
+- ['projects_locations-certificates-create.md', 'Projects', 'Locations Certificates Create']
+- ['projects_locations-certificates-delete.md', 'Projects', 'Locations Certificates Delete']
+- ['projects_locations-certificates-get.md', 'Projects', 'Locations Certificates Get']
+- ['projects_locations-certificates-list.md', 'Projects', 'Locations Certificates List']
+- ['projects_locations-certificates-patch.md', 'Projects', 'Locations Certificates Patch']
+- ['projects_locations-dns-authorizations-create.md', 'Projects', 'Locations Dns Authorizations Create']
+- ['projects_locations-dns-authorizations-delete.md', 'Projects', 'Locations Dns Authorizations Delete']
+- ['projects_locations-dns-authorizations-get.md', 'Projects', 'Locations Dns Authorizations Get']
+- ['projects_locations-dns-authorizations-list.md', 'Projects', 'Locations Dns Authorizations List']
+- ['projects_locations-dns-authorizations-patch.md', 'Projects', 'Locations Dns Authorizations Patch']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

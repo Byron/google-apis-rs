@@ -1,0 +1,45 @@
+site_name: Cloud PrivateCatalog Producer v3.0.0+20200405
+site_url: http://byron.github.io/google-apis-rs/google-cloudprivatecatalogproducer1_beta1-cli
+site_description: A complete library to interact with Cloud PrivateCatalog Producer (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprivatecatalogproducer1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['catalogs_associations-create.md', 'Catalogs', 'Associations Create']
+- ['catalogs_associations-delete.md', 'Catalogs', 'Associations Delete']
+- ['catalogs_associations-get.md', 'Catalogs', 'Associations Get']
+- ['catalogs_associations-list.md', 'Catalogs', 'Associations List']
+- ['catalogs_create.md', 'Catalogs', 'Create']
+- ['catalogs_delete.md', 'Catalogs', 'Delete']
+- ['catalogs_get.md', 'Catalogs', 'Get']
+- ['catalogs_get-iam-policy.md', 'Catalogs', 'Get Iam Policy']
+- ['catalogs_list.md', 'Catalogs', 'List']
+- ['catalogs_patch.md', 'Catalogs', 'Patch']
+- ['catalogs_products-copy.md', 'Catalogs', 'Products Copy']
+- ['catalogs_products-create.md', 'Catalogs', 'Products Create']
+- ['catalogs_products-delete.md', 'Catalogs', 'Products Delete']
+- ['catalogs_products-get.md', 'Catalogs', 'Products Get']
+- ['catalogs_products-icons-upload.md', 'Catalogs', 'Products Icons Upload']
+- ['catalogs_products-list.md', 'Catalogs', 'Products List']
+- ['catalogs_products-patch.md', 'Catalogs', 'Products Patch']
+- ['catalogs_products-versions-create.md', 'Catalogs', 'Products Versions Create']
+- ['catalogs_products-versions-delete.md', 'Catalogs', 'Products Versions Delete']
+- ['catalogs_products-versions-get.md', 'Catalogs', 'Products Versions Get']
+- ['catalogs_products-versions-list.md', 'Catalogs', 'Products Versions List']
+- ['catalogs_products-versions-patch.md', 'Catalogs', 'Products Versions Patch']
+- ['catalogs_set-iam-policy.md', 'Catalogs', 'Set Iam Policy']
+- ['catalogs_test-iam-permissions.md', 'Catalogs', 'Test Iam Permissions']
+- ['catalogs_undelete.md', 'Catalogs', 'Undelete']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

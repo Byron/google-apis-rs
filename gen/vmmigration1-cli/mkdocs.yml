@@ -1,0 +1,66 @@
+site_name: VM Migration Service v3.0.0+20220225
+site_url: http://byron.github.io/google-apis-rs/google-vmmigration1-cli
+site_description: A complete library to interact with VM Migration Service (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/vmmigration1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-groups-add-group-migration.md', 'Projects', 'Locations Groups Add Group Migration']
+- ['projects_locations-groups-create.md', 'Projects', 'Locations Groups Create']
+- ['projects_locations-groups-delete.md', 'Projects', 'Locations Groups Delete']
+- ['projects_locations-groups-get.md', 'Projects', 'Locations Groups Get']
+- ['projects_locations-groups-list.md', 'Projects', 'Locations Groups List']
+- ['projects_locations-groups-patch.md', 'Projects', 'Locations Groups Patch']
+- ['projects_locations-groups-remove-group-migration.md', 'Projects', 'Locations Groups Remove Group Migration']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-sources-create.md', 'Projects', 'Locations Sources Create']
+- ['projects_locations-sources-datacenter-connectors-create.md', 'Projects', 'Locations Sources Datacenter Connectors Create']
+- ['projects_locations-sources-datacenter-connectors-delete.md', 'Projects', 'Locations Sources Datacenter Connectors Delete']
+- ['projects_locations-sources-datacenter-connectors-get.md', 'Projects', 'Locations Sources Datacenter Connectors Get']
+- ['projects_locations-sources-datacenter-connectors-list.md', 'Projects', 'Locations Sources Datacenter Connectors List']
+- ['projects_locations-sources-datacenter-connectors-upgrade-appliance.md', 'Projects', 'Locations Sources Datacenter Connectors Upgrade Appliance']
+- ['projects_locations-sources-delete.md', 'Projects', 'Locations Sources Delete']
+- ['projects_locations-sources-fetch-inventory.md', 'Projects', 'Locations Sources Fetch Inventory']
+- ['projects_locations-sources-get.md', 'Projects', 'Locations Sources Get']
+- ['projects_locations-sources-list.md', 'Projects', 'Locations Sources List']
+- ['projects_locations-sources-migrating-vms-clone-jobs-cancel.md', 'Projects', 'Locations Sources Migrating Vms Clone Jobs Cancel']
+- ['projects_locations-sources-migrating-vms-clone-jobs-create.md', 'Projects', 'Locations Sources Migrating Vms Clone Jobs Create']
+- ['projects_locations-sources-migrating-vms-clone-jobs-get.md', 'Projects', 'Locations Sources Migrating Vms Clone Jobs Get']
+- ['projects_locations-sources-migrating-vms-clone-jobs-list.md', 'Projects', 'Locations Sources Migrating Vms Clone Jobs List']
+- ['projects_locations-sources-migrating-vms-create.md', 'Projects', 'Locations Sources Migrating Vms Create']
+- ['projects_locations-sources-migrating-vms-cutover-jobs-cancel.md', 'Projects', 'Locations Sources Migrating Vms Cutover Jobs Cancel']
+- ['projects_locations-sources-migrating-vms-cutover-jobs-create.md', 'Projects', 'Locations Sources Migrating Vms Cutover Jobs Create']
+- ['projects_locations-sources-migrating-vms-cutover-jobs-get.md', 'Projects', 'Locations Sources Migrating Vms Cutover Jobs Get']
+- ['projects_locations-sources-migrating-vms-cutover-jobs-list.md', 'Projects', 'Locations Sources Migrating Vms Cutover Jobs List']
+- ['projects_locations-sources-migrating-vms-delete.md', 'Projects', 'Locations Sources Migrating Vms Delete']
+- ['projects_locations-sources-migrating-vms-finalize-migration.md', 'Projects', 'Locations Sources Migrating Vms Finalize Migration']
+- ['projects_locations-sources-migrating-vms-get.md', 'Projects', 'Locations Sources Migrating Vms Get']
+- ['projects_locations-sources-migrating-vms-list.md', 'Projects', 'Locations Sources Migrating Vms List']
+- ['projects_locations-sources-migrating-vms-patch.md', 'Projects', 'Locations Sources Migrating Vms Patch']
+- ['projects_locations-sources-migrating-vms-pause-migration.md', 'Projects', 'Locations Sources Migrating Vms Pause Migration']
+- ['projects_locations-sources-migrating-vms-resume-migration.md', 'Projects', 'Locations Sources Migrating Vms Resume Migration']
+- ['projects_locations-sources-migrating-vms-start-migration.md', 'Projects', 'Locations Sources Migrating Vms Start Migration']
+- ['projects_locations-sources-patch.md', 'Projects', 'Locations Sources Patch']
+- ['projects_locations-sources-utilization-reports-create.md', 'Projects', 'Locations Sources Utilization Reports Create']
+- ['projects_locations-sources-utilization-reports-delete.md', 'Projects', 'Locations Sources Utilization Reports Delete']
+- ['projects_locations-sources-utilization-reports-get.md', 'Projects', 'Locations Sources Utilization Reports Get']
+- ['projects_locations-sources-utilization-reports-list.md', 'Projects', 'Locations Sources Utilization Reports List']
+- ['projects_locations-target-projects-create.md', 'Projects', 'Locations Target Projects Create']
+- ['projects_locations-target-projects-delete.md', 'Projects', 'Locations Target Projects Delete']
+- ['projects_locations-target-projects-get.md', 'Projects', 'Locations Target Projects Get']
+- ['projects_locations-target-projects-list.md', 'Projects', 'Locations Target Projects List']
+- ['projects_locations-target-projects-patch.md', 'Projects', 'Locations Target Projects Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

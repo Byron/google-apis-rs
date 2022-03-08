@@ -1,0 +1,26 @@
+site_name: Cloud Scheduler v3.0.0+20220212
+site_url: http://byron.github.io/google-apis-rs/google-cloudscheduler1_beta1-cli
+site_description: A complete library to interact with Cloud Scheduler (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudscheduler1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-jobs-create.md', 'Projects', 'Locations Jobs Create']
+- ['projects_locations-jobs-delete.md', 'Projects', 'Locations Jobs Delete']
+- ['projects_locations-jobs-get.md', 'Projects', 'Locations Jobs Get']
+- ['projects_locations-jobs-list.md', 'Projects', 'Locations Jobs List']
+- ['projects_locations-jobs-patch.md', 'Projects', 'Locations Jobs Patch']
+- ['projects_locations-jobs-pause.md', 'Projects', 'Locations Jobs Pause']
+- ['projects_locations-jobs-resume.md', 'Projects', 'Locations Jobs Resume']
+- ['projects_locations-jobs-run.md', 'Projects', 'Locations Jobs Run']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

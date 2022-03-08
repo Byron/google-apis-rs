@@ -1,0 +1,24 @@
+site_name: Datapipelines v3.0.0+20220218
+site_url: http://byron.github.io/google-apis-rs/google-datapipelines1-cli
+site_description: A complete library to interact with Datapipelines (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datapipelines1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-list-pipelines.md', 'Projects', 'Locations List Pipelines']
+- ['projects_locations-pipelines-create.md', 'Projects', 'Locations Pipelines Create']
+- ['projects_locations-pipelines-delete.md', 'Projects', 'Locations Pipelines Delete']
+- ['projects_locations-pipelines-get.md', 'Projects', 'Locations Pipelines Get']
+- ['projects_locations-pipelines-jobs-list.md', 'Projects', 'Locations Pipelines Jobs List']
+- ['projects_locations-pipelines-patch.md', 'Projects', 'Locations Pipelines Patch']
+- ['projects_locations-pipelines-run.md', 'Projects', 'Locations Pipelines Run']
+- ['projects_locations-pipelines-stop.md', 'Projects', 'Locations Pipelines Stop']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

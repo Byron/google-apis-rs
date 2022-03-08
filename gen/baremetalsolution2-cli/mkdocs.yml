@@ -1,0 +1,47 @@
+site_name: baremetalsolution v3.0.0+20220209
+site_url: http://byron.github.io/google-apis-rs/google-baremetalsolution2-cli
+site_description: A complete library to interact with baremetalsolution (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/baremetalsolution2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
+- ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
+- ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']
+- ['projects_locations-instances-reset.md', 'Projects', 'Locations Instances Reset']
+- ['projects_locations-instances-start.md', 'Projects', 'Locations Instances Start']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-networks-get.md', 'Projects', 'Locations Networks Get']
+- ['projects_locations-networks-list.md', 'Projects', 'Locations Networks List']
+- ['projects_locations-networks-list-network-usage.md', 'Projects', 'Locations Networks List Network Usage']
+- ['projects_locations-networks-patch.md', 'Projects', 'Locations Networks Patch']
+- ['projects_locations-nfs-shares-get.md', 'Projects', 'Locations Nfs Shares Get']
+- ['projects_locations-nfs-shares-list.md', 'Projects', 'Locations Nfs Shares List']
+- ['projects_locations-nfs-shares-patch.md', 'Projects', 'Locations Nfs Shares Patch']
+- ['projects_locations-provisioning-configs-submit.md', 'Projects', 'Locations Provisioning Configs Submit']
+- ['projects_locations-provisioning-quotas-list.md', 'Projects', 'Locations Provisioning Quotas List']
+- ['projects_locations-snapshot-schedule-policies-create.md', 'Projects', 'Locations Snapshot Schedule Policies Create']
+- ['projects_locations-snapshot-schedule-policies-delete.md', 'Projects', 'Locations Snapshot Schedule Policies Delete']
+- ['projects_locations-snapshot-schedule-policies-get.md', 'Projects', 'Locations Snapshot Schedule Policies Get']
+- ['projects_locations-snapshot-schedule-policies-list.md', 'Projects', 'Locations Snapshot Schedule Policies List']
+- ['projects_locations-snapshot-schedule-policies-patch.md', 'Projects', 'Locations Snapshot Schedule Policies Patch']
+- ['projects_locations-volumes-get.md', 'Projects', 'Locations Volumes Get']
+- ['projects_locations-volumes-list.md', 'Projects', 'Locations Volumes List']
+- ['projects_locations-volumes-luns-get.md', 'Projects', 'Locations Volumes Luns Get']
+- ['projects_locations-volumes-luns-list.md', 'Projects', 'Locations Volumes Luns List']
+- ['projects_locations-volumes-patch.md', 'Projects', 'Locations Volumes Patch']
+- ['projects_locations-volumes-snapshots-create.md', 'Projects', 'Locations Volumes Snapshots Create']
+- ['projects_locations-volumes-snapshots-delete.md', 'Projects', 'Locations Volumes Snapshots Delete']
+- ['projects_locations-volumes-snapshots-get.md', 'Projects', 'Locations Volumes Snapshots Get']
+- ['projects_locations-volumes-snapshots-list.md', 'Projects', 'Locations Volumes Snapshots List']
+- ['projects_locations-volumes-snapshots-restore-volume-snapshot.md', 'Projects', 'Locations Volumes Snapshots Restore Volume Snapshot']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,24 @@
+site_name: Chrome Management v3.0.0+20220305
+site_url: http://byron.github.io/google-apis-rs/google-chromemanagement1-cli
+site_description: A complete library to interact with Chrome Management (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/chromemanagement1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['customers_apps-android-get.md', 'Customers', 'Apps Android Get']
+- ['customers_apps-chrome-get.md', 'Customers', 'Apps Chrome Get']
+- ['customers_apps-count-chrome-app-requests.md', 'Customers', 'Apps Count Chrome App Requests']
+- ['customers_apps-web-get.md', 'Customers', 'Apps Web Get']
+- ['customers_reports-count-chrome-versions.md', 'Customers', 'Reports Count Chrome Versions']
+- ['customers_reports-count-installed-apps.md', 'Customers', 'Reports Count Installed Apps']
+- ['customers_reports-find-installed-app-devices.md', 'Customers', 'Reports Find Installed App Devices']
+- ['customers_telemetry-devices-list.md', 'Customers', 'Telemetry Devices List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

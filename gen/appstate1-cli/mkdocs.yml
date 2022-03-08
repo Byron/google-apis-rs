@@ -1,0 +1,21 @@
+site_name: App State v3.0.0+20190627
+site_url: http://byron.github.io/google-apis-rs/google-appstate1-cli
+site_description: A complete library to interact with App State (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/appstate1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['states_clear.md', 'States', 'Clear']
+- ['states_delete.md', 'States', 'Delete']
+- ['states_get.md', 'States', 'Get']
+- ['states_list.md', 'States', 'List']
+- ['states_update.md', 'States', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

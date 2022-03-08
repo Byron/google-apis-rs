@@ -1,0 +1,42 @@
+site_name: AdSense Host v3.0.0+20200930
+site_url: http://byron.github.io/google-apis-rs/google-adsensehost4d1-cli
+site_description: A complete library to interact with AdSense Host (protocol v4.1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adsensehost4d1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_adclients-get.md', 'Accounts', 'Adclients Get']
+- ['accounts_adclients-list.md', 'Accounts', 'Adclients List']
+- ['accounts_adunits-delete.md', 'Accounts', 'Adunits Delete']
+- ['accounts_adunits-get.md', 'Accounts', 'Adunits Get']
+- ['accounts_adunits-get-ad-code.md', 'Accounts', 'Adunits Get Ad Code']
+- ['accounts_adunits-insert.md', 'Accounts', 'Adunits Insert']
+- ['accounts_adunits-list.md', 'Accounts', 'Adunits List']
+- ['accounts_adunits-patch.md', 'Accounts', 'Adunits Patch']
+- ['accounts_adunits-update.md', 'Accounts', 'Adunits Update']
+- ['accounts_get.md', 'Accounts', 'Get']
+- ['accounts_list.md', 'Accounts', 'List']
+- ['accounts_reports-generate.md', 'Accounts', 'Reports Generate']
+- ['adclients_get.md', 'Adclients', 'Get']
+- ['adclients_list.md', 'Adclients', 'List']
+- ['associationsessions_start.md', 'Associationsessions', 'Start']
+- ['associationsessions_verify.md', 'Associationsessions', 'Verify']
+- ['customchannels_delete.md', 'Customchannels', 'Delete']
+- ['customchannels_get.md', 'Customchannels', 'Get']
+- ['customchannels_insert.md', 'Customchannels', 'Insert']
+- ['customchannels_list.md', 'Customchannels', 'List']
+- ['customchannels_patch.md', 'Customchannels', 'Patch']
+- ['customchannels_update.md', 'Customchannels', 'Update']
+- ['reports_generate.md', 'Reports', 'Generate']
+- ['urlchannels_delete.md', 'Urlchannels', 'Delete']
+- ['urlchannels_insert.md', 'Urlchannels', 'Insert']
+- ['urlchannels_list.md', 'Urlchannels', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+
