@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Check - Service Control v2.0.4+20210326</title>
+  <title>Check - Service Control v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Service Control v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Service Control v3.0.0+20220227</a>
         
       </div>
 
@@ -309,7 +309,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>path=duo</code><ul>
-<li>The HTTP URL path.</li>
+<li>The HTTP URL path, excluding the query parameters.</li>
 </ul>
 </li>
 <li><code>protocol=ipsum</code><ul>
@@ -379,7 +379,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>type=sed</code><ul>
-<li>The type of the resource. The syntax is platform-specific because different platforms define their resources differently. For Google APIs, the type format must be &#34;{service}/{kind}&#34;.</li>
+<li>The type of the resource. The syntax is platform-specific because different platforms define their resources differently. For Google APIs, the type format must be &#34;{service}/{kind}&#34;, such as &#34;pubsub.googleapis.com/Topic&#34;.</li>
 </ul>
 </li>
 <li><code>uid=duo</code><ul>
@@ -395,7 +395,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..response    backend-latency=no</code></p>
 <ul>
-<li>The length of time it takes the backend service to fully respond to a request. Measured from when the destination service starts to send the request to the backend until when the destination service receives the complete response from the backend.</li>
+<li>The amount of time it takes the backend service to fully respond to a request. Measured from when the destination service starts to send the request to the backend until when the destination service receives the complete response from the backend.</li>
 </ul>
 </li>
 <li><code>code=stet</code><ul>

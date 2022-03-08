@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Clusters Node Pools Set Autoscaling - Container v2.0.4+20210314</title>
+  <title>Locations Clusters Node Pools Set Autoscaling - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -452,39 +452,39 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Can this node pool be deleted automatically.</li>
 </ul>
 </li>
-<li><code>enabled=false</code><ul>
+<li><code>enabled=true</code><ul>
 <li>Is autoscaling enabled for this node pool.</li>
 </ul>
 </li>
-<li><code>max-node-count=85</code><ul>
-<li>Maximum number of nodes in the NodePool. Must be &gt;= min_node_count. There has to enough quota to scale up the cluster.</li>
+<li><code>max-node-count=91</code><ul>
+<li>Maximum number of nodes for one location in the NodePool. Must be &gt;= min_node_count. There has to be enough quota to scale up the cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>min-node-count=31</code></p>
+<p><code>min-node-count=51</code></p>
 <ul>
-<li>Minimum number of nodes in the NodePool. Must be &gt;= 1 and &lt;= max_node_count.</li>
+<li>Minimum number of nodes for one location in the NodePool. Must be &gt;= 1 and &lt;= max_node_count.</li>
 </ul>
 </li>
 <li>
-<p><code>..    cluster-id=kasd</code></p>
+<p><code>..    cluster-id=stet</code></p>
 <ul>
 <li>Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>name=sadipscing</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>The name (project, location, cluster, node pool) of the node pool to set autoscaler settings. Specified in the format <code>projects/*/locations/*/clusters/*/nodePools/*</code>.</li>
 </ul>
 </li>
-<li><code>node-pool-id=tempor</code><ul>
+<li><code>node-pool-id=ipsum</code><ul>
 <li>Deprecated. The name of the node pool to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>project-id=sea</code><ul>
+<li><code>project-id=no</code><ul>
 <li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>zone=et</code><ul>
+<li><code>zone=sit</code><ul>
 <li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - Cloud Identity v2.0.4+20210310</title>
+  <title>Create - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -172,6 +172,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../groups_list">List</a>
                     
                 </li>
@@ -238,6 +243,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../groups_search">Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
                     
                 </li>
             
@@ -310,56 +320,56 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=voluptua.</code><ul>
+<li><code>-r .    create-time=diam</code><ul>
 <li>Output only. The time when the <code>Group</code> was created.</li>
 </ul>
 </li>
-<li><code>description=amet.</code><ul>
+<li><code>description=dolor</code><ul>
 <li>An extended description to help users determine the purpose of a <code>Group</code>. Must not be longer than 4,096 characters.</li>
 </ul>
 </li>
-<li><code>display-name=consetetur</code><ul>
+<li><code>display-name=et</code><ul>
 <li>The display name of the <code>Group</code>.</li>
 </ul>
 </li>
-<li><code>dynamic-group-metadata.status    status=diam</code><ul>
+<li><code>dynamic-group-metadata.status    status=et</code><ul>
 <li>Status of the dynamic group.</li>
 </ul>
 </li>
 <li>
-<p><code>status-time=dolor</code></p>
+<p><code>status-time=sadipscing</code></p>
 <ul>
 <li>The latest time at which the dynamic group is guaranteed to be in the given status. If status is <code>UP_TO_DATE</code>, the latest time at which the dynamic group was confirmed to be up-to-date. If status is <code>UPDATING_MEMBERSHIPS</code>, the time at which dynamic group was created.</li>
 </ul>
 </li>
 <li>
-<p><code>...group-key    id=et</code></p>
+<p><code>...group-key    id=stet</code></p>
 <ul>
 <li>The ID of the entity. For Google-managed entities, the <code>id</code> should be the email address of an existing group or user. For external-identity-mapped entities, the <code>id</code> must be a string conforming to the Identity Source&#39;s requirements. Must be unique within a <code>namespace</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>namespace=et</code></p>
+<p><code>namespace=dolor</code></p>
 <ul>
-<li>The namespace in which the entity exists. If not specified, the <code>EntityKey</code> represents a Google-managed entity such as a Google user or a Google Group. If specified, the <code>EntityKey</code> represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of `identitysources/{identity_source_id}.</li>
+<li>The namespace in which the entity exists. If not specified, the <code>EntityKey</code> represents a Google-managed entity such as a Google user or a Google Group. If specified, the <code>EntityKey</code> represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of <code>identitysources/{identity_source}</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    labels=key=sadipscing</code></p>
+<p><code>..    labels=key=duo</code></p>
 <ul>
-<li>Required. One or more label entries that apply to the Group. Currently supported labels contain a key with an empty value. Google Groups are the default type of group and have a label with a key of <code>cloudidentity.googleapis.com/groups.discussion_forum</code> and an empty value. Existing Google Groups can have an additional label with a key of <code>cloudidentity.googleapis.com/groups.security</code> and an empty value added to them. <strong>This is an immutable change and the security label cannot be removed once added.</strong> Dynamic groups have a label with a key of <code>cloudidentity.googleapis.com/groups.dynamic</code>. Identity-mapped groups for Cloud Search have a label with a key of <code>system/groups/external</code> and an empty value. Examples: {&#34;cloudidentity.googleapis.com/groups.discussion_forum&#34;: &#34;&#34;} or {&#34;system/groups/external&#34;: &#34;&#34;}.</li>
+<li>Required. One or more label entries that apply to the Group. Currently supported labels contain a key with an empty value. Google Groups are the default type of group and have a label with a key of <code>cloudidentity.googleapis.com/groups.discussion_forum</code> and an empty value. Existing Google Groups can have an additional label with a key of <code>cloudidentity.googleapis.com/groups.security</code> and an empty value added to them. <strong>This is an immutable change and the security label cannot be removed once added.</strong> Dynamic groups have a label with a key of <code>cloudidentity.googleapis.com/groups.dynamic</code>. Identity-mapped groups for Cloud Search have a label with a key of <code>system/groups/external</code> and an empty value.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=stet</code><ul>
-<li>Output only. The <a href="https://cloud.google.com/apis/design/resource_names">resource name</a> of the <code>Group</code>. Shall be of the form <code>groups/{group_id}</code>.</li>
+<li><code>name=vero</code><ul>
+<li>Output only. The <a href="https://cloud.google.com/apis/design/resource_names">resource name</a> of the <code>Group</code>. Shall be of the form <code>groups/{group}</code>.</li>
 </ul>
 </li>
-<li><code>parent=dolor</code><ul>
-<li>Required. Immutable. The resource name of the entity under which this <code>Group</code> resides in the Cloud Identity resource hierarchy. Must be of the form <code>identitysources/{identity_source_id}</code> for external- identity-mapped groups or <code>customers/{customer_id}</code> for Google Groups.</li>
+<li><code>parent=vero</code><ul>
+<li>Required. Immutable. The resource name of the entity under which this <code>Group</code> resides in the Cloud Identity resource hierarchy. Must be of the form <code>identitysources/{identity_source}</code> for external- identity-mapped groups or <code>customers/{customer}</code> for Google Groups. The <code>customer</code> must begin with &#34;C&#34; (for example, &#39;C046psxkn&#39;).</li>
 </ul>
 </li>
-<li><code>update-time=duo</code><ul>
+<li><code>update-time=invidunt</code><ul>
 <li>Output only. The time when the <code>Group</code> was last updated.</li>
 </ul>
 </li>

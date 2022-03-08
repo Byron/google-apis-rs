@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search All Iam Policies - Cloud Asset v2.0.4+20210319</title>
+  <title>Search All Iam Policies - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -82,6 +104,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../methods_analyze-iam-policy-longrunning">Analyze Iam Policy Longrunning</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
                     
                 </li>
             
@@ -132,6 +159,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
                     
                 </li>
             
@@ -200,6 +258,18 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li>
+<p><strong>-p asset-types=string</strong></p>
+<ul>
+<li>Optional. A list of asset types that the IAM policies are attached to. If empty, it will search the IAM policies that are attached to all the <a href="https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types">searchable asset types</a>. Regular expressions are also supported. For example: * &#34;compute.googleapis.com.<em>&#34; snapshots IAM policies attached to asset type starts with &#34;compute.googleapis.com&#34;. * &#34;.</em>Instance&#34; snapshots IAM policies attached to asset type ends with &#34;Instance&#34;. * &#34;.<em>Instance.</em>&#34; snapshots IAM policies attached to asset type contains &#34;Instance&#34;. See <a href="https://github.com/google/re2/wiki/Syntax">RE2</a> for all supported regular expression syntax. If the regular expression does not match any supported asset type, an INVALID_ARGUMENT error will be returned.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p order-by=string</strong></p>
+<ul>
+<li>Optional. A comma-separated list of fields specifying the sorting order of the results. The default order is ascending. Add &#34; DESC&#34; after the field name to indicate descending order. Redundant space characters are ignored. Example: &#34;assetType DESC, resource&#34;. Only singular primitive fields in the response are sortable: * resource * assetType * project All the other fields such as repeated fields (e.g., <code>folders</code>) and non-primitive fields (e.g., <code>policy</code>) are not supported.</li>
+</ul>
+</li>
+<li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
 <li>Optional. The page size for search result pagination. Page size is capped at 500 even if a larger value is given. If set to zero, server will pick an appropriate default. Returned results may be fewer than requested. When this happens, there could be more results as long as <code>next_page_token</code> is returned.</li>
@@ -214,7 +284,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p query=string</strong></p>
 <ul>
-<li>Optional. The query statement. See <a href="https://cloud.google.com/asset-inventory/docs/searching-iam-policies#how_to_construct_a_query">how to construct a query</a> for more information. If not specified or empty, it will search all the IAM policies within the specified <code>scope</code>. Note that the query string is compared against each Cloud IAM policy binding, including its members, roles, and Cloud IAM conditions. The returned Cloud IAM policies will only contain the bindings that match your query. To learn more about the IAM policy structure, see <a href="https://cloud.google.com/iam/docs/policies#structure">IAM policy doc</a>. Examples: * <code>policy:amy@gmail.com</code> to find IAM policy bindings that specify user &#34;amy@gmail.com&#34;. * <code>policy:roles/compute.admin</code> to find IAM policy bindings that specify the Compute Admin role. * <code>policy:comp*</code> to find IAM policy bindings that contain &#34;comp&#34; as a prefix of any word in the binding. * <code>policy.role.permissions:storage.buckets.update</code> to find IAM policy bindings that specify a role containing &#34;storage.buckets.update&#34; permission. Note that if callers don&#39;t have <code>iam.roles.get</code> access to a role&#39;s included permissions, policy bindings that specify this role will be dropped from the search results. * <code>policy.role.permissions:upd*</code> to find IAM policy bindings that specify a role containing &#34;upd&#34; as a prefix of any word in the role permission. Note that if callers don&#39;t have <code>iam.roles.get</code> access to a role&#39;s included permissions, policy bindings that specify this role will be dropped from the search results. * <code>resource:organizations/123456</code> to find IAM policy bindings that are set on &#34;organizations/123456&#34;. * <code>resource=//cloudresourcemanager.googleapis.com/projects/myproject</code> to find IAM policy bindings that are set on the project named &#34;myproject&#34;. * <code>Important</code> to find IAM policy bindings that contain &#34;Important&#34; as a word in any of the searchable fields (except for the included permissions). * <code>resource:(instance1 OR instance2) policy:amy</code> to find IAM policy bindings that are set on resources &#34;instance1&#34; or &#34;instance2&#34; and also specify user &#34;amy&#34;.</li>
+<li>Optional. The query statement. See <a href="https://cloud.google.com/asset-inventory/docs/searching-iam-policies#how_to_construct_a_query">how to construct a query</a> for more information. If not specified or empty, it will search all the IAM policies within the specified <code>scope</code>. Note that the query string is compared against each Cloud IAM policy binding, including its principals, roles, and Cloud IAM conditions. The returned Cloud IAM policies will only contain the bindings that match your query. To learn more about the IAM policy structure, see <a href="https://cloud.google.com/iam/docs/policies#structure">IAM policy doc</a>. Examples: * <code>policy:amy@gmail.com</code> to find IAM policy bindings that specify user &#34;amy@gmail.com&#34;. * <code>policy:roles/compute.admin</code> to find IAM policy bindings that specify the Compute Admin role. * <code>policy:comp*</code> to find IAM policy bindings that contain &#34;comp&#34; as a prefix of any word in the binding. * <code>policy.role.permissions:storage.buckets.update</code> to find IAM policy bindings that specify a role containing &#34;storage.buckets.update&#34; permission. Note that if callers don&#39;t have <code>iam.roles.get</code> access to a role&#39;s included permissions, policy bindings that specify this role will be dropped from the search results. * <code>policy.role.permissions:upd*</code> to find IAM policy bindings that specify a role containing &#34;upd&#34; as a prefix of any word in the role permission. Note that if callers don&#39;t have <code>iam.roles.get</code> access to a role&#39;s included permissions, policy bindings that specify this role will be dropped from the search results. * <code>resource:organizations/123456</code> to find IAM policy bindings that are set on &#34;organizations/123456&#34;. * <code>resource=//cloudresourcemanager.googleapis.com/projects/myproject</code> to find IAM policy bindings that are set on the project named &#34;myproject&#34;. * <code>Important</code> to find IAM policy bindings that contain &#34;Important&#34; as a word in any of the searchable fields (except for the included permissions). * <code>resource:(instance1 OR instance2) policy:amy</code> to find IAM policy bindings that are set on resources &#34;instance1&#34; or &#34;instance2&#34; and also specify user &#34;amy&#34;. * <code>roles:roles/compute.admin</code> to find IAM policy bindings that specify the Compute Admin role. * <code>memberTypes:user</code> to find IAM policy bindings that contain the principal type &#34;user&#34;.</li>
 </ul>
 </li>
 </ul>

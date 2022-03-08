@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Bigtable Admin v2.0.4+20210323</title>
+  <title>Bigtable Admin v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Bigtable Admin v2.0.4+20210323</a>
+        <a href="." class="icon icon-home"> Bigtable Admin v3.0.0+20220222</a>
         
       </div>
 
@@ -152,6 +152,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_instances-clusters-list/">Instances Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_instances-clusters-partial-update-cluster/">Instances Clusters Partial Update Cluster</a>
                     
                 </li>
             
@@ -330,7 +335,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/bigtableadmin2-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Bigtable Admin</em> API at revision <em>20210323</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Bigtable Admin</em> API at revision <em>20220222</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">bigtableadmin2 [options]
         operations
                 cancel &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -355,6 +360,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 instances-clusters-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 instances-clusters-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 instances-clusters-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                instances-clusters-partial-update-cluster &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 instances-clusters-update &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 instances-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 instances-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

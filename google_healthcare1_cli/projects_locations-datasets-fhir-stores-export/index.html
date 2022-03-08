@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Fhir Stores Export - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Fhir Stores Export - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -446,6 +446,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir--resource-validate">Locations Datasets Fhir Stores Fhir  Resource Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-fhir-capabilities">Locations Datasets Fhir Stores Fhir Capabilities</a>
                     
                 </li>
@@ -556,12 +561,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-export">Locations Datasets Hl7 V2 Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get">Locations Datasets Hl7 V2 Stores Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get-iam-policy">Locations Datasets Hl7 V2 Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-import">Locations Datasets Hl7 V2 Stores Import</a>
                     
                 </li>
             
@@ -660,6 +675,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-nlp-analyze-entities">Locations Services Nlp Analyze Entities</a>
+                    
+                </li>
+            
         
 
     
@@ -727,7 +747,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .bigquery-destination    dataset-uri=stet</code><ul>
+<li><code>-r .bigquery-destination    dataset-uri=takimata</code><ul>
 <li>BigQuery URI to an existing dataset, up to 2000 characters long, in the format <code>bq://projectId.bqDatasetId</code>.</li>
 </ul>
 </li>
@@ -735,24 +755,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>If this flag is <code>TRUE</code>, all tables are deleted from the dataset before the new exported tables are written. If the flag is not set and the destination dataset contains tables, the export call returns an error. If <code>write_disposition</code> is specified, this parameter is ignored. force=false is equivalent to write_disposition=WRITE_EMPTY and force=true is equivalent to write_disposition=WRITE_TRUNCATE.</li>
 </ul>
 </li>
-<li><code>schema-config    recursive-structure-depth=sea</code><ul>
+<li><code>schema-config    recursive-structure-depth=et</code><ul>
 <li>The depth for all recursive structures in the output analytics schema. For example, <code>concept</code> in the CodeSystem resource is a recursive structure; when the depth is 2, the CodeSystem table will have a column called <code>concept.concept</code> but not <code>concept.concept.concept</code>. If not specified or set to 0, the server will use the default value 2. The maximum depth allowed is 5.</li>
 </ul>
 </li>
 <li>
-<p><code>schema-type=et</code></p>
+<p><code>schema-type=at</code></p>
 <ul>
 <li>Specifies the output schema type. Schema type is required.</li>
 </ul>
 </li>
 <li>
-<p><code>..    write-disposition=at</code></p>
+<p><code>..    write-disposition=dolor</code></p>
 <ul>
-<li>Determines whether existing tables in the destination dataset are overwritten or appended to. If a write_disposition is specified, the <code>force</code> parameter is ignored.</li>
+<li>Determines if existing data in the destination dataset is overwritten, appended to, or not written if the tables contain data. If a write_disposition is specified, the <code>force</code> parameter is ignored.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-destination    uri-prefix=dolore</code></p>
+<p><code>..gcs-destination    uri-prefix=et</code></p>
 <ul>
 <li>URI for a Cloud Storage directory where result files should be written, in the format of <code>gs://{bucket-id}/{path/to/destination/dir}</code>. If there is no trailing slash, the service appends one when composing the object path. The user is responsible for creating the Cloud Storage bucket referenced in <code>uri_prefix</code>.</li>
 </ul>

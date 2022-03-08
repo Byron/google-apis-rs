@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Secrets List - Secret Manager v2.0.4+20210319</title>
+  <title>Secrets List - Secret Manager v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Secret Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Secret Manager v3.0.0+20220226</a>
         
       </div>
 
@@ -212,6 +212,12 @@ You can set the scope for this method like this: <code>secretmanager1 --scope &l
 or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
 <code>-p</code> for completeness.</p>
 <ul>
+<li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li>Optional. Filter string, adhering to the rules in <a href="https://cloud.google.com/secret-manager/docs/filtering">List-operation filtering</a>. List only secrets matching the filter. If filter is empty, all secrets are listed.</li>
+</ul>
+</li>
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Fhir Stores Import - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Fhir Stores Import - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -425,6 +425,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir--resource-validate">Locations Datasets Fhir Stores Fhir  Resource Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-fhir-capabilities">Locations Datasets Fhir Stores Fhir Capabilities</a>
                     
                 </li>
@@ -556,12 +561,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-export">Locations Datasets Hl7 V2 Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get">Locations Datasets Hl7 V2 Stores Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get-iam-policy">Locations Datasets Hl7 V2 Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-import">Locations Datasets Hl7 V2 Stores Import</a>
                     
                 </li>
             
@@ -660,6 +675,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-nlp-analyze-entities">Locations Services Nlp Analyze Entities</a>
+                    
+                </li>
+            
         
 
     
@@ -721,11 +741,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    content-structure=lorem</code><ul>
+<li><code>-r .    content-structure=at</code><ul>
 <li>The content structure in the source location. If not specified, the server treats the input source files as BUNDLE.</li>
 </ul>
 </li>
-<li><code>gcs-source    uri=et</code><ul>
+<li><code>gcs-source    uri=dolores</code><ul>
 <li>Points to a Cloud Storage URI containing file(s) to import. The URI must be in the following format: <code>gs://{bucket_id}/{object_id}</code>. The URI can include wildcards in <code>object_id</code> and thus identify multiple files. Supported wildcards: * <code>*</code> to match 0 or more non-separator characters * <code>**</code> to match 0 or more characters (including separators). Must be used at the end of a path and with no other wildcards in the path. Can also be used with a file extension (such as .ndjson), which imports all files with the extension in the specified directory and its sub-directories. For example, <code>gs://my-bucket/my-directory/**.ndjson</code> imports all files with <code>.ndjson</code> extensions in <code>my-directory/</code> and its sub-directories. * <code>?</code> to match 1 character Files matching the wildcard are expected to contain content only, no metadata.</li>
 </ul>
 </li>

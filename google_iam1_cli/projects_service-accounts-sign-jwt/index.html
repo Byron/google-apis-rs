@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Service Accounts Sign Jwt - Iam v2.0.4+20210325</title>
+  <title>Service Accounts Sign Jwt - Iam v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Iam v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Iam v3.0.0+20220224</a>
         
       </div>
 
@@ -51,6 +51,27 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../iam-policies_query-auditable-services">Query Auditable Services</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-operations-get">Workforce Pools Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-providers-operations-get">Workforce Pools Providers Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-subjects-operations-get">Workforce Pools Subjects Operations Get</a>
                     
                 </li>
             
@@ -153,6 +174,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workload-identity-pools-providers-keys-operations-get">Locations Workload Identity Pools Providers Keys Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-workload-identity-pools-providers-list">Locations Workload Identity Pools Providers List</a>
                     
                 </li>
@@ -244,6 +270,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_service-accounts-keys-delete">Service Accounts Keys Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-disable">Service Accounts Keys Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-enable">Service Accounts Keys Enable</a>
                     
                 </li>
             
@@ -404,7 +440,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    payload=est</code><ul>
-<li>Required. Deprecated. <a href="https://cloud.google.com/iam/help/credentials/migrate-api">Migrate to Service Account Credentials API</a>. The JWT payload to sign. Must be a serialized JSON object that contains a JWT Claims Set. For example: <code>{&amp;#34;sub&amp;#34;: &amp;#34;user@example.com&amp;#34;, &amp;#34;iat&amp;#34;: 313435}</code> If the JWT Claims Set contains an expiration time (<code>exp</code>) claim, it must be an integer timestamp that is not in the past and no more than 1 hour in the future. If the JWT Claims Set does not contain an expiration time (<code>exp</code>) claim, this claim is added automatically, with a timestamp that is 1 hour in the future.</li>
+<li>Required. Deprecated. <a href="https://cloud.google.com/iam/help/credentials/migrate-api">Migrate to Service Account Credentials API</a>. The JWT payload to sign. Must be a serialized JSON object that contains a JWT Claims Set. For example: <code>{&amp;#34;sub&amp;#34;: &amp;#34;user@example.com&amp;#34;, &amp;#34;iat&amp;#34;: 313435}</code> If the JWT Claims Set contains an expiration time (<code>exp</code>) claim, it must be an integer timestamp that is not in the past and no more than 12 hours in the future. If the JWT Claims Set does not contain an expiration time (<code>exp</code>) claim, this claim is added automatically, with a timestamp that is 1 hour in the future.</li>
 </ul>
 </li>
 </ul>

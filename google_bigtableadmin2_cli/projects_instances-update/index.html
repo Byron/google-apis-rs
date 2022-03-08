@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Instances Update - Bigtable Admin v2.0.4+20210323</title>
+  <title>Instances Update - Bigtable Admin v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Bigtable Admin v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Bigtable Admin v3.0.0+20220222</a>
         
       </div>
 
@@ -152,6 +152,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_instances-clusters-list">Instances Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-clusters-partial-update-cluster">Instances Clusters Partial Update Cluster</a>
                     
                 </li>
             
@@ -357,6 +362,7 @@ You can set the scope for this method like this: <code>bigtableadmin2 --scope &l
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>Instance:
+  create-time: string
   display-name: string
   labels: { string: string }
   name: string
@@ -367,7 +373,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    display-name=gubergren</code><ul>
+<li><code>-r .    create-time=aliquyam</code><ul>
+<li>Output only. A server-assigned timestamp representing when this Instance was created. For instances created before this field was added (August 2021), this value is <code>seconds: 0, nanos: 1</code>.</li>
+</ul>
+</li>
+<li><code>display-name=ipsum</code><ul>
 <li>Required. The descriptive name for this instance as it appears in UIs. Can be changed at any time, but should be kept globally unique to avoid confusion.</li>
 </ul>
 </li>
@@ -376,15 +386,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=accusam</code><ul>
+<li><code>name=sanctus</code><ul>
 <li>The unique name of the instance. Values are of the form <code>projects/{project}/instances/a-z+[a-z0-9]</code>.</li>
 </ul>
 </li>
-<li><code>state=voluptua.</code><ul>
+<li><code>state=lorem</code><ul>
 <li>Output only. The current state of the instance.</li>
 </ul>
 </li>
-<li><code>type=dolore</code><ul>
+<li><code>type=est</code><ul>
 <li>Required. The type of the instance. Defaults to <code>PRODUCTION</code>.</li>
 </ul>
 </li>

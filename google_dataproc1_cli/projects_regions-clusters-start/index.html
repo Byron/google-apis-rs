@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Regions Clusters Start - Dataproc v2.0.4+20210322</title>
+  <title>Regions Clusters Start - Dataproc v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Dataproc v3.0.0+20220224</a>
         
       </div>
 
@@ -81,6 +81,26 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-autoscaling-policies-update">Locations Autoscaling Policies Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-create">Locations Batches Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-delete">Locations Batches Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-get">Locations Batches Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-list">Locations Batches List</a>
                     
                 </li>
             
@@ -211,6 +231,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_regions-clusters-patch">Regions Clusters Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-repair">Regions Clusters Repair</a>
                     
                 </li>
             
@@ -458,12 +483,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    cluster-uuid=lorem</code><ul>
+<li><code>-r .    cluster-uuid=consetetur</code><ul>
 <li>Optional. Specifying the cluster_uuid means the RPC will fail (with error NOT_FOUND) if a cluster with the specified UUID does not exist.</li>
 </ul>
 </li>
-<li><code>request-id=amet.</code><ul>
-<li>Optional. A unique id used to identify the request. If the server receives two StartClusterRequest (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.StartClusterRequest)s with the same id, then the second request will be ignored and the first google.longrunning.Operation created and stored in the backend is returned.Recommendation: Set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.</li>
+<li><code>request-id=amet</code><ul>
+<li>Optional. A unique ID used to identify the request. If the server receives two StartClusterRequest (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.StartClusterRequest)s with the same id, then the second request will be ignored and the first google.longrunning.Operation created and stored in the backend is returned.Recommendation: Set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.</li>
 </ul>
 </li>
 </ul>

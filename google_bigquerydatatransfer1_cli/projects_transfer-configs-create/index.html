@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Transfer Configs Create - BigQuery Data Transfer v2.0.4+20210324</title>
+  <title>Transfer Configs Create - BigQuery Data Transfer v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Data Transfer v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Data Transfer v3.0.0+20220225</a>
         
       </div>
 
@@ -60,6 +60,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_enroll-data-sources">Enroll Data Sources</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-data-sources-check-valid-creds">Locations Data Sources Check Valid Creds</a>
                     
                 </li>
@@ -71,6 +76,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-data-sources-list">Locations Data Sources List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-enroll-data-sources">Locations Enroll Data Sources</a>
                     
                 </li>
             
@@ -282,6 +292,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   name: string
   next-run-time: string
   notification-pubsub-topic: string
+  owner-info:
+    email: string
   schedule: string
   schedule-options:
     disable-auto-scheduling: boolean
@@ -295,19 +307,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    data-refresh-window-days=58</code><ul>
+<li><code>-r .    data-refresh-window-days=25</code><ul>
 <li>The number of days to look back to automatically refresh the data. For example, if <code>data_refresh_window_days = 10</code>, then every day BigQuery reingests data for [today-10, today-1], rather than ingesting data for just [today-1]. Only valid if the data source supports the feature. Set the value to 0 to use the default value.</li>
 </ul>
 </li>
-<li><code>data-source-id=et</code><ul>
+<li><code>data-source-id=erat</code><ul>
 <li>Data source id. Cannot be changed once data transfer is created.</li>
 </ul>
 </li>
-<li><code>dataset-region=et</code><ul>
+<li><code>dataset-region=sed</code><ul>
 <li>Output only. Region in which BigQuery dataset is located.</li>
 </ul>
 </li>
-<li><code>destination-dataset-id=vero</code><ul>
+<li><code>destination-dataset-id=duo</code><ul>
 <li>The BigQuery target dataset id.</li>
 </ul>
 </li>
@@ -315,50 +327,58 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Is this config disabled. When set to true, no runs are scheduled for a given transfer.</li>
 </ul>
 </li>
-<li><code>display-name=duo</code><ul>
+<li><code>display-name=diam</code><ul>
 <li>User specified display name for the data transfer.</li>
 </ul>
 </li>
 <li>
-<p><code>email-preferences    enable-failure-email=false</code></p>
+<p><code>email-preferences    enable-failure-email=true</code></p>
 <ul>
 <li>If true, email notifications will be sent on transfer run failures.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=diam</code></p>
+<p><code>..    name=et</code></p>
 <ul>
 <li>The resource name of the transfer config. Transfer config names have the form <code>projects/{project_id}/locations/{region}/transferConfigs/{config_id}</code>. Where <code>config_id</code> is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config.</li>
 </ul>
 </li>
-<li><code>next-run-time=dolor</code><ul>
+<li><code>next-run-time=et</code><ul>
 <li>Output only. Next time when data transfer will run.</li>
 </ul>
 </li>
-<li><code>notification-pubsub-topic=et</code><ul>
-<li>Pub/Sub topic where notifications will be sent after transfer runs associated with this transfer config finish.</li>
+<li><code>notification-pubsub-topic=sadipscing</code><ul>
+<li>Pub/Sub topic where notifications will be sent after transfer runs associated with this transfer config finish. The format for specifying a pubsub topic is: <code>projects/{project}/topics/{topic}</code></li>
 </ul>
 </li>
-<li><code>schedule=et</code><ul>
-<li>Data transfer schedule. If the data source does not support a custom schedule, this should be empty. If it is empty, the default value for the data source will be used. The specified times are in UTC. Examples of valid format: <code>1st,3rd monday of month 15:30</code>, <code>every wed,fri of jan,jun 13:15</code>, and <code>first sunday of quarter 00:00</code>. See more explanation about the format here: https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format NOTE: the granularity should be at least 8 hours, or less frequent.</li>
+<li>
+<p><code>owner-info    email=stet</code></p>
+<ul>
+<li>E-mail address of the user.</li>
+</ul>
+</li>
+<li>
+<p><code>..    schedule=dolor</code></p>
+<ul>
+<li>Data transfer schedule. If the data source does not support a custom schedule, this should be empty. If it is empty, the default value for the data source will be used. The specified times are in UTC. Examples of valid format: <code>1st,3rd monday of month 15:30</code>, <code>every wed,fri of jan,jun 13:15</code>, and <code>first sunday of quarter 00:00</code>. See more explanation about the format here: https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format NOTE: The minimum interval time between recurring transfers depends on the data source; refer to the documentation for your data source.</li>
 </ul>
 </li>
 <li><code>schedule-options    disable-auto-scheduling=false</code><ul>
 <li>If true, automatic scheduling of data transfer runs for this configuration will be disabled. The runs can be started on ad-hoc basis using StartManualTransferRuns API. When automatic scheduling is disabled, the TransferConfig.schedule field will be ignored.</li>
 </ul>
 </li>
-<li><code>end-time=stet</code><ul>
+<li><code>end-time=vero</code><ul>
 <li>Defines time to stop scheduling transfer runs. A transfer run cannot be scheduled at or after the end time. The end time can be changed at any moment. The time when a data transfer can be trigerred manually is not limited by this option.</li>
 </ul>
 </li>
 <li>
-<p><code>start-time=dolor</code></p>
+<p><code>start-time=invidunt</code></p>
 <ul>
 <li>Specifies time to start scheduling transfer runs. The first run will be scheduled at or after the start time according to a recurrence pattern defined in the schedule string. The start time can be changed at any moment. The time when a data transfer can be trigerred manually is not limited by this option.</li>
 </ul>
 </li>
 <li>
-<p><code>..    state=duo</code></p>
+<p><code>..    state=stet</code></p>
 <ul>
 <li>Output only. State of the most recently updated transfer run.</li>
 </ul>
@@ -367,7 +387,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. Data transfer modification time. Ignored by server on input.</li>
 </ul>
 </li>
-<li><code>user-id=vero</code><ul>
+<li><code>user-id=elitr</code><ul>
 <li>Deprecated. Unique ID of the user on whose behalf transfer is done.</li>
 </ul>
 </li>
@@ -399,19 +419,19 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p authorization-code=string</strong></p>
 <ul>
-<li>Optional OAuth2 authorization code to use with this transfer configuration. This is required if new credentials are needed, as indicated by <code>CheckValidCreds</code>. In order to obtain authorization_code, please make a request to https://www.gstatic.com/bigquerydatatransfer/oauthz/auth?client_id=&amp;scope=&amp;redirect_uri= * client_id should be OAuth client_id of BigQuery DTS API for the given data source returned by ListDataSources method. * data_source_scopes are the scopes returned by ListDataSources method. * redirect_uri is an optional parameter. If not specified, then authorization code is posted to the opener of authorization flow window. Otherwise it will be sent to the redirect uri. A special value of urn:ietf:wg:oauth:2.0:oob means that authorization code should be returned in the title bar of the browser, with the page text prompting the user to copy the code and paste it in the application.</li>
+<li>Optional OAuth2 authorization code to use with this transfer configuration. This is required only if <code>transferConfig.dataSourceId</code> is &#39;youtube_channel&#39; and new credentials are needed, as indicated by <code>CheckValidCreds</code>. In order to obtain authorization_code, please make a request to https://www.gstatic.com/bigquerydatatransfer/oauthz/auth?client_id=&amp;scope=&amp;redirect_uri=urn:ietf:wg:oauth:2.0:oob&amp;response_type=authorization_code * client_id should be OAuth client_id of BigQuery DTS API for the given data source returned by ListDataSources method. * data_source_scopes are the scopes returned by ListDataSources method. Note that this should not be set when <code>service_account_name</code> is used to create the transfer config.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p service-account-name=string</strong></p>
 <ul>
-<li>Optional service account name. If this field is set, transfer config will be created with this service account credentials. It requires that requesting user calling this API has permissions to act as this service account.</li>
+<li>Optional service account name. If this field is set, transfer config will be created with this service account credential. It requires that requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating transfer config. Please refer to this public guide for the latest list of data sources with service account support: https://cloud.google.com/bigquery-transfer/docs/use-service-accounts</li>
 </ul>
 </li>
 <li>
 <p><strong>-p version-info=string</strong></p>
 <ul>
-<li>Optional version info. If users want to find a very recent access token, that is, immediately after approving access, users have to set the version_info claim in the token request. To obtain the version_info, users must use the &#34;none+gsession&#34; response type. which be return a version_info back in the authorization response which be be put in a JWT claim in the token request.</li>
+<li>Optional version info. This is required only if <code>transferConfig.dataSourceId</code> is anything else but &#39;youtube_channel&#39; and new credentials are needed, as indicated by <code>CheckValidCreds</code>. In order to obtain version info, please make a request to https://www.gstatic.com/bigquerydatatransfer/oauthz/auth?client_id=&amp;scope=&amp;redirect_uri=urn:ietf:wg:oauth:2.0:oob&amp;response_type=version_info * client_id should be OAuth client_id of BigQuery DTS API for the given data source returned by ListDataSources method. * data_source_scopes are the scopes returned by ListDataSources method. Note that this should not be set when <code>service_account_name</code> is used to create the transfer config.</li>
 </ul>
 </li>
 </ul>

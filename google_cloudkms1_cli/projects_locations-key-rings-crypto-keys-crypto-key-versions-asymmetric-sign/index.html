@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Sign - Cloud KMS v2.0.4+20210318</title>
+  <title>Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Sign - Cloud KMS v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud KMS v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Cloud KMS v3.0.0+20220225</a>
         
       </div>
 
@@ -43,6 +43,46 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-create">Locations Ekm Connections Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get">Locations Ekm Connections Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get-iam-policy">Locations Ekm Connections Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-list">Locations Ekm Connections List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-patch">Locations Ekm Connections Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-set-iam-policy">Locations Ekm Connections Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-test-iam-permissions">Locations Ekm Connections Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-generate-random-bytes">Locations Generate Random Bytes</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -117,6 +157,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list">Locations Key Rings Crypto Keys Crypto Key Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign">Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify">Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify</a>
                     
                 </li>
             
@@ -292,6 +342,8 @@ You can set the scope for this method like this: <code>cloudkms1 --scope &lt;sco
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>AsymmetricSignRequest:
+  data: string
+  data-crc32c: string
   digest:
     sha256: string
     sha384: string
@@ -302,24 +354,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .digest    sha256=ipsum</code><ul>
+<li><code>-r .    data=vero</code><ul>
+<li>Optional. The data to sign. It can&#39;t be supplied if AsymmetricSignRequest.digest is supplied.</li>
+</ul>
+</li>
+<li><code>data-crc32c=erat</code><ul>
+<li>Optional. An optional CRC32C checksum of the AsymmetricSignRequest.data. If specified, KeyManagementService will verify the integrity of the received AsymmetricSignRequest.data using this checksum. KeyManagementService will report an error if the checksum verification fails. If you receive a checksum error, your client should verify that CRC32C(AsymmetricSignRequest.data) is equal to AsymmetricSignRequest.data_crc32c, and if so, perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type.</li>
+</ul>
+</li>
+<li><code>digest    sha256=sed</code><ul>
 <li>A message digest produced with the SHA-256 algorithm.</li>
 </ul>
 </li>
-<li><code>sha384=ipsum</code><ul>
+<li><code>sha384=duo</code><ul>
 <li>A message digest produced with the SHA-384 algorithm.</li>
 </ul>
 </li>
 <li>
-<p><code>sha512=est</code></p>
+<p><code>sha512=dolore</code></p>
 <ul>
 <li>A message digest produced with the SHA-512 algorithm.</li>
 </ul>
 </li>
 <li>
-<p><code>..    digest-crc32c=gubergren</code></p>
+<p><code>..    digest-crc32c=et</code></p>
 <ul>
-<li>Optional. An optional CRC32C checksum of the AsymmetricSignRequest.digest. If specified, KeyManagementService will verify the integrity of the received AsymmetricSignRequest.digest using this checksum. KeyManagementService will report an error if the checksum verification fails. If you receive a checksum error, your client should verify that CRC32C(AsymmetricSignRequest.digest) is equal to AsymmetricSignRequest.digest_crc32c, and if so, perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type. NOTE: This field is in Beta.</li>
+<li>Optional. An optional CRC32C checksum of the AsymmetricSignRequest.digest. If specified, KeyManagementService will verify the integrity of the received AsymmetricSignRequest.digest using this checksum. KeyManagementService will report an error if the checksum verification fails. If you receive a checksum error, your client should verify that CRC32C(AsymmetricSignRequest.digest) is equal to AsymmetricSignRequest.digest_crc32c, and if so, perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type.</li>
 </ul>
 </li>
 </ul>

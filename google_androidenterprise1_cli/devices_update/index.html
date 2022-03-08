@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - Android Enterprise v2.0.4+20210324</title>
+  <title>Update - Android Enterprise v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Enterprise v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> Android Enterprise v3.0.0+20220303</a>
         
       </div>
 
@@ -569,7 +569,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Updates the device policy. To ensure the policy is properly enforced, you need to prevent unmanaged accounts from accessing Google Play by setting the allowed_accounts in the managed configuration for the Google Play package. See restrict accounts in Google Play.</p>
+              <p>Updates the device policy. To ensure the policy is properly enforced, you need to prevent unmanaged accounts from accessing Google Play by setting the allowed_accounts in the managed configuration for the Google Play package. See restrict accounts in Google Play. When provisioning a new device, you should set the device policy using this method before adding the managed Google Play Account to the device, otherwise the policy will not be applied for a short period of time after adding the account to the device.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/androidenterprise</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/androidenterprise</em>.
@@ -619,7 +619,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>policy    auto-update-policy=ipsum</code><ul>
-<li>The auto-update policy for apps installed on the device. &#34;choiceToTheUser&#34; allows the device&#39;s user to configure the app update policy. &#34;always&#34; enables auto updates. &#34;never&#34; disables auto updates. &#34;wifiOnly&#34; enables auto updates only when the device is connected to wifi.</li>
+<li>Deprecated. Use autoUpdateMode instead. When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect. &#34;choiceToTheUser&#34; allows the device&#39;s user to configure the app update policy. &#34;always&#34; enables auto updates. &#34;never&#34; disables auto updates. &#34;wifiOnly&#34; enables auto updates only when the device is connected to wifi.</li>
 </ul>
 </li>
 <li><code>device-report-policy=voluptua.</code><ul>

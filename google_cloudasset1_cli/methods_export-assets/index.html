@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Export Assets - Cloud Asset v2.0.4+20210319</title>
+  <title>Export Assets - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -82,6 +104,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../methods_analyze-iam-policy-longrunning">Analyze Iam Policy Longrunning</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
                     
                 </li>
             
@@ -140,6 +167,37 @@
         
 
     
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -173,7 +231,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Exports assets with time and resource types to a given Cloud Storage location/BigQuery table. For Cloud Storage location destinations, the output format is newline-delimited JSON. Each line represents a google.cloud.asset.v1.Asset in the JSON format; for BigQuery table destinations, the output table stores the fields in asset proto as columns. This API implements the google.longrunning.Operation API , which allows you to keep track of the export. We recommend intervals of at least 2 seconds with exponential retry to poll the export operation result. For regular-size resource parent, the export operation usually finishes within 5 minutes.</p>
+              <p>Exports assets with time and resource types to a given Cloud Storage location/BigQuery table. For Cloud Storage location destinations, the output format is newline-delimited JSON. Each line represents a google.cloud.asset.v1.Asset in the JSON format; for BigQuery table destinations, the output table stores the fields in asset Protobuf as columns. This API implements the google.longrunning.Operation API, which allows you to keep track of the export. We recommend intervals of at least 2 seconds with exponential retry to poll the export operation result. For regular-size resource parent, the export operation usually finishes within 5 minutes.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -204,22 +262,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       uri: string
       uri-prefix: string
   read-time: string
+  relationship-types: [string]
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    asset-types=sed</code><ul>
+<li><code>-r .    asset-types=et</code><ul>
 <li>A list of asset types to take a snapshot for. For example: &#34;compute.googleapis.com/Disk&#34;. Regular expressions are also supported. For example: * &#34;compute.googleapis.com.<em>&#34; snapshots resources whose asset type starts with &#34;compute.googleapis.com&#34;. * &#34;.</em>Instance&#34; snapshots resources whose asset type ends with &#34;Instance&#34;. * &#34;.<em>Instance.</em>&#34; snapshots resources whose asset type contains &#34;Instance&#34;. See <a href="https://github.com/google/re2/wiki/Syntax">RE2</a> for all supported regular expression syntax. If the regular expression does not match any supported asset type, an INVALID_ARGUMENT error will be returned. If specified, only matching assets will be returned, otherwise, it will snapshot all asset types. See <a href="https://cloud.google.com/asset-inventory/docs/overview">Introduction to Cloud Asset Inventory</a> for all supported asset types.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>content-type=no</code><ul>
+<li><code>content-type=sed</code><ul>
 <li>Asset content type. If not specified, no content but the asset name will be returned.</li>
 </ul>
 </li>
-<li><code>output-config.bigquery-destination    dataset=stet</code><ul>
-<li>Required. The BigQuery dataset in format &#34;projects/projectId/datasets/datasetId&#34;, to which the snapshot result should be exported. If this dataset does not exist, the export call returns an INVALID_ARGUMENT error.</li>
+<li><code>output-config.bigquery-destination    dataset=et</code><ul>
+<li>Required. The BigQuery dataset in format &#34;projects/projectId/datasets/datasetId&#34;, to which the snapshot result should be exported. If this dataset does not exist, the export call returns an INVALID_ARGUMENT error. Setting the <code>contentType</code> for <code>exportAssets</code> determines the <a href="..//asset-inventory/docs/exporting-to-bigquery#bigquery-schema">schema</a> of the BigQuery table. Setting <code>separateTablesPerAssetType</code> to <code>TRUE</code> also influences the schema.</li>
 </ul>
 </li>
 <li><code>force=true</code><ul>
@@ -227,39 +286,44 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>partition-spec    partition-key=et</code></p>
+<p><code>partition-spec    partition-key=vero</code></p>
 <ul>
 <li>The partition key for BigQuery partitioned table.</li>
 </ul>
 </li>
 <li>
-<p><code>..    separate-tables-per-asset-type=true</code></p>
+<p><code>..    separate-tables-per-asset-type=false</code></p>
 <ul>
 <li>If this flag is <code>TRUE</code>, the snapshot results will be written to one or multiple tables, each of which contains results of one asset type. The [force] and [partition_spec] fields will apply to each of them. Field [table] will be concatenated with &#34;<em>&#34; and the asset type names (see https://cloud.google.com/asset-inventory/docs/supported-asset-types for supported asset types) to construct per-asset-type table names, in which all non-alphanumeric characters like &#34;.&#34; and &#34;/&#34; will be substituted by &#34;</em>&#34;. Example: if field [table] is &#34;mytable&#34; and snapshot results contain &#34;storage.googleapis.com/Bucket&#34; assets, the corresponding table name will be &#34;mytable_storage_googleapis_com_Bucket&#34;. If any of these tables does not exist, a new table with the concatenated name will be created. When [content_type] in the ExportAssetsRequest is <code>RESOURCE</code>, the schema of each table will include RECORD-type columns mapped to the nested fields in the Asset.resource.data field of that asset type (up to the 15 nested level BigQuery supports (https://cloud.google.com/bigquery/docs/nested-repeated#limitations)). The fields in &gt;15 nested levels will be stored in JSON format string as a child column of its parent RECORD column. If error occurs when exporting to any table, the whole export call will return an error but the export results that already succeed will persist. Example: if exporting to table_type_A succeeds when exporting to table_type_B fails during one export call, the results in table_type_A will persist and there will not be partial results persisting in a table.</li>
 </ul>
 </li>
 <li>
-<p><code>table=vero</code></p>
+<p><code>table=duo</code></p>
 <ul>
 <li>Required. The BigQuery table to which the snapshot result should be written. If this table does not exist, a new table with the given name will be created.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-destination    uri=erat</code></p>
+<p><code>..gcs-destination    uri=dolore</code></p>
 <ul>
 <li>The uri of the Cloud Storage object. It&#39;s the same uri that is used by gsutil. Example: &#34;gs://bucket_name/object_name&#34;. See <a href="https://cloud.google.com/storage/docs/viewing-editing-metadata">Viewing and Editing Object Metadata</a> for more information. If the specified Cloud Storage object already exists and there is no <a href="https://cloud.google.com/storage/docs/object-holds">hold</a>, it will be overwritten with the exported result.</li>
 </ul>
 </li>
 <li>
-<p><code>uri-prefix=sed</code></p>
+<p><code>uri-prefix=et</code></p>
 <ul>
 <li>The uri prefix of all generated Cloud Storage objects. Example: &#34;gs://bucket_name/object_name_prefix&#34;. Each object uri is in format: &#34;gs://bucket_name/object_name_prefix// and only contains assets for that type. starts from 0. Example: &#34;gs://bucket_name/object_name_prefix/compute.googleapis.com/Disk/0&#34; is the first shard of output objects containing all compute.googleapis.com/Disk assets. An INVALID_ARGUMENT error will be returned if file with the same name &#34;gs://bucket_name/object_name_prefix&#34; already exists.</li>
 </ul>
 </li>
 <li>
-<p><code>...    read-time=duo</code></p>
+<p><code>...    read-time=voluptua.</code></p>
 <ul>
 <li>Timestamp to take an asset snapshot. This can only be set to a timestamp between the current time and the current time minus 35 days (inclusive). If not specified, the current time will be used. Due to delays in resource data collection and indexing, there is a volatile window during which running the same query may get different results.</li>
+</ul>
+</li>
+<li><code>relationship-types=amet.</code><ul>
+<li>A list of relationship types to export, for example: <code>INSTANCE_TO_INSTANCEGROUP</code>. This field should only be specified if content_type=RELATIONSHIP. * If specified: it snapshots specified relationships. It returns an error if any of the [relationship_types] doesn&#39;t belong to the supported relationship types of the [asset_types] or if any of the [asset_types] doesn&#39;t belong to the source types of the [relationship_types]. * Otherwise: it snapshots the supported relationships for all [asset_types] or returns an error if any of the [asset_types] has no relationship support. An unspecified asset types field means all supported asset_types. See <a href="https://cloud.google.com/asset-inventory/docs/overview">Introduction to Cloud Asset Inventory</a> for all supported asset types and relationship types.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Targeting Types Assigned Targeting Options Create - Display Video v2.0.4+20210325</title>
+  <title>Targeting Types Assigned Targeting Options Create - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -483,12 +493,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -515,12 +555,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -631,6 +686,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -841,7 +901,7 @@ You can set the scope for this method like this: <code>displayvideo1 --scope &lt
 </ul>
 </li>
 <li><strong>&lt;targeting-type&gt;</strong> <em>(string)</em><ul>
-<li>Required. Identifies the type of this assigned targeting option. Supported targeting types: * <code>TARGETING_TYPE_CHANNEL</code> * <code>TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION</code> * <code>TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION</code></li>
+<li>Required. Identifies the type of this assigned targeting option. Supported targeting types: * <code>TARGETING_TYPE_CHANNEL</code> * <code>TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION</code> * <code>TARGETING_TYPE_OMID</code> * <code>TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION</code></li>
 </ul>
 </li>
 </ul>
@@ -863,12 +923,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     display-name: string
     negative: boolean
   assigned-targeting-option-id: string
+  audio-content-type-details:
+    audio-content-type: string
+    targeting-option-id: string
   authorized-seller-status-details:
     authorized-seller-status: string
     targeting-option-id: string
   browser-details:
     display-name: string
     negative: boolean
+    targeting-option-id: string
+  business-chain-details:
+    display-name: string
+    proximity-radius-amount: number
+    proximity-radius-unit: string
     targeting-option-id: string
   carrier-and-isp-details:
     display-name: string
@@ -933,8 +1001,14 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     negative: boolean
     targeting-option-id: string
   name: string
+  native-content-position-details:
+    content-position: string
+    targeting-option-id: string
   negative-keyword-list-details:
     negative-keyword-list-id: string
+  omid-details:
+    omid: string
+    targeting-option-id: string
   on-screen-position-details:
     ad-type: string
     on-screen-position: string
@@ -945,6 +1019,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     targeting-option-id: string
   parental-status-details:
     parental-status: string
+    targeting-option-id: string
+  poi-details:
+    display-name: string
+    latitude: number
+    longitude: number
+    proximity-radius-amount: number
+    proximity-radius-unit: string
     targeting-option-id: string
   proximity-location-list-details:
     proximity-location-list-id: string
@@ -1013,18 +1094,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .age-range-details    age-range=dolore</code><ul>
-<li>Output only. The age range of an audience. We only support targeting a continuous age range of an audience. Thus, the age range represented in this field can be 1) targeted solely, or, 2) part of a larger continuous age range. The reach of a continuous age range targeting can be expanded by also targeting an audience of an unknown age.</li>
+<li><code>-r .age-range-details    age-range=gubergren</code><ul>
+<li>The age range of an audience. We only support targeting a continuous age range of an audience. Thus, the age range represented in this field can be 1) targeted solely, or, 2) part of a larger continuous age range. The reach of a continuous age range targeting can be expanded by also targeting an audience of an unknown age. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=dolores</code></p>
+<p><code>targeting-option-id=sed</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_AGE_RANGE</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..app-category-details    display-name=invidunt</code></p>
+<p><code>..app-category-details    display-name=no</code></p>
 <ul>
 <li>Output only. The display name of the app category.</li>
 </ul>
@@ -1034,13 +1115,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=et</code></p>
+<p><code>targeting-option-id=est</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_APP_CATEGORY</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..app-details    app-id=voluptua.</code></p>
+<p><code>..app-details    app-id=elitr</code></p>
 <ul>
 <li>Required. The ID of the app. Android&#39;s Play store app uses bundle ID, for example <code>com.google.android.gm</code>. Apple&#39;s App store app ID uses 9 digit string, for example <code>422689480</code>.</li>
 </ul>
@@ -1049,50 +1130,82 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Indicates the platform of the targeted app. If this field is not specified, the app platform will be assumed to be mobile (i.e., Android or iOS), and we will derive the appropriate mobile platform from the app ID.</li>
 </ul>
 </li>
-<li><code>display-name=est</code><ul>
+<li><code>display-name=consetetur</code><ul>
 <li>Output only. The display name of the app.</li>
 </ul>
 </li>
 <li>
-<p><code>negative=true</code></p>
+<p><code>negative=false</code></p>
 <ul>
 <li>Indicates if this option is being negatively targeted.</li>
 </ul>
 </li>
 <li>
-<p><code>..    assigned-targeting-option-id=et</code></p>
+<p><code>..    assigned-targeting-option-id=voluptua.</code></p>
 <ul>
 <li>Output only. The unique ID of the assigned targeting option. The ID is only unique within a given resource and targeting type. It may be reused in other contexts.</li>
 </ul>
 </li>
-<li><code>authorized-seller-status-details    authorized-seller-status=labore</code><ul>
+<li><code>audio-content-type-details    audio-content-type=kasd</code><ul>
+<li>The audio content type. Output only in v1. Required in v2.</li>
+</ul>
+</li>
+<li>
+<p><code>targeting-option-id=no</code></p>
+<ul>
+<li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_AUDIO_CONTENT_TYPE</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..authorized-seller-status-details    authorized-seller-status=amet.</code></p>
+<ul>
 <li>Output only. The authorized seller status to target.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=labore</code></p>
+<p><code>targeting-option-id=aliquyam</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_AUTHORIZED_SELLER_STATUS</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..browser-details    display-name=et</code></p>
+<p><code>..browser-details    display-name=accusam</code></p>
 <ul>
 <li>Output only. The display name of the browser.</li>
 </ul>
 </li>
-<li><code>negative=false</code><ul>
+<li><code>negative=true</code><ul>
 <li>Indicates if this option is being negatively targeted. All assigned browser targeting options on the same resource must have the same value for this field.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=ut</code></p>
+<p><code>targeting-option-id=duo</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_BROWSER</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..carrier-and-isp-details    display-name=amet.</code></p>
+<p><code>..business-chain-details    display-name=kasd</code></p>
+<ul>
+<li>Output only. The display name of a business chain, e.g. &#34;KFC&#34;, &#34;Chase Bank&#34;.</li>
+</ul>
+</li>
+<li><code>proximity-radius-amount=0.5941507496742189</code><ul>
+<li>Required. The radius of the area around the business chain that will be targeted. The units of the radius are specified by proximity_radius_unit. Must be 1 to 800 if unit is <code>DISTANCE_UNIT_KILOMETERS</code> and 1 to 500 if unit is <code>DISTANCE_UNIT_MILES</code>. The minimum increment for both cases is 0.1. Inputs will be rounded to the nearest acceptable value if it is too granular, e.g. 15.57 will become 15.6.</li>
+</ul>
+</li>
+<li><code>proximity-radius-unit=kasd</code><ul>
+<li>Required. The unit of distance by which the targeting radius is measured.</li>
+</ul>
+</li>
+<li>
+<p><code>targeting-option-id=sanctus</code></p>
+<ul>
+<li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_BUSINESS_CHAIN</code>. Accepted business chain targeting option IDs can be retrieved using SearchTargetingOptions.</li>
+</ul>
+</li>
+<li>
+<p><code>..carrier-and-isp-details    display-name=gubergren</code></p>
 <ul>
 <li>Output only. The display name of the carrier or ISP.</li>
 </ul>
@@ -1102,13 +1215,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=rebum.</code></p>
+<p><code>targeting-option-id=dolor</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_CARRIER_AND_ISP</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..category-details    display-name=consetetur</code></p>
+<p><code>..category-details    display-name=sanctus</code></p>
 <ul>
 <li>Output only. The display name of the category.</li>
 </ul>
@@ -1118,77 +1231,77 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=amet.</code></p>
+<p><code>targeting-option-id=amet</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_CATEGORY</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..channel-details    channel-id=kasd</code></p>
+<p><code>..channel-details    channel-id=magna</code></p>
 <ul>
 <li>Required. ID of the channel. Should refer to the channel ID field on a <a href="../partners.channels#Channel.FIELDS.channel_id">Partner-owned channel</a> or <a href="../advertisers.channels#Channel.FIELDS.channel_id">advertiser-owned channel</a> resource.</li>
 </ul>
 </li>
 <li>
-<p><code>negative=false</code></p>
+<p><code>negative=true</code></p>
 <ul>
 <li>Indicates if this option is being negatively targeted. For advertiser level assigned targeting option, this field must be true.</li>
 </ul>
 </li>
 <li>
-<p><code>..content-instream-position-details    ad-type=amet.</code></p>
+<p><code>..content-instream-position-details    ad-type=tempor</code></p>
 <ul>
 <li>Output only. The ad type to target. Only applicable to insertion order targeting and new line items supporting the specified ad type will inherit this targeting option by default. Possible values are: * <code>AD_TYPE_VIDEO</code>, the setting will be inherited by new line item when line_item_type is <code>LINE_ITEM_TYPE_VIDEO_DEFAULT</code>. * <code>AD_TYPE_AUDIO</code>, the setting will be inherited by new line item when line_item_type is <code>LINE_ITEM_TYPE_AUDIO_DEFAULT</code>.</li>
 </ul>
 </li>
-<li><code>content-instream-position=takimata</code><ul>
-<li>Output only. The content instream position for video or audio ads.</li>
+<li><code>content-instream-position=consetetur</code><ul>
+<li>The content instream position for video or audio ads. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=amet.</code></p>
+<p><code>targeting-option-id=amet</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_CONTENT_INSTREAM_POSITION</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..content-outstream-position-details    ad-type=et</code></p>
+<p><code>..content-outstream-position-details    ad-type=ipsum</code></p>
 <ul>
 <li>Output only. The ad type to target. Only applicable to insertion order targeting and new line items supporting the specified ad type will inherit this targeting option by default. Possible values are: * <code>AD_TYPE_DISPLAY</code>, the setting will be inherited by new line item when line_item_type is <code>LINE_ITEM_TYPE_DISPLAY_DEFAULT</code>. * <code>AD_TYPE_VIDEO</code>, the setting will be inherited by new line item when line_item_type is <code>LINE_ITEM_TYPE_VIDEO_DEFAULT</code>.</li>
 </ul>
 </li>
-<li><code>content-outstream-position=labore</code><ul>
-<li>Output only. The content outstream position.</li>
+<li><code>content-outstream-position=et</code><ul>
+<li>The content outstream position. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=sed</code></p>
+<p><code>targeting-option-id=elitr</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..day-and-time-details    day-of-week=sit</code></p>
+<p><code>..day-and-time-details    day-of-week=dolor</code></p>
 <ul>
 <li>Required. The day of the week for this day and time targeting setting.</li>
 </ul>
 </li>
-<li><code>end-hour=3</code><ul>
+<li><code>end-hour=81</code><ul>
 <li>Required. The end hour for day and time targeting. Must be between 1 (1 hour after start of day) and 24 (end of day).</li>
 </ul>
 </li>
-<li><code>start-hour=13</code><ul>
+<li><code>start-hour=9</code><ul>
 <li>Required. The start hour for day and time targeting. Must be between 0 (start of day) and 23 (1 hour before end of day).</li>
 </ul>
 </li>
 <li>
-<p><code>time-zone-resolution=elitr</code></p>
+<p><code>time-zone-resolution=et</code></p>
 <ul>
 <li>Required. The mechanism used to determine which timezone to use for this day and time targeting setting.</li>
 </ul>
 </li>
 <li>
-<p><code>..device-make-model-details    display-name=voluptua.</code></p>
+<p><code>..device-make-model-details    display-name=lorem</code></p>
 <ul>
 <li>Output only. The display name of the device make and model.</li>
 </ul>
@@ -1198,249 +1311,299 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=amet.</code></p>
+<p><code>targeting-option-id=ipsum</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_DEVICE_MAKE_MODEL</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..device-type-details    device-type=aliquyam</code></p>
+<p><code>..device-type-details    device-type=ea</code></p>
 <ul>
-<li>Output only. The display name of the device type.</li>
+<li>The display name of the device type. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=et</code></p>
+<p><code>targeting-option-id=ipsum</code></p>
 <ul>
 <li>Required. ID of the device type.</li>
 </ul>
 </li>
 <li>
-<p><code>..digital-content-label-exclusion-details    content-rating-tier=gubergren</code></p>
+<p><code>..digital-content-label-exclusion-details    content-rating-tier=eos</code></p>
 <ul>
 <li>Output only. The display name of the digital content label rating tier.</li>
 </ul>
 </li>
 <li>
-<p><code>excluded-targeting-option-id=sed</code></p>
+<p><code>excluded-targeting-option-id=vero</code></p>
 <ul>
 <li>Required. ID of the digital content label to be EXCLUDED.</li>
 </ul>
 </li>
 <li>
-<p><code>..environment-details    environment=no</code></p>
+<p><code>..environment-details    environment=sanctus</code></p>
 <ul>
-<li>Output only. The serving environment.</li>
+<li>The serving environment. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=sit</code></p>
+<p><code>targeting-option-id=dolores</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_ENVIRONMENT</code> (e.g., &#34;508010&#34; for targeting the <code>ENVIRONMENT_WEB_OPTIMIZED</code> option).</li>
 </ul>
 </li>
 <li>
-<p><code>..exchange-details    targeting-option-id=est</code></p>
+<p><code>..exchange-details    targeting-option-id=elitr</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_EXCHANGE</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..gender-details    gender=elitr</code></p>
+<p><code>..gender-details    gender=diam</code></p>
 <ul>
-<li>Output only. The gender of the audience.</li>
+<li>The gender of the audience. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=et</code></p>
+<p><code>targeting-option-id=sed</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_GENDER</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..geo-region-details    display-name=consetetur</code></p>
+<p><code>..geo-region-details    display-name=lorem</code></p>
 <ul>
 <li>Output only. The display name of the geographic region (e.g., &#34;Ontario, Canada&#34;).</li>
 </ul>
 </li>
-<li><code>geo-region-type=at</code><ul>
+<li><code>geo-region-type=magna</code><ul>
 <li>Output only. The type of geographic region targeting.</li>
 </ul>
 </li>
-<li><code>negative=false</code><ul>
+<li><code>negative=true</code><ul>
 <li>Indicates if this option is being negatively targeted.</li>
-</ul>
-</li>
-<li>
-<p><code>targeting-option-id=voluptua.</code></p>
-<ul>
-<li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_GEO_REGION</code>.</li>
-</ul>
-</li>
-<li>
-<p><code>..household-income-details    household-income=kasd</code></p>
-<ul>
-<li>Output only. The household income of the audience.</li>
 </ul>
 </li>
 <li>
 <p><code>targeting-option-id=no</code></p>
 <ul>
+<li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_GEO_REGION</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..household-income-details    household-income=sadipscing</code></p>
+<ul>
+<li>Output only. The household income of the audience.</li>
+</ul>
+</li>
+<li>
+<p><code>targeting-option-id=sit</code></p>
+<ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_HOUSEHOLD_INCOME</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    inheritance=amet.</code></p>
+<p><code>..    inheritance=duo</code></p>
 <ul>
 <li>Output only. The inheritance status of the assigned targeting option.</li>
 </ul>
 </li>
 <li>
-<p><code>inventory-source-details    inventory-source-id=aliquyam</code></p>
+<p><code>inventory-source-details    inventory-source-id=stet</code></p>
 <ul>
 <li>Required. ID of the inventory source. Should refer to the inventory_source_id field of an InventorySource resource.</li>
 </ul>
 </li>
 <li>
-<p><code>..inventory-source-group-details    inventory-source-group-id=accusam</code></p>
+<p><code>..inventory-source-group-details    inventory-source-group-id=diam</code></p>
 <ul>
 <li>Required. ID of the inventory source group. Should refer to the inventory_source_group_id field of an InventorySourceGroup resource.</li>
 </ul>
 </li>
 <li>
-<p><code>..keyword-details    keyword=sanctus</code></p>
+<p><code>..keyword-details    keyword=accusam</code></p>
 <ul>
 <li>Required. The keyword, for example <code>car insurance</code>. Positive keyword cannot be offensive word. Must be UTF-8 encoded with a maximum size of 255 bytes. Maximum number of characters is 80. Maximum number of words is 10.</li>
 </ul>
 </li>
 <li>
-<p><code>negative=false</code></p>
+<p><code>negative=true</code></p>
 <ul>
 <li>Indicates if this option is being negatively targeted.</li>
 </ul>
 </li>
 <li>
-<p><code>..language-details    display-name=kasd</code></p>
+<p><code>..language-details    display-name=lorem</code></p>
 <ul>
 <li>Output only. The display name of the language (e.g., &#34;French&#34;).</li>
 </ul>
 </li>
-<li><code>negative=true</code><ul>
+<li><code>negative=false</code><ul>
 <li>Indicates if this option is being negatively targeted. All assigned language targeting options on the same resource must have the same value for this field.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=sanctus</code></p>
+<p><code>targeting-option-id=est</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_LANGUAGE</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=gubergren</code></p>
+<p><code>..    name=sadipscing</code></p>
 <ul>
 <li>Output only. The resource name for this assigned targeting option.</li>
 </ul>
 </li>
+<li><code>native-content-position-details    content-position=sit</code><ul>
+<li>The content position. Output only in v1. Required in v2.</li>
+</ul>
+</li>
 <li>
-<p><code>negative-keyword-list-details    negative-keyword-list-id=accusam</code></p>
+<p><code>targeting-option-id=ipsum</code></p>
+<ul>
+<li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_NATIVE_CONTENT_POSITION</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..negative-keyword-list-details    negative-keyword-list-id=amet.</code></p>
 <ul>
 <li>Required. ID of the negative keyword list. Should refer to the negative_keyword_list_id field of a NegativeKeywordList resource.</li>
 </ul>
 </li>
 <li>
-<p><code>..on-screen-position-details    ad-type=lorem</code></p>
+<p><code>..omid-details    omid=et</code></p>
+<ul>
+<li>The type of Open Measurement enabled inventory. Output only in v1. Required in v2.</li>
+</ul>
+</li>
+<li>
+<p><code>targeting-option-id=ut</code></p>
+<ul>
+<li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_OMID</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..on-screen-position-details    ad-type=et</code></p>
 <ul>
 <li>Output only. The ad type to target. Only applicable to insertion order targeting and new line items supporting the specified ad type will inherit this targeting option by default. Possible values are: * <code>AD_TYPE_DISPLAY</code>, the setting will be inherited by new line item when line_item_type is <code>LINE_ITEM_TYPE_DISPLAY_DEFAULT</code>. * <code>AD_TYPE_VIDEO</code>, the setting will be inherited by new line item when line_item_type is <code>LINE_ITEM_TYPE_VIDEO_DEFAULT</code>.</li>
 </ul>
 </li>
-<li><code>on-screen-position=dolor</code><ul>
+<li><code>on-screen-position=et</code><ul>
 <li>Output only. The on screen position.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=sanctus</code></p>
+<p><code>targeting-option-id=at</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_ON_SCREEN_POSITION</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..operating-system-details    display-name=sea</code></p>
+<p><code>..operating-system-details    display-name=sed</code></p>
 <ul>
 <li>Output only. The display name of the operating system.</li>
 </ul>
 </li>
-<li><code>negative=false</code><ul>
+<li><code>negative=true</code><ul>
 <li>Indicates if this option is being negatively targeted.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=amet</code></p>
+<p><code>targeting-option-id=sadipscing</code></p>
 <ul>
 <li>Required. The targeting option ID populated in targeting_option_id field when targeting_type is <code>TARGETING_TYPE_OPERATING_SYSTEM</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..parental-status-details    parental-status=magna</code></p>
+<p><code>..parental-status-details    parental-status=voluptua.</code></p>
 <ul>
 <li>Output only. The parental status of the audience.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-option-id=accusam</code></p>
+<p><code>targeting-option-id=et</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_PARENTAL_STATUS</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..proximity-location-list-details    proximity-location-list-id=lorem</code></p>
+<p><code>..poi-details    display-name=clita</code></p>
+<ul>
+<li>Output only. The display name of a POI, e.g. &#34;Times Square&#34;, &#34;Space Needle&#34;, followed by its full address if available.</li>
+</ul>
+</li>
+<li><code>latitude=0.026465139860502473</code><ul>
+<li>Output only. Latitude of the POI rounding to 6th decimal place.</li>
+</ul>
+</li>
+<li><code>longitude=0.6700467372622907</code><ul>
+<li>Output only. Longitude of the POI rounding to 6th decimal place.</li>
+</ul>
+</li>
+<li><code>proximity-radius-amount=0.3143240263483795</code><ul>
+<li>Required. The radius of the area around the POI that will be targeted. The units of the radius are specified by proximity_radius_unit. Must be 1 to 800 if unit is <code>DISTANCE_UNIT_KILOMETERS</code> and 1 to 500 if unit is <code>DISTANCE_UNIT_MILES</code>.</li>
+</ul>
+</li>
+<li><code>proximity-radius-unit=diam</code><ul>
+<li>Required. The unit of distance by which the targeting radius is measured.</li>
+</ul>
+</li>
+<li>
+<p><code>targeting-option-id=ipsum</code></p>
+<ul>
+<li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_POI</code>. Accepted POI targeting option IDs can be retrieved using SearchTargetingOptions. If targeting a specific latitude/longitude coordinate removed from an address or POI name, you can generate the necessary targeting option ID by rounding the desired coordinate values to the 6th decimal place, removing the decimals, and concatenating the string values separated by a semicolon. For example, you can target the latitude/longitude pair of 40.7414691, -74.003387 using the targeting option ID &#34;40741469;-74003387&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>..proximity-location-list-details    proximity-location-list-id=eos</code></p>
 <ul>
 <li>Required. ID of the proximity location list. Should refer to the location_list_id field of a LocationList resource whose type is <code>TARGETING_LOCATION_TYPE_PROXIMITY</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>proximity-radius-range=tempor</code></p>
+<p><code>proximity-radius-range=erat</code></p>
 <ul>
 <li>Required. Radius range for proximity location list. This represents the size of the area around a chosen location that will be targeted. <code>All</code> proximity location targeting under a single resource must have the same radius range value. Set this value to match any existing targeting. If updated, this field will change the radius range for all proximity targeting under the resource.</li>
 </ul>
 </li>
 <li>
-<p><code>..regional-location-list-details    negative=true</code></p>
+<p><code>..regional-location-list-details    negative=false</code></p>
 <ul>
 <li>Indicates if this option is being negatively targeted.</li>
 </ul>
 </li>
 <li>
-<p><code>regional-location-list-id=amet</code></p>
+<p><code>regional-location-list-id=justo</code></p>
 <ul>
 <li>Required. ID of the regional location list. Should refer to the location_list_id field of a LocationList resource whose type is <code>TARGETING_LOCATION_TYPE_REGIONAL</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..sensitive-category-exclusion-details    excluded-targeting-option-id=ipsum</code></p>
+<p><code>..sensitive-category-exclusion-details    excluded-targeting-option-id=justo</code></p>
 <ul>
 <li>Required. ID of the sensitive category to be EXCLUDED.</li>
 </ul>
 </li>
 <li>
-<p><code>sensitive-category=et</code></p>
+<p><code>sensitive-category=eirmod</code></p>
 <ul>
-<li>Output only. An enum for the DV360 Sensitive category content classifier.</li>
+<li>An enum for the DV360 Sensitive category content classifier. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>..sub-exchange-details    targeting-option-id=elitr</code></p>
+<p><code>..sub-exchange-details    targeting-option-id=duo</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_SUB_EXCHANGE</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    targeting-type=dolor</code></p>
+<p><code>..    targeting-type=sanctus</code></p>
 <ul>
 <li>Output only. Identifies the type of this assigned targeting option.</li>
 </ul>
 </li>
 <li>
-<p><code>third-party-verifier-details.adloox    excluded-adloox-categories=duo</code></p>
+<p><code>third-party-verifier-details.adloox    excluded-adloox-categories=aliquyam</code></p>
 <ul>
 <li>Adloox&#39;s brand safety settings.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
@@ -1453,46 +1616,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>avoided-star-rating=et</code></p>
+<p><code>avoided-star-rating=eirmod</code></p>
 <ul>
 <li>Avoid bidding on apps with the star ratings.</li>
 </ul>
 </li>
 <li>
-<p><code>..    avoided-age-ratings=lorem</code></p>
+<p><code>..    avoided-age-ratings=sanctus</code></p>
 <ul>
 <li>Avoid bidding on apps with the age rating.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>brand-safety-categories    avoid-unknown-brand-safety-category=false</code><ul>
+<li><code>brand-safety-categories    avoid-unknown-brand-safety-category=true</code><ul>
 <li>Unknown or unrateable.</li>
 </ul>
 </li>
-<li><code>avoided-high-severity-categories=ipsum</code><ul>
+<li><code>avoided-high-severity-categories=kasd</code><ul>
 <li>Brand safety high severity avoidance categories.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>avoided-medium-severity-categories=ea</code></p>
+<p><code>avoided-medium-severity-categories=voluptua.</code></p>
 <ul>
 <li>Brand safety medium severity avoidance categories.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    custom-segment-id=ipsum</code></p>
+<p><code>..    custom-segment-id=erat</code></p>
 <ul>
 <li>The custom segment ID provided by DoubleVerify. The ID must start with &#34;51&#34; and consist of eight digits. Custom segment ID cannot be specified along with any of the following fields: * brand_safety_categories * avoided_age_ratings * app_star_rating * fraud_invalid_traffic</li>
 </ul>
 </li>
-<li><code>display-viewability    iab=eos</code><ul>
+<li><code>display-viewability    iab=nonumy</code><ul>
 <li>Target web and app inventory to maximize IAB viewable rate.</li>
 </ul>
 </li>
 <li>
-<p><code>viewable-during=vero</code></p>
+<p><code>viewable-during=magna</code></p>
 <ul>
 <li>Target web and app inventory to maximize 100% viewable duration.</li>
 </ul>
@@ -1504,13 +1667,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>avoided-fraud-option=dolores</code></p>
+<p><code>avoided-fraud-option=lorem</code></p>
 <ul>
 <li>Avoid Sites and Apps with historical Fraud &amp; IVT.</li>
 </ul>
 </li>
 <li>
-<p><code>..video-viewability    player-impression-rate=elitr</code></p>
+<p><code>..video-viewability    player-impression-rate=aliquyam</code></p>
 <ul>
 <li>Target inventory to maximize impressions with 400x300 or greater player size.</li>
 </ul>
@@ -1520,19 +1683,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>video-viewable-rate=sed</code></p>
+<p><code>video-viewable-rate=vero</code></p>
 <ul>
 <li>Target web inventory to maximize fully viewable rate.</li>
 </ul>
 </li>
 <li>
-<p><code>...integral-ad-science    custom-segment-id=lorem</code></p>
+<p><code>...integral-ad-science    custom-segment-id=erat</code></p>
 <ul>
 <li>The custom segment ID provided by Integral Ad Science. The ID must be between <code>1000001</code> and <code>1999999</code>, inclusive.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>display-viewability=magna</code><ul>
+<li><code>display-viewability=dolore</code><ul>
 <li>Display Viewability section (applicable to display line items only).</li>
 </ul>
 </li>
@@ -1540,27 +1703,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Brand Safety - <strong>Unrateable</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-ad-fraud-risk=no</code><ul>
+<li><code>excluded-ad-fraud-risk=consetetur</code><ul>
 <li>Ad Fraud settings.</li>
 </ul>
 </li>
-<li><code>excluded-adult-risk=sadipscing</code><ul>
+<li><code>excluded-adult-risk=amet</code><ul>
 <li>Brand Safety - <strong>Adult content</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-alcohol-risk=sit</code><ul>
+<li><code>excluded-alcohol-risk=magna</code><ul>
 <li>Brand Safety - <strong>Alcohol</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-drugs-risk=duo</code><ul>
+<li><code>excluded-drugs-risk=sanctus</code><ul>
 <li>Brand Safety - <strong>Drugs</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-gambling-risk=stet</code><ul>
+<li><code>excluded-gambling-risk=clita</code><ul>
 <li>Brand Safety - <strong>Gambling</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-hate-speech-risk=diam</code><ul>
+<li><code>excluded-hate-speech-risk=invidunt</code><ul>
 <li>Brand Safety - <strong>Hate speech</strong>.</li>
 </ul>
 </li>
@@ -1568,68 +1731,68 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Brand Safety - <strong>Illegal downloads</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-offensive-language-risk=dolore</code><ul>
+<li><code>excluded-offensive-language-risk=amet.</code><ul>
 <li>Brand Safety - <strong>Offensive language</strong>.</li>
 </ul>
 </li>
-<li><code>excluded-violence-risk=eirmod</code><ul>
+<li><code>excluded-violence-risk=sanctus</code><ul>
 <li>Brand Safety - <strong>Violence</strong>.</li>
 </ul>
 </li>
-<li><code>traq-score-option=lorem</code><ul>
+<li><code>traq-score-option=invidunt</code><ul>
 <li>True advertising quality (applicable to Display line items only).</li>
 </ul>
 </li>
 <li>
-<p><code>video-viewability=ut</code></p>
+<p><code>video-viewability=sit</code></p>
 <ul>
 <li>Video Viewability Section (applicable to video line items only).</li>
 </ul>
 </li>
 <li>
-<p><code>...url-details    negative=true</code></p>
+<p><code>...url-details    negative=false</code></p>
 <ul>
 <li>Indicates if this option is being negatively targeted.</li>
 </ul>
 </li>
 <li>
-<p><code>url=sadipscing</code></p>
+<p><code>url=et</code></p>
 <ul>
 <li>Required. The URL, for example <code>example.com</code>. DV360 supports two levels of subdirectory targeting, for example <code>www.example.com/one-subdirectory-level/second-level</code>, and five levels of subdomain targeting, for example <code>five.four.three.two.one.example.com</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..user-rewarded-content-details    targeting-option-id=sit</code></p>
+<p><code>..user-rewarded-content-details    targeting-option-id=dolor</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_USER_REWARDED_CONTENT</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>user-rewarded-content=ipsum</code></p>
+<p><code>user-rewarded-content=et</code></p>
 <ul>
 <li>Output only. User rewarded content status for video ads.</li>
 </ul>
 </li>
 <li>
-<p><code>..video-player-size-details    targeting-option-id=amet.</code></p>
+<p><code>..video-player-size-details    targeting-option-id=sed</code></p>
 <ul>
 <li>Required. The targeting_option_id field when targeting_type is <code>TARGETING_TYPE_VIDEO_PLAYER_SIZE</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>video-player-size=et</code></p>
+<p><code>video-player-size=justo</code></p>
 <ul>
-<li>Output only. The video player size.</li>
+<li>The video player size. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 <li>
-<p><code>..viewability-details    targeting-option-id=ut</code></p>
+<p><code>..viewability-details    targeting-option-id=sadipscing</code></p>
 <ul>
 <li>Required. The targeting_option_id of a TargetingOption of type <code>TARGETING_TYPE_VIEWABILITY</code> (e.g., &#34;509010&#34; for targeting the <code>VIEWABILITY_10_PERCENT_OR_MORE</code> option).</li>
 </ul>
 </li>
-<li><code>viewability=et</code><ul>
-<li>Output only. The predicted viewability percentage.</li>
+<li><code>viewability=accusam</code><ul>
+<li>The predicted viewability percentage. Output only in v1. Required in v2.</li>
 </ul>
 </li>
 </ul>

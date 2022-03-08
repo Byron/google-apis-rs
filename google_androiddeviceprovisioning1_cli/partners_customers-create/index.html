@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Customers Create - Android Provisioning Partner v2.0.4+20210331</title>
+  <title>Customers Create - Android Provisioning Partner v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Provisioning Partner v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Android Provisioning Partner v3.0.0+20220305</a>
         
       </div>
 
@@ -257,8 +257,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     admin-emails: [string]
     company-id: string
     company-name: string
+    language-code: string
     name: string
     owner-emails: [string]
+    skip-welcome-email: boolean
     terms-status: string
 
 </code></pre>
@@ -278,16 +280,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. The name of the company. For example <em>XYZ Corp</em>. Displayed to the company&#39;s employees in the zero-touch enrollment portal.</li>
 </ul>
 </li>
-<li><code>name=kasd</code><ul>
+<li><code>language-code=kasd</code><ul>
+<li>Input only. The preferred locale of the customer represented as a BCP47 language code. This field is validated on input and requests containing unsupported language codes will be rejected. Supported language codes: Arabic (ar) Chinese (Hong Kong) (zh-HK) Chinese (Simplified) (zh-CN) Chinese (Traditional) (zh-TW) Czech (cs) Danish (da) Dutch (nl) English (UK) (en-GB) English (US) (en-US) Filipino (fil) Finnish (fi) French (fr) German (de) Hebrew (iw) Hindi (hi) Hungarian (hu) Indonesian (id) Italian (it) Japanese (ja) Korean (ko) Norwegian (Bokmal) (no) Polish (pl) Portuguese (Brazil) (pt-BR) Portuguese (Portugal) (pt-PT) Russian (ru) Spanish (es) Spanish (Latin America) (es-419) Swedish (sv) Thai (th) Turkish (tr) Ukrainian (uk) Vietnamese (vi)</li>
+</ul>
+</li>
+<li><code>name=et</code><ul>
 <li>Output only. The API resource name of the company. The resource name is one of the following formats: * <code>partners/[PARTNER_ID]/customers/[CUSTOMER_ID]</code> * <code>partners/[PARTNER_ID]/vendors/[VENDOR_ID]</code> * <code>partners/[PARTNER_ID]/vendors/[VENDOR_ID]/customers/[CUSTOMER_ID]</code> Assigned by the server.</li>
 </ul>
 </li>
-<li><code>owner-emails=et</code><ul>
-<li>Required. Input only. Email address of customer&#39;s users in the owner role. At least one <code>owner_email</code> is required. Each email address must be associated with a Google Account. Owners share the same access as admins but can also add, delete, and edit your organization&#39;s portal users.</li>
+<li><code>owner-emails=sed</code><ul>
+<li>Required. Input only. Email address of customer&#39;s users in the owner role. At least one <code>owner_email</code> is required. Owners share the same access as admins but can also add, delete, and edit your organization&#39;s portal users.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>terms-status=sed</code><ul>
+<li><code>skip-welcome-email=true</code><ul>
+<li>Input only. If set to true, welcome email will not be sent to the customer. It is recommended to skip the welcome email if devices will be claimed with additional DEVICE_PROTECTION service, as the customer will receive separate emails at device claim time. This field is ignored if this is not a Zero-touch customer.</li>
+</ul>
+</li>
+<li><code>terms-status=vero</code><ul>
 <li>Output only. Whether any user from the company has accepted the latest Terms of Service (ToS). See TermsStatus.</li>
 </ul>
 </li>

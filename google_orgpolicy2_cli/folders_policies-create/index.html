@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Policies Create - OrgPolicy API v2.0.4+20210330</title>
+  <title>Policies Create - OrgPolicy API v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> OrgPolicy API v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> OrgPolicy API v3.0.0+20220305</a>
         
       </div>
 
@@ -235,6 +235,13 @@ You can set the scope for this method like this: <code>orgpolicy2 --scope &lt;sc
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>GoogleCloudOrgpolicyV2Policy:
+  alternate:
+    launch: string
+    spec:
+      etag: string
+      inherit-from-parent: boolean
+      reset: boolean
+      update-time: string
   name: string
   spec:
     etag: string
@@ -246,8 +253,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    name=et</code><ul>
-<li>Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * <code>projects/{project_number}/policies/{constraint_name}</code> * <code>folders/{folder_id}/policies/{constraint_name}</code> * <code>organizations/{organization_id}/policies/{constraint_name}</code> For example, &#34;projects/123/policies/compute.disableSerialPortAccess&#34;. Note: <code>projects/{project_id}/policies/{constraint_name}</code> is also an acceptable name for API requests, but responses will return the name using the equivalent project number.</li>
+<li><code>-r .alternate    launch=et</code><ul>
+<li>Reference to the launch that will be used while audit logging and to control the launch. Should be set only in the alternate policy.</li>
 </ul>
 </li>
 <li><code>spec    etag=magna</code><ul>
@@ -262,7 +269,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Ignores policies set above this resource and restores the <code>constraint_default</code> enforcement behavior of the specific <code>Constraint</code> at this resource. This field can be set in policies for either list or boolean constraints. If set, <code>rules</code> must be empty and <code>inherit_from_parent</code> must be set to false.</li>
 </ul>
 </li>
-<li><code>update-time=amet.</code><ul>
+<li>
+<p><code>update-time=amet.</code></p>
+<ul>
+<li>Output only. The time stamp this was previously updated. This represents the last time a call to <code>CreatePolicy</code> or <code>UpdatePolicy</code> was made for that <code>Policy</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>...    name=takimata</code></p>
+<ul>
+<li>Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * <code>projects/{project_number}/policies/{constraint_name}</code> * <code>folders/{folder_id}/policies/{constraint_name}</code> * <code>organizations/{organization_id}/policies/{constraint_name}</code> For example, &#34;projects/123/policies/compute.disableSerialPortAccess&#34;. Note: <code>projects/{project_id}/policies/{constraint_name}</code> is also an acceptable name for API requests, but responses will return the name using the equivalent project number.</li>
+</ul>
+</li>
+<li><code>spec    etag=amet.</code><ul>
+<li>An opaque tag indicating the current version of the <code>Policy</code>, used for concurrency control. This field is ignored if used in a <code>CreatePolicy</code> request. When the <code>Policy</code> is returned from either a <code>GetPolicy</code> or a <code>ListPolicies</code> request, this <code>etag</code> indicates the version of the current <code>Policy</code> to use when executing a read-modify-write loop. When the <code>Policy</code> is returned from a <code>GetEffectivePolicy</code> request, the <code>etag</code> will be unset.</li>
+</ul>
+</li>
+<li><code>inherit-from-parent=true</code><ul>
+<li>Determines the inheritance behavior for this <code>Policy</code>. If <code>inherit_from_parent</code> is true, PolicyRules set higher up in the hierarchy (up to the closest root) are inherited and present in the effective policy. If it is false, then no rules are inherited, and this Policy becomes the new root for evaluation. This field can be set only for Policies which configure list constraints.</li>
+</ul>
+</li>
+<li><code>reset=true</code><ul>
+<li>Ignores policies set above this resource and restores the <code>constraint_default</code> enforcement behavior of the specific <code>Constraint</code> at this resource. This field can be set in policies for either list or boolean constraints. If set, <code>rules</code> must be empty and <code>inherit_from_parent</code> must be set to false.</li>
+</ul>
+</li>
+<li><code>update-time=lorem</code><ul>
 <li>Output only. The time stamp this was previously updated. This represents the last time a call to <code>CreatePolicy</code> or <code>UpdatePolicy</code> was made for that <code>Policy</code>.</li>
 </ul>
 </li>

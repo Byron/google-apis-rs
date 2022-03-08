@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Creatives Patch - Real-time Bidding v2.0.4+20210331</title>
+  <title>Creatives Patch - Real-time Bidding v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Real-time Bidding v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Real-time Bidding v3.0.0+20220307</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../bidders_endpoints-list">Endpoints List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../bidders_endpoints-patch">Endpoints Patch</a>
                     
                 </li>
             
@@ -355,6 +360,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     price-display-text: string
     star-rating: number
     video-url: string
+    video-vast-xml: string
   restricted-categories: [string]
   version: integer
   video:
@@ -371,11 +377,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    account-id=aliquyam</code><ul>
+<li><code>-r .    account-id=consetetur</code><ul>
 <li>Output only. ID of the buyer account that this creative is owned by. Can be used to filter the response of the creatives.list method with equality and inequality check.</li>
 </ul>
 </li>
-<li><code>ad-choices-destination-url=amet</code><ul>
+<li><code>ad-choices-destination-url=stet</code><ul>
 <li>The link to AdChoices destination page. This is only supported for native ads.</li>
 </ul>
 </li>
@@ -383,219 +389,167 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The name of the company being advertised in the creative. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>agency-id=et</code><ul>
+<li><code>agency-id=aliquyam</code><ul>
 <li>The agency ID for this creative.</li>
 </ul>
 </li>
-<li><code>api-update-time=sea</code><ul>
+<li><code>api-update-time=elitr</code><ul>
 <li>Output only. The last update timestamp of the creative via API.</li>
 </ul>
 </li>
-<li><code>creative-format=consetetur</code><ul>
+<li><code>creative-format=duo</code><ul>
 <li>Output only. The format of this creative. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>creative-id=consetetur</code><ul>
+<li><code>creative-id=diam</code><ul>
 <li>Buyer-specific creative ID that references this creative in bid responses. This field is Ignored in update operations. Can be used to filter the response of the creatives.list method. The maximum length of the creative ID is 128 bytes.</li>
 </ul>
 </li>
-<li><code>creative-serving-decision.ad-technology-providers    detected-gvl-ids=stet</code><ul>
+<li><code>creative-serving-decision.ad-technology-providers    detected-gvl-ids=est</code><ul>
 <li>The detected IAB Global Vendor List (GVL) IDs for this creative. See the IAB Global Vendor List at https://vendorlist.consensu.org/v2/vendor-list.json for details about the vendors.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-provider-ids=est</code><ul>
+<li><code>detected-provider-ids=sit</code><ul>
 <li>The detected <a href="https://support.google.com/admanager/answer/9012903">Google Ad Tech Providers (ATP)</a> for this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/providers.csv for mapping of provider ID to provided name, a privacy policy URL, and a list of domains which can be attributed to the provider.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>unidentified-provider-domains=aliquyam</code></p>
+<p><code>unidentified-provider-domains=sed</code></p>
 <ul>
 <li>Domains of detected unidentified ad technology providers (if any). You must ensure that the creatives used in bids placed for inventory that will serve to EEA or UK users does not contain unidentified ad technology providers. Google reserves the right to filter non-compliant bids.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..china-policy-compliance    status=elitr</code></p>
+<p><code>..china-policy-compliance    status=eos</code></p>
 <ul>
 <li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..deals-policy-compliance    status=duo</code></p>
+<p><code>..deals-policy-compliance    status=lorem</code></p>
 <ul>
 <li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..    detected-attributes=diam</code></p>
+<p><code>..    detected-attributes=ea</code></p>
 <ul>
 <li>Publisher-excludable attributes that were detected for this creative. Can be used to filter the response of the creatives.list method. If the <code>excluded_attribute</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto">bid request</a> contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-click-through-urls=est</code><ul>
+<li><code>detected-click-through-urls=stet</code><ul>
 <li>The set of detected destination URLs for the creative. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-domains=sit</code><ul>
+<li><code>detected-domains=dolores</code><ul>
 <li>The detected domains for this creative.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-languages=sed</code><ul>
+<li><code>detected-languages=eos</code><ul>
 <li>The detected languages for this creative. The order is arbitrary. The codes are 2 or 5 characters and are documented at https://developers.google.com/adwords/api/docs/appendix/languagecodes. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-product-categories=26</code><ul>
+<li><code>detected-product-categories=33</code><ul>
 <li>Detected product categories, if any. See the ad-product-categories.txt file in the technical documentation for a list of IDs. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-sensitive-categories=45</code><ul>
+<li><code>detected-sensitive-categories=91</code><ul>
 <li>Detected sensitive categories, if any. Can be used to filter the response of the creatives.list method. See the ad-sensitive-categories.txt file in the technical documentation for a list of IDs. You should use these IDs along with the excluded-sensitive-category field in the bid request to filter your bids.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-vendor-ids=84</code><ul>
+<li><code>detected-vendor-ids=27</code><ul>
 <li>IDs of the ad technology vendors that were detected to be used by this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt for possible values. Can be used to filter the response of the creatives.list method. If the <code>allowed_vendor_type</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto">bid request</a> does not contain one of the vendor type IDs that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>last-status-update=stet</code><ul>
+<li><code>last-status-update=at</code><ul>
 <li>The last time the creative status was updated. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>network-policy-compliance    status=dolores</code></p>
+<p><code>network-policy-compliance    status=dolore</code></p>
 <ul>
 <li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..platform-policy-compliance    status=eos</code></p>
+<p><code>..platform-policy-compliance    status=eirmod</code></p>
 <ul>
 <li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..russia-policy-compliance    status=et</code></p>
+<p><code>..russia-policy-compliance    status=lorem</code></p>
 <ul>
 <li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>...    deal-ids=sea</code></p>
+<p><code>...    deal-ids=accusam</code></p>
 <ul>
 <li>Output only. IDs of all of the deals with which this creative has been used in bidding. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-attributes=et</code><ul>
+<li><code>declared-attributes=amet</code><ul>
 <li>All declared attributes for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method. If the <code>excluded_attribute</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto&amp;#34;">bid request</a> contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-click-through-urls=at</code><ul>
+<li><code>declared-click-through-urls=erat</code><ul>
 <li>The set of declared destination URLs for the creative. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-restricted-categories=dolore</code><ul>
+<li><code>declared-restricted-categories=dolores</code><ul>
 <li>All declared restricted categories for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-vendor-ids=61</code><ul>
+<li><code>declared-vendor-ids=20</code><ul>
 <li>IDs for the declared ad technology vendors that may be used by this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt for possible values. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>html    height=50</code><ul>
+<li><code>html    height=28</code><ul>
 <li>The height of the HTML snippet in pixels. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>snippet=accusam</code><ul>
+<li><code>snippet=sea</code><ul>
 <li>The HTML snippet that displays the ad when inserted in the web page.</li>
-</ul>
-</li>
-<li>
-<p><code>width=54</code></p>
-<ul>
-<li>The width of the HTML snippet in pixels. Can be used to filter the response of the creatives.list method.</li>
-</ul>
-</li>
-<li>
-<p><code>..    impression-tracking-urls=erat</code></p>
-<ul>
-<li>The set of URLs to be called to record an impression.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>name=dolores</code><ul>
-<li>Output only. Name of the creative. Follows the pattern <code>buyers/{buyer}/creatives/{creative}</code>, where <code>{buyer}</code> represents the account ID of the buyer who owns the creative, and <code>{creative}</code> is the buyer-specific creative ID that references this creative in the bid response.</li>
-</ul>
-</li>
-<li><code>native    advertiser-name=erat</code><ul>
-<li>The name of the advertiser or sponsor, to be displayed in the ad creative.</li>
-</ul>
-</li>
-<li><code>app-icon    height=28</code><ul>
-<li>Image height in pixels.</li>
-</ul>
-</li>
-<li><code>url=sea</code><ul>
-<li>The URL of the image.</li>
 </ul>
 </li>
 <li>
 <p><code>width=42</code></p>
 <ul>
-<li>Image width in pixels.</li>
+<li>The width of the HTML snippet in pixels. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..    body=lorem</code></p>
+<p><code>..    impression-tracking-urls=lorem</code></p>
 <ul>
-<li>A long description of the ad.</li>
+<li>The set of URLs to be called to record an impression.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>call-to-action=et</code><ul>
-<li>A label for the button that the user is supposed to click.</li>
+<li><code>name=et</code><ul>
+<li>Output only. Name of the creative. Follows the pattern <code>buyers/{buyer}/creatives/{creative}</code>, where <code>{buyer}</code> represents the account ID of the buyer who owns the creative, and <code>{creative}</code> is the buyer-specific creative ID that references this creative in the bid response.</li>
 </ul>
 </li>
-<li><code>click-link-url=at</code><ul>
-<li>The URL that the browser/SDK will load when the user clicks the ad.</li>
+<li><code>native    advertiser-name=at</code><ul>
+<li>The name of the advertiser or sponsor, to be displayed in the ad creative.</li>
 </ul>
 </li>
-<li><code>click-tracking-url=dolor</code><ul>
-<li>The URL to use for click tracking.</li>
-</ul>
-</li>
-<li><code>headline=et</code><ul>
-<li>A short title for the ad.</li>
-</ul>
-</li>
-<li><code>image    height=53</code><ul>
-<li>Image height in pixels.</li>
-</ul>
-</li>
-<li><code>url=erat</code><ul>
-<li>The URL of the image.</li>
-</ul>
-</li>
-<li>
-<p><code>width=91</code></p>
-<ul>
-<li>Image width in pixels.</li>
-</ul>
-</li>
-<li>
-<p><code>..logo    height=60</code></p>
-<ul>
+<li><code>app-icon    height=97</code><ul>
 <li>Image height in pixels.</li>
 </ul>
 </li>
@@ -604,25 +558,81 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>width=89</code></p>
+<p><code>width=53</code></p>
 <ul>
 <li>Image width in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    price-display-text=justo</code></p>
+<p><code>..    body=erat</code></p>
+<ul>
+<li>A long description of the ad.</li>
+</ul>
+</li>
+<li><code>call-to-action=sea</code><ul>
+<li>A label for the button that the user is supposed to click.</li>
+</ul>
+</li>
+<li><code>click-link-url=nonumy</code><ul>
+<li>The URL that the browser/SDK will load when the user clicks the ad.</li>
+</ul>
+</li>
+<li><code>click-tracking-url=et</code><ul>
+<li>The URL to use for click tracking.</li>
+</ul>
+</li>
+<li><code>headline=gubergren</code><ul>
+<li>A short title for the ad.</li>
+</ul>
+</li>
+<li><code>image    height=80</code><ul>
+<li>Image height in pixels.</li>
+</ul>
+</li>
+<li><code>url=sea</code><ul>
+<li>The URL of the image.</li>
+</ul>
+</li>
+<li>
+<p><code>width=5</code></p>
+<ul>
+<li>Image width in pixels.</li>
+</ul>
+</li>
+<li>
+<p><code>..logo    height=3</code></p>
+<ul>
+<li>Image height in pixels.</li>
+</ul>
+</li>
+<li><code>url=aliquyam</code><ul>
+<li>The URL of the image.</li>
+</ul>
+</li>
+<li>
+<p><code>width=76</code></p>
+<ul>
+<li>Image width in pixels.</li>
+</ul>
+</li>
+<li>
+<p><code>..    price-display-text=at</code></p>
 <ul>
 <li>The price of the promoted app including currency info.</li>
 </ul>
 </li>
-<li><code>star-rating=0.3216722759557804</code><ul>
+<li><code>star-rating=0.6413061576894121</code><ul>
 <li>The app rating in the app store. Must be in the range [0-5].</li>
 </ul>
 </li>
-<li>
-<p><code>video-url=sit</code></p>
-<ul>
+<li><code>video-url=gubergren</code><ul>
 <li>The URL to fetch a native video ad.</li>
+</ul>
+</li>
+<li>
+<p><code>video-vast-xml=dolor</code></p>
+<ul>
+<li>The contents of a VAST document for a native video ad.</li>
 </ul>
 </li>
 <li>
@@ -632,11 +642,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>version=76</code><ul>
+<li><code>version=40</code><ul>
 <li>Output only. The version of this creative. Version for a new creative is 1 and it increments during subsequent creative updates.</li>
 </ul>
 </li>
-<li><code>video.video-metadata    duration=at</code><ul>
+<li><code>video.video-metadata    duration=amet.</code><ul>
 <li>The duration of the ad. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
@@ -648,23 +658,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Is this a VPAID ad? Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>skip-offset=dolor</code><ul>
+<li><code>skip-offset=accusam</code><ul>
 <li>The minimum duration that the user has to watch before being able to skip this ad. If the field is not set, the ad is not skippable. If the field is set, the ad is skippable. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>vast-version=aliquyam</code></p>
+<p><code>vast-version=gubergren</code></p>
 <ul>
 <li>The maximum VAST version across all wrapped VAST documents. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..    video-url=no</code></p>
+<p><code>..    video-url=sadipscing</code></p>
 <ul>
 <li>The URL to fetch a video ad.</li>
 </ul>
 </li>
-<li><code>video-vast-xml=amet.</code><ul>
+<li><code>video-vast-xml=at</code><ul>
 <li>The contents of a VAST document for a video ad. This document should conform to the VAST 2.0 or 3.0 standard.</li>
 </ul>
 </li>

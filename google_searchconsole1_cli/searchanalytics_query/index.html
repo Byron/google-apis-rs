@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Query - Search Console v2.0.4+20210325</title>
+  <title>Query - Search Console v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Search Console v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Search Console v3.0.0+20220305</a>
         
       </div>
 
@@ -126,6 +126,17 @@
 
     
         
+        <span>Url Inspection</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-inspection_index-inspect">Index Inspect</a>
+                    
+                </li>
+            
+        
+
+    
+        
         <span>Url Testing Tools</span>
             
                 <li class="toctree-l1 ">
@@ -198,6 +209,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   search-type: string
   start-date: string
   start-row: integer
+  type: string
 
 </code></pre>
 
@@ -234,6 +246,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 <li><code>start-row=21</code><ul>
 <li>[Optional; Default is 0] Zero-based index of the first row in the response. Must be a non-negative number.</li>
+</ul>
+</li>
+<li><code>type=amet.</code><ul>
+<li>Optional. [Optional; Default is \&#34;web\&#34;] Type of report: search type, or either Discover or Gnews.</li>
 </ul>
 </li>
 </ul>

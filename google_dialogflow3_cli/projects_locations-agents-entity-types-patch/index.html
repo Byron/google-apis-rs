@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Agents Entity Types Patch - Dialogflow v2.0.4+20210329</title>
+  <title>Locations Agents Entity Types Patch - Dialogflow v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dialogflow v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Dialogflow v3.0.0+20220228</a>
         
       </div>
 
@@ -43,6 +43,16 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-get">Locations Agents Changelogs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-list">Locations Agents Changelogs List</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-create">Locations Agents Create</a>
@@ -104,12 +114,32 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-continuous-test-results-list">Locations Agents Environments Continuous Test Results List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-create">Locations Agents Environments Create</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-delete">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deploy-flow">Locations Agents Environments Deploy Flow</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-get">Locations Agents Environments Deployments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-list">Locations Agents Environments Deployments List</a>
                     
                 </li>
             
@@ -169,6 +199,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-run-continuous-test">Locations Agents Environments Run Continuous Test</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-sessions-detect-intent">Locations Agents Environments Sessions Detect Intent</a>
                     
                 </li>
@@ -224,12 +259,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-export">Locations Agents Flows Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get">Locations Agents Flows Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get-validation-result">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-import">Locations Agents Flows Import</a>
                     
                 </li>
             
@@ -300,6 +345,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-validate">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-versions-compare-versions">Locations Agents Flows Versions Compare Versions</a>
                     
                 </li>
             
@@ -514,6 +564,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
                     
                 </li>
@@ -604,7 +664,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Updates the specified entity type.</p>
+              <p>Updates the specified entity type. Note: You should always train a flow prior to sending it queries. See the <a href="https://cloud.google.com/dialogflow/cx/docs/concept/training">training documentation</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -636,11 +696,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    auto-expansion-mode=sed</code><ul>
+<li><code>-r .    auto-expansion-mode=ipsum</code><ul>
 <li>Indicates whether the entity type can be automatically expanded.</li>
 </ul>
 </li>
-<li><code>display-name=ut</code><ul>
+<li><code>display-name=ipsum</code><ul>
 <li>Required. The human-readable name of the entity type, unique within the agent.</li>
 </ul>
 </li>
@@ -648,11 +708,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Enables fuzzy entity extraction during classification.</li>
 </ul>
 </li>
-<li><code>kind=ipsum</code><ul>
+<li><code>kind=ea</code><ul>
 <li>Required. Indicates the kind of entity type.</li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>name=dolor</code><ul>
 <li>The unique identifier of the entity type. Required for EntityTypes.UpdateEntityType. Format: <code>projects//locations//agents//entityTypes/</code>.</li>
 </ul>
 </li>
@@ -775,7 +835,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-agents-environments-create" class="btn btn-neutral float-right" title="Locations Agents Environments Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-agents-environments-continuous-test-results-list" class="btn btn-neutral float-right" title="Locations Agents Environments Continuous Test Results List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../projects_locations-agents-entity-types-list" class="btn btn-neutral" title="Locations Agents Entity Types List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -807,7 +867,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../projects_locations-agents-entity-types-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-agents-environments-create" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-agents-environments-continuous-test-results-list" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

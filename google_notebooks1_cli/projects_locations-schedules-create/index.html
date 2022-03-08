@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Schedules Create - AI Platform Notebooks v2.0.4+20210305</title>
+  <title>Locations Schedules Create - AI Platform Notebooks v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> AI Platform Notebooks v2.0.4+20210305</a>
+        <a href=".." class="icon icon-home"> AI Platform Notebooks v3.0.0+20220224</a>
         
       </div>
 
@@ -140,6 +140,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-rollback">Locations Instances Rollback</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-instances-set-accelerator">Locations Instances Set Accelerator</a>
                     
                 </li>
@@ -175,6 +180,21 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-update-config">Locations Instances Update Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-update-metadata-items">Locations Instances Update Metadata Items</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-update-shielded-instance-config">Locations Instances Update Shielded Instance Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-instances-upgrade">Locations Instances Upgrade</a>
                     
                 </li>
@@ -206,6 +226,66 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-create">Locations Runtimes Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-delete">Locations Runtimes Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-get">Locations Runtimes Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-get-iam-policy">Locations Runtimes Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-list">Locations Runtimes List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-report-event">Locations Runtimes Report Event</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-reset">Locations Runtimes Reset</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-set-iam-policy">Locations Runtimes Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-start">Locations Runtimes Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-stop">Locations Runtimes Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-switch">Locations Runtimes Switch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-test-iam-permissions">Locations Runtimes Test Iam Permissions</a>
                     
                 </li>
             
@@ -320,13 +400,22 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       core-count: int64
       type: string
     container-image-uri: string
+    dataproc-parameters:
+      cluster: string
     input-notebook-file: string
+    job-type: string
+    kernel-spec: string
     labels: { string: string }
     master-type: string
     output-notebook-folder: string
     parameters: string
     params-yaml-file: string
     scale-tier: string
+    service-account: string
+    tensorboard: string
+    vertex-ai-parameters:
+      env: { string: string }
+      network: string
   name: string
   state: string
   time-zone: string
@@ -336,84 +425,117 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=consetetur</code><ul>
+<li><code>-r .    create-time=dolor</code><ul>
 <li>Output only. Time the schedule was created.</li>
 </ul>
 </li>
-<li><code>cron-schedule=voluptua.</code><ul>
-<li>Cron-tab formatted schedule by which the job will execute Format: minute, hour, day of month, month, day of week e.g. 0 0 * * WED = every Wednesday More examples: https://crontab.guru/examples.html</li>
+<li><code>cron-schedule=et</code><ul>
+<li>Cron-tab formatted schedule by which the job will execute. Format: minute, hour, day of month, month, day of week, e.g. 0 0 * * WED = every Wednesday More examples: https://crontab.guru/examples.html</li>
 </ul>
 </li>
-<li><code>description=et</code><ul>
+<li><code>description=sit</code><ul>
 <li>A brief description of this environment.</li>
 </ul>
 </li>
 <li><code>display-name=erat</code><ul>
-<li>Output only. Display name used for UI purposes. Name can only contain alphanumeric characters, hyphens ‘-’, and underscores ‘_’.</li>
+<li>Output only. Display name used for UI purposes. Name can only contain alphanumeric characters, hyphens &#39;-&#39;, and underscores &#39;_&#39;.</li>
 </ul>
 </li>
-<li><code>execution-template.accelerator-config    core-count=-96</code><ul>
+<li><code>execution-template.accelerator-config    core-count=-10</code><ul>
 <li>Count of cores of this accelerator.</li>
 </ul>
 </li>
 <li>
-<p><code>type=amet.</code></p>
+<p><code>type=nonumy</code></p>
 <ul>
 <li>Type of this accelerator.</li>
 </ul>
 </li>
 <li>
-<p><code>..    container-image-uri=sed</code></p>
+<p><code>..    container-image-uri=et</code></p>
 <ul>
 <li>Container Image URI to a DLVM Example: &#39;gcr.io/deeplearning-platform-release/base-cu100&#39; More examples can be found at: https://cloud.google.com/ai-platform/deep-learning-containers/docs/choosing-container</li>
 </ul>
 </li>
-<li><code>input-notebook-file=takimata</code><ul>
-<li>Path to the notebook file to execute. Must be in a Google Cloud Storage bucket. Format: gs://{project_id}/{folder}/{notebook_file_name} Ex: gs://notebook_user/scheduled_notebooks/sentiment_notebook.ipynb</li>
+<li>
+<p><code>dataproc-parameters    cluster=gubergren</code></p>
+<ul>
+<li>URI for cluster used to run Dataproc execution. Format: <code>projects/{PROJECT_ID}/regions/{REGION}/clusters/{CLUSTER_NAME}</code></li>
 </ul>
 </li>
-<li><code>labels=key=dolores</code><ul>
+<li>
+<p><code>..    input-notebook-file=justo</code></p>
+<ul>
+<li>Path to the notebook file to execute. Must be in a Google Cloud Storage bucket. Format: <code>gs://{bucket_name}/{folder}/{notebook_file_name}</code> Ex: <code>gs://notebook_user/scheduled_notebooks/sentiment_notebook.ipynb</code></li>
+</ul>
+</li>
+<li><code>job-type=sea</code><ul>
+<li>The type of Job to be used on this execution.</li>
+</ul>
+</li>
+<li><code>kernel-spec=consetetur</code><ul>
+<li>Name of the kernel spec to use. This must be specified if the kernel spec name on the execution target does not match the name in the input notebook file.</li>
+</ul>
+</li>
+<li><code>labels=key=sit</code><ul>
 <li>Labels for execution. If execution is scheduled, a field included will be &#39;nbs-scheduled&#39;. Otherwise, it is an immediate execution, and an included field will be &#39;nbs-immediate&#39;. Use fields to efficiently index between various types of executions.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>master-type=gubergren</code><ul>
-<li>Specifies the type of virtual machine to use for your training job&#39;s master worker. You must specify this field when <code>scaleTier</code> is set to <code>CUSTOM</code>. You can use certain Compute Engine machine types directly in this field. The following types are supported: - <code>n1-standard-4</code> - <code>n1-standard-8</code> - <code>n1-standard-16</code> - <code>n1-standard-32</code> - <code>n1-standard-64</code> - <code>n1-standard-96</code> - <code>n1-highmem-2</code> - <code>n1-highmem-4</code> - <code>n1-highmem-8</code> - <code>n1-highmem-16</code> - <code>n1-highmem-32</code> - <code>n1-highmem-64</code> - <code>n1-highmem-96</code> - <code>n1-highcpu-16</code> - <code>n1-highcpu-32</code> - <code>n1-highcpu-64</code> - <code>n1-highcpu-96</code> Alternatively, you can use the following legacy machine types: - <code>standard</code> - <code>large_model</code> - <code>complex_model_s</code> - <code>complex_model_m</code> - <code>complex_model_l</code> - <code>standard_gpu</code> - <code>complex_model_m_gpu</code> - <code>complex_model_l_gpu</code> - <code>standard_p100</code> - <code>complex_model_m_p100</code> - <code>standard_v100</code> - <code>large_model_v100</code> - <code>complex_model_m_v100</code> - <code>complex_model_l_v100</code> Finally, if you want to use a TPU for training, specify <code>cloud_tpu</code> in this field. Learn more about the [special configuration options for training with TPU.</li>
+<li><code>master-type=aliquyam</code><ul>
+<li>Specifies the type of virtual machine to use for your training job&#39;s master worker. You must specify this field when <code>scaleTier</code> is set to <code>CUSTOM</code>. You can use certain Compute Engine machine types directly in this field. The following types are supported: - <code>n1-standard-4</code> - <code>n1-standard-8</code> - <code>n1-standard-16</code> - <code>n1-standard-32</code> - <code>n1-standard-64</code> - <code>n1-standard-96</code> - <code>n1-highmem-2</code> - <code>n1-highmem-4</code> - <code>n1-highmem-8</code> - <code>n1-highmem-16</code> - <code>n1-highmem-32</code> - <code>n1-highmem-64</code> - <code>n1-highmem-96</code> - <code>n1-highcpu-16</code> - <code>n1-highcpu-32</code> - <code>n1-highcpu-64</code> - <code>n1-highcpu-96</code> Alternatively, you can use the following legacy machine types: - <code>standard</code> - <code>large_model</code> - <code>complex_model_s</code> - <code>complex_model_m</code> - <code>complex_model_l</code> - <code>standard_gpu</code> - <code>complex_model_m_gpu</code> - <code>complex_model_l_gpu</code> - <code>standard_p100</code> - <code>complex_model_m_p100</code> - <code>standard_v100</code> - <code>large_model_v100</code> - <code>complex_model_m_v100</code> - <code>complex_model_l_v100</code> Finally, if you want to use a TPU for training, specify <code>cloud_tpu</code> in this field. Learn more about the <a href="https://cloud.google.com/ai-platform/training/docs/using-tpus#configuring_a_custom_tpu_machine">special configuration options for training with TPU</a>.</li>
 </ul>
 </li>
-<li><code>output-notebook-folder=et</code><ul>
-<li>Path to the notebook folder to write to. Must be in a Google Cloud Storage bucket path. Format: gs://{project_id}/{folder} Ex: gs://notebook_user/scheduled_notebooks</li>
+<li><code>output-notebook-folder=eos</code><ul>
+<li>Path to the notebook folder to write to. Must be in a Google Cloud Storage bucket path. Format: <code>gs://{bucket_name}/{folder}</code> Ex: <code>gs://notebook_user/scheduled_notebooks</code></li>
 </ul>
 </li>
-<li><code>parameters=accusam</code><ul>
+<li><code>parameters=at</code><ul>
 <li>Parameters used within the &#39;input_notebook_file&#39; notebook.</li>
 </ul>
 </li>
-<li><code>params-yaml-file=voluptua.</code><ul>
-<li>Parameters to be overridden in the notebook during execution. Ref https://papermill.readthedocs.io/en/latest/usage-parameterize.html on how to specifying parameters in the input notebook and pass them here in an YAML file. Ex: gs://notebook_user/scheduled_notebooks/sentiment_notebook_params.yaml</li>
+<li><code>params-yaml-file=dolores</code><ul>
+<li>Parameters to be overridden in the notebook during execution. Ref https://papermill.readthedocs.io/en/latest/usage-parameterize.html on how to specifying parameters in the input notebook and pass them here in an YAML file. Ex: <code>gs://notebook_user/scheduled_notebooks/sentiment_notebook_params.yaml</code></li>
+</ul>
+</li>
+<li><code>scale-tier=consetetur</code><ul>
+<li>Required. Scale tier of the hardware used for notebook execution. DEPRECATED Will be discontinued. As right now only CUSTOM is supported.</li>
+</ul>
+</li>
+<li><code>service-account=gubergren</code><ul>
+<li>The email address of a service account to use when running the execution. You must have the <code>iam.serviceAccounts.actAs</code> permission for the specified service account.</li>
+</ul>
+</li>
+<li><code>tensorboard=dolor</code><ul>
+<li>The name of a Vertex AI [Tensorboard] resource to which this execution will upload Tensorboard logs. Format: <code>projects/{project}/locations/{location}/tensorboards/{tensorboard}</code></li>
+</ul>
+</li>
+<li><code>vertex-ai-parameters    env=key=aliquyam</code><ul>
+<li>Environment variables. At most 100 environment variables can be specified and unique. Example: GCP_BUCKET=gs://my-bucket/samples/</li>
+<li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>scale-tier=dolore</code></p>
+<p><code>network=no</code></p>
 <ul>
-<li>Required. Scale tier of the hardware used for notebook execution.</li>
+<li>The full name of the Compute Engine <a href="..//compute/docs/networks-and-firewalls#networks">network</a> to which the Job should be peered. For example, <code>projects/12345/global/networks/myVPC</code>. <a href="https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert">Format</a> is of the form <code>projects/{project}/global/networks/{network}</code>. Where {project} is a project number, as in <code>12345</code>, and {network} is a network name. Private services access must already be configured for the network. If left unspecified, the job is not peered with any network.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=dolore</code></p>
+<p><code>...    name=amet.</code></p>
 <ul>
 <li>Output only. The name of this schedule. Format: <code>projects/{project_id}/locations/{location}/schedules/{schedule_id}</code></li>
 </ul>
 </li>
-<li><code>state=dolore</code><ul>
+<li><code>state=ipsum</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>time-zone=voluptua.</code><ul>
+<li><code>time-zone=lorem</code><ul>
 <li>Timezone on which the cron_schedule. The value of this field must be a time zone name from the tz database. TZ Database: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones Note that some time zones include a provision for daylight savings time. The rules for daylight saving time are determined by the chosen tz. For UTC use the string &#34;utc&#34;. If a time zone is not specified, the default will be in UTC (also known as GMT).</li>
 </ul>
 </li>
-<li><code>update-time=amet.</code><ul>
+<li><code>update-time=accusam</code><ul>
 <li>Output only. Time the schedule was last updated.</li>
 </ul>
 </li>
@@ -527,7 +649,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         <a href="../projects_locations-schedules-delete" class="btn btn-neutral float-right" title="Locations Schedules Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-operations-list" class="btn btn-neutral" title="Locations Operations List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-runtimes-test-iam-permissions" class="btn btn-neutral" title="Locations Runtimes Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -555,7 +677,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-operations-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-runtimes-test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-schedules-delete" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

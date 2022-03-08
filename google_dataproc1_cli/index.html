@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dataproc v2.0.4+20210322</title>
+  <title>Dataproc v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Dataproc v2.0.4+20210322</a>
+        <a href="." class="icon icon-home"> Dataproc v3.0.0+20220224</a>
         
       </div>
 
@@ -81,6 +81,26 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-autoscaling-policies-update/">Locations Autoscaling Policies Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-batches-create/">Locations Batches Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-batches-delete/">Locations Batches Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-batches-get/">Locations Batches Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-batches-list/">Locations Batches List</a>
                     
                 </li>
             
@@ -211,6 +231,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_regions-clusters-patch/">Regions Clusters Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_regions-clusters-repair/">Regions Clusters Repair</a>
                     
                 </li>
             
@@ -424,7 +449,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataproc1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Dataproc</em> API at revision <em>20210322</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Dataproc</em> API at revision <em>20220224</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">dataproc1 [options]
         projects
                 locations-autoscaling-policies-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -435,6 +460,10 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-autoscaling-policies-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-autoscaling-policies-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-autoscaling-policies-update &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-batches-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-batches-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-batches-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-batches-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workflow-templates-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workflow-templates-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workflow-templates-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -461,6 +490,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 regions-clusters-inject-credentials &lt;project&gt; &lt;region&gt; &lt;cluster&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 regions-clusters-list &lt;project-id&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 regions-clusters-patch &lt;project-id&gt; &lt;region&gt; &lt;cluster-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                regions-clusters-repair &lt;project-id&gt; &lt;region&gt; &lt;cluster-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 regions-clusters-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 regions-clusters-start &lt;project-id&gt; &lt;region&gt; &lt;cluster-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 regions-clusters-stop &lt;project-id&gt; &lt;region&gt; &lt;cluster-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

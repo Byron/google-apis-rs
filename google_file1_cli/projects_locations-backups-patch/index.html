@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Backups Patch - Cloud Filestore v2.0.4+20210323</title>
+  <title>Locations Backups Patch - Cloud Filestore v3.0.0+20220214</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Filestore v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Cloud Filestore v3.0.0+20220214</a>
         
       </div>
 
@@ -129,6 +129,31 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-create">Locations Instances Snapshots Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-delete">Locations Instances Snapshots Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-get">Locations Instances Snapshots Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-list">Locations Instances Snapshots List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-patch">Locations Instances Snapshots Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-list">Locations List</a>
                     
                 </li>
@@ -197,7 +222,7 @@ You can set the scope for this method like this: <code>file1 --scope &lt;scope&g
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Output only. The resource name of the backup, in the format projects/{project_number}/locations/{location_id}/backups/{backup_id}.</li>
+<li>Output only. The resource name of the backup, in the format <code>projects/{project_number}/locations/{location_id}/backups/{backup_id}</code>.</li>
 </ul>
 </li>
 </ul>
@@ -212,6 +237,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   download-bytes: string
   labels: { string: string }
   name: string
+  satisfies-pzs: boolean
   source-file-share: string
   source-instance: string
   source-instance-tier: string
@@ -222,11 +248,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    capacity-gb=duo</code><ul>
+<li><code>-r .    capacity-gb=gubergren</code><ul>
 <li>Output only. Capacity of the source file share when the backup was created.</li>
 </ul>
 </li>
-<li><code>create-time=ipsum</code><ul>
+<li><code>create-time=lorem</code><ul>
 <li>Output only. The time when the backup was created.</li>
 </ul>
 </li>
@@ -234,36 +260,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A description of the backup with 2048 characters or less. Requests with longer descriptions will be rejected.</li>
 </ul>
 </li>
-<li><code>download-bytes=lorem</code><ul>
+<li><code>download-bytes=eos</code><ul>
 <li>Output only. Amount of bytes that will be downloaded if the backup is restored. This may be different than storage bytes, since sequential backups of the same disk will share storage.</li>
 </ul>
 </li>
-<li><code>labels=key=gubergren</code><ul>
+<li><code>labels=key=dolor</code><ul>
 <li>Resource labels to represent user provided metadata.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=eos</code><ul>
-<li>Output only. The resource name of the backup, in the format projects/{project_number}/locations/{location_id}/backups/{backup_id}.</li>
+<li><code>name=ea</code><ul>
+<li>Output only. The resource name of the backup, in the format <code>projects/{project_number}/locations/{location_id}/backups/{backup_id}</code>.</li>
 </ul>
 </li>
-<li><code>source-file-share=dolor</code><ul>
+<li><code>satisfies-pzs=true</code><ul>
+<li>Output only. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>source-file-share=invidunt</code><ul>
 <li>Name of the file share in the source Cloud Filestore instance that the backup is created from.</li>
 </ul>
 </li>
-<li><code>source-instance=ea</code><ul>
-<li>The resource name of the source Cloud Filestore instance, in the format projects/{project_number}/locations/{location_id}/instances/{instance_id}, used to create this backup.</li>
+<li><code>source-instance=amet</code><ul>
+<li>The resource name of the source Cloud Filestore instance, in the format <code>projects/{project_number}/locations/{location_id}/instances/{instance_id}</code>, used to create this backup.</li>
 </ul>
 </li>
-<li><code>source-instance-tier=ipsum</code><ul>
+<li><code>source-instance-tier=duo</code><ul>
 <li>Output only. The service tier of the source Cloud Filestore instance that this backup is created from.</li>
 </ul>
 </li>
-<li><code>state=invidunt</code><ul>
+<li><code>state=ipsum</code><ul>
 <li>Output only. The backup state.</li>
 </ul>
 </li>
-<li><code>storage-bytes=amet</code><ul>
+<li><code>storage-bytes=sed</code><ul>
 <li>Output only. The size of the storage used by the backup. As backups share storage, this number is expected to change with backup creation/deletion.</li>
 </ul>
 </li>

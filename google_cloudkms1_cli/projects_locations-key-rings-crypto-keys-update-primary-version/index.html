@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Key Rings Crypto Keys Update Primary Version - Cloud KMS v2.0.4+20210318</title>
+  <title>Locations Key Rings Crypto Keys Update Primary Version - Cloud KMS v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud KMS v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Cloud KMS v3.0.0+20220225</a>
         
       </div>
 
@@ -43,6 +43,46 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-create">Locations Ekm Connections Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get">Locations Ekm Connections Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get-iam-policy">Locations Ekm Connections Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-list">Locations Ekm Connections List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-patch">Locations Ekm Connections Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-set-iam-policy">Locations Ekm Connections Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-test-iam-permissions">Locations Ekm Connections Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-generate-random-bytes">Locations Generate Random Bytes</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -96,6 +136,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list">Locations Key Rings Crypto Keys Crypto Key Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign">Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify">Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify</a>
                     
                 </li>
             
@@ -271,7 +321,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Update the version of a CryptoKey that will be used in Encrypt. Returns an error if called on an asymmetric key.</p>
+              <p>Update the version of a CryptoKey that will be used in Encrypt. Returns an error if called on a key whose purpose is not ENCRYPT_DECRYPT.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -298,7 +348,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    crypto-key-version-id=ipsum</code><ul>
+<li><code>-r .    crypto-key-version-id=eos</code><ul>
 <li>Required. The id of the child CryptoKeyVersion to use as primary.</li>
 </ul>
 </li>

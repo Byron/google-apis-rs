@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Service Level Objectives Patch - Monitoring v2.0.4+20210322</title>
+  <title>Service Level Objectives Patch - Monitoring v3.0.0+20220218</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
         
       </div>
 
@@ -208,6 +208,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_time-series-create">Time Series Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
                     
                 </li>
             
@@ -447,68 +452,69 @@ In the latter case it is advised to set the field-cursor to the data-structure's
           min: number
         time-series: string
       window-period: string
+  user-labels: { string: string }
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    calendar-period=magna</code><ul>
+<li><code>-r .    calendar-period=nonumy</code><ul>
 <li>A calendar period, semantically &#34;since the start of the current &#34;. At this time, only DAY, WEEK, FORTNIGHT, and MONTH are supported.</li>
 </ul>
 </li>
-<li><code>display-name=et</code><ul>
+<li><code>display-name=rebum.</code><ul>
 <li>Name used for UI elements listing this SLO.</li>
 </ul>
 </li>
-<li><code>goal=0.820349993375188</code><ul>
+<li><code>goal=0.49172447269529684</code><ul>
 <li>The fraction of service that must be good in order for this objective to be met. 0 &lt; goal &lt;= 0.999.</li>
 </ul>
 </li>
-<li><code>name=dolor</code><ul>
+<li><code>name=eos</code><ul>
 <li>Resource name for this ServiceLevelObjective. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME] </li>
 </ul>
 </li>
-<li><code>rolling-period=lorem</code><ul>
+<li><code>rolling-period=amet.</code><ul>
 <li>A rolling time period, semantically &#34;in the past &#34;. Must be an integer multiple of 1 day no larger than 30 days.</li>
 </ul>
 </li>
 <li>
-<p><code>service-level-indicator.basic-sli.latency    threshold=justo</code></p>
+<p><code>service-level-indicator.basic-sli.latency    threshold=dolore</code></p>
 <ul>
 <li>Good service is defined to be the count of requests made to this service that return in no more than threshold.</li>
 </ul>
 </li>
 <li>
-<p><code>..    location=amet.</code></p>
+<p><code>..    location=amet</code></p>
 <ul>
 <li>OPTIONAL: The set of locations to which this SLI is relevant. Telemetry from other locations will not be used to calculate performance for this SLI. If omitted, this SLI applies to all locations in which the Service has activity. For service types that don&#39;t support breaking down by location, setting this field will result in an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>method=no</code><ul>
+<li><code>method=ut</code><ul>
 <li>OPTIONAL: The set of RPCs to which this SLI is relevant. Telemetry from other methods will not be used to calculate performance for this SLI. If omitted, this SLI applies to all the Service&#39;s methods. For service types that don&#39;t support breaking down by method, setting this field will result in an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>version=nonumy</code></p>
+<p><code>version=at</code></p>
 <ul>
 <li>OPTIONAL: The set of API versions to which this SLI is relevant. Telemetry from other API versions will not be used to calculate performance for this SLI. If omitted, this SLI applies to all API versions. For service types that don&#39;t support breaking down by version, setting this field will result in an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..request-based.distribution-cut    distribution-filter=sed</code></p>
+<p><code>..request-based.distribution-cut    distribution-filter=sit</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries aggregating values. Must have ValueType = DISTRIBUTION and MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
-<li><code>range    max=0.6940359249925465</code><ul>
+<li><code>range    max=0.1955564814768168</code><ul>
 <li>Range maximum.</li>
 </ul>
 </li>
 <li>
-<p><code>min=0.342498288197713</code></p>
+<p><code>min=0.44431237216058306</code></p>
 <ul>
 <li>Range minimum.</li>
 </ul>
@@ -519,125 +525,132 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries quantifying bad service, either demanded service that was not provided or demanded service that was of inadequate quality. Must have ValueType = DOUBLE or ValueType = INT64 and must have MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
-<li><code>good-service-filter=tempor</code><ul>
+<li><code>good-service-filter=duo</code><ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries quantifying good service provided. Must have ValueType = DOUBLE or ValueType = INT64 and must have MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
 <li>
-<p><code>total-service-filter=dolore</code></p>
+<p><code>total-service-filter=kasd</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries quantifying total demanded service. Must have ValueType = DOUBLE or ValueType = INT64 and must have MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
 <li>
-<p><code>...windows-based    good-bad-metric-filter=eos</code></p>
+<p><code>...windows-based    good-bad-metric-filter=sadipscing</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries with ValueType = BOOL. The window is good if any true values appear in the window.</li>
 </ul>
 </li>
 <li>
-<p><code>good-total-ratio-threshold.basic-sli-performance.latency    threshold=amet.</code></p>
+<p><code>good-total-ratio-threshold.basic-sli-performance.latency    threshold=tempor</code></p>
 <ul>
 <li>Good service is defined to be the count of requests made to this service that return in no more than threshold.</li>
 </ul>
 </li>
 <li>
-<p><code>..    location=dolore</code></p>
+<p><code>..    location=sea</code></p>
 <ul>
 <li>OPTIONAL: The set of locations to which this SLI is relevant. Telemetry from other locations will not be used to calculate performance for this SLI. If omitted, this SLI applies to all locations in which the Service has activity. For service types that don&#39;t support breaking down by location, setting this field will result in an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>method=amet</code><ul>
+<li><code>method=et</code><ul>
 <li>OPTIONAL: The set of RPCs to which this SLI is relevant. Telemetry from other methods will not be used to calculate performance for this SLI. If omitted, this SLI applies to all the Service&#39;s methods. For service types that don&#39;t support breaking down by method, setting this field will result in an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>version=ut</code></p>
+<p><code>version=lorem</code></p>
 <ul>
 <li>OPTIONAL: The set of API versions to which this SLI is relevant. Telemetry from other API versions will not be used to calculate performance for this SLI. If omitted, this SLI applies to all API versions. For service types that don&#39;t support breaking down by version, setting this field will result in an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..performance.distribution-cut    distribution-filter=at</code></p>
+<p><code>..performance.distribution-cut    distribution-filter=magna</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries aggregating values. Must have ValueType = DISTRIBUTION and MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
-<li><code>range    max=0.3787849038508272</code><ul>
+<li><code>range    max=0.3283916781018025</code><ul>
 <li>Range maximum.</li>
 </ul>
 </li>
 <li>
-<p><code>min=0.6394924405538467</code></p>
+<p><code>min=0.2767666248974914</code></p>
 <ul>
 <li>Range minimum.</li>
 </ul>
 </li>
 <li>
-<p><code>...good-total-ratio    bad-service-filter=ut</code></p>
+<p><code>...good-total-ratio    bad-service-filter=invidunt</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries quantifying bad service, either demanded service that was not provided or demanded service that was of inadequate quality. Must have ValueType = DOUBLE or ValueType = INT64 and must have MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
-<li><code>good-service-filter=rebum.</code><ul>
+<li><code>good-service-filter=clita</code><ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries quantifying good service provided. Must have ValueType = DOUBLE or ValueType = INT64 and must have MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
 <li>
-<p><code>total-service-filter=duo</code></p>
+<p><code>total-service-filter=stet</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying a TimeSeries quantifying total demanded service. Must have ValueType = DOUBLE or ValueType = INT64 and must have MetricKind = DELTA or MetricKind = CUMULATIVE.</li>
 </ul>
 </li>
 <li>
-<p><code>...    threshold=0.30129532554933913</code></p>
+<p><code>...    threshold=0.9502568181793487</code></p>
 <ul>
 <li>If window performance &gt;= threshold, the window is counted as good.</li>
 </ul>
 </li>
 <li>
-<p><code>..metric-mean-in-range.range    max=0.49164260022944106</code></p>
+<p><code>..metric-mean-in-range.range    max=0.5058218521649169</code></p>
 <ul>
 <li>Range maximum.</li>
 </ul>
 </li>
 <li>
-<p><code>min=0.7169828132723964</code></p>
+<p><code>min=0.5909579744308877</code></p>
 <ul>
 <li>Range minimum.</li>
 </ul>
 </li>
 <li>
-<p><code>..    time-series=lorem</code></p>
+<p><code>..    time-series=dolores</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying the TimeSeries to use for evaluating window quality.</li>
 </ul>
 </li>
 <li>
-<p><code>..metric-sum-in-range.range    max=0.5349682891994094</code></p>
+<p><code>..metric-sum-in-range.range    max=0.04322352738011259</code></p>
 <ul>
 <li>Range maximum.</li>
 </ul>
 </li>
 <li>
-<p><code>min=0.9289312830326454</code></p>
+<p><code>min=0.5604347251077454</code></p>
 <ul>
 <li>Range minimum.</li>
 </ul>
 </li>
 <li>
-<p><code>..    time-series=at</code></p>
+<p><code>..    time-series=clita</code></p>
 <ul>
 <li>A monitoring filter (https://cloud.google.com/monitoring/api/v3/filters) specifying the TimeSeries to use for evaluating window quality.</li>
 </ul>
 </li>
 <li>
-<p><code>..    window-period=invidunt</code></p>
+<p><code>..    window-period=dolor</code></p>
 <ul>
 <li>Duration over which window quality is evaluated. Must be an integer fraction of a day and at least 60s.</li>
+</ul>
+</li>
+<li>
+<p><code>...    user-labels=key=aliquyam</code></p>
+<ul>
+<li>Labels which have been used to annotate the service-level objective. Label keys must start with a letter. Label keys and values may contain lowercase letters, numbers, underscores, and dashes. Label keys and values have a maximum length of 63 characters, and must be less than 128 bytes in size. Up to 64 label entries may be stored. For labels which do not have a semantic value, the empty string may be supplied for the label value.</li>
+<li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 </ul>

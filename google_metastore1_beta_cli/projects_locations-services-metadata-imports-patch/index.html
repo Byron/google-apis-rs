@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Services Metadata Imports Patch - Dataproc Metastore v2.0.4+20210325</title>
+  <title>Locations Services Metadata Imports Patch - Dataproc Metastore v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc Metastore v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Dataproc Metastore v3.0.0+20220222</a>
         
       </div>
 
@@ -85,12 +85,57 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-get-iam-policy">Locations Services Backups Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-backups-list">Locations Services Backups List</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-set-iam-policy">Locations Services Backups Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-test-iam-permissions">Locations Services Backups Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-create">Locations Services Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-get-iam-policy">Locations Services Databases Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-set-iam-policy">Locations Services Databases Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-get-iam-policy">Locations Services Databases Tables Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-set-iam-policy">Locations Services Databases Tables Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-test-iam-permissions">Locations Services Databases Tables Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-test-iam-permissions">Locations Services Databases Test Iam Permissions</a>
                     
                 </li>
             
@@ -169,6 +214,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-remove-iam-policy">Locations Services Remove Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-restore">Locations Services Restore</a>
                     
                 </li>
@@ -243,6 +293,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     source-database: string
     type: string
   description: string
+  end-time: string
   name: string
   state: string
   update-time: string
@@ -252,42 +303,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    create-time=et</code><ul>
-<li>Output only. The time when the metadata import was created.</li>
+<li>Output only. The time when the metadata import was started.</li>
 </ul>
 </li>
-<li><code>database-dump    database-type=sadipscing</code><ul>
+<li><code>database-dump    database-type=erat</code><ul>
 <li>The type of the database.</li>
 </ul>
 </li>
-<li><code>gcs-uri=stet</code><ul>
+<li><code>gcs-uri=consetetur</code><ul>
 <li>A Cloud Storage object or folder URI that specifies the source from which to import metadata. It must begin with gs://.</li>
 </ul>
 </li>
-<li><code>source-database=dolor</code><ul>
+<li><code>source-database=amet.</code><ul>
 <li>The name of the source database.</li>
 </ul>
 </li>
 <li>
-<p><code>type=duo</code></p>
+<p><code>type=sed</code></p>
 <ul>
 <li>Optional. The type of the database dump. If unspecified, defaults to MYSQL.</li>
 </ul>
 </li>
 <li>
-<p><code>..    description=vero</code></p>
+<p><code>..    description=takimata</code></p>
 <ul>
 <li>The description of the metadata import.</li>
 </ul>
 </li>
-<li><code>name=vero</code><ul>
+<li><code>end-time=dolores</code><ul>
+<li>Output only. The time when the metadata import finished.</li>
+</ul>
+</li>
+<li><code>name=gubergren</code><ul>
 <li>Immutable. The relative resource name of the metadata import, of the form:projects/{project_number}/locations/{location_id}/services/{service_id}/metadataImports/{metadata_import_id}.</li>
 </ul>
 </li>
-<li><code>state=invidunt</code><ul>
+<li><code>state=et</code><ul>
 <li>Output only. The current state of the metadata import.</li>
 </ul>
 </li>
-<li><code>update-time=stet</code><ul>
+<li><code>update-time=accusam</code><ul>
 <li>Output only. The time when the metadata import was last updated.</li>
 </ul>
 </li>

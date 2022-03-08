@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Service Perimeters Replace All - Access Context Manager v2.0.4+20210319</title>
+  <title>Service Perimeters Replace All - Access Context Manager v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Access Context Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Access Context Manager v3.0.0+20220301</a>
         
       </div>
 
@@ -75,6 +75,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_access-levels-test-iam-permissions">Access Levels Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../access-policies_create">Create</a>
                     
                 </li>
@@ -86,6 +91,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_get-iam-policy">Get Iam Policy</a>
                     
                 </li>
             
@@ -152,6 +162,21 @@
                             
                         
                         </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_service-perimeters-test-iam-permissions">Service Perimeters Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_test-iam-permissions">Test Iam Permissions</a>
                     
                 </li>
             
@@ -248,7 +273,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Replace all existing Service Perimeters in an Access Policy with the Service Perimeters provided. This is done atomically. The longrunning operation from this RPC will have a successful status once all replacements have propagated to long-lasting storage. Replacements containing errors will result in an error response for the first error encountered. Replacement will be cancelled on error, existing Service Perimeters will not be affected. Operation.response field will contain ReplaceServicePerimetersResponse.</p>
+              <p>Replace all existing service perimeters in an access policy with the service perimeters provided. This is done atomically. The long-running operation from this RPC has a successful status after all replacements propagate to long-lasting storage. Replacements containing errors result in an error response for the first error encountered. Upon an error, replacement are cancelled and existing service perimeters are not affected. The Operation.response field contains ReplaceServicePerimetersResponse.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -271,7 +296,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    etag=et</code><ul>
+<li><code>-r .    etag=duo</code><ul>
 <li>Optional. The etag for the version of the Access Policy that this replace operation is to be performed on. If, at the time of replace, the etag for the Access Policy stored in Access Context Manager is different from the specified etag, then the replace operation will not be performed and the call will fail. This field is not required. If etag is not provided, the operation will be performed as if a valid etag is provided.</li>
 </ul>
 </li>
@@ -372,7 +397,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../operations_cancel" class="btn btn-neutral float-right" title="Cancel"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../access-policies_service-perimeters-test-iam-permissions" class="btn btn-neutral float-right" title="Service Perimeters Test Iam Permissions"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../access-policies_service-perimeters-patch" class="btn btn-neutral" title="Service Perimeters Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -404,7 +429,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../access-policies_service-perimeters-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../operations_cancel" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../access-policies_service-perimeters-test-iam-permissions" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

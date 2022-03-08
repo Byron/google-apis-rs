@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Troubleshoot - Policy Troubleshooter v2.0.4+20210329</title>
+  <title>Troubleshoot - Policy Troubleshooter v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Policy Troubleshooter v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Policy Troubleshooter v3.0.0+20220227</a>
         
       </div>
 
@@ -103,7 +103,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Checks whether a member has a specific permission for a specific resource, and explains why the member does or does not have that permission.</p>
+              <p>Checks whether a principal has a specific permission for a specific resource, and explains why the principal does or does not have that permission.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -127,11 +127,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>permission=magna</code><ul>
-<li>Required. The IAM permission to check for the specified member and resource. For a complete list of IAM permissions, see https://cloud.google.com/iam/help/permissions/reference. For a complete list of predefined IAM roles and the permissions in each role, see https://cloud.google.com/iam/help/roles/reference.</li>
+<li>Required. The IAM permission to check for the specified principal and resource. For a complete list of IAM permissions, see https://cloud.google.com/iam/help/permissions/reference. For a complete list of predefined IAM roles and the permissions in each role, see https://cloud.google.com/iam/help/roles/reference.</li>
 </ul>
 </li>
 <li><code>principal=no</code><ul>
-<li>Required. The member, or principal, whose access you want to check, in the form of the email address that represents that member. For example, <code>alice@example.com</code> or <code>my-service-account@my-project.iam.gserviceaccount.com</code>. The member must be a Google Account or a service account. Other types of members are not supported.</li>
+<li>Required. The principal whose access you want to check, in the form of the email address that represents that principal. For example, <code>alice@example.com</code> or <code>my-service-account@my-project.iam.gserviceaccount.com</code>. The principal must be a Google Account or a service account. Other types of principals are not supported.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Services Patch - appengine v2.0.4+20210324</title>
+  <title>Services Patch - appengine v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> appengine v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> appengine v3.0.0+20220226</a>
         
       </div>
 
@@ -316,6 +316,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>Service:
   id: string
+  labels: { string: string }
   name: string
   network-settings:
     ingress-traffic-allowed: string
@@ -327,28 +328,33 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    id=takimata</code><ul>
+<li><code>-r .    id=consetetur</code><ul>
 <li>Relative name of the service within the application. Example: default.@OutputOnly</li>
 </ul>
 </li>
-<li><code>name=consetetur</code><ul>
+<li><code>labels=key=voluptua.</code><ul>
+<li>A set of labels to apply to this service. Labels are key/value pairs that describe the service and all resources that belong to it (e.g., versions). The labels can be used to search and group resources, and are propagated to the usage and billing reports, enabling fine-grain analysis of costs. An example of using labels is to tag resources belonging to different environments (e.g., &#34;env=prod&#34;, &#34;env=qa&#34;). Label keys and values can be no longer than 63 characters and can only contain lowercase letters, numeric characters, underscores, dashes, and international characters. Label keys must start with a lowercase letter or an international character. Each service can have at most 32 labels.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>name=et</code><ul>
 <li>Full path to the Service resource in the API. Example: apps/myapp/services/default.@OutputOnly</li>
 </ul>
 </li>
 <li>
-<p><code>network-settings    ingress-traffic-allowed=voluptua.</code></p>
+<p><code>network-settings    ingress-traffic-allowed=erat</code></p>
 <ul>
 <li>The ingress settings for version or service.</li>
 </ul>
 </li>
 <li>
-<p><code>..split    allocations=key=0.7904276045322813</code></p>
+<p><code>..split    allocations=key=0.04583256524798884</code></p>
 <ul>
 <li>Mapping from version IDs within the service to fractional (0.000, 1] allocations of traffic for that version. Each version can be specified only once, but some versions in the service may not have any traffic allocation. Services that have traffic allocated cannot be deleted until either the service is deleted or their traffic allocation is removed. Allocations must sum to 1. Up to two decimal place precision is supported for IP-based splits and up to three decimal places is supported for cookie-based splits.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>shard-by=erat</code><ul>
+<li><code>shard-by=sed</code><ul>
 <li>Mechanism used to determine which version a request is sent to. The traffic selection algorithm will be stable for either type until allocations are changed.</li>
 </ul>
 </li>
@@ -386,7 +392,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p update-mask=string</strong></p>
 <ul>
-<li>Standard field mask for the set of fields to be updated.</li>
+<li>Required. Standard field mask for the set of fields to be updated.</li>
 </ul>
 </li>
 </ul>

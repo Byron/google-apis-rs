@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Zones Clusters Node Pools Update - Container v2.0.4+20210314</title>
+  <title>Zones Clusters Node Pools Update - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -446,6 +446,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>UpdateNodePoolRequest:
   cluster-id: string
+  gcfs-config:
+    enabled: boolean
+  gvnic:
+    enabled: boolean
   image-type: string
   kubelet-config:
     cpu-cfs-quota: boolean
@@ -469,30 +473,44 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    cluster-id=stet</code><ul>
+<li><code>-r .    cluster-id=consetetur</code><ul>
 <li>Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>image-type=sadipscing</code><ul>
+<li>
+<p><code>gcfs-config    enabled=false</code></p>
+<ul>
+<li>Whether to use GCFS.</li>
+</ul>
+</li>
+<li>
+<p><code>..gvnic    enabled=false</code></p>
+<ul>
+<li>Whether gVNIC features are enabled in the node pool.</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-type=ipsum</code></p>
+<ul>
 <li>Required. The desired image type for the node pool.</li>
 </ul>
 </li>
-<li><code>kubelet-config    cpu-cfs-quota=false</code><ul>
+<li><code>kubelet-config    cpu-cfs-quota=true</code><ul>
 <li>Enable CPU CFS quota enforcement for containers that specify CPU limits. This option is enabled by default which makes kubelet use CFS quota (https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt) to enforce container CPU limits. Otherwise, CPU limits will not be enforced at all. Disable this option to mitigate CPU throttling problems while still having your pods to be in Guaranteed QoS class by specifying the CPU limits. The default value is &#39;true&#39; if unspecified.</li>
 </ul>
 </li>
-<li><code>cpu-cfs-quota-period=et</code><ul>
+<li><code>cpu-cfs-quota-period=est</code><ul>
 <li>Set the CPU CFS quota period value &#39;cpu.cfs_period_us&#39;. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as &#34;300ms&#34;. Valid time units are &#34;ns&#34;, &#34;us&#34; (or &#34;µs&#34;), &#34;ms&#34;, &#34;s&#34;, &#34;m&#34;, &#34;h&#34;. The value must be a positive duration.</li>
 </ul>
 </li>
 <li>
-<p><code>cpu-manager-policy=clita</code></p>
+<p><code>cpu-manager-policy=rebum.</code></p>
 <ul>
-<li>Control the CPU management policy on the node. See https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/ The following values are allowed. - &#34;none&#34;: the default, which represents the existing scheduling behavior. - &#34;static&#34;: allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. The default value is &#39;none&#39; if unspecified.</li>
+<li>Control the CPU management policy on the node. See https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/ The following values are allowed. * &#34;none&#34;: the default, which represents the existing scheduling behavior. * &#34;static&#34;: allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. The default value is &#39;none&#39; if unspecified.</li>
 </ul>
 </li>
 <li>
-<p><code>..linux-node-config    sysctls=key=sit</code></p>
+<p><code>..linux-node-config    sysctls=key=nonumy</code></p>
 <ul>
 <li>The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.netdev_max_backlog net.core.rmem_max net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse</li>
 <li>the value will be associated with the given <code>key</code></li>
@@ -505,40 +523,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>name=sanctus</code><ul>
+<li><code>name=et</code><ul>
 <li>The name (project, location, cluster, node pool) of the node pool to update. Specified in the format <code>projects/*/locations/*/clusters/*/nodePools/*</code>.</li>
 </ul>
 </li>
-<li><code>node-pool-id=no</code><ul>
+<li><code>node-pool-id=et</code><ul>
 <li>Deprecated. The name of the node pool to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>node-version=stet</code><ul>
+<li><code>node-version=aliquyam</code><ul>
 <li>Required. The Kubernetes version to change the nodes to (typically an upgrade). Users may specify either explicit versions offered by Kubernetes Engine or version aliases, which have the following behavior: - &#34;latest&#34;: picks the highest valid Kubernetes version - &#34;1.X&#34;: picks the highest valid patch+gke.N patch in the 1.X version - &#34;1.X.Y&#34;: picks the highest valid gke.N patch in the 1.X.Y version - &#34;1.X.Y-gke.N&#34;: picks an explicit Kubernetes version - &#34;-&#34;: picks the Kubernetes master version</li>
 </ul>
 </li>
-<li><code>project-id=diam</code><ul>
+<li><code>project-id=sanctus</code><ul>
 <li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>upgrade-settings    max-surge=51</code><ul>
+<li><code>upgrade-settings    max-surge=21</code><ul>
 <li>The maximum number of nodes that can be created beyond the current size of the node pool during the upgrade process.</li>
 </ul>
 </li>
 <li>
-<p><code>max-unavailable=76</code></p>
+<p><code>max-unavailable=12</code></p>
 <ul>
 <li>The maximum number of nodes that can be simultaneously unavailable during the upgrade process. A node is considered available if its status is Ready.</li>
 </ul>
 </li>
 <li>
-<p><code>..workload-metadata-config    mode=erat</code></p>
+<p><code>..workload-metadata-config    mode=dolore</code></p>
 <ul>
 <li>Mode is the configuration for how to expose metadata to workloads running on the node pool.</li>
 </ul>
 </li>
 <li>
-<p><code>..    zone=at</code></p>
+<p><code>..    zone=dolore</code></p>
 <ul>
 <li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the name field.</li>
 </ul>

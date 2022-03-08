@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Set Available Product Set - Android Enterprise v2.0.4+20210324</title>
+  <title>Set Available Product Set - Android Enterprise v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Enterprise v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> Android Enterprise v3.0.0+20220303</a>
         
       </div>
 
@@ -599,7 +599,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>product-set-behavior=et</code><ul>
+<li><code>product-set-behavior=sadipscing</code><ul>
 <li>The interpretation of this product set. &#34;unknown&#34; should never be sent and is ignored if received. &#34;whitelist&#34; means that the user is entitled to access the product set. &#34;includeAll&#34; means that all products are accessible, including products that are approved, products with revoked approval, and products that have never been approved. &#34;allApproved&#34; means that the user is entitled to access all products that are approved for the enterprise. If the value is &#34;allApproved&#34; or &#34;includeAll&#34;, the productId field is ignored. If no value is provided, it is interpreted as &#34;whitelist&#34; for backwards compatibility. Further &#34;allApproved&#34; or &#34;includeAll&#34; does not enable automatic visibility of &#34;alpha&#34; or &#34;beta&#34; tracks for Android app. Use ProductVisibility to enable &#34;alpha&#34; or &#34;beta&#34; tracks per user.</li>
 </ul>
 </li>

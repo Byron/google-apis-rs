@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Budgets Patch - CloudBillingBudget v2.0.4+20210326</title>
+  <title>Budgets Patch - CloudBillingBudget v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> CloudBillingBudget v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> CloudBillingBudget v3.0.0+20220227</a>
         
       </div>
 
@@ -221,11 +221,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>...budget-filter    calendar-period=lorem</code></p>
 <ul>
-<li>Optional. Specifies to track usage for recurring calendar period. E.g. Assume that CalendarPeriod.QUARTER is set. The budget will track usage from April 1 to June 30, when current calendar month is April, May, June. After that, it will track usage from July 1 to September 30 when current calendar month is July, August, September, and so on.</li>
+<li>Optional. Specifies to track usage for recurring calendar period. For example, assume that CalendarPeriod.QUARTER is set. The budget will track usage from April 1 to June 30, when the current calendar month is April, May, June. After that, it will track usage from July 1 to September 30 when the current calendar month is July, August, September, so on.</li>
 </ul>
 </li>
 <li><code>credit-types=eos</code><ul>
-<li>Optional. If Filter.credit_types_treatment is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be subtracted from gross cost to determine the spend for threshold calculations. If Filter.credit_types_treatment is <strong>not</strong> INCLUDE_SPECIFIED_CREDITS, this field must be empty. See <a href="https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type">a list of acceptable credit type values</a>.</li>
+<li>Optional. If Filter.credit_types_treatment is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be subtracted from gross cost to determine the spend for threshold calculations. See <a href="https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type">a list of acceptable credit type values</a>. If Filter.credit_types_treatment is <strong>not</strong> INCLUDE_SPECIFIED_CREDITS, this field must be empty.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update Policy - Binary Authorization v2.0.4+20210318</title>
+  <title>Update Policy - Binary Authorization v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Binary Authorization v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Binary Authorization v3.0.0+20220225</a>
         
       </div>
 
@@ -204,6 +204,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     evaluation-mode: string
     require-attestations-by: [string]
   description: string
+  etag: string
   global-policy-evaluation-mode: string
   name: string
   update-time: string
@@ -212,36 +213,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .default-admission-rule    enforcement-mode=ipsum</code><ul>
+<li><code>-r .default-admission-rule    enforcement-mode=amet</code><ul>
 <li>Required. The action when a pod creation is denied by the admission rule.</li>
 </ul>
 </li>
-<li><code>evaluation-mode=invidunt</code><ul>
+<li><code>evaluation-mode=duo</code><ul>
 <li>Required. How this admission rule will be evaluated.</li>
 </ul>
 </li>
 <li>
-<p><code>require-attestations-by=amet</code></p>
+<p><code>require-attestations-by=ipsum</code></p>
 <ul>
 <li>Optional. The resource names of the attestors that must attest to a container image, in the format <code>projects/*/attestors/*</code>. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    description=duo</code></p>
+<p><code>..    description=sed</code></p>
 <ul>
 <li>Optional. A descriptive comment.</li>
 </ul>
 </li>
-<li><code>global-policy-evaluation-mode=ipsum</code><ul>
+<li><code>etag=ut</code><ul>
+<li>Optional. Used to prevent updating the policy when another request has updated it since it was retrieved.</li>
+</ul>
+</li>
+<li><code>global-policy-evaluation-mode=gubergren</code><ul>
 <li>Optional. Controls the evaluation of a Google-maintained global admission policy for common system-level images. Images not covered by the global policy will be subject to the project admission policy. This setting has no effect when specified inside a global admission policy.</li>
 </ul>
 </li>
-<li><code>name=sed</code><ul>
+<li><code>name=rebum.</code><ul>
 <li>Output only. The resource name, in the format <code>projects/*/policy</code>. There is at most one policy per project.</li>
 </ul>
 </li>
-<li><code>update-time=ut</code><ul>
+<li><code>update-time=est</code><ul>
 <li>Output only. Time when the policy was last updated.</li>
 </ul>
 </li>

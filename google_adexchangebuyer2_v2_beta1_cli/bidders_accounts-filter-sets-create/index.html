@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Accounts Filter Sets Create - AdExchangeBuyerII v2.0.4+20210331</title>
+  <title>Accounts Filter Sets Create - AdExchangeBuyerII v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> AdExchangeBuyerII v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> AdExchangeBuyerII v3.0.0+20220307</a>
         
       </div>
 
@@ -141,6 +141,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_finalized-proposals-list">Finalized Proposals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_finalized-proposals-pause">Finalized Proposals Pause</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_finalized-proposals-resume">Finalized Proposals Resume</a>
                     
                 </li>
             
@@ -467,104 +477,104 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .absolute-date-range.end-date    day=79</code><ul>
+<li><code>-r .absolute-date-range.end-date    day=20</code><ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=53</code><ul>
+<li><code>month=91</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=20</code></p>
+<p><code>year=60</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>..start-date    day=91</code></p>
+<p><code>..start-date    day=79</code></p>
 <ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=60</code><ul>
+<li><code>month=89</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=79</code></p>
+<p><code>year=80</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>...    breakdown-dimensions=gubergren</code></p>
+<p><code>...    breakdown-dimensions=sea</code></p>
 <ul>
 <li>The set of dimensions along which to break down the response; may be empty. If multiple dimensions are requested, the breakdown is along the Cartesian product of the requested dimensions.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>creative-id=justo</code><ul>
+<li><code>creative-id=consetetur</code><ul>
 <li>The ID of the creative on which to filter; optional. This field may be set only for a filter set that accesses account-level troubleshooting data, i.e., one whose name matches the <code>bidders/*/accounts/*/filterSets/*</code> pattern.</li>
 </ul>
 </li>
-<li><code>deal-id=sea</code><ul>
+<li><code>deal-id=sit</code><ul>
 <li>The ID of the deal on which to filter; optional. This field may be set only for a filter set that accesses account-level troubleshooting data, i.e., one whose name matches the <code>bidders/*/accounts/*/filterSets/*</code> pattern.</li>
 </ul>
 </li>
-<li><code>environment=consetetur</code><ul>
+<li><code>environment=aliquyam</code><ul>
 <li>The environment on which to filter; optional.</li>
 </ul>
 </li>
-<li><code>format=sit</code><ul>
+<li><code>format=eos</code><ul>
 <li>Creative format bidded on or allowed to bid on, can be empty.</li>
 </ul>
 </li>
-<li><code>formats=aliquyam</code><ul>
+<li><code>formats=at</code><ul>
 <li>Creative formats bidded on or allowed to bid on, can be empty. Although this field is a list, it can only be populated with a single item. A HTTP 400 bad request error will be returned in the response if you specify multiple items.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>name=eos</code><ul>
+<li><code>name=dolores</code><ul>
 <li>A user-defined name of the filter set. Filter set names must be unique globally and match one of the patterns: - <code>bidders/*/filterSets/*</code> (for accessing bidder-level troubleshooting data) - <code>bidders/*/accounts/*/filterSets/*</code> (for accessing account-level troubleshooting data) This field is required in create operations.</li>
 </ul>
 </li>
-<li><code>platforms=at</code><ul>
+<li><code>platforms=consetetur</code><ul>
 <li>The list of platforms on which to filter; may be empty. The filters represented by multiple platforms are ORed together (i.e., if non-empty, results must match any one of the platforms).</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>publisher-identifiers=dolores</code><ul>
+<li><code>publisher-identifiers=gubergren</code><ul>
 <li>For Open Bidding partners only. The list of publisher identifiers on which to filter; may be empty. The filters represented by multiple publisher identifiers are ORed together.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>realtime-time-range    start-timestamp=consetetur</code></p>
+<p><code>realtime-time-range    start-timestamp=dolor</code></p>
 <ul>
 <li>The start timestamp of the real-time RTB metrics aggregation.</li>
 </ul>
 </li>
 <li>
-<p><code>..relative-date-range    duration-days=39</code></p>
+<p><code>..relative-date-range    duration-days=69</code></p>
 <ul>
 <li>The number of days in the requested date range, e.g., for a range spanning today: 1. For a range spanning the last 7 days: 7.</li>
 </ul>
 </li>
 <li>
-<p><code>offset-days=97</code></p>
+<p><code>offset-days=40</code></p>
 <ul>
 <li>The end date of the filter set, specified as the number of days before today, e.g., for a range where the last date is today: 0.</li>
 </ul>
 </li>
 <li>
-<p><code>..    seller-network-ids=69</code></p>
+<p><code>..    seller-network-ids=99</code></p>
 <ul>
 <li>For Authorized Buyers only. The list of IDs of the seller (publisher) networks on which to filter; may be empty. The filters represented by multiple seller network IDs are ORed together (i.e., if non-empty, results must match any one of the publisher networks). See <a href="https://developers.google.com/authorized-buyers/rtb/downloads/seller-network-ids">seller-network-ids</a> file for the set of existing seller network IDs.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>time-series-granularity=no</code><ul>
+<li><code>time-series-granularity=ipsum</code><ul>
 <li>The granularity of time intervals if a time series breakdown is desired; optional.</li>
 </ul>
 </li>

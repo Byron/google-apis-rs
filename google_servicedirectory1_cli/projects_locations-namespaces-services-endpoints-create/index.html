@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Namespaces Services Endpoints Create - Service Directory v2.0.4+20210316</title>
+  <title>Locations Namespaces Services Endpoints Create - Service Directory v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Service Directory v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Service Directory v3.0.0+20220224</a>
         
       </div>
 
@@ -244,6 +244,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   address: string
   annotations: { string: string }
   name: string
+  network: string
   port: integer
 
 </code></pre>
@@ -255,7 +256,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>annotations=key=amet.</code><ul>
-<li>Optional. Annotations for the endpoint. This data can be consumed by service clients. Restrictions: * The entire annotations dictionary may contain up to 512 characters, spread accoss all key-value pairs. Annotations that go beyond this limit are rejected * Valid annotation keys have two segments: an optional prefix and name, separated by a slash (/). The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between. The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots (.), not longer than 253 characters in total, followed by a slash (/) Annotations that fails to meet these requirements are rejected. * The <code>(*.)google.com/</code> and <code>(*.)googleapis.com/</code> prefixes are reserved for system annotations managed by Service Directory. If the user tries to write to these keyspaces, those entries are silently ignored by the system Note: This field is equivalent to the <code>metadata</code> field in the v1beta1 API. They have the same syntax and read/write to the same location in Service Directory.</li>
+<li>Optional. Annotations for the endpoint. This data can be consumed by service clients. Restrictions: * The entire annotations dictionary may contain up to 512 characters, spread accoss all key-value pairs. Annotations that go beyond this limit are rejected * Valid annotation keys have two segments: an optional prefix and name, separated by a slash (/). The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between. The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots (.), not longer than 253 characters in total, followed by a slash (/) Annotations that fails to meet these requirements are rejected. Note: This field is equivalent to the <code>metadata</code> field in the v1beta1 API. They have the same syntax and read/write to the same location in Service Directory.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
@@ -263,7 +264,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Immutable. The resource name for the endpoint in the format <code>projects/*/locations/*/namespaces/*/services/*/endpoints/*</code>.</li>
 </ul>
 </li>
-<li><code>port=49</code><ul>
+<li><code>network=amet.</code><ul>
+<li>Immutable. The Google Compute Engine network (VPC) of the endpoint in the format <code>projects//locations/global/networks/*</code>. The project must be specified by project number (project id is rejected). Incorrectly formatted networks are rejected, we also check to make sure that you have the servicedirectory.networks.attach permission on the project specified.</li>
+</ul>
+</li>
+<li><code>port=81</code><ul>
 <li>Optional. Service Directory rejects values outside of <code>[0, 65535]</code>.</li>
 </ul>
 </li>

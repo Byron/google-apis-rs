@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations List - Cloud Domains v2.0.4+20210216</title>
+  <title>Locations List - Cloud Domains v3.0.0+20220128</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Domains v2.0.4+20210216</a>
+        <a href=".." class="icon icon-home"> Cloud Domains v3.0.0+20220128</a>
         
       </div>
 
@@ -149,6 +149,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-retrieve-transfer-parameters">Locations Registrations Retrieve Transfer Parameters</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-registrations-search-domains">Locations Registrations Search Domains</a>
                     
                 </li>
@@ -160,6 +165,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-registrations-test-iam-permissions">Locations Registrations Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-transfer">Locations Registrations Transfer</a>
                     
                 </li>
             
@@ -230,19 +240,19 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>The standard list filter.</li>
+<li>A filter to narrow down results to a preferred subset. The filtering language accepts strings like &#34;displayName=tokyo&#34;, and is documented in more detail in <a href="https://google.aip.dev/160">AIP-160</a>.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>The standard list page size.</li>
+<li>The maximum number of results to return. If not set, the service selects a default.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p page-token=string</strong></p>
 <ul>
-<li>The standard list page token.</li>
+<li>A page token received from the <code>next_page_token</code> field in the response. Send that page token to receive the subsequent page.</li>
 </ul>
 </li>
 </ul>

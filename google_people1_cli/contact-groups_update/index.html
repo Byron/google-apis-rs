@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - People Service v2.0.4+20210330</title>
+  <title>Update - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -233,7 +233,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Update the name of an existing contact group owned by the authenticated user.</p>
+              <p>Update the name of an existing contact group owned by the authenticated user. Updated contact group names must be unique to the users contact groups. Attempting to create a group with a duplicate name will return a HTTP 409 error. Mutate requests for the same user should be sent sequentially to avoid increased latency and failures.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/contacts</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/contacts</em>.
@@ -302,7 +302,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    name=amet</code></p>
 <ul>
-<li>The contact group name set by the group owner or a system provided name for system groups.</li>
+<li>The contact group name set by the group owner or a system provided name for system groups. For <a href="..//people/api/rest/v1/contactGroups/create"><code>contactGroups.create</code></a> or <a href="..//people/api/rest/v1/contactGroups/update"><code>contactGroups.update</code></a> the name must be unique to the users contact groups. Attempting to create a group with a duplicate name will return a HTTP 409 error.</li>
 </ul>
 </li>
 <li>

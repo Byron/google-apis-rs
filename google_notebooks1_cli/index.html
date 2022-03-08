@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AI Platform Notebooks v2.0.4+20210305</title>
+  <title>AI Platform Notebooks v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> AI Platform Notebooks v2.0.4+20210305</a>
+        <a href="." class="icon icon-home"> AI Platform Notebooks v3.0.0+20220224</a>
         
       </div>
 
@@ -140,6 +140,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-rollback/">Locations Instances Rollback</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-instances-set-accelerator/">Locations Instances Set Accelerator</a>
                     
                 </li>
@@ -175,6 +180,21 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-update-config/">Locations Instances Update Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-update-metadata-items/">Locations Instances Update Metadata Items</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-update-shielded-instance-config/">Locations Instances Update Shielded Instance Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-instances-upgrade/">Locations Instances Upgrade</a>
                     
                 </li>
@@ -206,6 +226,66 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-operations-list/">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-create/">Locations Runtimes Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-delete/">Locations Runtimes Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-get/">Locations Runtimes Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-get-iam-policy/">Locations Runtimes Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-list/">Locations Runtimes List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-report-event/">Locations Runtimes Report Event</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-reset/">Locations Runtimes Reset</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-set-iam-policy/">Locations Runtimes Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-start/">Locations Runtimes Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-stop/">Locations Runtimes Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-switch/">Locations Runtimes Switch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-runtimes-test-iam-permissions/">Locations Runtimes Test Iam Permissions</a>
                     
                 </li>
             
@@ -281,7 +361,7 @@ DO NOT EDIT !
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
 <p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
 <p>Everything else about the <em>AI Platform Notebooks</em> API can be found at the
-<a href="https://cloud.google.com/ai-platform/notebooks/docs/">official documentation site</a>.</p>
+<a href="https://cloud.google.com/notebooks/docs/">official documentation site</a>.</p>
 <h1 id="installation-and-source-code">Installation and Source Code</h1>
 <p>Install the command-line interface with cargo using:</p>
 <pre><code class="bash">cargo install google-notebooks1-cli
@@ -289,7 +369,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/notebooks1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>AI Platform Notebooks</em> API at revision <em>20210305</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>AI Platform Notebooks</em> API at revision <em>20220224</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">notebooks1 [options]
         projects
                 locations-environments-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -311,6 +391,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-instances-register &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-report &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-reset &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-rollback &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-set-accelerator &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-set-labels &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -318,6 +399,9 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-instances-start &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-stop &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-update-config &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-update-metadata-items &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-update-shielded-instance-config &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-upgrade &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-upgrade-internal &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -325,6 +409,18 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-operations-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-report-event &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-reset &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-start &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-stop &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-switch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-runtimes-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-schedules-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-schedules-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-schedules-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

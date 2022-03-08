@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>User Lists Create - Real-time Bidding v2.0.4+20210331</title>
+  <title>User Lists Create - Real-time Bidding v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Real-time Bidding v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Real-time Bidding v3.0.0+20220307</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../bidders_endpoints-list">Endpoints List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../bidders_endpoints-patch">Endpoints Patch</a>
                     
                 </li>
             
@@ -310,62 +315,62 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    description=ipsum</code><ul>
+<li><code>-r .    description=sit</code><ul>
 <li>The description for the user list.</li>
 </ul>
 </li>
-<li><code>display-name=lorem</code><ul>
+<li><code>display-name=duo</code><ul>
 <li>Required. Display name of the user list. This must be unique across all user lists for a given account.</li>
 </ul>
 </li>
-<li><code>membership-duration-days=accusam</code><ul>
+<li><code>membership-duration-days=sit</code><ul>
 <li>Required. The number of days a user&#39;s cookie stays on the user list. The field must be between 0 and 540 inclusive.</li>
 </ul>
 </li>
-<li><code>name=gubergren</code><ul>
+<li><code>name=magna</code><ul>
 <li>Output only. Name of the user list that must follow the pattern <code>buyers/{buyer}/userLists/{user_list}</code>, where <code>{buyer}</code> represents the account ID of the buyer who owns the user list. For a bidder accessing user lists on behalf of a child seat buyer, <code>{buyer}</code> represents the account ID of the child seat buyer. <code>{user_list}</code> is an int64 identifier assigned by Google to uniquely identify a user list.</li>
 </ul>
 </li>
-<li><code>status=sadipscing</code><ul>
+<li><code>status=et</code><ul>
 <li>Output only. The status of the user list. A new user list starts out as open.</li>
 </ul>
 </li>
-<li><code>url-restriction.end-date    day=74</code><ul>
+<li><code>url-restriction.end-date    day=35</code><ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=48</code><ul>
+<li><code>month=97</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=81</code></p>
+<p><code>year=95</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>..    restriction-type=sit</code></p>
+<p><code>..    restriction-type=justo</code></p>
 <ul>
 <li>The restriction type for the specified URL.</li>
 </ul>
 </li>
-<li><code>start-date    day=18</code><ul>
+<li><code>start-date    day=49</code><ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=79</code><ul>
+<li><code>month=90</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=35</code></p>
+<p><code>year=10</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>..    url=dolor</code></p>
+<p><code>..    url=sed</code></p>
 <ul>
 <li>Required. The URL to use for applying the restriction on the user list.</li>
 </ul>

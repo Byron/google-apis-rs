@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Monitoring v2.0.4+20210322</title>
+  <title>List - Monitoring v3.0.0+20220218</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
         
       </div>
 
@@ -212,6 +212,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_time-series-list">Time Series List</a>
                     
                 </li>
@@ -381,7 +386,7 @@ You can set the scope for this method like this: <code>monitoring3 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. Resource name of the parent containing the listed services, either a project or a Monitoring Workspace. The formats are: projects/[PROJECT_ID_OR_NUMBER] workspaces/[HOST_PROJECT_ID_OR_NUMBER] </li>
+<li>Required. Resource name of the parent containing the listed services, either a project (https://cloud.google.com/monitoring/api/v3#project_name) or a Monitoring Workspace. The formats are: projects/[PROJECT_ID_OR_NUMBER] workspaces/[HOST_PROJECT_ID_OR_NUMBER] </li>
 </ul>
 </li>
 </ul>

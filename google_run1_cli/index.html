@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Run v2.0.4+20210326</title>
+  <title>Cloud Run v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Run v2.0.4+20210326</a>
+        <a href="." class="icon icon-home"> Cloud Run v3.0.0+20220225</a>
         
       </div>
 
@@ -76,6 +76,51 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="namespaces_domainmappings-list/">Domainmappings List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_executions-delete/">Executions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_executions-get/">Executions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_executions-list/">Executions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_jobs-create/">Jobs Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_jobs-delete/">Jobs Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_jobs-get/">Jobs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_jobs-list/">Jobs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_jobs-replace-job/">Jobs Replace Job</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_jobs-run/">Jobs Run</a>
                     
                 </li>
             
@@ -129,6 +174,16 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_tasks-get/">Tasks Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="namespaces_tasks-list/">Tasks List</a>
+                    
+                </li>
+            
         
 
     
@@ -172,6 +227,21 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-domainmappings-list/">Locations Domainmappings List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-jobs-get-iam-policy/">Locations Jobs Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-jobs-set-iam-policy/">Locations Jobs Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-jobs-test-iam-permissions/">Locations Jobs Test Iam Permissions</a>
                     
                 </li>
             
@@ -300,7 +370,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Run</em> API at revision <em>20210326</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Run</em> API at revision <em>20220225</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">run1 [options]
         namespaces
                 authorizeddomains-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -310,6 +380,15 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 domainmappings-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 domainmappings-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 domainmappings-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                executions-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                executions-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                executions-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                jobs-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                jobs-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                jobs-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                jobs-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                jobs-replace-job &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                jobs-run &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 revisions-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 revisions-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 revisions-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -320,6 +399,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 services-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 services-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 services-replace-service &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tasks-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tasks-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         projects
                 authorizeddomains-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-authorizeddomains-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -329,6 +410,9 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-domainmappings-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-domainmappings-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-domainmappings-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-jobs-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-jobs-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-jobs-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-revisions-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-revisions-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

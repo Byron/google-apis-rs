@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Fhir Stores Create - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Fhir Stores Create - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -474,6 +474,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-configure-search">Locations Datasets Fhir Stores Configure Search</a>
+                    
+                </li>
+            
                 <li class="toctree-l1 current">
                     <a class="current" href=".">Locations Datasets Fhir Stores Create</a>
                     
@@ -859,8 +864,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   name: string
   notification-config:
     pubsub-topic: string
+    send-for-bulk-import: boolean
   validation-config:
+    disable-fhirpath-validation: boolean
     disable-profile-validation: boolean
+    disable-reference-type-validation: boolean
+    disable-required-field-validation: boolean
     enabled-implementation-guides: [string]
   version: string
 
@@ -876,44 +885,60 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Immutable. Whether to disable referential integrity in this FHIR store. This field is immutable after FHIR store creation. The default value is false, meaning that the API enforces referential integrity and fails the requests that result in inconsistent state in the FHIR store. When this field is set to true, the API skips referential integrity checks. Consequently, operations that rely on references, such as GetPatientEverything, do not return all the results if broken references exist.</li>
 </ul>
 </li>
-<li><code>disable-resource-versioning=false</code><ul>
+<li><code>disable-resource-versioning=true</code><ul>
 <li>Immutable. Whether to disable resource versioning for this FHIR store. This field can not be changed after the creation of FHIR store. If set to false, which is the default behavior, all write operations cause historical versions to be recorded automatically. The historical versions can be fetched through the history APIs, but cannot be updated. If set to true, no historical versions are kept. The server sends errors for attempts to read the historical versions.</li>
 </ul>
 </li>
-<li><code>enable-update-create=false</code><ul>
+<li><code>enable-update-create=true</code><ul>
 <li>Whether this FHIR store has the <a href="https://www.hl7.org/fhir/capabilitystatement-definitions.html#CapabilityStatement.rest.resource.updateCreate">updateCreate capability</a>. This determines if the client can use an Update operation to create a new resource with a client-specified ID. If false, all IDs are server-assigned through the Create operation and attempts to update a non-existent resource return errors. It is strongly advised not to include or encode any sensitive data such as patient identifiers in client-specified resource IDs. Those IDs are part of the FHIR resource path recorded in Cloud audit logs and Pub/Sub notifications. Those IDs can also be contained in reference fields within other resources.</li>
 </ul>
 </li>
-<li><code>labels=key=aliquyam</code><ul>
+<li><code>labels=key=lorem</code><ul>
 <li>User-supplied key-value pairs used to organize FHIR stores. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}{0,62} Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63} No more than 64 labels can be associated with a given store.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=eos</code><ul>
+<li><code>name=accusam</code><ul>
 <li>Output only. Resource name of the FHIR store, of the form <code>projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}</code>.</li>
 </ul>
 </li>
-<li>
-<p><code>notification-config    pubsub-topic=at</code></p>
-<ul>
+<li><code>notification-config    pubsub-topic=gubergren</code><ul>
 <li>The <a href="https://cloud.google.com/pubsub/docs/">Pub/Sub</a> topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data contains the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. <a href="https://cloud.google.com/pubsub/docs/overview#names">Topic names</a> must be scoped to a project. Cloud Healthcare API service account must have publisher permissions on the given Pub/Sub topic. Not having adequate permissions causes the calls that send notifications to fail. If a notification can&#39;t be published to Pub/Sub, errors are logged to Cloud Logging (see <a href="https://cloud.google.com/healthcare/docs/how-tos/logging">Viewing error logs in Cloud Logging</a>). If the number of errors exceeds a certain rate, some aren&#39;t submitted. Note that not all operations trigger notifications, see <a href="https://cloud.google.com/healthcare/docs/how-tos/pubsub">Configuring Pub/Sub notifications</a> for specific details.</li>
 </ul>
 </li>
 <li>
-<p><code>..validation-config    disable-profile-validation=true</code></p>
+<p><code>send-for-bulk-import=true</code></p>
 <ul>
-<li>Whether to disable profile validation for this FHIR store. Set this to true to disable checking incoming resources for conformance against StructureDefinitions in this FHIR store.</li>
+<li>Indicates whether or not to send Pub/Sub notifications on bulk import. Only supported for DICOM imports.</li>
 </ul>
 </li>
 <li>
-<p><code>enabled-implementation-guides=gubergren</code></p>
+<p><code>..validation-config    disable-fhirpath-validation=true</code></p>
+<ul>
+<li>Whether to disable FHIRPath validation for incoming resources. Set this to true to disable checking incoming resources for conformance against FHIRPath requirement defined in the FHIR specification. This property only affects resource types that do not have profiles configured for them, any rules in enabled implementation guides will still be enforced.</li>
+</ul>
+</li>
+<li><code>disable-profile-validation=true</code><ul>
+<li>Whether to disable profile validation for this FHIR store. Set this to true to disable checking incoming resources for conformance against StructureDefinitions in this FHIR store.</li>
+</ul>
+</li>
+<li><code>disable-reference-type-validation=false</code><ul>
+<li>Whether to disable reference type validation for incoming resources. Set this to true to disable checking incoming resources for conformance against reference type requirement defined in the FHIR specification. This property only affects resource types that do not have profiles configured for them, any rules in enabled implementation guides will still be enforced.</li>
+</ul>
+</li>
+<li><code>disable-required-field-validation=true</code><ul>
+<li>Whether to disable required fields validation for incoming resources. Set this to true to disable checking incoming resources for conformance against required fields requirement defined in the FHIR specification. This property only affects resource types that do not have profiles configured for them, any rules in enabled implementation guides will still be enforced.</li>
+</ul>
+</li>
+<li>
+<p><code>enabled-implementation-guides=dolor</code></p>
 <ul>
 <li>A list of ImplementationGuide URLs in this FHIR store that are used to configure the profiles to use for validation. For example, to use the US Core profiles for validation, set <code>enabled_implementation_guides</code> to <code>[&amp;#34;http://hl7.org/fhir/us/core/ImplementationGuide/ig&amp;#34;]</code>. If <code>enabled_implementation_guides</code> is empty or omitted, then incoming resources are only required to conform to the base FHIR profiles. Otherwise, a resource must conform to at least one profile listed in the <code>global</code> property of one of the enabled ImplementationGuides. The Cloud Healthcare API does not currently enforce all of the rules in a StructureDefinition. The following rules are supported: - min/max - minValue/maxValue - maxLength - type - fixed[x] - pattern[x] on simple types - slicing, when using &#34;value&#34; as the discriminator type When a URL cannot be resolved (for example, in a type assertion), the server does not return an error.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    version=dolor</code></p>
+<p><code>..    version=lorem</code></p>
 <ul>
 <li>Immutable. The FHIR specification version that this FHIR store supports natively. This field is immutable after store creation. Requests are rejected if they contain FHIR resources of a different version. Version is required for every FHIR store.</li>
 </ul>
@@ -1028,7 +1053,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         <a href="../projects_locations-datasets-fhir-stores-deidentify" class="btn btn-neutral float-right" title="Locations Datasets Fhir Stores Deidentify"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-datasets-dicom-stores-test-iam-permissions" class="btn btn-neutral" title="Locations Datasets Dicom Stores Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-datasets-fhir-stores-configure-search" class="btn btn-neutral" title="Locations Datasets Fhir Stores Configure Search"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -1056,7 +1081,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-datasets-dicom-stores-test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-datasets-fhir-stores-configure-search" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-datasets-fhir-stores-deidentify" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

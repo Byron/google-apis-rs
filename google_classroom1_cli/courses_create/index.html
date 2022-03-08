@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - classroom v2.0.4+20210323</title>
+  <title>Create - classroom v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> classroom v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> classroom v3.0.0+20220224</a>
         
       </div>
 
@@ -421,7 +421,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates a course. The user specified in <code>ownerId</code> is the owner of the created course and added as a teacher. This method returns the following error codes: * <code>PERMISSION_DENIED</code> if the requesting user is not permitted to create courses or for access errors. * <code>NOT_FOUND</code> if the primary teacher is not a valid user. * <code>FAILED_PRECONDITION</code> if the course owner&#39;s account is disabled or for the following request errors: * UserGroupsMembershipLimitReached * <code>ALREADY_EXISTS</code> if an alias was specified in the <code>id</code> and already exists.</p>
+              <p>Creates a course. The user specified in <code>ownerId</code> is the owner of the created course and added as a teacher. A non-admin requesting user can only create a course with themselves as the owner. Domain admins can create courses owned by any user within their domain. This method returns the following error codes: * <code>PERMISSION_DENIED</code> if the requesting user is not permitted to create courses or for access errors. * <code>NOT_FOUND</code> if the primary teacher is not a valid user. * <code>FAILED_PRECONDITION</code> if the course owner&#39;s account is disabled or for the following request errors: * UserGroupsMembershipLimitReached * <code>ALREADY_EXISTS</code> if an alias was specified in the <code>id</code> and already exists.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/classroom.courses</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/classroom.courses</em>.
@@ -439,6 +439,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   description: string
   description-heading: string
   enrollment-code: string
+  gradebook-settings:
+    calculation-type: string
+    display-setting: string
   guardians-enabled: boolean
   id: string
   name: string
@@ -456,51 +459,63 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    alternate-link=sea</code><ul>
+<li><code>-r .    alternate-link=stet</code><ul>
 <li>Absolute link to this course in the Classroom web UI. Read-only.</li>
 </ul>
 </li>
-<li><code>calendar-id=consetetur</code><ul>
+<li><code>calendar-id=est</code><ul>
 <li>The Calendar ID for a calendar that all course members can see, to which Classroom adds events for course work and announcements in the course. Read-only.</li>
 </ul>
 </li>
-<li><code>course-group-email=consetetur</code><ul>
+<li><code>course-group-email=aliquyam</code><ul>
 <li>The email address of a Google group containing all members of the course. This group does not accept email and can only be used for permissions. Read-only.</li>
 </ul>
 </li>
-<li><code>course-state=stet</code><ul>
+<li><code>course-state=elitr</code><ul>
 <li>State of the course. If unspecified, the default state is <code>PROVISIONED</code>.</li>
 </ul>
 </li>
-<li><code>creation-time=est</code><ul>
+<li><code>creation-time=duo</code><ul>
 <li>Creation time of the course. Specifying this field in a course update mask results in an error. Read-only.</li>
 </ul>
 </li>
-<li><code>description=aliquyam</code><ul>
+<li><code>description=diam</code><ul>
 <li>Optional description. For example, &#34;We&#39;ll be learning about the structure of living creatures from a combination of textbooks, guest lectures, and lab work. Expect to be excited!&#34; If set, this field must be a valid UTF-8 string and no longer than 30,000 characters.</li>
 </ul>
 </li>
-<li><code>description-heading=elitr</code><ul>
+<li><code>description-heading=est</code><ul>
 <li>Optional heading for the description. For example, &#34;Welcome to 10th Grade Biology.&#34; If set, this field must be a valid UTF-8 string and no longer than 3600 characters.</li>
 </ul>
 </li>
-<li><code>enrollment-code=duo</code><ul>
+<li><code>enrollment-code=sit</code><ul>
 <li>Enrollment code to use when joining this course. Specifying this field in a course update mask results in an error. Read-only.</li>
 </ul>
 </li>
-<li><code>guardians-enabled=true</code><ul>
+<li><code>gradebook-settings    calculation-type=sed</code><ul>
+<li>Indicates how the overall grade is calculated.</li>
+</ul>
+</li>
+<li>
+<p><code>display-setting=eos</code></p>
+<ul>
+<li>Indicates who can see the overall grade..</li>
+</ul>
+</li>
+<li>
+<p><code>..    guardians-enabled=true</code></p>
+<ul>
 <li>Whether or not guardian notifications are enabled for this course. Read-only.</li>
 </ul>
 </li>
-<li><code>id=est</code><ul>
+<li><code>id=ea</code><ul>
 <li>Identifier for this course assigned by Classroom. When creating a course, you may optionally set this identifier to an alias string in the request to create a corresponding alias. The <code>id</code> is still assigned by Classroom and cannot be updated after the course is created. Specifying this field in a course update mask results in an error.</li>
 </ul>
 </li>
-<li><code>name=sit</code><ul>
+<li><code>name=stet</code><ul>
 <li>Name of the course. For example, &#34;10th Grade Biology&#34;. The name is required. It must be between 1 and 750 characters and a valid UTF-8 string.</li>
 </ul>
 </li>
-<li><code>owner-id=sed</code><ul>
+<li><code>owner-id=dolores</code><ul>
 <li>The identifier of the owner of a course. When specified as a parameter of a create course request, this field is required. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal <code>&amp;#34;me&amp;#34;</code>, indicating the requesting user This must be set in a create request. Admins can also specify this field in a patch course request to transfer ownership. In other contexts, it is read-only.</li>
 </ul>
 </li>
@@ -508,31 +523,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional room location. For example, &#34;301&#34;. If set, this field must be a valid UTF-8 string and no longer than 650 characters.</li>
 </ul>
 </li>
-<li><code>section=lorem</code><ul>
+<li><code>section=et</code><ul>
 <li>Section of the course. For example, &#34;Period 2&#34;. If set, this field must be a valid UTF-8 string and no longer than 2800 characters.</li>
 </ul>
 </li>
-<li><code>teacher-folder    alternate-link=ea</code><ul>
+<li><code>teacher-folder    alternate-link=sea</code><ul>
 <li>URL that can be used to access the Drive folder. Read-only.</li>
 </ul>
 </li>
-<li><code>id=stet</code><ul>
+<li><code>id=et</code><ul>
 <li>Drive API resource ID.</li>
 </ul>
 </li>
 <li>
-<p><code>title=dolores</code></p>
+<p><code>title=at</code></p>
 <ul>
 <li>Title of the Drive folder. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>..    teacher-group-email=eos</code></p>
+<p><code>..    teacher-group-email=dolore</code></p>
 <ul>
 <li>The email address of a Google group containing all teachers of the course. This group does not accept email and can only be used for permissions. Read-only.</li>
 </ul>
 </li>
-<li><code>update-time=et</code><ul>
+<li><code>update-time=eirmod</code><ul>
 <li>Time of the most recent update to this course. Specifying this field in a course update mask results in an error. Read-only.</li>
 </ul>
 </li>

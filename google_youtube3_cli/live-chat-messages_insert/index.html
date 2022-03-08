@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - YouTube v2.0.4+20210330</title>
+  <title>Insert - YouTube v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
         
       </div>
 
@@ -157,11 +157,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_update">Update</a>
                     
                 </li>
             
@@ -608,6 +603,17 @@
         
 
     
+        
+        <span>Youtube</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -677,10 +683,17 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       user-comment: string
     has-display-content: boolean
     live-chat-id: string
+    member-milestone-chat-details:
+      member-level-name: string
+      member-month: integer
+      user-comment: string
     message-deleted-details:
       deleted-message-id: string
     message-retracted-details:
       retracted-message-id: string
+    new-sponsor-details:
+      is-upgrade: boolean
+      member-level-name: string
     published-at: string
     super-chat-details:
       amount-display-string: string
@@ -713,197 +726,223 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .author-details    channel-id=invidunt</code><ul>
+<li><code>-r .author-details    channel-id=diam</code><ul>
 <li>The YouTube channel ID.</li>
 </ul>
 </li>
-<li><code>channel-url=sea</code><ul>
+<li><code>channel-url=amet</code><ul>
 <li>The channel&#39;s URL.</li>
 </ul>
 </li>
-<li><code>display-name=duo</code><ul>
+<li><code>display-name=at</code><ul>
 <li>The channel&#39;s display name.</li>
 </ul>
 </li>
-<li><code>is-chat-moderator=true</code><ul>
+<li><code>is-chat-moderator=false</code><ul>
 <li>Whether the author is a moderator of the live chat.</li>
 </ul>
 </li>
-<li><code>is-chat-owner=true</code><ul>
+<li><code>is-chat-owner=false</code><ul>
 <li>Whether the author is the owner of the live chat.</li>
 </ul>
 </li>
-<li><code>is-chat-sponsor=false</code><ul>
+<li><code>is-chat-sponsor=true</code><ul>
 <li>Whether the author is a sponsor of the live chat.</li>
 </ul>
 </li>
-<li><code>is-verified=true</code><ul>
+<li><code>is-verified=false</code><ul>
 <li>Whether the author&#39;s identity has been verified by YouTube.</li>
 </ul>
 </li>
 <li>
-<p><code>profile-image-url=ipsum</code></p>
+<p><code>profile-image-url=et</code></p>
 <ul>
 <li>The channels&#39;s avatar URL.</li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=sea</code></p>
+<p><code>..    etag=nonumy</code></p>
 <ul>
 <li>Etag of this resource.</li>
 </ul>
 </li>
-<li><code>id=sit</code><ul>
+<li><code>id=accusam</code><ul>
 <li>The ID that YouTube assigns to uniquely identify the message.</li>
 </ul>
 </li>
-<li><code>kind=amet.</code><ul>
+<li><code>kind=ut</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#liveChatMessage&#34;.</li>
 </ul>
 </li>
-<li><code>snippet    author-channel-id=ipsum</code><ul>
-<li>The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action superChatEvent - the user that made the purchase</li>
+<li><code>snippet    author-channel-id=voluptua.</code><ul>
+<li>The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor memberMilestoneChatEvent - the member that sent the message messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action superChatEvent - the user that made the purchase superStickerEvent - the user that made the purchase</li>
 </ul>
 </li>
-<li><code>display-message=at</code><ul>
+<li><code>display-message=consetetur</code><ul>
 <li>Contains a string that can be displayed to the user. If this field is not present the message is silent, at the moment only messages of type TOMBSTONE and CHAT_ENDED_EVENT are silent.</li>
 </ul>
 </li>
-<li><code>fan-funding-event-details    amount-display-string=vero</code><ul>
+<li><code>fan-funding-event-details    amount-display-string=dolor</code><ul>
 <li>A rendered string that displays the fund amount and currency to the user.</li>
 </ul>
 </li>
-<li><code>amount-micros=takimata</code><ul>
+<li><code>amount-micros=amet</code><ul>
 <li>The amount of the fund.</li>
 </ul>
 </li>
-<li><code>currency=gubergren</code><ul>
+<li><code>currency=et</code><ul>
 <li>The currency in which the fund was made.</li>
 </ul>
 </li>
 <li>
-<p><code>user-comment=et</code></p>
+<p><code>user-comment=aliquyam</code></p>
 <ul>
 <li>The comment added by the user to this fan funding event.</li>
 </ul>
 </li>
 <li>
-<p><code>..    has-display-content=false</code></p>
+<p><code>..    has-display-content=true</code></p>
 <ul>
 <li>Whether the message has display content that should be displayed to users.</li>
 </ul>
 </li>
-<li><code>live-chat-id=magna</code><ul>
+<li><code>live-chat-id=invidunt</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
+<li><code>member-milestone-chat-details    member-level-name=sea</code><ul>
+<li>The name of the Level at which the viever is a member. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn&#39;t filled.</li>
+</ul>
+</li>
+<li><code>member-month=81</code><ul>
+<li>The total amount of months (rounded up) the viewer has been a member that granted them this Member Milestone Chat. This is the same number of months as is being displayed to YouTube users.</li>
+</ul>
+</li>
 <li>
-<p><code>message-deleted-details    deleted-message-id=sit</code></p>
+<p><code>user-comment=sea</code></p>
+<ul>
+<li>The comment added by the member to this Member Milestone Chat. This field is empty for messages without a comment from the member.</li>
+</ul>
+</li>
+<li>
+<p><code>..message-deleted-details    deleted-message-id=stet</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..message-retracted-details    retracted-message-id=gubergren</code></p>
+<p><code>..message-retracted-details    retracted-message-id=sadipscing</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..    published-at=elitr</code></p>
+<p><code>..new-sponsor-details    is-upgrade=true</code></p>
+<ul>
+<li>If the viewer just had upgraded from a lower level. For viewers that were not members at the time of purchase, this field is false.</li>
+</ul>
+</li>
+<li>
+<p><code>member-level-name=ipsum</code></p>
+<ul>
+<li>The name of the Level that the viewer just had joined. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn&#39;t filled.</li>
+</ul>
+</li>
+<li>
+<p><code>..    published-at=sea</code></p>
 <ul>
 <li>The date and time when the message was orignally published.</li>
 </ul>
 </li>
-<li><code>super-chat-details    amount-display-string=ipsum</code><ul>
+<li><code>super-chat-details    amount-display-string=sit</code><ul>
 <li>A rendered string that displays the fund amount and currency to the user.</li>
 </ul>
 </li>
-<li><code>amount-micros=kasd</code><ul>
+<li><code>amount-micros=amet.</code><ul>
 <li>The amount purchased by the user, in micros (1,750,000 micros = 1.75).</li>
 </ul>
 </li>
-<li><code>currency=dolore</code><ul>
+<li><code>currency=ipsum</code><ul>
 <li>The currency in which the purchase was made.</li>
 </ul>
 </li>
-<li><code>tier=50</code><ul>
+<li><code>tier=74</code><ul>
 <li>The tier in which the amount belongs. Lower amounts belong to lower tiers. The lowest tier is 1.</li>
 </ul>
 </li>
 <li>
-<p><code>user-comment=amet</code></p>
+<p><code>user-comment=vero</code></p>
 <ul>
 <li>The comment added by the user to this Super Chat event.</li>
 </ul>
 </li>
 <li>
-<p><code>..super-sticker-details    amount-display-string=ipsum</code></p>
+<p><code>..super-sticker-details    amount-display-string=takimata</code></p>
 <ul>
 <li>A rendered string that displays the fund amount and currency to the user.</li>
 </ul>
 </li>
-<li><code>amount-micros=lorem</code><ul>
+<li><code>amount-micros=gubergren</code><ul>
 <li>The amount purchased by the user, in micros (1,750,000 micros = 1.75).</li>
 </ul>
 </li>
-<li><code>currency=dolores</code><ul>
+<li><code>currency=et</code><ul>
 <li>The currency in which the purchase was made.</li>
 </ul>
 </li>
-<li><code>super-sticker-metadata    alt-text=consetetur</code><ul>
+<li><code>super-sticker-metadata    alt-text=invidunt</code><ul>
 <li>Internationalized alt text that describes the sticker image and any animation associated with it.</li>
 </ul>
 </li>
-<li><code>alt-text-language=stet</code><ul>
+<li><code>alt-text-language=magna</code><ul>
 <li>Specifies the localization language in which the alt text is returned.</li>
 </ul>
 </li>
 <li>
-<p><code>sticker-id=accusam</code></p>
+<p><code>sticker-id=sit</code></p>
 <ul>
 <li>Unique identifier of the Super Sticker. This is a shorter form of the alt_text that includes pack name and a recognizable characteristic of the sticker.</li>
 </ul>
 </li>
 <li>
-<p><code>..    tier=55</code></p>
+<p><code>..    tier=89</code></p>
 <ul>
 <li>The tier in which the amount belongs. Lower amounts belong to lower tiers. The lowest tier is 1.</li>
 </ul>
 </li>
 <li>
-<p><code>..text-message-details    message-text=takimata</code></p>
+<p><code>..text-message-details    message-text=elitr</code></p>
 <ul>
 <li>The user&#39;s message.</li>
 </ul>
 </li>
 <li>
-<p><code>..    type=sed</code></p>
+<p><code>..    type=ipsum</code></p>
 <ul>
 <li>The type of message, this will always be present, it determines the contents of the message as well as which fields will be present.</li>
 </ul>
 </li>
-<li><code>user-banned-details    ban-duration-seconds=nonumy</code><ul>
+<li><code>user-banned-details    ban-duration-seconds=kasd</code><ul>
 <li>The duration of the ban. This property is only present if the banType is temporary.</li>
 </ul>
 </li>
-<li><code>ban-type=sea</code><ul>
+<li><code>ban-type=dolore</code><ul>
 <li>The type of ban.</li>
 </ul>
 </li>
-<li><code>banned-user-details    channel-id=eos</code><ul>
+<li><code>banned-user-details    channel-id=lorem</code><ul>
 <li>The YouTube channel ID.</li>
 </ul>
 </li>
-<li><code>channel-url=dolore</code><ul>
+<li><code>channel-url=amet</code><ul>
 <li>The channel&#39;s URL.</li>
 </ul>
 </li>
-<li><code>display-name=accusam</code><ul>
+<li><code>display-name=ipsum</code><ul>
 <li>The channel&#39;s display name.</li>
 </ul>
 </li>
-<li><code>profile-image-url=elitr</code><ul>
+<li><code>profile-image-url=lorem</code><ul>
 <li>The channels&#39;s avatar URL.</li>
 </ul>
 </li>

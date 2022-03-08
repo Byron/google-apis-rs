@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Patch - Cloud Asset v2.0.4+20210319</title>
+  <title>Patch - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -107,6 +129,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../methods_batch-get-assets-history">Batch Get Assets History</a>
                     
                 </li>
@@ -134,6 +161,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
                     
                 </li>
             
@@ -203,60 +261,68 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       pubsub-destination:
         topic: string
     name: string
+    relationship-types: [string]
   update-mask: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .feed    asset-names=amet.</code><ul>
-<li>A list of the full names of the assets to receive updates. You must specify either or both of asset_names and asset_types. Only asset updates matching specified asset_names or asset_types are exported to the feed. Example: <code>//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1</code>. See <a href="https://cloud.google.com/apis/design/resource_names#full_resource_name">Resource Names</a> for more info.</li>
+<li><code>-r .feed    asset-names=duo</code><ul>
+<li>A list of the full names of the assets to receive updates. You must specify either or both of asset_names and asset_types. Only asset updates matching specified asset_names or asset_types are exported to the feed. Example: <code>//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1</code>. For a list of the full names for supported asset types, see <a href="..//asset-inventory/docs/resource-name-format">Resource name format</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>asset-types=duo</code><ul>
-<li>A list of types of the assets to receive updates. You must specify either or both of asset_names and asset_types. Only asset updates matching specified asset_names or asset_types are exported to the feed. Example: <code>&amp;#34;compute.googleapis.com/Disk&amp;#34;</code> See <a href="https://cloud.google.com/asset-inventory/docs/supported-asset-types">this topic</a> for a list of all supported asset types.</li>
+<li><code>asset-types=ipsum</code><ul>
+<li>A list of types of the assets to receive updates. You must specify either or both of asset_names and asset_types. Only asset updates matching specified asset_names or asset_types are exported to the feed. Example: <code>&amp;#34;compute.googleapis.com/Disk&amp;#34;</code> For a list of all supported asset types, see <a href="..//asset-inventory/docs/supported-asset-types">Supported asset types</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>condition    description=ipsum</code><ul>
+<li><code>condition    description=gubergren</code><ul>
 <li>Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.</li>
 </ul>
 </li>
-<li><code>expression=gubergren</code><ul>
+<li><code>expression=lorem</code><ul>
 <li>Textual representation of an expression in Common Expression Language syntax.</li>
 </ul>
 </li>
-<li><code>location=lorem</code><ul>
+<li><code>location=gubergren</code><ul>
 <li>Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.</li>
 </ul>
 </li>
 <li>
-<p><code>title=gubergren</code></p>
+<p><code>title=eos</code></p>
 <ul>
 <li>Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.</li>
 </ul>
 </li>
 <li>
-<p><code>..    content-type=eos</code></p>
+<p><code>..    content-type=dolor</code></p>
 <ul>
 <li>Asset content type. If not specified, no content but the asset name and type will be returned.</li>
 </ul>
 </li>
 <li>
-<p><code>feed-output-config.pubsub-destination    topic=dolor</code></p>
+<p><code>feed-output-config.pubsub-destination    topic=ea</code></p>
 <ul>
 <li>The name of the Pub/Sub topic to publish to. Example: <code>projects/PROJECT_ID/topics/TOPIC_ID</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...    name=ea</code></p>
+<p><code>...    name=ipsum</code></p>
 <ul>
 <li>Required. The format will be projects/{project_number}/feeds/{client-assigned_feed_identifier} or folders/{folder_number}/feeds/{client-assigned_feed_identifier} or organizations/{organization_number}/feeds/{client-assigned_feed_identifier} The client-assigned feed identifier must be unique within the parent project/folder/organization.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-mask=ipsum</code></p>
+<p><code>relationship-types=invidunt</code></p>
+<ul>
+<li>A list of relationship types to output, for example: <code>INSTANCE_TO_INSTANCEGROUP</code>. This field should only be specified if content_type=RELATIONSHIP. * If specified: it outputs specified relationship updates on the [asset_names] or the [asset_types]. It returns an error if any of the [relationship_types] doesn&#39;t belong to the supported relationship types of the [asset_names] or [asset_types], or any of the [asset_names] or the [asset_types] doesn&#39;t belong to the source types of the [relationship_types]. * Otherwise: it outputs the supported relationships of the types of [asset_names] and [asset_types] or returns an error if any of the [asset_names] or the [asset_types] has no replationship support. See <a href="https://cloud.google.com/asset-inventory/docs/overview">Introduction to Cloud Asset Inventory</a> for all supported asset types and relationship types.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-mask=amet</code></p>
 <ul>
 <li>Required. Only updates the <code>feed</code> fields indicated by this mask. The field mask must not be empty, and it must not contain fields that are immutable or only set by the server.</li>
 </ul>

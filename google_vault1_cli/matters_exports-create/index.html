@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Exports Create - Vault v2.0.4+20210316</title>
+  <title>Exports Create - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -272,7 +272,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates an Export.</p>
+              <p>Creates an export.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/ediscovery</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/ediscovery</em>.
@@ -300,6 +300,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     mail-options:
       export-format: string
       show-confidential-mode-content: boolean
+      use-new-export: boolean
     region: string
     voice-options:
       export-format: string
@@ -355,78 +356,82 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>export-options.drive-options    include-access-info=false</code></p>
 <ul>
-<li>Set to true to include access level information for users with indirect access to files.</li>
+<li>To include access level information for users with <a href="https://support.google.com/vault/answer/6099459#metadata">indirect access</a> to files, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>..groups-options    export-format=sed</code></p>
 <ul>
-<li>The export format for groups export.</li>
+<li>The file format for exported messages.</li>
 </ul>
 </li>
 <li>
 <p><code>..hangouts-chat-options    export-format=duo</code></p>
 <ul>
-<li>The export format for hangouts chat export.</li>
+<li>The file format for exported messages.</li>
 </ul>
 </li>
 <li>
 <p><code>..mail-options    export-format=sed</code></p>
 <ul>
-<li>The export file format.</li>
+<li>The file format for exported messages.</li>
+</ul>
+</li>
+<li><code>show-confidential-mode-content=true</code><ul>
+<li>To export confidential mode content, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
-<p><code>show-confidential-mode-content=true</code></p>
+<p><code>use-new-export=true</code></p>
 <ul>
-<li>Set to true to export confidential mode content.</li>
+<li>To use the new export system, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    region=stet</code></p>
+<p><code>..    region=et</code></p>
 <ul>
-<li>The requested export location.</li>
+<li>The requested data region for the export.</li>
 </ul>
 </li>
 <li>
-<p><code>voice-options    export-format=kasd</code></p>
+<p><code>voice-options    export-format=et</code></p>
 <ul>
-<li>The export format for voice export.</li>
+<li>The file format for exported text messages.</li>
 </ul>
 </li>
 <li>
-<p><code>...    id=et</code></p>
+<p><code>...    id=vero</code></p>
 <ul>
 <li>Output only. The generated export ID.</li>
 </ul>
 </li>
-<li><code>matter-id=sed</code><ul>
+<li><code>matter-id=erat</code><ul>
 <li>Output only. The matter ID.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=sed</code><ul>
 <li>The export name.</li>
 </ul>
 </li>
 <li>
-<p><code>query.account-info    emails=et</code></p>
+<p><code>query.account-info    emails=duo</code></p>
 <ul>
 <li>A set of accounts to search.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    corpus=vero</code></p>
+<p><code>..    corpus=dolore</code></p>
 <ul>
-<li>The corpus to search.</li>
+<li>The Google Workspace service to search.</li>
 </ul>
 </li>
-<li><code>data-scope=erat</code><ul>
-<li>The data source to search from.</li>
+<li><code>data-scope=et</code><ul>
+<li>The data source to search.</li>
 </ul>
 </li>
 <li><code>drive-options    include-shared-drives=false</code><ul>
-<li>Set to true to include shared drive.</li>
+<li>Set to <strong>true</strong> to include shared drives.</li>
 </ul>
 </li>
 <li><code>include-team-drives=false</code><ul>
@@ -434,46 +439,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>version-date=diam</code></p>
+<p><code>version-date=dolor</code></p>
 <ul>
-<li>Search the versions of the Drive file as of the reference date. These timestamps are in GMT and rounded down to the given date.</li>
+<li>Search the current version of the Drive file, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.</li>
 </ul>
 </li>
 <li>
-<p><code>..    end-time=dolor</code></p>
+<p><code>..    end-time=et</code></p>
 <ul>
-<li>The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The end time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
 <p><code>hangouts-chat-info    room-id=et</code></p>
 <ul>
-<li>A set of rooms to search.</li>
+<li>A list of Chat spaces IDs, as provided by the <a href="https://developers.google.com/hangouts/chat">Chat API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
 <p><code>..hangouts-chat-options    include-rooms=false</code></p>
 <ul>
-<li>Set to true to include rooms.</li>
+<li>For searches by account or organizational unit, set to <strong>true</strong> to include rooms.</li>
 </ul>
 </li>
 <li>
 <p><code>..mail-options    exclude-drafts=false</code></p>
 <ul>
-<li>Set to true to exclude drafts.</li>
+<li>Set to <strong>true</strong> to exclude drafts.</li>
 </ul>
 </li>
 <li>
 <p><code>..    method=duo</code></p>
 <ul>
-<li>The search method to use. This field is similar to the search_method field but is introduced to support shared drives. It supports all search method types. In case the search_method is TEAM_DRIVE the response of this field will be SHARED_DRIVE only.</li>
+<li>The entity to search. This field replaces <strong>searchMethod</strong> to support shared drives. When <strong>searchMethod</strong> is <strong>TEAM_DRIVE</strong>, the response of this field is <strong>SHARED_DRIVE</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>org-unit-info    org-unit-id=vero</code></p>
 <ul>
-<li>Org unit to search, as provided by the Admin SDK Directory API.</li>
+<li>The name of the organizational unit to search, as provided by the <a href="https://developers.google.com/admin-sdk/directory/">Admin SDK Directory API</a>.</li>
 </ul>
 </li>
 <li>
@@ -485,31 +490,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>shared-drive-info    shared-drive-ids=invidunt</code></p>
 <ul>
-<li>List of Shared drive IDs, as provided by Drive API.</li>
+<li>A list of shared drive IDs, as provided by the <a href="https://developers.google.com/drive">Drive API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
 <p><code>..    start-time=stet</code></p>
 <ul>
-<li>The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The start time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
 <p><code>team-drive-info    team-drive-ids=vero</code></p>
 <ul>
-<li>List of Team Drive IDs, as provided by Drive API.</li>
+<li>List of Team Drive IDs, as provided by the <a href="https://developers.google.com/drive">Drive API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
 <p><code>..    terms=elitr</code></p>
 <ul>
-<li>The corpus-specific search operators used to generate search results.</li>
+<li>Service-specific <a href="https://support.google.com/vault/answer/2474474">search operators</a> to filter search results.</li>
 </ul>
 </li>
 <li><code>time-zone=lorem</code><ul>
-<li>The time zone name. It should be an IANA TZ name, such as &#34;America/Los_Angeles&#34;. For more information, see Time Zone.</li>
+<li>The time zone name. It should be an IANA TZ name, such as &#34;America/Los_Angeles&#34;. For a list of time zone names, see <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">Time Zone</a>. For more information about how Vault uses time zones, see <a href="https://support.google.com/vault/answer/6092995#time">the Vault help center</a>.</li>
 </ul>
 </li>
 <li>
@@ -534,7 +539,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..stats    exported-artifact-count=-23</code></p>
 <ul>
-<li>The number of documents already processed by the export.</li>
+<li>The number of messages or files already processed for export.</li>
 </ul>
 </li>
 <li><code>size-in-bytes=takimata</code><ul>
@@ -544,13 +549,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>total-artifact-count=-46</code></p>
 <ul>
-<li>The number of documents to be exported.</li>
+<li>The number of messages or files to be exported.</li>
 </ul>
 </li>
 <li>
 <p><code>..    status=voluptua.</code></p>
 <ul>
-<li>Output only. The export status.</li>
+<li>Output only. The status of the export.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Analyze Iam Policy - Cloud Asset v2.0.4+20210319</title>
+  <title>Analyze Iam Policy - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -105,6 +127,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../methods_batch-get-assets-history">Batch Get Assets History</a>
                     
                 </li>
@@ -132,6 +159,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
                     
                 </li>
             
@@ -212,27 +270,33 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 <li>
+<p><strong>-p analysis-query-condition-context-access-time=string</strong></p>
+<ul>
+<li>The hypothetical access timestamp to evaluate IAM conditions. Note that this value must not be earlier than the current time; otherwise, an INVALID_ARGUMENT error will be returned.</li>
+</ul>
+</li>
+<li>
 <p><strong>-p analysis-query-identity-selector-identity=string</strong></p>
 <ul>
-<li>Required. The identity appear in the form of members in <a href="https://cloud.google.com/iam/reference/rest/v1/Binding">IAM policy binding</a>. The examples of supported forms are: &#34;user:mike@example.com&#34;, &#34;group:admins@example.com&#34;, &#34;domain:google.com&#34;, &#34;serviceAccount:my-project-id@appspot.gserviceaccount.com&#34;. Notice that wildcard characters (such as * and ?) are not supported. You must give a specific identity.</li>
+<li>Required. The identity appear in the form of principals in <a href="https://cloud.google.com/iam/reference/rest/v1/Binding">IAM policy binding</a>. The examples of supported forms are: &#34;user:mike@example.com&#34;, &#34;group:admins@example.com&#34;, &#34;domain:google.com&#34;, &#34;serviceAccount:my-project-id@appspot.gserviceaccount.com&#34;. Notice that wildcard characters (such as * and ?) are not supported. You must give a specific identity.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p analysis-query-options-analyze-service-account-impersonation=boolean</strong></p>
 <ul>
-<li>Optional. If true, the response will include access analysis from identities to resources via service account impersonation. This is a very expensive operation, because many derived queries will be executed. We highly recommend you use AssetService.AnalyzeIamPolicyLongrunning rpc instead. For example, if the request analyzes for which resources user A has permission P, and there&#39;s an IAM policy states user A has iam.serviceAccounts.getAccessToken permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to a GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Another example, if the request analyzes for who has permission P to a GCP folder F, and there&#39;s an IAM policy states user A has iam.serviceAccounts.actAs permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to the GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Default is false.</li>
+<li>Optional. If true, the response will include access analysis from identities to resources via service account impersonation. This is a very expensive operation, because many derived queries will be executed. We highly recommend you use AssetService.AnalyzeIamPolicyLongrunning rpc instead. For example, if the request analyzes for which resources user A has permission P, and there&#39;s an IAM policy states user A has iam.serviceAccounts.getAccessToken permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to a GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Another example, if the request analyzes for who has permission P to a GCP folder F, and there&#39;s an IAM policy states user A has iam.serviceAccounts.actAs permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to the GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Only the following permissions are considered in this analysis: * <code>iam.serviceAccounts.actAs</code> * <code>iam.serviceAccounts.signBlob</code> * <code>iam.serviceAccounts.signJwt</code> * <code>iam.serviceAccounts.getAccessToken</code> * <code>iam.serviceAccounts.getOpenIdToken</code> * <code>iam.serviceAccounts.implicitDelegation</code> Default is false.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p analysis-query-options-expand-groups=boolean</strong></p>
 <ul>
-<li>Optional. If true, the identities section of the result will expand any Google groups appearing in an IAM policy binding. If IamPolicyAnalysisQuery.identity_selector is specified, the identity in the result will be determined by the selector, and this flag is not allowed to set. Default is false.</li>
+<li>Optional. If true, the identities section of the result will expand any Google groups appearing in an IAM policy binding. If IamPolicyAnalysisQuery.identity_selector is specified, the identity in the result will be determined by the selector, and this flag is not allowed to set. If true, the default max expansion per group is 1000 for AssetService.AnalyzeIamPolicy][]. Default is false.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p analysis-query-options-expand-resources=boolean</strong></p>
 <ul>
-<li>Optional. If true and IamPolicyAnalysisQuery.resource_selector is not specified, the resource section of the result will expand any resource attached to an IAM policy to include resources lower in the resource hierarchy. For example, if the request analyzes for which resources user A has permission P, and the results include an IAM policy with P on a GCP folder, the results will also include resources in that folder with permission P. If true and IamPolicyAnalysisQuery.resource_selector is specified, the resource section of the result will expand the specified resource to include resources lower in the resource hierarchy. Only project or lower resources are supported. Folder and organization resource cannot be used together with this option. For example, if the request analyzes for which users have permission P on a GCP project with this option enabled, the results will include all users who have permission P on that project or any lower resource. Default is false.</li>
+<li>Optional. If true and IamPolicyAnalysisQuery.resource_selector is not specified, the resource section of the result will expand any resource attached to an IAM policy to include resources lower in the resource hierarchy. For example, if the request analyzes for which resources user A has permission P, and the results include an IAM policy with P on a GCP folder, the results will also include resources in that folder with permission P. If true and IamPolicyAnalysisQuery.resource_selector is specified, the resource section of the result will expand the specified resource to include resources lower in the resource hierarchy. Only project or lower resources are supported. Folder and organization resource cannot be used together with this option. For example, if the request analyzes for which users have permission P on a GCP project with this option enabled, the results will include all users who have permission P on that project or any lower resource. If true, the default max expansion per resource is 1000 for AssetService.AnalyzeIamPolicy][] and 100000 for AssetService.AnalyzeIamPolicyLongrunning][]. Default is false.</li>
 </ul>
 </li>
 <li>
@@ -244,13 +308,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p analysis-query-options-output-group-edges=boolean</strong></p>
 <ul>
-<li>Optional. If true, the result will output group identity edges, starting from the binding&#39;s group members, to any expanded identities. Default is false.</li>
+<li>Optional. If true, the result will output the relevant membership relationships between groups and other groups, and between groups and principals. Default is false.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p analysis-query-options-output-resource-edges=boolean</strong></p>
 <ul>
-<li>Optional. If true, the result will output resource edges, starting from the policy attached resource, to any expanded resources. Default is false.</li>
+<li>Optional. If true, the result will output the relevant parent/child relationships between resources. Default is false.</li>
 </ul>
 </li>
 <li>
@@ -263,6 +327,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p><strong>-p execution-timeout=string</strong></p>
 <ul>
 <li>Optional. Amount of time executable has to complete. See JSON representation of <a href="https://developers.google.com/protocol-buffers/docs/proto3#json">Duration</a>. If this field is set with a value less than the RPC deadline, and the execution of your query hasn&#39;t finished in the specified execution timeout, you will get a response with partial result. Otherwise, your query&#39;s execution will continue until the RPC deadline. If it&#39;s not finished until then, you will get a DEADLINE_EXCEEDED error. Default is empty.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p saved-analysis-query=string</strong></p>
+<ul>
+<li>Optional. The name of a saved query, which must be in the format of: * projects/project_number/savedQueries/saved_query_id * folders/folder_number/savedQueries/saved_query_id * organizations/organization_number/savedQueries/saved_query_id If both <code>analysis_query</code> and <code>saved_analysis_query</code> are provided, they will be merged together with the <code>saved_analysis_query</code> as base and the <code>analysis_query</code> as overrides. For more details of the merge behavior, please refer to the <a href="https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message#Message.MergeFrom.details">MergeFrom</a> page. Note that you cannot override primitive fields with default value, such as 0 or empty string, etc., because we use proto3, which doesn&#39;t support field presence yet.</li>
 </ul>
 </li>
 </ul>

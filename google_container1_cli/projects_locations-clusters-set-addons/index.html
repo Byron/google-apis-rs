@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Clusters Set Addons - Container v2.0.4+20210314</title>
+  <title>Locations Clusters Set Addons - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -443,6 +443,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       enabled: boolean
     gce-persistent-disk-csi-driver-config:
       enabled: boolean
+    gcp-filestore-csi-driver-config:
+      enabled: boolean
     horizontal-pod-autoscaling:
       disabled: boolean
     http-load-balancing:
@@ -489,44 +491,50 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..horizontal-pod-autoscaling    disabled=false</code></p>
+<p><code>..gcp-filestore-csi-driver-config    enabled=true</code></p>
+<ul>
+<li>Whether the GCP Filestore CSI driver is enabled for this cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>..horizontal-pod-autoscaling    disabled=true</code></p>
 <ul>
 <li>Whether the Horizontal Pod Autoscaling feature is enabled in the cluster. When enabled, it ensures that metrics are collected into Stackdriver Monitoring.</li>
 </ul>
 </li>
 <li>
-<p><code>..http-load-balancing    disabled=false</code></p>
+<p><code>..http-load-balancing    disabled=true</code></p>
 <ul>
 <li>Whether the HTTP Load Balancing controller is enabled in the cluster. When enabled, it runs a small pod in the cluster that manages the load balancers.</li>
 </ul>
 </li>
 <li>
-<p><code>..kubernetes-dashboard    disabled=true</code></p>
+<p><code>..kubernetes-dashboard    disabled=false</code></p>
 <ul>
 <li>Whether the Kubernetes Dashboard is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>..network-policy-config    disabled=true</code></p>
+<p><code>..network-policy-config    disabled=false</code></p>
 <ul>
 <li>Whether NetworkPolicy is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>...    cluster-id=sea</code></p>
+<p><code>...    cluster-id=stet</code></p>
 <ul>
 <li>Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>name=duo</code><ul>
 <li>The name (project, location, cluster) of the cluster to set addons. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
 </ul>
 </li>
-<li><code>project-id=stet</code><ul>
+<li><code>project-id=elitr</code><ul>
 <li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>zone=gubergren</code><ul>
+<li><code>zone=aliquyam</code><ul>
 <li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>

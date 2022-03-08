@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Lakes Tasks Patch - Cloud Dataplex v3.0.0+20220223</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Dataplex v3.0.0+20220223</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-actions-list">Locations Lakes Actions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-content-get-iam-policy">Locations Lakes Content Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-content-set-iam-policy">Locations Lakes Content Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-content-test-iam-permissions">Locations Lakes Content Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-contentitems-create">Locations Lakes Contentitems Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-contentitems-delete">Locations Lakes Contentitems Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-contentitems-get">Locations Lakes Contentitems Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-contentitems-list">Locations Lakes Contentitems List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-contentitems-patch">Locations Lakes Contentitems Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-create">Locations Lakes Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-delete">Locations Lakes Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-create">Locations Lakes Environments Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-delete">Locations Lakes Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-get">Locations Lakes Environments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-get-iam-policy">Locations Lakes Environments Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-list">Locations Lakes Environments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-patch">Locations Lakes Environments Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-sessions-list">Locations Lakes Environments Sessions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-set-iam-policy">Locations Lakes Environments Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-environments-test-iam-permissions">Locations Lakes Environments Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-get">Locations Lakes Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-get-iam-policy">Locations Lakes Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-list">Locations Lakes List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-patch">Locations Lakes Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-set-iam-policy">Locations Lakes Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-create">Locations Lakes Tasks Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-delete">Locations Lakes Tasks Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-get">Locations Lakes Tasks Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-get-iam-policy">Locations Lakes Tasks Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-jobs-cancel">Locations Lakes Tasks Jobs Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-jobs-get">Locations Lakes Tasks Jobs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-jobs-list">Locations Lakes Tasks Jobs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-list">Locations Lakes Tasks List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Lakes Tasks Patch</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-set-iam-policy">Locations Lakes Tasks Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-tasks-test-iam-permissions">Locations Lakes Tasks Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-test-iam-permissions">Locations Lakes Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-actions-list">Locations Lakes Zones Actions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-actions-list">Locations Lakes Zones Assets Actions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-create">Locations Lakes Zones Assets Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-delete">Locations Lakes Zones Assets Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-get">Locations Lakes Zones Assets Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-get-iam-policy">Locations Lakes Zones Assets Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-list">Locations Lakes Zones Assets List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-patch">Locations Lakes Zones Assets Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-set-iam-policy">Locations Lakes Zones Assets Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-assets-test-iam-permissions">Locations Lakes Zones Assets Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-create">Locations Lakes Zones Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-delete">Locations Lakes Zones Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-create">Locations Lakes Zones Entities Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-delete">Locations Lakes Zones Entities Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-get">Locations Lakes Zones Entities Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-list">Locations Lakes Zones Entities List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-partitions-create">Locations Lakes Zones Entities Partitions Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-partitions-delete">Locations Lakes Zones Entities Partitions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-partitions-get">Locations Lakes Zones Entities Partitions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-partitions-list">Locations Lakes Zones Entities Partitions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-entities-update">Locations Lakes Zones Entities Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-get">Locations Lakes Zones Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-get-iam-policy">Locations Lakes Zones Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-list">Locations Lakes Zones List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-patch">Locations Lakes Zones Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-set-iam-policy">Locations Lakes Zones Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-lakes-zones-test-iam-permissions">Locations Lakes Zones Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Lakes Tasks Patch</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataplex1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Update the task resource.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>dataplex1 --scope &lt;scope&gt; projects locations-lakes-tasks-patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Output only. The relative resource name of the task, of the form: projects/{project_number}/locations/{location_id}/lakes/{lake_id}/ tasks/{task_id}.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudDataplexV1Task:
+  create-time: string
+  description: string
+  display-name: string
+  execution-spec:
+    args: { string: string }
+    max-job-execution-lifetime: string
+    service-account: string
+  labels: { string: string }
+  name: string
+  spark:
+    archive-uris: [string]
+    file-uris: [string]
+    infrastructure-spec:
+      batch:
+        executors-count: integer
+        max-executors-count: integer
+      container-image:
+        java-jars: [string]
+        properties: { string: string }
+        python-packages: [string]
+      vpc-network:
+        network: string
+        network-tags: [string]
+        sub-network: string
+    main-class: string
+    main-jar-file-uri: string
+    python-script-file: string
+    sql-script: string
+    sql-script-file: string
+  state: string
+  trigger-spec:
+    disabled: boolean
+    max-retries: integer
+    schedule: string
+    start-time: string
+    type: string
+  uid: string
+  update-time: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    create-time=est</code><ul>
+<li>Output only. The time when the task was created.</li>
+</ul>
+</li>
+<li><code>description=aliquyam</code><ul>
+<li>Optional. Description of the task.</li>
+</ul>
+</li>
+<li><code>display-name=elitr</code><ul>
+<li>Optional. User friendly display name.</li>
+</ul>
+</li>
+<li><code>execution-spec    args=key=duo</code><ul>
+<li>Optional. The arguments to pass to the task. The args can use placeholders of the format ${placeholder} as part of key/value string. These will be interpolated before passing the args to the driver. Currently supported placeholders: - ${task_id} - ${job_time} To pass positional args, set the key as TASK_ARGS. The value should be a comma-separated string of all the positional arguments. To use a delimiter other than comma, refer to https://cloud.google.com/sdk/gcloud/reference/topic/escaping. In case of other keys being present in the args, then TASK_ARGS will be passed as the last argument.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>max-job-execution-lifetime=diam</code><ul>
+<li>Optional. The maximum duration after which the job execution is expired.</li>
+</ul>
+</li>
+<li>
+<p><code>service-account=est</code></p>
+<ul>
+<li>Required. Service account to use to execute a task. If not provided, the default Compute service account for the project is used.</li>
+</ul>
+</li>
+<li>
+<p><code>..    labels=key=sit</code></p>
+<ul>
+<li>Optional. User-defined labels for the task.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>name=sed</code><ul>
+<li>Output only. The relative resource name of the task, of the form: projects/{project_number}/locations/{location_id}/lakes/{lake_id}/ tasks/{task_id}.</li>
+</ul>
+</li>
+<li><code>spark    archive-uris=eos</code><ul>
+<li>Optional. Cloud Storage URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>file-uris=lorem</code><ul>
+<li>Optional. Cloud Storage URIs of files to be placed in the working directory of each executor.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>infrastructure-spec.batch    executors-count=84</code><ul>
+<li>Optional. Total number of job executors.</li>
+</ul>
+</li>
+<li>
+<p><code>max-executors-count=86</code></p>
+<ul>
+<li>Optional. Max configurable executors. If max_executors_count &gt; executors_count, then auto-scaling is enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>..container-image    java-jars=dolores</code></p>
+<ul>
+<li>Optional. A list of Java JARS to add to the classpath. Valid input includes Cloud Storage URIs to Jar binaries. For example, gs://bucket-name/my/path/to/file.jar</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>properties=key=eos</code><ul>
+<li>Optional. Override to common configuration of open source components installed on the Dataproc cluster. The properties to set on daemon config files. Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. For more information, see Cluster properties (https://cloud.google.com/dataproc/docs/concepts/cluster-properties).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>python-packages=et</code></p>
+<ul>
+<li>Optional. A list of python packages to be installed. Valid formats include Cloud Storage URI to a PIP installable library. For example, gs://bucket-name/my/path/to/lib.tar.gz</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..vpc-network    network=sea</code></p>
+<ul>
+<li>Optional. The Cloud VPC network in which the job is run. By default, the Cloud VPC network named Default within the project is used.</li>
+</ul>
+</li>
+<li><code>network-tags=et</code><ul>
+<li>Optional. List of network tags to apply to the job.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>sub-network=at</code></p>
+<ul>
+<li>Optional. The Cloud VPC sub-network in which the job is run.</li>
+</ul>
+</li>
+<li>
+<p><code>...    main-class=dolore</code></p>
+<ul>
+<li>The name of the driver&#39;s main class. The jar file that contains the class must be in the default CLASSPATH or specified in jar_file_uris. The execution args are passed in as a sequence of named process arguments (--key=value).</li>
+</ul>
+</li>
+<li><code>main-jar-file-uri=eirmod</code><ul>
+<li>The Cloud Storage URI of the jar file that contains the main class. The execution args are passed in as a sequence of named process arguments (--key=value).</li>
+</ul>
+</li>
+<li><code>python-script-file=lorem</code><ul>
+<li>The Gcloud Storage URI of the main Python file to use as the driver. Must be a .py file. The execution args are passed in as a sequence of named process arguments (--key=value).</li>
+</ul>
+</li>
+<li><code>sql-script=accusam</code><ul>
+<li>The query text. The execution args are used to declare a set of script variables (set key=&#34;value&#34;;).</li>
+</ul>
+</li>
+<li>
+<p><code>sql-script-file=amet</code></p>
+<ul>
+<li>A reference to a query file. This can be the Cloud Storage URI of the query file or it can the path to a SqlScript Content. The execution args are used to declare a set of script variables (set key=&#34;value&#34;;).</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=erat</code></p>
+<ul>
+<li>Output only. Current state of the task.</li>
+</ul>
+</li>
+<li><code>trigger-spec    disabled=true</code><ul>
+<li>Optional. Prevent the task from executing. This does not cancel already running tasks. It is intended to temporarily disable RECURRING tasks.</li>
+</ul>
+</li>
+<li><code>max-retries=20</code><ul>
+<li>Optional. Number of retry attempts before aborting. Set to zero to never attempt to retry a failed task.</li>
+</ul>
+</li>
+<li><code>schedule=accusam</code><ul>
+<li>Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for running tasks periodically. To explicitly set a timezone to the cron tab, apply a prefix in the cron tab: &#34;CRON_TZ=${IANA_TIME_ZONE}&#34; or &#34;TZ=${IANA_TIME_ZONE}&#34;. The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone database. For example, &#34;CRON_TZ=America/New_York 1 * <em> * </em>&#34;, or &#34;TZ=America/New_York 1 * <em> * </em>&#34;. This field is required for RECURRING tasks.</li>
+</ul>
+</li>
+<li><code>start-time=sea</code><ul>
+<li>Optional. The first run of the task will be after this time. If not specified, the task will run shortly after being submitted if ON_DEMAND and based on the schedule if RECURRING.</li>
+</ul>
+</li>
+<li>
+<p><code>type=takimata</code></p>
+<ul>
+<li>Required. Immutable. Trigger type of the user-specified Task.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uid=lorem</code></p>
+<ul>
+<li>Output only. System generated globally unique ID for the task. This ID will be different if the task is deleted and re-created with the same name.</li>
+</ul>
+</li>
+<li><code>update-time=et</code><ul>
+<li>Output only. The time when the task was last updated.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p update-mask=string</strong></p>
+<ul>
+<li>Required. Mask of fields to update.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p validate-only=boolean</strong></p>
+<ul>
+<li>Optional. Only validate the request, but do not perform mutations. The default is false.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-lakes-tasks-set-iam-policy" class="btn btn-neutral float-right" title="Locations Lakes Tasks Set Iam Policy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-lakes-tasks-list" class="btn btn-neutral" title="Locations Lakes Tasks List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-lakes-tasks-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-lakes-tasks-set-iam-policy" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

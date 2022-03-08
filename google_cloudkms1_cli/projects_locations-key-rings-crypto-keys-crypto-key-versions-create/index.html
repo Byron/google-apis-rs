@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Key Rings Crypto Keys Crypto Key Versions Create - Cloud KMS v2.0.4+20210318</title>
+  <title>Locations Key Rings Crypto Keys Crypto Key Versions Create - Cloud KMS v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud KMS v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Cloud KMS v3.0.0+20220225</a>
         
       </div>
 
@@ -43,6 +43,46 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-create">Locations Ekm Connections Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get">Locations Ekm Connections Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get-iam-policy">Locations Ekm Connections Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-list">Locations Ekm Connections List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-patch">Locations Ekm Connections Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-set-iam-policy">Locations Ekm Connections Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-test-iam-permissions">Locations Ekm Connections Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-generate-random-bytes">Locations Generate Random Bytes</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -117,6 +157,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list">Locations Key Rings Crypto Keys Crypto Key Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign">Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify">Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify</a>
                     
                 </li>
             
@@ -304,6 +354,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   destroy-event-time: string
   destroy-time: string
   external-protection-level-options:
+    ekm-connection-key-path: string
     external-key-uri: string
   generate-time: string
   import-failure-reason: string
@@ -311,92 +362,101 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   import-time: string
   name: string
   protection-level: string
+  reimport-eligible: boolean
   state: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    algorithm=ea</code><ul>
+<li><code>-r .    algorithm=voluptua.</code><ul>
 <li>Output only. The CryptoKeyVersionAlgorithm that this CryptoKeyVersion supports.</li>
 </ul>
 </li>
-<li><code>attestation.cert-chains    cavium-certs=dolor</code><ul>
+<li><code>attestation.cert-chains    cavium-certs=amet.</code><ul>
 <li>Cavium certificate chain corresponding to the attestation.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>google-card-certs=lorem</code><ul>
+<li><code>google-card-certs=consetetur</code><ul>
 <li>Google card certificate chain corresponding to the attestation.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>google-partition-certs=eos</code></p>
+<p><code>google-partition-certs=diam</code></p>
 <ul>
 <li>Google partition certificate chain corresponding to the attestation.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    content=labore</code></p>
+<p><code>..    content=dolor</code></p>
 <ul>
 <li>Output only. The attestation data provided by the HSM when the key operation was performed.</li>
 </ul>
 </li>
 <li>
-<p><code>format=sed</code></p>
+<p><code>format=et</code></p>
 <ul>
 <li>Output only. The format of the attestation data.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=duo</code></p>
+<p><code>..    create-time=et</code></p>
 <ul>
 <li>Output only. The time at which this CryptoKeyVersion was created.</li>
 </ul>
 </li>
-<li><code>destroy-event-time=sed</code><ul>
+<li><code>destroy-event-time=sadipscing</code><ul>
 <li>Output only. The time this CryptoKeyVersion&#39;s key material was destroyed. Only present if state is DESTROYED.</li>
 </ul>
 </li>
-<li><code>destroy-time=no</code><ul>
+<li><code>destroy-time=stet</code><ul>
 <li>Output only. The time this CryptoKeyVersion&#39;s key material is scheduled for destruction. Only present if state is DESTROY_SCHEDULED.</li>
 </ul>
 </li>
+<li><code>external-protection-level-options    ekm-connection-key-path=dolor</code><ul>
+<li>The path to the external key material on the EKM when using EkmConnection e.g., &#34;v0/my/key&#34;. Set this field instead of external_key_uri when using an EkmConnection.</li>
+</ul>
+</li>
 <li>
-<p><code>external-protection-level-options    external-key-uri=stet</code></p>
+<p><code>external-key-uri=duo</code></p>
 <ul>
 <li>The URI for an external resource that this CryptoKeyVersion represents.</li>
 </ul>
 </li>
 <li>
-<p><code>..    generate-time=kasd</code></p>
+<p><code>..    generate-time=vero</code></p>
 <ul>
 <li>Output only. The time this CryptoKeyVersion&#39;s key material was generated.</li>
 </ul>
 </li>
-<li><code>import-failure-reason=et</code><ul>
-<li>Output only. The root cause of an import failure. Only present if state is IMPORT_FAILED.</li>
+<li><code>import-failure-reason=vero</code><ul>
+<li>Output only. The root cause of the most recent import failure. Only present if state is IMPORT_FAILED.</li>
 </ul>
 </li>
-<li><code>import-job=sed</code><ul>
-<li>Output only. The name of the ImportJob used to import this CryptoKeyVersion. Only present if the underlying key material was imported.</li>
+<li><code>import-job=invidunt</code><ul>
+<li>Output only. The name of the ImportJob used in the most recent import of this CryptoKeyVersion. Only present if the underlying key material was imported.</li>
 </ul>
 </li>
-<li><code>import-time=et</code><ul>
-<li>Output only. The time at which this CryptoKeyVersion&#39;s key material was imported.</li>
+<li><code>import-time=stet</code><ul>
+<li>Output only. The time at which this CryptoKeyVersion&#39;s key material was most recently imported.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=vero</code><ul>
 <li>Output only. The resource name for this CryptoKeyVersion in the format <code>projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*</code>.</li>
 </ul>
 </li>
-<li><code>protection-level=vero</code><ul>
+<li><code>protection-level=elitr</code><ul>
 <li>Output only. The ProtectionLevel describing how crypto operations are performed with this CryptoKeyVersion.</li>
 </ul>
 </li>
-<li><code>state=erat</code><ul>
+<li><code>reimport-eligible=true</code><ul>
+<li>Output only. Whether or not this key version is eligible for reimport, by being specified as a target in ImportCryptoKeyVersionRequest.crypto_key_version.</li>
+</ul>
+</li>
+<li><code>state=ipsum</code><ul>
 <li>The current state of the CryptoKeyVersion.</li>
 </ul>
 </li>

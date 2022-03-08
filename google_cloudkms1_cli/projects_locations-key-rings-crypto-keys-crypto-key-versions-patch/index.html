@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Key Rings Crypto Keys Crypto Key Versions Patch - Cloud KMS v2.0.4+20210318</title>
+  <title>Locations Key Rings Crypto Keys Crypto Key Versions Patch - Cloud KMS v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud KMS v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Cloud KMS v3.0.0+20220225</a>
         
       </div>
 
@@ -43,6 +43,46 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-create">Locations Ekm Connections Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get">Locations Ekm Connections Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get-iam-policy">Locations Ekm Connections Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-list">Locations Ekm Connections List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-patch">Locations Ekm Connections Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-set-iam-policy">Locations Ekm Connections Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-test-iam-permissions">Locations Ekm Connections Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-generate-random-bytes">Locations Generate Random Bytes</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -96,6 +136,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list">Locations Key Rings Crypto Keys Crypto Key Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign">Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify">Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify</a>
                     
                 </li>
             
@@ -307,6 +357,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   destroy-event-time: string
   destroy-time: string
   external-protection-level-options:
+    ekm-connection-key-path: string
     external-key-uri: string
   generate-time: string
   import-failure-reason: string
@@ -314,92 +365,101 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   import-time: string
   name: string
   protection-level: string
+  reimport-eligible: boolean
   state: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    algorithm=et</code><ul>
+<li><code>-r .    algorithm=dolores</code><ul>
 <li>Output only. The CryptoKeyVersionAlgorithm that this CryptoKeyVersion supports.</li>
 </ul>
 </li>
-<li><code>attestation.cert-chains    cavium-certs=voluptua.</code><ul>
+<li><code>attestation.cert-chains    cavium-certs=gubergren</code><ul>
 <li>Cavium certificate chain corresponding to the attestation.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>google-card-certs=amet.</code><ul>
+<li><code>google-card-certs=et</code><ul>
 <li>Google card certificate chain corresponding to the attestation.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>google-partition-certs=consetetur</code></p>
+<p><code>google-partition-certs=accusam</code></p>
 <ul>
 <li>Google partition certificate chain corresponding to the attestation.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    content=diam</code></p>
+<p><code>..    content=voluptua.</code></p>
 <ul>
 <li>Output only. The attestation data provided by the HSM when the key operation was performed.</li>
 </ul>
 </li>
 <li>
-<p><code>format=dolor</code></p>
+<p><code>format=dolore</code></p>
 <ul>
 <li>Output only. The format of the attestation data.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=et</code></p>
+<p><code>..    create-time=dolore</code></p>
 <ul>
 <li>Output only. The time at which this CryptoKeyVersion was created.</li>
 </ul>
 </li>
-<li><code>destroy-event-time=et</code><ul>
+<li><code>destroy-event-time=dolore</code><ul>
 <li>Output only. The time this CryptoKeyVersion&#39;s key material was destroyed. Only present if state is DESTROYED.</li>
 </ul>
 </li>
-<li><code>destroy-time=sadipscing</code><ul>
+<li><code>destroy-time=voluptua.</code><ul>
 <li>Output only. The time this CryptoKeyVersion&#39;s key material is scheduled for destruction. Only present if state is DESTROY_SCHEDULED.</li>
 </ul>
 </li>
+<li><code>external-protection-level-options    ekm-connection-key-path=amet.</code><ul>
+<li>The path to the external key material on the EKM when using EkmConnection e.g., &#34;v0/my/key&#34;. Set this field instead of external_key_uri when using an EkmConnection.</li>
+</ul>
+</li>
 <li>
-<p><code>external-protection-level-options    external-key-uri=stet</code></p>
+<p><code>external-key-uri=ea</code></p>
 <ul>
 <li>The URI for an external resource that this CryptoKeyVersion represents.</li>
 </ul>
 </li>
 <li>
-<p><code>..    generate-time=dolor</code></p>
+<p><code>..    generate-time=sadipscing</code></p>
 <ul>
 <li>Output only. The time this CryptoKeyVersion&#39;s key material was generated.</li>
 </ul>
 </li>
-<li><code>import-failure-reason=duo</code><ul>
-<li>Output only. The root cause of an import failure. Only present if state is IMPORT_FAILED.</li>
+<li><code>import-failure-reason=lorem</code><ul>
+<li>Output only. The root cause of the most recent import failure. Only present if state is IMPORT_FAILED.</li>
 </ul>
 </li>
-<li><code>import-job=vero</code><ul>
-<li>Output only. The name of the ImportJob used to import this CryptoKeyVersion. Only present if the underlying key material was imported.</li>
+<li><code>import-job=invidunt</code><ul>
+<li>Output only. The name of the ImportJob used in the most recent import of this CryptoKeyVersion. Only present if the underlying key material was imported.</li>
 </ul>
 </li>
-<li><code>import-time=vero</code><ul>
-<li>Output only. The time at which this CryptoKeyVersion&#39;s key material was imported.</li>
+<li><code>import-time=no</code><ul>
+<li>Output only. The time at which this CryptoKeyVersion&#39;s key material was most recently imported.</li>
 </ul>
 </li>
-<li><code>name=invidunt</code><ul>
+<li><code>name=est</code><ul>
 <li>Output only. The resource name for this CryptoKeyVersion in the format <code>projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*</code>.</li>
 </ul>
 </li>
-<li><code>protection-level=stet</code><ul>
+<li><code>protection-level=at</code><ul>
 <li>Output only. The ProtectionLevel describing how crypto operations are performed with this CryptoKeyVersion.</li>
 </ul>
 </li>
-<li><code>state=vero</code><ul>
+<li><code>reimport-eligible=true</code><ul>
+<li>Output only. Whether or not this key version is eligible for reimport, by being specified as a target in ImportCryptoKeyVersionRequest.crypto_key_version.</li>
+</ul>
+</li>
+<li><code>state=sit</code><ul>
 <li>The current state of the CryptoKeyVersion.</li>
 </ul>
 </li>
@@ -513,7 +573,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         <a href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-restore" class="btn btn-neutral float-right" title="Locations Key Rings Crypto Keys Crypto Key Versions Restore"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list" class="btn btn-neutral" title="Locations Key Rings Crypto Keys Crypto Key Versions List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify" class="btn btn-neutral" title="Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -541,7 +601,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-restore" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Global Connectivity Tests Create - Network Management v2.0.4+20210325</title>
+  <title>Locations Global Connectivity Tests Create - Network Management v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Network Management v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Network Management v3.0.0+20220223</a>
         
       </div>
 
@@ -199,6 +199,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   create-time: string
   description: string
   destination:
+    cloud-sql-instance: string
+    gke-master-cluster: string
     instance: string
     ip-address: string
     network: string
@@ -217,6 +219,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     verify-time: string
   related-projects: [string]
   source:
+    cloud-sql-instance: string
+    gke-master-cluster: string
     instance: string
     ip-address: string
     network: string
@@ -237,28 +241,36 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The user-supplied description of the Connectivity Test. Maximum of 512 characters.</li>
 </ul>
 </li>
-<li><code>destination    instance=no</code><ul>
+<li><code>destination    cloud-sql-instance=no</code><ul>
+<li>A <a href="https://cloud.google.com/sql">Cloud SQL</a> instance URI.</li>
+</ul>
+</li>
+<li><code>gke-master-cluster=ipsum</code><ul>
+<li>A cluster URI for <a href="https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture">Google Kubernetes Engine master</a>.</li>
+</ul>
+</li>
+<li><code>instance=voluptua.</code><ul>
 <li>A Compute Engine instance URI.</li>
 </ul>
 </li>
-<li><code>ip-address=ipsum</code><ul>
+<li><code>ip-address=at</code><ul>
 <li>The IP address of the endpoint, which can be an external or internal IP. An IPv6 address is only allowed when the test&#39;s destination is a <a href="..//load-balancing/docs/load-balancing-overview">global load balancer VIP</a>.</li>
 </ul>
 </li>
-<li><code>network=voluptua.</code><ul>
+<li><code>network=sanctus</code><ul>
 <li>A Compute Engine network URI.</li>
 </ul>
 </li>
-<li><code>network-type=at</code><ul>
+<li><code>network-type=sed</code><ul>
 <li>Type of the network where the endpoint is located. Applicable only to source endpoint, as destination network type can be inferred from the source.</li>
 </ul>
 </li>
-<li><code>port=93</code><ul>
+<li><code>port=99</code><ul>
 <li>The IP protocol port of the endpoint. Only applicable when protocol is TCP or UDP.</li>
 </ul>
 </li>
 <li>
-<p><code>project-id=sed</code></p>
+<p><code>project-id=takimata</code></p>
 <ul>
 <li>Project ID where the endpoint is located. The Project ID can be derived from the URI if you provide a VM instance or network URI. The following are two cases where you must provide the project ID: 1. Only the IP address is specified, and the IP address is within a GCP project. 2. When you are using Shared VPC and the IP address that you provide is from the service project. In this case, the network that the IP address resides in is defined in the host project.</li>
 </ul>
@@ -269,20 +281,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. The display name of a Connectivity Test.</li>
 </ul>
 </li>
-<li><code>labels=key=takimata</code><ul>
+<li><code>labels=key=duo</code><ul>
 <li>Resource labels to represent user-provided metadata.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=amet.</code><ul>
+<li><code>name=ipsum</code><ul>
 <li>Required. Unique name of the resource using the form: <code>projects/{project_id}/locations/global/connectivityTests/{test_id}</code></li>
 </ul>
 </li>
-<li><code>protocol=duo</code><ul>
+<li><code>protocol=gubergren</code><ul>
 <li>IP Protocol of the test. When not provided, &#34;TCP&#34; is assumed.</li>
 </ul>
 </li>
-<li><code>reachability-details.error    code=46</code><ul>
+<li><code>reachability-details.error    code=50</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
@@ -293,29 +305,37 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    result=lorem</code></p>
+<p><code>..    result=eos</code></p>
 <ul>
 <li>The overall result of the test&#39;s configuration analysis.</li>
 </ul>
 </li>
 <li>
-<p><code>verify-time=gubergren</code></p>
+<p><code>verify-time=dolor</code></p>
 <ul>
 <li>The time of the configuration analysis.</li>
 </ul>
 </li>
 <li>
-<p><code>..    related-projects=eos</code></p>
+<p><code>..    related-projects=ea</code></p>
 <ul>
 <li>Other projects that may be relevant for reachability analysis. This is applicable to scenarios where a test can cross project boundaries.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>source    instance=dolor</code><ul>
+<li><code>source    cloud-sql-instance=ipsum</code><ul>
+<li>A <a href="https://cloud.google.com/sql">Cloud SQL</a> instance URI.</li>
+</ul>
+</li>
+<li><code>gke-master-cluster=invidunt</code><ul>
+<li>A cluster URI for <a href="https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture">Google Kubernetes Engine master</a>.</li>
+</ul>
+</li>
+<li><code>instance=amet</code><ul>
 <li>A Compute Engine instance URI.</li>
 </ul>
 </li>
-<li><code>ip-address=ea</code><ul>
+<li><code>ip-address=duo</code><ul>
 <li>The IP address of the endpoint, which can be an external or internal IP. An IPv6 address is only allowed when the test&#39;s destination is a <a href="..//load-balancing/docs/load-balancing-overview">global load balancer VIP</a>.</li>
 </ul>
 </li>
@@ -323,22 +343,22 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A Compute Engine network URI.</li>
 </ul>
 </li>
-<li><code>network-type=invidunt</code><ul>
+<li><code>network-type=sed</code><ul>
 <li>Type of the network where the endpoint is located. Applicable only to source endpoint, as destination network type can be inferred from the source.</li>
 </ul>
 </li>
-<li><code>port=54</code><ul>
+<li><code>port=64</code><ul>
 <li>The IP protocol port of the endpoint. Only applicable when protocol is TCP or UDP.</li>
 </ul>
 </li>
 <li>
-<p><code>project-id=duo</code></p>
+<p><code>project-id=gubergren</code></p>
 <ul>
 <li>Project ID where the endpoint is located. The Project ID can be derived from the URI if you provide a VM instance or network URI. The following are two cases where you must provide the project ID: 1. Only the IP address is specified, and the IP address is within a GCP project. 2. When you are using Shared VPC and the IP address that you provide is from the service project. In this case, the network that the IP address resides in is defined in the host project.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-time=ipsum</code></p>
+<p><code>..    update-time=rebum.</code></p>
 <ul>
 <li>Output only. The time the test&#39;s configuration was updated.</li>
 </ul>

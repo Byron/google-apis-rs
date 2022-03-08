@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - YouTube v2.0.4+20210330</title>
+  <title>Update - YouTube v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
         
       </div>
 
@@ -157,11 +157,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_update">Update</a>
                     
                 </li>
             
@@ -505,6 +500,9 @@
                             <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
                             
                         
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
                             <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
                             
                         
@@ -605,6 +603,17 @@
         
 
     
+        
+        <span>Youtube</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -659,36 +668,36 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    etag=ipsum</code><ul>
+<li><code>-r .    etag=elitr</code><ul>
 <li>Etag of this resource</li>
 </ul>
 </li>
-<li><code>kind=ea</code><ul>
+<li><code>kind=dolor</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#thirdPartyLink&#34;.</li>
 </ul>
 </li>
-<li><code>linking-token=ipsum</code><ul>
+<li><code>linking-token=duo</code><ul>
 <li>The linking_token identifies a YouTube account and channel with which the third party account is linked.</li>
 </ul>
 </li>
-<li><code>snippet.channel-to-store-link    store-name=eos</code><ul>
+<li><code>snippet.channel-to-store-link    store-name=diam</code><ul>
 <li>Name of the store.</li>
 </ul>
 </li>
 <li>
-<p><code>store-url=vero</code></p>
+<p><code>store-url=et</code></p>
 <ul>
 <li>Landing page of the store.</li>
 </ul>
 </li>
 <li>
-<p><code>..    type=sanctus</code></p>
+<p><code>..    type=lorem</code></p>
 <ul>
 <li>Type of the link named after the entities that are being linked.</li>
 </ul>
 </li>
 <li>
-<p><code>..status    link-status=dolores</code></p>
+<p><code>..status    link-status=no</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
@@ -710,6 +719,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   It will be a JSON-encoded structure.
   The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
   If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p external-channel-id=string</strong><ul>
+<li>Channel ID to which changes should be applied, for delegation.</li>
 </ul>
 </li>
 </ul>

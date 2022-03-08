@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Patch - storage v2.0.4+20210330</title>
+  <title>Patch - storage v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> storage v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> storage v3.0.0+20220228</a>
         
       </div>
 
@@ -427,8 +427,13 @@ You can set the scope for this method like this: <code>storage1 --scope &lt;scop
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>Bucket:
+  autoclass:
+    enabled: boolean
+    toggle-time: string
   billing:
     requester-pays: boolean
+  custom-placement-config:
+    data-locations: [string]
   default-event-based-hold: boolean
   encryption:
     default-kms-key-name: string
@@ -459,6 +464,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     effective-time: string
     is-locked: boolean
     retention-period: string
+  rpo: string
   satisfies-pzs: boolean
   self-link: string
   storage-class: string
@@ -469,16 +475,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   website:
     main-page-suffix: string
     not-found-page: string
-  zone-affinity: [string]
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
+<li><code>-r .autoclass    enabled=true</code><ul>
+<li>Whether or not Autoclass is enabled on this bucket</li>
+</ul>
+</li>
 <li>
-<p><code>-r .billing    requester-pays=true</code></p>
+<p><code>toggle-time=consetetur</code></p>
+<ul>
+<li>A date and time in RFC 3339 format representing the instant at which &#34;enabled&#34; was last toggled.</li>
+</ul>
+</li>
+<li>
+<p><code>..billing    requester-pays=false</code></p>
 <ul>
 <li>When set to true, Requester Pays is enabled for this bucket.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-placement-config    data-locations=erat</code></p>
+<ul>
+<li>The list of regional locations in which data is placed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
@@ -488,13 +510,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>encryption    default-kms-key-name=accusam</code></p>
+<p><code>encryption    default-kms-key-name=amet.</code></p>
 <ul>
 <li>A Cloud KMS key that will be used to encrypt objects inserted into this bucket, if no encryption method is specified.</li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=takimata</code></p>
+<p><code>..    etag=sed</code></p>
 <ul>
 <li>HTTP 1.1 Entity tag for the bucket.</li>
 </ul>
@@ -504,15 +526,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>locked-time=voluptua.</code></p>
+<p><code>locked-time=et</code></p>
 <ul>
 <li>The deadline for changing iamConfiguration.bucketPolicyOnly.enabled from true to false in RFC 3339 format. iamConfiguration.bucketPolicyOnly.enabled may be changed from true to false until the locked time, after which the field is immutable.</li>
 </ul>
 </li>
 <li>
-<p><code>..    public-access-prevention=et</code></p>
+<p><code>..    public-access-prevention=accusam</code></p>
 <ul>
-<li>The bucket&#39;s Public Access Prevention configuration. Currently, &#39;unspecified&#39; and &#39;enforced&#39; are supported.</li>
+<li>The bucket&#39;s Public Access Prevention configuration. Currently, &#39;inherited&#39; and &#39;enforced&#39; are supported.</li>
 </ul>
 </li>
 <li><code>uniform-bucket-level-access    enabled=false</code><ul>
@@ -520,108 +542,112 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>locked-time=amet.</code></p>
+<p><code>locked-time=dolore</code></p>
 <ul>
 <li>The deadline for changing iamConfiguration.uniformBucketLevelAccess.enabled from true to false in RFC 3339  format. iamConfiguration.uniformBucketLevelAccess.enabled may be changed from true to false until the locked time, after which the field is immutable.</li>
 </ul>
 </li>
 <li>
-<p><code>...    id=sed</code></p>
+<p><code>...    id=dolore</code></p>
 <ul>
 <li>The ID of the bucket. For buckets, the id and name properties are the same.</li>
 </ul>
 </li>
-<li><code>kind=takimata</code><ul>
+<li><code>kind=dolore</code><ul>
 <li>The kind of item this is. For buckets, this is always storage#bucket.</li>
 </ul>
 </li>
-<li><code>labels=key=dolores</code><ul>
+<li><code>labels=key=voluptua.</code><ul>
 <li>User-provided labels, in key/value pairs.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>location=gubergren</code><ul>
+<li><code>location=amet.</code><ul>
 <li>The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer&#39;s guide for the authoritative list.</li>
 </ul>
 </li>
-<li><code>location-type=et</code><ul>
+<li><code>location-type=ea</code><ul>
 <li>The type of the bucket location.</li>
 </ul>
 </li>
-<li><code>logging    log-bucket=accusam</code><ul>
+<li><code>logging    log-bucket=sadipscing</code><ul>
 <li>The destination bucket where the current bucket&#39;s logs should be placed.</li>
 </ul>
 </li>
 <li>
-<p><code>log-object-prefix=voluptua.</code></p>
+<p><code>log-object-prefix=lorem</code></p>
 <ul>
 <li>A prefix for log object names.</li>
 </ul>
 </li>
 <li>
-<p><code>..    metageneration=dolore</code></p>
+<p><code>..    metageneration=invidunt</code></p>
 <ul>
 <li>The metadata generation of this bucket.</li>
 </ul>
 </li>
-<li><code>name=dolore</code><ul>
+<li><code>name=no</code><ul>
 <li>The name of the bucket.</li>
 </ul>
 </li>
-<li><code>owner    entity=dolore</code><ul>
+<li><code>owner    entity=est</code><ul>
 <li>The entity, in the form project-owner-projectId.</li>
 </ul>
 </li>
 <li>
-<p><code>entity-id=voluptua.</code></p>
+<p><code>entity-id=at</code></p>
 <ul>
 <li>The ID for the entity.</li>
 </ul>
 </li>
 <li>
-<p><code>..    project-number=amet.</code></p>
+<p><code>..    project-number=sed</code></p>
 <ul>
 <li>The project number of the project the bucket belongs to.</li>
 </ul>
 </li>
-<li><code>retention-policy    effective-time=ea</code><ul>
+<li><code>retention-policy    effective-time=sit</code><ul>
 <li>Server-determined value that indicates the time from which policy was enforced and effective. This value is in RFC 3339 format.</li>
 </ul>
 </li>
-<li><code>is-locked=false</code><ul>
+<li><code>is-locked=true</code><ul>
 <li>Once locked, an object retention policy cannot be modified.</li>
 </ul>
 </li>
 <li>
-<p><code>retention-period=lorem</code></p>
+<p><code>retention-period=aliquyam</code></p>
 <ul>
 <li>The duration in seconds that objects need to be retained. Retention duration must be greater than zero and less than 100 years. Note that enforcement of retention periods less than a day is not guaranteed. Such periods should only be used for testing purposes.</li>
 </ul>
 </li>
 <li>
-<p><code>..    satisfies-pzs=true</code></p>
+<p><code>..    rpo=ipsum</code></p>
 <ul>
+<li>The Recovery Point Objective (RPO) of this bucket. Set to ASYNC_TURBO to turn on Turbo Replication on a bucket.</li>
+</ul>
+</li>
+<li><code>satisfies-pzs=true</code><ul>
 <li>Reserved for future use.</li>
 </ul>
 </li>
-<li><code>self-link=no</code><ul>
+<li><code>self-link=est</code><ul>
 <li>The URI of this bucket.</li>
 </ul>
 </li>
-<li><code>storage-class=est</code><ul>
+<li><code>storage-class=sed</code><ul>
 <li>The bucket&#39;s default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, ARCHIVE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.</li>
 </ul>
 </li>
-<li><code>time-created=at</code><ul>
+<li><code>time-created=diam</code><ul>
 <li>The creation time of the bucket in RFC 3339 format.</li>
 </ul>
 </li>
-<li><code>updated=sed</code><ul>
+<li><code>updated=dolores</code><ul>
 <li>The modification time of the bucket in RFC 3339 format.</li>
 </ul>
 </li>
 <li>
-<p><code>versioning    enabled=false</code></p>
+<p><code>versioning    enabled=true</code></p>
 <ul>
 <li>While set to true, versioning is fully enabled for this bucket.</li>
 </ul>
@@ -632,17 +658,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>If the requested object path is missing, the service will ensure the path has a trailing &#39;/&#39;, append this suffix, and attempt to retrieve the resulting object. This allows the creation of index.html objects to represent directory pages.</li>
 </ul>
 </li>
-<li>
-<p><code>not-found-page=tempor</code></p>
-<ul>
+<li><code>not-found-page=sed</code><ul>
 <li>If the requested object path is missing, and any mainPageSuffix object is missing, if applicable, the service will return the named object from this bucket as the content for a 404 Not Found result.</li>
-</ul>
-</li>
-<li>
-<p><code>..    zone-affinity=aliquyam</code></p>
-<ul>
-<li>The zone or zones from which the bucket is intended to use zonal quota. Requests for data from outside the specified affinities are still allowed but won&#39;t be able to use zonal quota. The zone or zones need to be within the bucket location otherwise the requests will fail with a 400 Bad Request response.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 </ul>
@@ -750,6 +767,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p><strong>-p quota-user=string</strong></p>
 <ul>
 <li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;, &#34;resumable&#34;).</li>
 </ul>
 </li>
 <li>

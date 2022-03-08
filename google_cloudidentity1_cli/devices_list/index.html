@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Cloud Identity v2.0.4+20210310</title>
+  <title>List - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -124,6 +124,9 @@
                     
                         <ul>
                         
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
                             <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
                             
                         
@@ -160,6 +163,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
                     
                 </li>
             
@@ -233,6 +241,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -270,6 +283,14 @@
           <div role="main">
             <div class="section">
               <p>Lists/Searches devices.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-identity.devices</em></li>
+<li><em>https://www.googleapis.com/auth/cloud-identity.devices.readonly</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-identity.devices.readonly</em>.
+You can set the scope for this method like this: <code>cloudidentity1 --scope &lt;scope&gt; devices list ...</code></p>
 <h1 id="optional-output-flags">Optional Output Flags</h1>
 <p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
 <ul>
@@ -289,7 +310,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p customer=string</strong></p>
 <ul>
-<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer in the format: <code>customers/{customer_id}</code>, where customer_id is the customer to whom the device belongs. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code>. If you&#39;re using this API to manage another organization, use <code>customers/{customer_id}</code>, where customer_id is the customer to whom the device belongs.</li>
+<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer in the format: <code>customers/{customer}</code>, where customer is the customer to whom the device belongs. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code>. If you&#39;re using this API to manage another organization, use <code>customers/{customer}</code>, where customer is the customer to whom the device belongs.</li>
 </ul>
 </li>
 <li>

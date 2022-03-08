@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Global Connectivity Tests Patch - Network Management v2.0.4+20210325</title>
+  <title>Locations Global Connectivity Tests Patch - Network Management v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Network Management v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Network Management v3.0.0+20220223</a>
         
       </div>
 
@@ -199,6 +199,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   create-time: string
   description: string
   destination:
+    cloud-sql-instance: string
+    gke-master-cluster: string
     instance: string
     ip-address: string
     network: string
@@ -217,6 +219,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     verify-time: string
   related-projects: [string]
   source:
+    cloud-sql-instance: string
+    gke-master-cluster: string
     instance: string
     ip-address: string
     network: string
@@ -229,116 +233,132 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=sed</code><ul>
+<li><code>-r .    create-time=est</code><ul>
 <li>Output only. The time the test was created.</li>
 </ul>
 </li>
-<li><code>description=ut</code><ul>
+<li><code>description=ipsum</code><ul>
 <li>The user-supplied description of the Connectivity Test. Maximum of 512 characters.</li>
 </ul>
 </li>
-<li><code>destination    instance=gubergren</code><ul>
+<li><code>destination    cloud-sql-instance=ipsum</code><ul>
+<li>A <a href="https://cloud.google.com/sql">Cloud SQL</a> instance URI.</li>
+</ul>
+</li>
+<li><code>gke-master-cluster=est</code><ul>
+<li>A cluster URI for <a href="https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture">Google Kubernetes Engine master</a>.</li>
+</ul>
+</li>
+<li><code>instance=gubergren</code><ul>
 <li>A Compute Engine instance URI.</li>
 </ul>
 </li>
-<li><code>ip-address=rebum.</code><ul>
+<li><code>ip-address=ea</code><ul>
 <li>The IP address of the endpoint, which can be an external or internal IP. An IPv6 address is only allowed when the test&#39;s destination is a <a href="..//load-balancing/docs/load-balancing-overview">global load balancer VIP</a>.</li>
 </ul>
 </li>
-<li><code>network=est</code><ul>
+<li><code>network=dolor</code><ul>
 <li>A Compute Engine network URI.</li>
 </ul>
 </li>
-<li><code>network-type=ipsum</code><ul>
+<li><code>network-type=lorem</code><ul>
 <li>Type of the network where the endpoint is located. Applicable only to source endpoint, as destination network type can be inferred from the source.</li>
 </ul>
 </li>
-<li><code>port=51</code><ul>
+<li><code>port=76</code><ul>
 <li>The IP protocol port of the endpoint. Only applicable when protocol is TCP or UDP.</li>
 </ul>
 </li>
 <li>
-<p><code>project-id=est</code></p>
+<p><code>project-id=labore</code></p>
 <ul>
 <li>Project ID where the endpoint is located. The Project ID can be derived from the URI if you provide a VM instance or network URI. The following are two cases where you must provide the project ID: 1. Only the IP address is specified, and the IP address is within a GCP project. 2. When you are using Shared VPC and the IP address that you provide is from the service project. In this case, the network that the IP address resides in is defined in the host project.</li>
 </ul>
 </li>
 <li>
-<p><code>..    display-name=gubergren</code></p>
+<p><code>..    display-name=sed</code></p>
 <ul>
 <li>Output only. The display name of a Connectivity Test.</li>
 </ul>
 </li>
-<li><code>labels=key=ea</code><ul>
+<li><code>labels=key=duo</code><ul>
 <li>Resource labels to represent user-provided metadata.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=dolor</code><ul>
+<li><code>name=sed</code><ul>
 <li>Required. Unique name of the resource using the form: <code>projects/{project_id}/locations/global/connectivityTests/{test_id}</code></li>
 </ul>
 </li>
-<li><code>protocol=lorem</code><ul>
+<li><code>protocol=no</code><ul>
 <li>IP Protocol of the test. When not provided, &#34;TCP&#34; is assumed.</li>
 </ul>
 </li>
-<li><code>reachability-details.error    code=76</code><ul>
+<li><code>reachability-details.error    code=86</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
 <li>
-<p><code>message=labore</code></p>
+<p><code>message=kasd</code></p>
 <ul>
 <li>A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.</li>
 </ul>
 </li>
 <li>
-<p><code>..    result=sed</code></p>
+<p><code>..    result=et</code></p>
 <ul>
 <li>The overall result of the test&#39;s configuration analysis.</li>
 </ul>
 </li>
 <li>
-<p><code>verify-time=duo</code></p>
+<p><code>verify-time=sed</code></p>
 <ul>
 <li>The time of the configuration analysis.</li>
 </ul>
 </li>
 <li>
-<p><code>..    related-projects=sed</code></p>
+<p><code>..    related-projects=et</code></p>
 <ul>
 <li>Other projects that may be relevant for reachability analysis. This is applicable to scenarios where a test can cross project boundaries.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>source    instance=no</code><ul>
+<li><code>source    cloud-sql-instance=et</code><ul>
+<li>A <a href="https://cloud.google.com/sql">Cloud SQL</a> instance URI.</li>
+</ul>
+</li>
+<li><code>gke-master-cluster=vero</code><ul>
+<li>A cluster URI for <a href="https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture">Google Kubernetes Engine master</a>.</li>
+</ul>
+</li>
+<li><code>instance=erat</code><ul>
 <li>A Compute Engine instance URI.</li>
 </ul>
 </li>
-<li><code>ip-address=stet</code><ul>
+<li><code>ip-address=sed</code><ul>
 <li>The IP address of the endpoint, which can be an external or internal IP. An IPv6 address is only allowed when the test&#39;s destination is a <a href="..//load-balancing/docs/load-balancing-overview">global load balancer VIP</a>.</li>
 </ul>
 </li>
-<li><code>network=kasd</code><ul>
+<li><code>network=duo</code><ul>
 <li>A Compute Engine network URI.</li>
 </ul>
 </li>
-<li><code>network-type=et</code><ul>
+<li><code>network-type=dolore</code><ul>
 <li>Type of the network where the endpoint is located. Applicable only to source endpoint, as destination network type can be inferred from the source.</li>
 </ul>
 </li>
-<li><code>port=58</code><ul>
+<li><code>port=79</code><ul>
 <li>The IP protocol port of the endpoint. Only applicable when protocol is TCP or UDP.</li>
 </ul>
 </li>
 <li>
-<p><code>project-id=et</code></p>
+<p><code>project-id=voluptua.</code></p>
 <ul>
 <li>Project ID where the endpoint is located. The Project ID can be derived from the URI if you provide a VM instance or network URI. The following are two cases where you must provide the project ID: 1. Only the IP address is specified, and the IP address is within a GCP project. 2. When you are using Shared VPC and the IP address that you provide is from the service project. In this case, the network that the IP address resides in is defined in the host project.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-time=et</code></p>
+<p><code>..    update-time=amet.</code></p>
 <ul>
 <li>Output only. The time the test&#39;s configuration was updated.</li>
 </ul>

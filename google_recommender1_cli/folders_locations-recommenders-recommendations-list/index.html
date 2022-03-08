@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Recommenders Recommendations List - Recommender v2.0.4+20210319</title>
+  <title>Locations Recommenders Recommendations List - Recommender v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Recommender v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Recommender v3.0.0+20220228</a>
         
       </div>
 
@@ -277,7 +277,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists recommendations for a Cloud project. Requires the recommender.*.list IAM permission for the specified recommender.</p>
+              <p>Lists recommendations for the specified Cloud Resource. Requires the recommender.*.list IAM permission for the specified recommender.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -285,7 +285,7 @@ You can set the scope for this method like this: <code>recommender1 --scope &lt;
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The container resource on which to execute the request. Acceptable formats: 1. <code>projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> 2. <code>billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> 3. <code>folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> 4. <code>organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ RECOMMENDER_ID refers to supported recommenders: https://cloud.google.com/recommender/docs/recommenders.</li>
+<li>Required. The container resource on which to execute the request. Acceptable formats: * <code>projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> * <code>projects/[PROJECT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> * <code>billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> * <code>folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> * <code>organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]</code> LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ RECOMMENDER_ID refers to supported recommenders: https://cloud.google.com/recommender/docs/recommenders.</li>
 </ul>
 </li>
 </ul>
@@ -308,7 +308,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Filter expression to restrict the recommendations returned. Supported filter fields: state_info.state Eg: `state_info.state:&#34;DISMISSED&#34; or state_info.state:&#34;FAILED&#34;</li>
+<li>Filter expression to restrict the recommendations returned. Supported filter fields: * <code>state_info.state</code> * <code>recommenderSubtype</code> * <code>priority</code> Examples: * <code>stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED</code> * <code>recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE</code> * <code>priority = P1 OR priority = P2</code> * <code>stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)</code> (These expressions are based on the filter language described at https://google.aip.dev/160)</li>
 </ul>
 </li>
 <li>

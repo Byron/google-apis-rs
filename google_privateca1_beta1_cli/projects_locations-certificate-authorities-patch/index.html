@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Certificate Authorities Patch - Certificate Authority Service v2.0.4+20210322</title>
+  <title>Locations Certificate Authorities Patch - Certificate Authority Service v3.0.0+20220209</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Certificate Authority Service v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Certificate Authority Service v3.0.0+20220209</a>
         
       </div>
 
@@ -445,7 +445,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>allowed-dns-names=dolor</code><ul>
-<li>Optional. Contains valid, fully-qualified host names. Glob patterns are also supported. To allow an explicit wildcard certificate, escape with backlash (i.e. &#34;*&#34;). E.g. for globbed entries: &#39;<em>bar.com&#39; will allow &#39;foo.bar.com&#39;, but not &#39;</em>.bar.com&#39;, unless the allow_globbing_dns_wildcards field is set. E.g. for wildcard entries: &#39;*.bar.com&#39; will allow &#39;*.bar.com&#39;, but not &#39;foo.bar.com&#39;.</li>
+<li>Optional. Contains valid, fully-qualified host names. Glob patterns are also supported. To allow an explicit wildcard certificate, escape with backlash (i.e. <code>\*</code>). E.g. for globbed entries: <code>*bar.com</code> will allow <code>foo.bar.com</code>, but not <code>*.bar.com</code>, unless the allow_globbing_dns_wildcards field is set. E.g. for wildcard entries: <code>\*.bar.com</code> will allow <code>*.bar.com</code>, but not <code>foo.bar.com</code>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
@@ -781,7 +781,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>subordinate-config    certificate-authority=dolor</code><ul>
-<li>Required. This can refer to a CertificateAuthority in the same project that was used to create a subordinate CertificateAuthority. This field is used for information and usability purposes only. The resource name is in the format <code>projects/*/locations/*/certificateAuthorities/*</code>.</li>
+<li>Required. This can refer to a CertificateAuthority that was used to create a subordinate CertificateAuthority. This field is used for information and usability purposes only. The resource name is in the format <code>projects/*/locations/*/certificateAuthorities/*</code>.</li>
 </ul>
 </li>
 <li>

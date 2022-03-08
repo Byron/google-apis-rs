@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - YouTube v2.0.4+20210330</title>
+  <title>Update - YouTube v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
         
       </div>
 
@@ -157,11 +157,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_update">Update</a>
                     
                 </li>
             
@@ -611,6 +606,17 @@
         
 
     
+        
+        <span>Youtube</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -728,19 +734,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .content-details    bound-stream-id=ipsum</code><ul>
+<li><code>-r .content-details    bound-stream-id=erat</code><ul>
 <li>This value uniquely identifies the live stream bound to the broadcast.</li>
 </ul>
 </li>
-<li><code>bound-stream-last-update-time-ms=ea</code><ul>
+<li><code>bound-stream-last-update-time-ms=dolores</code><ul>
 <li>The date and time that the live stream referenced by boundStreamId was last updated.</li>
 </ul>
 </li>
-<li><code>closed-captions-type=at</code><ul>
+<li><code>closed-captions-type=ipsum</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>enable-auto-start=true</code><ul>
+<li><code>enable-auto-start=false</code><ul>
 <li>This setting indicates whether auto start is enabled for this broadcast. The default value for this property is false. This setting can only be used by Events.</li>
 </ul>
 </li>
@@ -748,7 +754,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>This setting indicates whether auto stop is enabled for this broadcast. The default value for this property is false. This setting can only be used by Events.</li>
 </ul>
 </li>
-<li><code>enable-closed-captions=false</code><ul>
+<li><code>enable-closed-captions=true</code><ul>
 <li>This setting indicates whether HTTP POST closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API. This is mutually exclusive with using the closed_captions_type property, and is equivalent to setting closed_captions_type to CLOSED_CAPTIONS_HTTP_POST.</li>
 </ul>
 </li>
@@ -756,11 +762,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>This setting indicates whether YouTube should enable content encryption for the broadcast.</li>
 </ul>
 </li>
-<li><code>enable-dvr=false</code><ul>
+<li><code>enable-dvr=true</code><ul>
 <li>This setting determines whether viewers can access DVR controls while watching the video. DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content. The default value for this property is true. <em>Important:</em> You must set the value to true and also set the enableArchive property&#39;s value to true if you want to make playback available immediately after the broadcast ends.</li>
 </ul>
 </li>
-<li><code>enable-embed=false</code><ul>
+<li><code>enable-embed=true</code><ul>
 <li>This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.</li>
 </ul>
 </li>
@@ -768,19 +774,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Indicates whether this broadcast has low latency enabled.</li>
 </ul>
 </li>
-<li><code>latency-preference=rebum.</code><ul>
+<li><code>latency-preference=nonumy</code><ul>
 <li>If both this and enable_low_latency are set, they must match. LATENCY_NORMAL should match enable_low_latency=false LATENCY_LOW should match enable_low_latency=true LATENCY_ULTRA_LOW should have enable_low_latency omitted.</li>
 </ul>
 </li>
-<li><code>mesh=et</code><ul>
+<li><code>mesh=lorem</code><ul>
 <li>The mesh for projecting the video if projection is mesh. The mesh value must be a UTF-8 string containing the base-64 encoding of 3D mesh data that follows the Spherical Video V2 RFC specification for an mshp box, excluding the box size and type but including the following four reserved zero bytes for the version and flags.</li>
 </ul>
 </li>
-<li><code>monitor-stream    broadcast-stream-delay-ms=71</code><ul>
+<li><code>monitor-stream    broadcast-stream-delay-ms=24</code><ul>
 <li>If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.</li>
 </ul>
 </li>
-<li><code>embed-html=stet</code><ul>
+<li><code>embed-html=diam</code><ul>
 <li>HTML code that embeds a player that plays the monitor stream.</li>
 </ul>
 </li>
@@ -791,7 +797,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    projection=kasd</code></p>
+<p><code>..    projection=sed</code></p>
 <ul>
 <li>The projection format of this broadcast. This defaults to rectangular.</li>
 </ul>
@@ -805,38 +811,38 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>stereo-layout=kasd</code></p>
+<p><code>stereo-layout=ea</code></p>
 <ul>
 <li>The 3D stereo layout of this broadcast. This defaults to mono.</li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=tempor</code></p>
+<p><code>..    etag=at</code></p>
 <ul>
 <li>Etag of this resource.</li>
 </ul>
 </li>
-<li><code>id=dolor</code><ul>
+<li><code>id=sit</code><ul>
 <li>The ID that YouTube assigns to uniquely identify the broadcast.</li>
 </ul>
 </li>
-<li><code>kind=amet</code><ul>
+<li><code>kind=sit</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#liveBroadcast&#34;.</li>
 </ul>
 </li>
-<li><code>snippet    actual-end-time=sit</code><ul>
+<li><code>snippet    actual-end-time=lorem</code><ul>
 <li>The date and time that the broadcast actually ended. This information is only available once the broadcast&#39;s state is complete.</li>
 </ul>
 </li>
-<li><code>actual-start-time=rebum.</code><ul>
+<li><code>actual-start-time=stet</code><ul>
 <li>The date and time that the broadcast actually started. This information is only available once the broadcast&#39;s state is live.</li>
 </ul>
 </li>
-<li><code>channel-id=sea</code><ul>
+<li><code>channel-id=duo</code><ul>
 <li>The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.</li>
 </ul>
 </li>
-<li><code>description=ipsum</code><ul>
+<li><code>description=elitr</code><ul>
 <li>The broadcast&#39;s description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.</li>
 </ul>
 </li>
@@ -844,38 +850,38 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Indicates whether this broadcast is the default broadcast. Internal only.</li>
 </ul>
 </li>
-<li><code>live-chat-id=eirmod</code><ul>
+<li><code>live-chat-id=et</code><ul>
 <li>The id of the live chat for this broadcast.</li>
 </ul>
 </li>
-<li><code>published-at=dolor</code><ul>
+<li><code>published-at=lorem</code><ul>
 <li>The date and time that the broadcast was added to YouTube&#39;s live broadcast schedule.</li>
 </ul>
 </li>
-<li><code>scheduled-end-time=sadipscing</code><ul>
-<li>The date and time that the broadcast is scheduled to start.</li>
-</ul>
-</li>
-<li><code>scheduled-start-time=dolor</code><ul>
+<li><code>scheduled-end-time=rebum.</code><ul>
 <li>The date and time that the broadcast is scheduled to end.</li>
 </ul>
 </li>
-<li><code>thumbnails.default    height=47</code><ul>
+<li><code>scheduled-start-time=et</code><ul>
+<li>The date and time that the broadcast is scheduled to start.</li>
+</ul>
+</li>
+<li><code>thumbnails.default    height=71</code><ul>
 <li>(Optional) Height of the thumbnail image.</li>
 </ul>
 </li>
-<li><code>url=consetetur</code><ul>
+<li><code>url=stet</code><ul>
 <li>The thumbnail image&#39;s URL.</li>
 </ul>
 </li>
 <li>
-<p><code>width=79</code></p>
+<p><code>width=19</code></p>
 <ul>
 <li>(Optional) Width of the thumbnail image.</li>
 </ul>
 </li>
 <li>
-<p><code>..high    height=53</code></p>
+<p><code>..high    height=88</code></p>
 <ul>
 <li>(Optional) Height of the thumbnail image.</li>
 </ul>
@@ -885,13 +891,45 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>width=60</code></p>
+<p><code>width=53</code></p>
 <ul>
 <li>(Optional) Width of the thumbnail image.</li>
 </ul>
 </li>
 <li>
-<p><code>..maxres    height=22</code></p>
+<p><code>..maxres    height=38</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=tempor</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=47</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..medium    height=4</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=sit</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=85</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..standard    height=41</code></p>
 <ul>
 <li>(Optional) Height of the thumbnail image.</li>
 </ul>
@@ -901,62 +939,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>width=63</code></p>
+<p><code>width=96</code></p>
 <ul>
 <li>(Optional) Width of the thumbnail image.</li>
 </ul>
 </li>
 <li>
-<p><code>..medium    height=86</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=voluptua.</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=24</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>..standard    height=9</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=amet</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=24</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>...    title=eirmod</code></p>
+<p><code>...    title=et</code></p>
 <ul>
 <li>The broadcast&#39;s title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.</li>
 </ul>
 </li>
 <li>
-<p><code>..statistics    total-chat-count=-31</code></p>
+<p><code>..statistics    total-chat-count=-94</code></p>
 <ul>
 <li>The total number of live chat messages currently on the broadcast. The property and its value will be present if the broadcast is public, has the live chat feature enabled, and has at least one message. Note that this field will not be filled after the broadcast ends. So this property would not identify the number of chat messages for an archived video of a completed live broadcast.</li>
 </ul>
 </li>
 <li>
-<p><code>..status    life-cycle-status=duo</code></p>
+<p><code>..status    life-cycle-status=eirmod</code></p>
 <ul>
 <li>The broadcast&#39;s status. The status can be updated using the API&#39;s liveBroadcasts.transition method.</li>
 </ul>
 </li>
-<li><code>live-broadcast-priority=et</code><ul>
+<li><code>live-broadcast-priority=dolor</code><ul>
 <li>Priority of the live broadcast event (internal state).</li>
 </ul>
 </li>
@@ -964,15 +970,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the broadcast is made for kids or not, decided by YouTube instead of the creator. This field is read only.</li>
 </ul>
 </li>
-<li><code>privacy-status=sit</code><ul>
+<li><code>privacy-status=dolor</code><ul>
 <li>The broadcast&#39;s privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.</li>
 </ul>
 </li>
-<li><code>recording-status=accusam</code><ul>
+<li><code>recording-status=dolor</code><ul>
 <li>The broadcast&#39;s recording status.</li>
 </ul>
 </li>
-<li><code>self-declared-made-for-kids=false</code><ul>
+<li><code>self-declared-made-for-kids=true</code><ul>
 <li>This field will be set to True if the creator declares the broadcast to be kids only: go/live-cw-work.</li>
 </ul>
 </li>

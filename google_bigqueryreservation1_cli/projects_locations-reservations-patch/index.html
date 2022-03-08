@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Reservations Patch - BigQuery Reservation v2.0.4+20210324</title>
+  <title>Locations Reservations Patch - BigQuery Reservation v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Reservation v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Reservation v3.0.0+20220226</a>
         
       </div>
 
@@ -216,7 +216,7 @@ You can set the scope for this method like this: <code>bigqueryreservation1 --sc
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The resource name of the reservation, e.g., <code>projects/*/locations/*/reservations/team1-prod</code>.</li>
+<li>The resource name of the reservation, e.g., <code>projects/*/locations/*/reservations/team1-prod</code>. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.</li>
 </ul>
 </li>
 </ul>
@@ -225,8 +225,10 @@ You can set the scope for this method like this: <code>bigqueryreservation1 --sc
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>Reservation:
+  concurrency: string
   creation-time: string
   ignore-idle-slots: boolean
+  multi-region-auxiliary: boolean
   name: string
   slot-capacity: string
   update-time: string
@@ -235,23 +237,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    creation-time=gubergren</code><ul>
+<li><code>-r .    concurrency=duo</code><ul>
+<li>Maximum number of queries that are allowed to run concurrently in this reservation. This is a soft limit due to asynchronous nature of the system and various optimizations for small queries. Default value is 0 which means that concurrency will be automatically set based on the reservation size.</li>
+</ul>
+</li>
+<li><code>creation-time=sed</code><ul>
 <li>Output only. Creation time of the reservation.</li>
 </ul>
 </li>
-<li><code>ignore-idle-slots=false</code><ul>
-<li>If false, any query using this reservation will use idle slots from other reservations within the same admin project. If true, a query using this reservation will execute with the slot capacity specified above at most.</li>
+<li><code>ignore-idle-slots=true</code><ul>
+<li>If false, any query or pipeline job using this reservation will use idle slots from other reservations within the same admin project. If true, a query or pipeline job using this reservation will execute with the slot capacity specified in the slot_capacity field at most.</li>
 </ul>
 </li>
-<li><code>name=lorem</code><ul>
-<li>The resource name of the reservation, e.g., <code>projects/*/locations/*/reservations/team1-prod</code>.</li>
+<li><code>multi-region-auxiliary=true</code><ul>
+<li>Applicable only for reservations located within one of the BigQuery multi-regions (US or EU). If set to true, this reservation is placed in the organization&#39;s secondary region which is designated for disaster recovery purposes. If false, this reservation is placed in the organization&#39;s default region.</li>
 </ul>
 </li>
-<li><code>slot-capacity=eos</code><ul>
-<li>Minimum slots available to this reservation. A slot is a unit of computational power in BigQuery, and serves as the unit of parallelism. Queries using this reservation might use more slots during runtime if ignore_idle_slots is set to false. If the new reservation&#39;s slot capacity exceed the parent&#39;s slot capacity or if total slot capacity of the new reservation and its siblings exceeds the parent&#39;s slot capacity, the request will fail with <code>google.rpc.Code.RESOURCE_EXHAUSTED</code>.</li>
+<li><code>name=et</code><ul>
+<li>The resource name of the reservation, e.g., <code>projects/*/locations/*/reservations/team1-prod</code>. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.</li>
 </ul>
 </li>
-<li><code>update-time=labore</code><ul>
+<li><code>slot-capacity=et</code><ul>
+<li>Minimum slots available to this reservation. A slot is a unit of computational power in BigQuery, and serves as the unit of parallelism. Queries using this reservation might use more slots during runtime if ignore_idle_slots is set to false. If the new reservation&#39;s slot capacity exceed the project&#39;s slot capacity or if total slot capacity of the new reservation and its siblings exceeds the project&#39;s slot capacity, the request will fail with <code>google.rpc.Code.RESOURCE_EXHAUSTED</code>. NOTE: for reservations in US or EU multi-regions slot capacity constraints are checked separately for default and auxiliary regions. See multi_region_auxiliary flag for more details.</li>
+</ul>
+</li>
+<li><code>update-time=vero</code><ul>
 <li>Output only. Last update time of the reservation.</li>
 </ul>
 </li>

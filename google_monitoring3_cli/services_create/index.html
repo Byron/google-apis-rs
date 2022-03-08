@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - Monitoring v2.0.4+20210322</title>
+  <title>Create - Monitoring v3.0.0+20220218</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
         
       </div>
 
@@ -212,6 +212,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_time-series-list">Time Series List</a>
                     
                 </li>
@@ -385,7 +390,7 @@ You can set the scope for this method like this: <code>monitoring3 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. Resource name of the parent workspace. The format is: projects/[PROJECT_ID_OR_NUMBER] </li>
+<li>Required. Resource name (https://cloud.google.com/monitoring/api/v3#project_name) of the parent workspace. The format is: projects/[PROJECT_ID_OR_NUMBER] </li>
 </ul>
 </li>
 </ul>
@@ -415,87 +420,97 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   name: string
   telemetry:
     resource-name: string
+  user-labels: { string: string }
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .app-engine    module-id=amet</code></p>
+<p><code>-r .app-engine    module-id=elitr</code></p>
 <ul>
 <li>The ID of the App Engine module underlying this service. Corresponds to the module_id resource label in the gae_app monitored resource: https://cloud.google.com/monitoring/api/resources#tag_gae_app</li>
 </ul>
 </li>
 <li>
-<p><code>..cloud-endpoints    service=est</code></p>
+<p><code>..cloud-endpoints    service=duo</code></p>
 <ul>
 <li>The name of the Cloud Endpoints service underlying this service. Corresponds to the service resource label in the api monitored resource: https://cloud.google.com/monitoring/api/resources#tag_api</li>
 </ul>
 </li>
 <li>
-<p><code>..cluster-istio    cluster-name=et</code></p>
+<p><code>..cluster-istio    cluster-name=diam</code></p>
 <ul>
 <li>The name of the Kubernetes cluster in which this Istio service is defined. Corresponds to the cluster_name resource label in k8s_cluster resources.</li>
 </ul>
 </li>
-<li><code>location=sea</code><ul>
+<li><code>location=est</code><ul>
 <li>The location of the Kubernetes cluster in which this Istio service is defined. Corresponds to the location resource label in k8s_cluster resources.</li>
 </ul>
 </li>
-<li><code>service-name=consetetur</code><ul>
+<li><code>service-name=sit</code><ul>
 <li>The name of the Istio service underlying this service. Corresponds to the destination_service_name metric label in Istio metrics.</li>
 </ul>
 </li>
 <li>
-<p><code>service-namespace=consetetur</code></p>
+<p><code>service-namespace=sed</code></p>
 <ul>
 <li>The namespace of the Istio service underlying this service. Corresponds to the destination_service_namespace metric label in Istio metrics.</li>
 </ul>
 </li>
 <li>
-<p><code>..    display-name=stet</code></p>
+<p><code>..    display-name=eos</code></p>
 <ul>
 <li>Name used for UI elements listing this Service.</li>
 </ul>
 </li>
-<li><code>istio-canonical-service    canonical-service=est</code><ul>
+<li><code>istio-canonical-service    canonical-service=lorem</code><ul>
 <li>The name of the canonical service underlying this service. Corresponds to the destination_canonical_service_name metric label in label in Istio metrics (https://cloud.google.com/monitoring/api/metrics_istio).</li>
 </ul>
 </li>
-<li><code>canonical-service-namespace=aliquyam</code><ul>
+<li><code>canonical-service-namespace=ea</code><ul>
 <li>The namespace of the canonical service underlying this service. Corresponds to the destination_canonical_service_namespace metric label in Istio metrics (https://cloud.google.com/monitoring/api/metrics_istio).</li>
 </ul>
 </li>
 <li>
-<p><code>mesh-uid=elitr</code></p>
+<p><code>mesh-uid=stet</code></p>
 <ul>
 <li>Identifier for the Istio mesh in which this canonical service is defined. Corresponds to the mesh_uid metric label in Istio metrics (https://cloud.google.com/monitoring/api/metrics_istio).</li>
 </ul>
 </li>
 <li>
-<p><code>..mesh-istio    mesh-uid=duo</code></p>
+<p><code>..mesh-istio    mesh-uid=dolores</code></p>
 <ul>
 <li>Identifier for the mesh in which this Istio service is defined. Corresponds to the mesh_uid metric label in Istio metrics.</li>
 </ul>
 </li>
-<li><code>service-name=diam</code><ul>
+<li><code>service-name=eos</code><ul>
 <li>The name of the Istio service underlying this service. Corresponds to the destination_service_name metric label in Istio metrics.</li>
 </ul>
 </li>
 <li>
-<p><code>service-namespace=est</code></p>
+<p><code>service-namespace=et</code></p>
 <ul>
 <li>The namespace of the Istio service underlying this service. Corresponds to the destination_service_namespace metric label in Istio metrics.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=sit</code></p>
+<p><code>..    name=sea</code></p>
 <ul>
 <li>Resource name for this Service. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] </li>
 </ul>
 </li>
-<li><code>telemetry    resource-name=sed</code><ul>
+<li>
+<p><code>telemetry    resource-name=et</code></p>
+<ul>
 <li>The full name of the resource that defines this service. Formatted as described in https://cloud.google.com/apis/design/resource_names.</li>
+</ul>
+</li>
+<li>
+<p><code>..    user-labels=key=at</code></p>
+<ul>
+<li>Labels which have been used to annotate the service. Label keys must start with a letter. Label keys and values may contain lowercase letters, numbers, underscores, and dashes. Label keys and values have a maximum length of 63 characters, and must be less than 128 bytes in size. Up to 64 label entries may be stored. For labels which do not have a semantic value, the empty string may be supplied for the label value.</li>
+<li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 </ul>

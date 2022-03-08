@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Delete - bigquery v2.0.4+20210327</title>
+  <title>Delete - bigquery v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> bigquery v2.0.4+20210327</a>
+        <a href=".." class="icon icon-home"> bigquery v3.0.0+20220222</a>
         
       </div>
 
@@ -333,7 +333,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Requests that a job is deleted. This call will return when the job is deleted. This method is available in limited preview.</p>
+              <p>Requests the deletion of the metadata of a job. This call returns when the job&#39;s metadata is deleted.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -345,11 +345,11 @@ You can set the scope for this method like this: <code>bigquery2 --scope &lt;sco
 <h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
 <ul>
 <li><strong>&lt;project-id&gt;</strong> <em>(string)</em><ul>
-<li>Required. Project ID of the job to be deleted.</li>
+<li>Required. Project ID of the job for which metadata is to be deleted.</li>
 </ul>
 </li>
 <li><strong>&lt;job-id&gt;</strong> <em>(string)</em><ul>
-<li>Required. Job ID of the job to be deleted. If this is a parent job which has child jobs, all child jobs will be deleted as well. Deletion of child jobs directly is not allowed.</li>
+<li>Required. Job ID of the job for which metadata is to be deleted. If this is a parent job which has child jobs, the metadata from all child jobs will be deleted as well. Direct deletion of the metadata of child jobs is not allowed.</li>
 </ul>
 </li>
 </ul>

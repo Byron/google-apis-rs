@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Jobs Search - Cloud Talent Solution v2.0.4+20210309</title>
+  <title>Jobs Search - Cloud Talent Solution v3.0.0+20220211</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Talent Solution v2.0.4+20210309</a>
+        <a href=".." class="icon icon-home"> Cloud Talent Solution v3.0.0+20220211</a>
         
       </div>
 
@@ -391,7 +391,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    custom-attribute-filter=sit</code></p>
 <ul>
-<li>Optional. This filter specifies a structured syntax to match against the Job.custom_attributes marked as <code>filterable</code>. The syntax for this expression is a subset of SQL syntax. Supported operators are: <code>=</code>, <code>!=</code>, <code>&amp;lt;</code>, <code>&amp;lt;=</code>, <code>&amp;gt;</code>, and <code>&amp;gt;=</code> where the left of the operator is a custom field key and the right of the operator is a number or a quoted string. You must escape backslash (\) and quote (\&#34;) characters. Supported functions are <code>LOWER([field_name])</code> to perform a case insensitive match and <code>EMPTY([field_name])</code> to filter on the existence of a key. Boolean expressions (AND/OR/NOT) are supported up to 3 levels of nesting (for example, &#34;((A AND B AND C) OR NOT D) AND E&#34;), a maximum of 100 comparisons or functions are allowed in the expression. The expression must be &lt; 6000 bytes in length. Sample Query: <code>(LOWER(driving_license)=&amp;#34;class \&amp;#34;a\&amp;#34;&amp;#34; OR EMPTY(driving_license)) AND driving_years &amp;gt; 10</code></li>
+<li>Optional. This filter specifies a structured syntax to match against the Job.custom_attributes marked as <code>filterable</code>. The syntax for this expression is a subset of SQL syntax. Supported operators are: <code>=</code>, <code>!=</code>, <code>&amp;lt;</code>, <code>&amp;lt;=</code>, <code>&amp;gt;</code>, and <code>&amp;gt;=</code> where the left of the operator is a custom field key and the right of the operator is a number or a quoted string. You must escape backslash (\) and quote (\&#34;) characters. Supported functions are <code>LOWER([field_name])</code> to perform a case insensitive match and <code>EMPTY([field_name])</code> to filter on the existence of a key. Boolean expressions (AND/OR/NOT) are supported up to 3 levels of nesting (for example, &#34;((A AND B AND C) OR NOT D) AND E&#34;), a maximum of 100 comparisons or functions are allowed in the expression. The expression must be &lt; 10000 bytes in length. Sample Query: <code>(LOWER(driving_license)=&amp;#34;class \&amp;#34;a\&amp;#34;&amp;#34; OR EMPTY(driving_license)) AND driving_years &amp;gt; 10</code></li>
 </ul>
 </li>
 <li><code>disable-spell-check=false</code><ul>

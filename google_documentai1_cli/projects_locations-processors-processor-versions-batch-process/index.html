@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Processors Processor Versions Batch Process - Document v2.0.4+20210329</title>
+  <title>Locations Processors Processor Versions Batch Process - Document v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Document v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Document v3.0.0+20220226</a>
         
       </div>
 
@@ -45,17 +45,7 @@
         <span>Operations</span>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="../operations_cancel">Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
                     <a class="" href="../operations_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_list">List</a>
                     
                 </li>
             
@@ -64,6 +54,11 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-fetch-processor-types">Locations Fetch Processor Types</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -76,7 +71,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
                     
                 </li>
             
@@ -86,7 +91,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-create">Locations Processors Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-delete">Locations Processors Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-disable">Locations Processors Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-enable">Locations Processors Enable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-get">Locations Processors Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-processors-human-review-config-review-document">Locations Processors Human Review Config Review Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-list">Locations Processors List</a>
                     
                 </li>
             
@@ -122,7 +157,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-delete">Locations Processors Processor Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-deploy">Locations Processors Processor Versions Deploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-get">Locations Processors Processor Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-list">Locations Processors Processor Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-processors-processor-versions-process">Locations Processors Processor Versions Process</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-undeploy">Locations Processors Processor Versions Undeploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-set-default-processor-version">Locations Processors Set Default Processor Version</a>
                     
                 </li>
             
@@ -148,7 +213,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../uiv1beta3_projects-locations-operations-cancel">Projects Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../uiv1beta3_projects-locations-operations-get">Projects Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../uiv1beta3_projects-locations-operations-list">Projects Locations Operations List</a>
                     
                 </li>
             
@@ -196,7 +271,7 @@ You can set the scope for this method like this: <code>documentai1 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The resource name of Processor or ProcessorVersion. Format: projects/{project}/locations/{location}/processors/{processor}, or projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}</li>
+<li>Required. The resource name of Processor or ProcessorVersion. Format: <code>projects/{project}/locations/{location}/processors/{processor}</code>, or <code>projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}</code></li>
 </ul>
 </li>
 </ul>
@@ -218,19 +293,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .document-output-config.gcs-output-config    gcs-uri=ut</code></p>
+<p><code>-r .document-output-config.gcs-output-config    gcs-uri=lorem</code></p>
 <ul>
 <li>The Cloud Storage uri (a directory) of the output.</li>
 </ul>
 </li>
 <li>
-<p><code>...input-documents.gcs-prefix    gcs-uri-prefix=gubergren</code></p>
+<p><code>...input-documents.gcs-prefix    gcs-uri-prefix=eos</code></p>
 <ul>
 <li>The URI prefix.</li>
 </ul>
 </li>
 <li>
-<p><code>...    skip-human-review=true</code></p>
+<p><code>...    skip-human-review=false</code></p>
 <ul>
 <li>Whether Human Review feature should be skipped for this request. Default to false.</li>
 </ul>
@@ -332,7 +407,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-processors-processor-versions-process" class="btn btn-neutral float-right" title="Locations Processors Processor Versions Process"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-processors-processor-versions-delete" class="btn btn-neutral float-right" title="Locations Processors Processor Versions Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../projects_locations-processors-process" class="btn btn-neutral" title="Locations Processors Process"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -364,7 +439,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../projects_locations-processors-process" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-processors-processor-versions-process" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-processors-processor-versions-delete" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

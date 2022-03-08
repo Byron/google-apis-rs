@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - YouTube v2.0.4+20210330</title>
+  <title>Insert - YouTube v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
         
       </div>
 
@@ -157,11 +157,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_update">Update</a>
                     
                 </li>
             
@@ -611,6 +606,17 @@
         
 
     
+        
+        <span>Youtube</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -711,86 +717,150 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .content-details    end-at=justo</code><ul>
+<li><code>-r .content-details    end-at=dolor</code><ul>
 <li>The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.</li>
 </ul>
 </li>
-<li><code>note=lorem</code><ul>
+<li><code>note=eos</code><ul>
 <li>A user-generated note for this item.</li>
 </ul>
 </li>
-<li><code>start-at=labore</code><ul>
+<li><code>start-at=magna</code><ul>
 <li>The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.</li>
 </ul>
 </li>
-<li><code>video-id=gubergren</code><ul>
+<li><code>video-id=no</code><ul>
 <li>The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.</li>
 </ul>
 </li>
 <li>
-<p><code>video-published-at=vero</code></p>
+<p><code>video-published-at=gubergren</code></p>
 <ul>
 <li>The date and time that the video was published to YouTube.</li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=ea</code></p>
+<p><code>..    etag=erat</code></p>
 <ul>
 <li>Etag of this resource.</li>
 </ul>
 </li>
-<li><code>id=sed</code><ul>
+<li><code>id=aliquyam</code><ul>
 <li>The ID that YouTube uses to uniquely identify the playlist item.</li>
 </ul>
 </li>
-<li><code>kind=sanctus</code><ul>
+<li><code>kind=consetetur</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#playlistItem&#34;.</li>
 </ul>
 </li>
-<li><code>snippet    channel-id=labore</code><ul>
+<li><code>snippet    channel-id=ea</code><ul>
 <li>The ID that YouTube uses to uniquely identify the user that added the item to the playlist.</li>
 </ul>
 </li>
-<li><code>channel-title=amet</code><ul>
+<li><code>channel-title=lorem</code><ul>
 <li>Channel title for the channel that the playlist item belongs to.</li>
 </ul>
 </li>
-<li><code>description=et</code><ul>
+<li><code>description=elitr</code><ul>
 <li>The item&#39;s description.</li>
 </ul>
 </li>
-<li><code>playlist-id=dolore</code><ul>
+<li><code>playlist-id=justo</code><ul>
 <li>The ID that YouTube uses to uniquely identify thGe playlist that the playlist item is in.</li>
 </ul>
 </li>
-<li><code>position=73</code><ul>
+<li><code>position=100</code><ul>
 <li>The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.</li>
 </ul>
 </li>
-<li><code>published-at=sit</code><ul>
+<li><code>published-at=lorem</code><ul>
 <li>The date and time that the item was added to the playlist.</li>
 </ul>
 </li>
-<li><code>resource-id    channel-id=sanctus</code><ul>
+<li><code>resource-id    channel-id=labore</code><ul>
 <li>The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.</li>
 </ul>
 </li>
-<li><code>kind=ipsum</code><ul>
+<li><code>kind=gubergren</code><ul>
 <li>The type of the API resource.</li>
 </ul>
 </li>
-<li><code>playlist-id=eirmod</code><ul>
+<li><code>playlist-id=vero</code><ul>
 <li>The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.</li>
 </ul>
 </li>
 <li>
-<p><code>video-id=vero</code></p>
+<p><code>video-id=ea</code></p>
 <ul>
 <li>The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.</li>
 </ul>
 </li>
 <li>
-<p><code>..thumbnails.default    height=23</code></p>
+<p><code>..thumbnails.default    height=8</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=sanctus</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=65</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..high    height=54</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=et</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=67</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..maxres    height=73</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=sit</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=93</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..medium    height=51</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=eirmod</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=25</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..standard    height=23</code></p>
 <ul>
 <li>(Optional) Height of the thumbnail image.</li>
 </ul>
@@ -806,87 +876,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..high    height=91</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=et</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=89</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>..maxres    height=67</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=ea</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=7</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>..medium    height=92</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=duo</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=12</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>..standard    height=37</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=sed</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=40</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>...    title=stet</code></p>
+<p><code>...    title=sea</code></p>
 <ul>
 <li>The item&#39;s title.</li>
 </ul>
 </li>
-<li><code>video-owner-channel-id=sea</code><ul>
+<li><code>video-owner-channel-id=et</code><ul>
 <li>Channel id for the channel this video belongs to.</li>
 </ul>
 </li>
 <li>
-<p><code>video-owner-channel-title=clita</code></p>
+<p><code>video-owner-channel-title=gubergren</code></p>
 <ul>
 <li>Channel title for the channel this video belongs to.</li>
 </ul>
 </li>
 <li>
-<p><code>..status    privacy-status=consetetur</code></p>
+<p><code>..status    privacy-status=dolore</code></p>
 <ul>
 <li>This resource&#39;s privacy status.</li>
 </ul>

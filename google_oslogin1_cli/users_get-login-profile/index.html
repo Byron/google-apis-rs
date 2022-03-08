@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Get Login Profile - Cloud OS Login v2.0.4+20210316</title>
+  <title>Get Login Profile - Cloud OS Login v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud OS Login v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Cloud OS Login v3.0.0+20220228</a>
         
       </div>
 
@@ -75,6 +75,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../users_projects-delete">Projects Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_ssh-public-keys-create">Ssh Public Keys Create</a>
                     
                 </li>
             
@@ -134,9 +139,11 @@
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
 <li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/cloud-platform.read-only</em></li>
 <li><em>https://www.googleapis.com/auth/compute</em></li>
+<li><em>https://www.googleapis.com/auth/compute.readonly</em></li>
 </ul>
-<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/compute.readonly</em>.
 You can set the scope for this method like this: <code>oslogin1 --scope &lt;scope&gt; users get-login-profile ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>

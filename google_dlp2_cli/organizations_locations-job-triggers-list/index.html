@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Job Triggers List - DLP v2.0.4+20210326</title>
+  <title>Locations Job Triggers List - DLP v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> DLP v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> DLP v3.0.0+20220227</a>
         
       </div>
 
@@ -678,6 +678,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p><strong>-p page-token=string</strong></p>
 <ul>
 <li>Page token to continue retrieval. Comes from previous call to ListJobTriggers. <code>order_by</code> field must not change for subsequent calls.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p type=string</strong></p>
+<ul>
+<li>The type of jobs. Will use <code>DlpJobType.INSPECT</code> if not set.</li>
 </ul>
 </li>
 </ul>

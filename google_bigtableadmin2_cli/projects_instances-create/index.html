@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Instances Create - Bigtable Admin v2.0.4+20210323</title>
+  <title>Instances Create - Bigtable Admin v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Bigtable Admin v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Bigtable Admin v3.0.0+20220222</a>
         
       </div>
 
@@ -152,6 +152,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_instances-clusters-list">Instances Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-clusters-partial-update-cluster">Instances Clusters Partial Update Cluster</a>
                     
                 </li>
             
@@ -332,7 +337,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Create an instance within a project.</p>
+              <p>Create an instance within a project. Note that exactly one of Cluster.serve_nodes and Cluster.cluster_config.cluster_autoscaling_config can be set. If serve_nodes is set to non-zero, then the cluster is manually scaled. If cluster_config.cluster_autoscaling_config is non-empty, then autoscaling is enabled.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -358,6 +363,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>CreateInstanceRequest:
   instance:
+    create-time: string
     display-name: string
     labels: { string: string }
     name: string
@@ -370,36 +376,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .instance    display-name=sed</code><ul>
+<li><code>-r .instance    create-time=vero</code><ul>
+<li>Output only. A server-assigned timestamp representing when this Instance was created. For instances created before this field was added (August 2021), this value is <code>seconds: 0, nanos: 1</code>.</li>
+</ul>
+</li>
+<li><code>display-name=elitr</code><ul>
 <li>Required. The descriptive name for this instance as it appears in UIs. Can be changed at any time, but should be kept globally unique to avoid confusion.</li>
 </ul>
 </li>
-<li><code>labels=key=duo</code><ul>
+<li><code>labels=key=lorem</code><ul>
 <li>Required. Labels are a flexible and lightweight mechanism for organizing cloud resources into groups that reflect a customer&#39;s organizational needs and deployment strategies. They can be used to filter resources and aggregate metrics. * Label keys must be between 1 and 63 characters long and must conform to the regular expression: <code>\p{Ll}\p{Lo}{0,62}</code>. * Label values must be between 0 and 63 characters long and must conform to the regular expression: <code>[\p{Ll}\p{Lo}\p{N}_-]{0,63}</code>. * No more than 64 labels can be associated with a given resource. * Keys and values must both be under 128 bytes.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=dolore</code><ul>
+<li><code>name=diam</code><ul>
 <li>The unique name of the instance. Values are of the form <code>projects/{project}/instances/a-z+[a-z0-9]</code>.</li>
 </ul>
 </li>
-<li><code>state=et</code><ul>
+<li><code>state=no</code><ul>
 <li>Output only. The current state of the instance.</li>
 </ul>
 </li>
 <li>
-<p><code>type=voluptua.</code></p>
+<p><code>type=ipsum</code></p>
 <ul>
 <li>Required. The type of the instance. Defaults to <code>PRODUCTION</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    instance-id=amet.</code></p>
+<p><code>..    instance-id=accusam</code></p>
 <ul>
 <li>Required. The ID to be used when referring to the new instance within its project, e.g., just <code>myinstance</code> rather than <code>projects/myproject/instances/myinstance</code>.</li>
 </ul>
 </li>
-<li><code>parent=consetetur</code><ul>
+<li><code>parent=takimata</code><ul>
 <li>Required. The unique name of the project in which to create the new instance. Values are of the form <code>projects/{project}</code>.</li>
 </ul>
 </li>

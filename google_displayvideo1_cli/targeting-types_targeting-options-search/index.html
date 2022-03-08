@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Targeting Options Search - Display Video v2.0.4+20210325</title>
+  <title>Targeting Options Search - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -462,12 +472,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -494,12 +534,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -610,6 +665,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -837,7 +897,7 @@ You can set the scope for this method like this: <code>displayvideo1 --scope &lt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;targeting-type&gt;</strong> <em>(string)</em><ul>
-<li>Required. The type of targeting options to retrieve. Accepted values are: * <code>TARGETING_TYPE_GEO_REGION</code></li>
+<li>Required. The type of targeting options to retrieve. Accepted values are: * <code>TARGETING_TYPE_GEO_REGION</code> * <code>TARGETING_TYPE_POI</code> * <code>TARGETING_TYPE_BUSINESS_CHAIN</code></li>
 </ul>
 </li>
 </ul>
@@ -847,33 +907,52 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>SearchTargetingOptionsRequest:
   advertiser-id: string
+  business-chain-search-terms:
+    business-chain-query: string
+    region-query: string
   geo-region-search-terms:
     geo-region-query: string
   page-size: integer
   page-token: string
+  poi-search-terms:
+    poi-query: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    advertiser-id=rebum.</code><ul>
+<li><code>-r .    advertiser-id=sadipscing</code><ul>
 <li>Required. The Advertiser this request is being made in the context of.</li>
 </ul>
 </li>
+<li><code>business-chain-search-terms    business-chain-query=accusam</code><ul>
+<li>The search query for the desired business chain. The query must be the full name of the business, e.g. &#34;KFC&#34;, &#34;mercedes-benz&#34;.</li>
+</ul>
+</li>
 <li>
-<p><code>geo-region-search-terms    geo-region-query=sadipscing</code></p>
+<p><code>region-query=elitr</code></p>
+<ul>
+<li>The search query for the desired geo region, e.g. &#34;Seattle&#34;, &#34;United State&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>..geo-region-search-terms    geo-region-query=sit</code></p>
 <ul>
 <li>The search query for the desired geo region. The query can be a prefix, e.g. &#34;New Yor&#34;, &#34;Seattle&#34;, &#34;USA&#34;, etc.</li>
 </ul>
 </li>
 <li>
-<p><code>..    page-size=86</code></p>
+<p><code>..    page-size=13</code></p>
 <ul>
 <li>Requested page size. Must be between <code>1</code> and <code>100</code>. If unspecified will default to <code>100</code>. Returns error code <code>INVALID_ARGUMENT</code> if an invalid value is specified.</li>
 </ul>
 </li>
-<li><code>page-token=et</code><ul>
+<li><code>page-token=dolore</code><ul>
 <li>A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to <code>SearchTargetingOptions</code> method. If not specified, the first page of results will be returned.</li>
+</ul>
+</li>
+<li><code>poi-search-terms    poi-query=et</code><ul>
+<li>The search query for the desired POI name, street address, or coordinate of the desired POI. The query can be a prefix, e.g. &#34;Times squar&#34;, &#34;40.7505045,-73.99562&#34;, &#34;315 W 44th St&#34;, etc.</li>
 </ul>
 </li>
 </ul>

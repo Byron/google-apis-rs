@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Nodes Create - TPU v2.0.4+20210217</title>
+  <title>Locations Nodes Create - TPU v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> TPU v2.0.4+20210217</a>
+        <a href=".." class="icon icon-home"> TPU v3.0.0+20220301</a>
         
       </div>
 
@@ -207,6 +207,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>Node:
   accelerator-type: string
+  api-version: string
   cidr-block: string
   create-time: string
   description: string
@@ -233,44 +234,48 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. The type of hardware accelerators associated with this node.</li>
 </ul>
 </li>
-<li><code>cidr-block=magna</code><ul>
+<li><code>api-version=magna</code><ul>
+<li>Output only. The API version that created this Node.</li>
+</ul>
+</li>
+<li><code>cidr-block=no</code><ul>
 <li>The CIDR block that the TPU node will use when selecting an IP address. This CIDR block must be a /29 block; the Compute Engine networks API forbids a smaller block, and using a larger block would be wasteful (a node can only consume one IP address). Errors will occur if the CIDR block has already been used for a currently existing TPU node, the CIDR block conflicts with any subnetworks in the user&#39;s provided network, or the provided network is peered with another network that is using that CIDR block.</li>
 </ul>
 </li>
-<li><code>create-time=no</code><ul>
+<li><code>create-time=ipsum</code><ul>
 <li>Output only. The time when the node was created.</li>
 </ul>
 </li>
-<li><code>description=ipsum</code><ul>
+<li><code>description=voluptua.</code><ul>
 <li>The user-supplied description of the TPU. Maximum of 512 characters.</li>
 </ul>
 </li>
-<li><code>health=voluptua.</code><ul>
+<li><code>health=at</code><ul>
 <li>The health status of the TPU node.</li>
 </ul>
 </li>
-<li><code>health-description=at</code><ul>
+<li><code>health-description=sanctus</code><ul>
 <li>Output only. If this field is populated, it contains a description of why the TPU Node is unhealthy.</li>
 </ul>
 </li>
-<li><code>ip-address=sanctus</code><ul>
+<li><code>ip-address=sed</code><ul>
 <li>Output only. DEPRECATED! Use network_endpoints instead. The network address for the TPU Node as visible to Compute Engine instances.</li>
 </ul>
 </li>
-<li><code>labels=key=sed</code><ul>
+<li><code>labels=key=amet.</code><ul>
 <li>Resource labels to represent user-provided metadata.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=amet.</code><ul>
+<li><code>name=takimata</code><ul>
 <li>Output only. Immutable. The name of the TPU</li>
 </ul>
 </li>
-<li><code>network=takimata</code><ul>
+<li><code>network=amet.</code><ul>
 <li>The name of a network they wish to peer the TPU node to. It must be a preexisting Compute Engine network inside of the project on which this API has been activated. If none is provided, &#34;default&#34; will be used.</li>
 </ul>
 </li>
-<li><code>port=amet.</code><ul>
+<li><code>port=duo</code><ul>
 <li>Output only. DEPRECATED! Use network_endpoints instead. The network port for the TPU Node as visible to Compute Engine instances.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Processors Processor Versions Process - Document v2.0.4+20210329</title>
+  <title>Locations Processors Processor Versions Process - Document v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Document v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Document v3.0.0+20220226</a>
         
       </div>
 
@@ -45,17 +45,7 @@
         <span>Operations</span>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="../operations_cancel">Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
                     <a class="" href="../operations_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_list">List</a>
                     
                 </li>
             
@@ -64,6 +54,11 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-fetch-processor-types">Locations Fetch Processor Types</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -76,7 +71,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
                     
                 </li>
             
@@ -86,7 +91,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-create">Locations Processors Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-delete">Locations Processors Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-disable">Locations Processors Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-enable">Locations Processors Enable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-get">Locations Processors Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-processors-human-review-config-review-document">Locations Processors Human Review Config Review Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-list">Locations Processors List</a>
                     
                 </li>
             
@@ -97,6 +132,26 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-processors-processor-versions-batch-process">Locations Processors Processor Versions Batch Process</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-delete">Locations Processors Processor Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-deploy">Locations Processors Processor Versions Deploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-get">Locations Processors Processor Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-list">Locations Processors Processor Versions List</a>
                     
                 </li>
             
@@ -127,6 +182,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-undeploy">Locations Processors Processor Versions Undeploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-set-default-processor-version">Locations Processors Set Default Processor Version</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_operations-get">Operations Get</a>
                     
                 </li>
@@ -148,7 +213,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../uiv1beta3_projects-locations-operations-cancel">Projects Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../uiv1beta3_projects-locations-operations-get">Projects Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../uiv1beta3_projects-locations-operations-list">Projects Locations Operations List</a>
                     
                 </li>
             
@@ -196,7 +271,7 @@ You can set the scope for this method like this: <code>documentai1 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The resource name of the Processor or ProcessorVersion to use for processing. If a Processor is specified, the server will use its default version. Format: projects/{project}/locations/{location}/processors/{processor}, or projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}</li>
+<li>Required. The resource name of the Processor or ProcessorVersion to use for processing. If a Processor is specified, the server will use its default version. Format: <code>projects/{project}/locations/{location}/processors/{processor}</code>, or <code>projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}</code></li>
 </ul>
 </li>
 </ul>
@@ -226,60 +301,60 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .inline-document    content=ipsum</code><ul>
+<li><code>-r .inline-document    content=sed</code><ul>
 <li>Optional. Inline document content, represented as a stream of bytes. Note: As with all <code>bytes</code> fields, protobuffers use a pure binary representation, whereas JSON representations use base64.</li>
 </ul>
 </li>
-<li><code>error    code=51</code><ul>
+<li><code>error    code=31</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
 <li>
-<p><code>message=est</code></p>
+<p><code>message=sed</code></p>
 <ul>
 <li>A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.</li>
 </ul>
 </li>
 <li>
-<p><code>..    mime-type=gubergren</code></p>
+<p><code>..    mime-type=no</code></p>
 <ul>
 <li>An IANA published MIME type (also referred to as media type). For more information, see https://www.iana.org/assignments/media-types/media-types.xhtml.</li>
 </ul>
 </li>
-<li><code>shard-info    shard-count=-17</code><ul>
+<li><code>shard-info    shard-count=-15</code><ul>
 <li>Total number of shards.</li>
 </ul>
 </li>
-<li><code>shard-index=dolor</code><ul>
+<li><code>shard-index=kasd</code><ul>
 <li>The 0-based index of this shard.</li>
 </ul>
 </li>
 <li>
-<p><code>text-offset=lorem</code></p>
+<p><code>text-offset=et</code></p>
 <ul>
 <li>The index of the first character in Document.text in the overall document global text.</li>
 </ul>
 </li>
 <li>
-<p><code>..    text=eos</code></p>
+<p><code>..    text=sed</code></p>
 <ul>
 <li>Optional. UTF-8 encoded text in reading order from the document.</li>
 </ul>
 </li>
 <li>
-<p><code>uri=labore</code></p>
+<p><code>uri=et</code></p>
 <ul>
 <li>Optional. Currently supports Google Cloud Storage URI of the form <code>gs://bucket_name/object_name</code>. Object versioning is not supported. See <a href="https://cloud.google.com/storage/docs/reference-uris">Google Cloud Storage Request URIs</a> for more info.</li>
 </ul>
 </li>
 <li>
-<p><code>..raw-document    content=sed</code></p>
+<p><code>..raw-document    content=et</code></p>
 <ul>
 <li>Inline document content.</li>
 </ul>
 </li>
 <li>
-<p><code>mime-type=duo</code></p>
+<p><code>mime-type=vero</code></p>
 <ul>
 <li>An IANA MIME type (RFC6838) indicating the nature and format of the [content].</li>
 </ul>
@@ -387,10 +462,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_operations-get" class="btn btn-neutral float-right" title="Operations Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-processors-processor-versions-undeploy" class="btn btn-neutral float-right" title="Locations Processors Processor Versions Undeploy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-processors-processor-versions-batch-process" class="btn btn-neutral" title="Locations Processors Processor Versions Batch Process"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-processors-processor-versions-list" class="btn btn-neutral" title="Locations Processors Processor Versions List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -418,8 +493,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-processors-processor-versions-batch-process" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_operations-get" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../projects_locations-processors-processor-versions-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-processors-processor-versions-undeploy" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

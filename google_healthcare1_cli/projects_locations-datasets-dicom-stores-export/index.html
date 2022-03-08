@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Dicom Stores Export - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Dicom Stores Export - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -446,6 +446,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir--resource-validate">Locations Datasets Fhir Stores Fhir  Resource Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-fhir-capabilities">Locations Datasets Fhir Stores Fhir Capabilities</a>
                     
                 </li>
@@ -556,12 +561,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-export">Locations Datasets Hl7 V2 Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get">Locations Datasets Hl7 V2 Stores Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get-iam-policy">Locations Datasets Hl7 V2 Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-import">Locations Datasets Hl7 V2 Stores Import</a>
                     
                 </li>
             
@@ -660,6 +675,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-nlp-analyze-entities">Locations Services Nlp Analyze Entities</a>
+                    
+                </li>
+            
         
 
     
@@ -716,6 +736,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   bigquery-destination:
     force: boolean
     table-uri: string
+    write-disposition: string
   gcs-destination:
     mime-type: string
     uri-prefix: string
@@ -725,22 +746,26 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .bigquery-destination    force=false</code><ul>
-<li>If the destination table already exists and this flag is <code>TRUE</code>, the table is overwritten by the contents of the DICOM store. If the flag is not set and the destination table already exists, the export call returns an error.</li>
+<li>Use <code>write_disposition</code> instead. If <code>write_disposition</code> is specified, this parameter is ignored. force=false is equivalent to write_disposition=WRITE_EMPTY and force=true is equivalent to write_disposition=WRITE_TRUNCATE.</li>
 </ul>
 </li>
-<li>
-<p><code>table-uri=elitr</code></p>
-<ul>
+<li><code>table-uri=sed</code><ul>
 <li>BigQuery URI to a table, up to 2000 characters long, in the format <code>bq://projectId.bqDatasetId.tableId</code></li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-destination    mime-type=sed</code></p>
+<p><code>write-disposition=no</code></p>
+<ul>
+<li>Determines whether the existing table in the destination is to be overwritten or appended to. If a write_disposition is specified, the <code>force</code> parameter is ignored.</li>
+</ul>
+</li>
+<li>
+<p><code>..gcs-destination    mime-type=nonumy</code></p>
 <ul>
 <li>MIME types supported by DICOM spec. Each file is written in the following format: <code>.../{study_id}/{series_id}/{instance_id}[/{frame_number}].{extension}</code> The frame_number component exists only for multi-frame instances. Supported MIME types are consistent with supported formats in DICOMweb: https://cloud.google.com/healthcare/docs/dicom#retrieve_transaction. Specifically, the following are supported: - application/dicom; transfer-syntax=1.2.840.10008.1.2.1 (uncompressed DICOM) - application/dicom; transfer-syntax=1.2.840.10008.1.2.4.50 (DICOM with embedded JPEG Baseline) - application/dicom; transfer-syntax=1.2.840.10008.1.2.4.90 (DICOM with embedded JPEG 2000 Lossless Only) - application/dicom; transfer-syntax=1.2.840.10008.1.2.4.91 (DICOM with embedded JPEG 2000) - application/dicom; transfer-syntax=<em> (DICOM with no transcoding) - application/octet-stream; transfer-syntax=1.2.840.10008.1.2.1 (raw uncompressed PixelData) - application/octet-stream; transfer-syntax=</em> (raw PixelData in whatever format it was uploaded in) - image/jpeg; transfer-syntax=1.2.840.10008.1.2.4.50 (Consumer JPEG) - image/png The following extensions are used for output files: - application/dicom -&gt; .dcm - image/jpeg -&gt; .jpg - image/png -&gt; .png - application/octet-stream -&gt; no extension If unspecified, the instances are exported in the original DICOM format they were uploaded in.</li>
 </ul>
 </li>
-<li><code>uri-prefix=no</code><ul>
+<li><code>uri-prefix=at</code><ul>
 <li>The Cloud Storage destination to export to. URI for a Cloud Storage directory where the server writes the result files, in the format <code>gs://{bucket-id}/{path/to/destination/dir}</code>). If there is no trailing slash, the service appends one when composing the object path. The user is responsible for creating the Cloud Storage bucket referenced in <code>uri_prefix</code>.</li>
 </ul>
 </li>

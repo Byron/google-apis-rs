@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Course Work Patch - classroom v2.0.4+20210323</title>
+  <title>Course Work Patch - classroom v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> classroom v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> classroom v3.0.0+20220224</a>
         
       </div>
 
@@ -469,6 +469,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     minutes: integer
     nanos: integer
     seconds: integer
+  grade-category:
+    default-grade-denominator: integer
+    id: string
+    name: string
+    weight: integer
   id: string
   individual-students-options:
     student-ids: [string]
@@ -487,30 +492,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    alternate-link=et</code><ul>
+<li><code>-r .    alternate-link=dolor</code><ul>
 <li>Absolute link to this course work in the Classroom web UI. This is only populated if <code>state</code> is <code>PUBLISHED</code>. Read-only.</li>
 </ul>
 </li>
-<li><code>assignee-mode=et</code><ul>
+<li><code>assignee-mode=duo</code><ul>
 <li>Assignee mode of the coursework. If unspecified, the default value is <code>ALL_STUDENTS</code>.</li>
 </ul>
 </li>
-<li><code>assignment.student-work-folder    alternate-link=sadipscing</code><ul>
+<li><code>assignment.student-work-folder    alternate-link=vero</code><ul>
 <li>URL that can be used to access the Drive folder. Read-only.</li>
 </ul>
 </li>
-<li><code>id=stet</code><ul>
+<li><code>id=vero</code><ul>
 <li>Drive API resource ID.</li>
 </ul>
 </li>
 <li>
-<p><code>title=dolor</code></p>
+<p><code>title=invidunt</code></p>
 <ul>
 <li>Title of the Drive folder. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>...    associated-with-developer=false</code></p>
+<p><code>...    associated-with-developer=true</code></p>
 <ul>
 <li>Whether this course work item is associated with the Developer Console project making the request. See CreateCourseWork for more details. Read-only.</li>
 </ul>
@@ -519,105 +524,125 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Identifier of the course. Read-only.</li>
 </ul>
 </li>
-<li><code>creation-time=invidunt</code><ul>
+<li><code>creation-time=elitr</code><ul>
 <li>Timestamp when this course work was created. Read-only.</li>
 </ul>
 </li>
-<li><code>creator-user-id=stet</code><ul>
+<li><code>creator-user-id=lorem</code><ul>
 <li>Identifier for the user that created the coursework. Read-only.</li>
 </ul>
 </li>
-<li><code>description=vero</code><ul>
+<li><code>description=diam</code><ul>
 <li>Optional description of this course work. If set, the description must be a valid UTF-8 string containing no more than 30,000 characters.</li>
 </ul>
 </li>
-<li><code>due-date    day=57</code><ul>
+<li><code>due-date    day=40</code><ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=95</code><ul>
+<li><code>month=1</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=72</code></p>
+<p><code>year=78</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>..due-time    hours=40</code></p>
+<p><code>..due-time    hours=42</code></p>
 <ul>
 <li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
 </ul>
 </li>
-<li><code>minutes=1</code><ul>
+<li><code>minutes=55</code><ul>
 <li>Minutes of hour of day. Must be from 0 to 59.</li>
 </ul>
 </li>
-<li><code>nanos=78</code><ul>
+<li><code>nanos=73</code><ul>
 <li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
 </ul>
 </li>
 <li>
-<p><code>seconds=42</code></p>
+<p><code>seconds=29</code></p>
 <ul>
 <li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
 </ul>
 </li>
 <li>
-<p><code>..    id=consetetur</code></p>
+<p><code>..grade-category    default-grade-denominator=70</code></p>
+<ul>
+<li>Default value of denominator. Only applicable when grade calculation type is TOTAL_POINTS.</li>
+</ul>
+</li>
+<li><code>id=consetetur</code><ul>
+<li>ID of the grade category.</li>
+</ul>
+</li>
+<li><code>name=amet.</code><ul>
+<li>Name of the grade category.</li>
+</ul>
+</li>
+<li>
+<p><code>weight=71</code></p>
+<ul>
+<li>The weight of the category average as part of overall average. A weight of 12.34% is represented as 123400 (100% is 1,000,000). The last two digits should always be zero since we use two decimal precision. Only applicable when grade calculation type is WEIGHTED_CATEGORIES.</li>
+</ul>
+</li>
+<li>
+<p><code>..    id=takimata</code></p>
 <ul>
 <li>Classroom-assigned identifier of this course work, unique per course. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>individual-students-options    student-ids=voluptua.</code></p>
+<p><code>individual-students-options    student-ids=dolores</code></p>
 <ul>
 <li>Identifiers for the students that have access to the coursework/announcement.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    max-points=0.7904276045322813</code></p>
+<p><code>..    max-points=0.3072987560065821</code></p>
 <ul>
 <li>Maximum grade for this course work. If zero or unspecified, this assignment is considered ungraded. This must be a non-negative integer value.</li>
 </ul>
 </li>
 <li>
-<p><code>multiple-choice-question    choices=erat</code></p>
+<p><code>multiple-choice-question    choices=et</code></p>
 <ul>
 <li>Possible choices.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    scheduled-time=consetetur</code></p>
+<p><code>..    scheduled-time=accusam</code></p>
 <ul>
 <li>Optional timestamp when this course work is scheduled to be published.</li>
 </ul>
 </li>
-<li><code>state=amet.</code><ul>
+<li><code>state=voluptua.</code><ul>
 <li>Status of this course work. If unspecified, the default state is <code>DRAFT</code>.</li>
 </ul>
 </li>
-<li><code>submission-modification-mode=sed</code><ul>
+<li><code>submission-modification-mode=dolore</code><ul>
 <li>Setting to determine when students are allowed to modify submissions. If unspecified, the default value is <code>MODIFIABLE_UNTIL_TURNED_IN</code>.</li>
 </ul>
 </li>
-<li><code>title=takimata</code><ul>
+<li><code>title=dolore</code><ul>
 <li>Title of this course work. The title must be a valid UTF-8 string containing between 1 and 3000 characters.</li>
 </ul>
 </li>
-<li><code>topic-id=dolores</code><ul>
+<li><code>topic-id=dolore</code><ul>
 <li>Identifier for the topic that this coursework is associated with. Must match an existing topic in the course.</li>
 </ul>
 </li>
-<li><code>update-time=gubergren</code><ul>
+<li><code>update-time=voluptua.</code><ul>
 <li>Timestamp of the most recent change to this course work. Read-only.</li>
 </ul>
 </li>
-<li><code>work-type=et</code><ul>
+<li><code>work-type=amet.</code><ul>
 <li>Type of this course work. The type is set when the course work is created and cannot be changed.</li>
 </ul>
 </li>

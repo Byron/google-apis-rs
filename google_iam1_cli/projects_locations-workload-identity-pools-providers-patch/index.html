@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Workload Identity Pools Providers Patch - Iam v2.0.4+20210325</title>
+  <title>Locations Workload Identity Pools Providers Patch - Iam v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Iam v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Iam v3.0.0+20220224</a>
         
       </div>
 
@@ -51,6 +51,27 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../iam-policies_query-auditable-services">Query Auditable Services</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-operations-get">Workforce Pools Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-providers-operations-get">Workforce Pools Providers Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-subjects-operations-get">Workforce Pools Subjects Operations Get</a>
                     
                 </li>
             
@@ -149,6 +170,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-workload-identity-pools-providers-get">Locations Workload Identity Pools Providers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workload-identity-pools-providers-keys-operations-get">Locations Workload Identity Pools Providers Keys Operations Get</a>
                     
                 </li>
             
@@ -268,6 +294,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_service-accounts-keys-delete">Service Accounts Keys Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-disable">Service Accounts Keys Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-enable">Service Accounts Keys Enable</a>
                     
                 </li>
             
@@ -422,7 +458,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>attribute-mapping=key=dolore</code><ul>
-<li>Maps attributes from authentication credentials issued by an external identity provider to Google Cloud attributes, such as <code>subject</code> and <code>segment</code>. Each key must be a string specifying the Google Cloud IAM attribute to map to. The following keys are supported: * <code>google.subject</code>: The principal IAM is authenticating. You can reference this value in IAM bindings. This is also the subject that appears in Cloud Logging logs. Cannot exceed 127 characters. * <code>google.groups</code>: Groups the external identity belongs to. You can grant groups access to resources using an IAM <code>principalSet</code> binding; access applies to all members of the group. You can also provide custom attributes by specifying <code>attribute.{custom_attribute}</code>, where <code>{custom_attribute}</code> is the name of the custom attribute to be mapped. You can define a maximum of 50 custom attributes. The maximum length of a mapped attribute key is 100 characters, and the key may only contain the characters [a-z0-9_]. You can reference these attributes in IAM policies to define fine-grained access for a workload to Google Cloud resources. For example: * <code>google.subject</code>: <code>principal://iam.googleapis.com/projects/{project}/locations/{location}/workloadIdentityPools/{pool}/subject/{value}</code> * <code>google.groups</code>: <code>principalSet://iam.googleapis.com/projects/{project}/locations/{location}/workloadIdentityPools/{pool}/group/{value}</code> * <code>attribute.{custom_attribute}</code>: <code>principalSet://iam.googleapis.com/projects/{project}/locations/{location}/workloadIdentityPools/{pool}/attribute.{custom_attribute}/{value}</code> Each value must be a [Common Expression Language] (https://opensource.google/projects/cel) function that maps an identity provider credential to the normalized attribute specified by the corresponding map key. You can use the <code>assertion</code> keyword in the expression to access a JSON representation of the authentication credential issued by the provider. The maximum length of an attribute mapping expression is 2048 characters. When evaluated, the total size of all mapped attributes must not exceed 8KB. For AWS providers, if no attribute mapping is defined, the following default mapping applies: <code>{ &amp;#34;google.subject&amp;#34;:&amp;#34;assertion.arn&amp;#34;, &amp;#34;attribute.aws_role&amp;#34;: &amp;#34;assertion.arn.contains(&amp;#39;assumed-role&amp;#39;)&amp;#34; &amp;#34; ? assertion.arn.extract(&amp;#39;{account_arn}assumed-role/&amp;#39;)&amp;#34; &amp;#34; + &amp;#39;assumed-role/&amp;#39;&amp;#34; &amp;#34; + assertion.arn.extract(&amp;#39;assumed-role/{role_name}/&amp;#39;)&amp;#34; &amp;#34; : assertion.arn&amp;#34;, }</code> If any custom attribute mappings are defined, they must include a mapping to the <code>google.subject</code> attribute. For OIDC providers, you must supply a custom mapping, which must include the <code>google.subject</code> attribute. For example, the following maps the <code>sub</code> claim of the incoming credential to the <code>subject</code> attribute on a Google token: <code>{&amp;#34;google.subject&amp;#34;: &amp;#34;assertion.sub&amp;#34;}</code></li>
+<li>Maps attributes from authentication credentials issued by an external identity provider to Google Cloud attributes, such as <code>subject</code> and <code>segment</code>. Each key must be a string specifying the Google Cloud IAM attribute to map to. The following keys are supported: * <code>google.subject</code>: The principal IAM is authenticating. You can reference this value in IAM bindings. This is also the subject that appears in Cloud Logging logs. Cannot exceed 127 bytes. * <code>google.groups</code>: Groups the external identity belongs to. You can grant groups access to resources using an IAM <code>principalSet</code> binding; access applies to all members of the group. You can also provide custom attributes by specifying <code>attribute.{custom_attribute}</code>, where <code>{custom_attribute}</code> is the name of the custom attribute to be mapped. You can define a maximum of 50 custom attributes. The maximum length of a mapped attribute key is 100 characters, and the key may only contain the characters [a-z0-9_]. You can reference these attributes in IAM policies to define fine-grained access for a workload to Google Cloud resources. For example: * <code>google.subject</code>: <code>principal://iam.googleapis.com/projects/{project}/locations/{location}/workloadIdentityPools/{pool}/subject/{value}</code> * <code>google.groups</code>: <code>principalSet://iam.googleapis.com/projects/{project}/locations/{location}/workloadIdentityPools/{pool}/group/{value}</code> * <code>attribute.{custom_attribute}</code>: <code>principalSet://iam.googleapis.com/projects/{project}/locations/{location}/workloadIdentityPools/{pool}/attribute.{custom_attribute}/{value}</code> Each value must be a [Common Expression Language] (https://opensource.google/projects/cel) function that maps an identity provider credential to the normalized attribute specified by the corresponding map key. You can use the <code>assertion</code> keyword in the expression to access a JSON representation of the authentication credential issued by the provider. The maximum length of an attribute mapping expression is 2048 characters. When evaluated, the total size of all mapped attributes must not exceed 8KB. For AWS providers, if no attribute mapping is defined, the following default mapping applies: <code>{ &amp;#34;google.subject&amp;#34;:&amp;#34;assertion.arn&amp;#34;, &amp;#34;attribute.aws_role&amp;#34;: &amp;#34;assertion.arn.contains(&amp;#39;assumed-role&amp;#39;)&amp;#34; &amp;#34; ? assertion.arn.extract(&amp;#39;{account_arn}assumed-role/&amp;#39;)&amp;#34; &amp;#34; + &amp;#39;assumed-role/&amp;#39;&amp;#34; &amp;#34; + assertion.arn.extract(&amp;#39;assumed-role/{role_name}/&amp;#39;)&amp;#34; &amp;#34; : assertion.arn&amp;#34;, }</code> If any custom attribute mappings are defined, they must include a mapping to the <code>google.subject</code> attribute. For OIDC providers, you must supply a custom mapping, which must include the <code>google.subject</code> attribute. For example, the following maps the <code>sub</code> claim of the incoming credential to the <code>subject</code> attribute on a Google token: <code>{&amp;#34;google.subject&amp;#34;: &amp;#34;assertion.sub&amp;#34;}</code></li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
@@ -458,7 +494,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>issuer-uri=et</code></p>
 <ul>
-<li>Required. The OIDC issuer URL.</li>
+<li>Required. The OIDC issuer URL. Must be an HTTPS endpoint.</li>
 </ul>
 </li>
 <li>

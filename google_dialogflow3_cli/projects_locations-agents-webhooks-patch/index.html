@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Agents Webhooks Patch - Dialogflow v2.0.4+20210329</title>
+  <title>Locations Agents Webhooks Patch - Dialogflow v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dialogflow v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Dialogflow v3.0.0+20220228</a>
         
       </div>
 
@@ -43,6 +43,16 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-get">Locations Agents Changelogs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-list">Locations Agents Changelogs List</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-create">Locations Agents Create</a>
@@ -80,12 +90,32 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-continuous-test-results-list">Locations Agents Environments Continuous Test Results List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-create">Locations Agents Environments Create</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-delete">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deploy-flow">Locations Agents Environments Deploy Flow</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-get">Locations Agents Environments Deployments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-list">Locations Agents Environments Deployments List</a>
                     
                 </li>
             
@@ -145,6 +175,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-run-continuous-test">Locations Agents Environments Run Continuous Test</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-sessions-detect-intent">Locations Agents Environments Sessions Detect Intent</a>
                     
                 </li>
@@ -200,12 +235,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-export">Locations Agents Flows Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get">Locations Agents Flows Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get-validation-result">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-import">Locations Agents Flows Import</a>
                     
                 </li>
             
@@ -276,6 +321,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-validate">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-versions-compare-versions">Locations Agents Flows Versions Compare Versions</a>
                     
                 </li>
             
@@ -514,6 +564,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
                     
                 </li>
@@ -628,51 +688,97 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   disabled: boolean
   display-name: string
   generic-web-service:
+    allowed-ca-certs: [string]
     password: string
     request-headers: { string: string }
     uri: string
     username: string
   name: string
+  service-directory:
+    generic-web-service:
+      allowed-ca-certs: [string]
+      password: string
+      request-headers: { string: string }
+      uri: string
+      username: string
+    service: string
   timeout: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    disabled=true</code><ul>
+<li><code>-r .    disabled=false</code><ul>
 <li>Indicates whether the webhook is disabled.</li>
 </ul>
 </li>
-<li><code>display-name=invidunt</code><ul>
+<li><code>display-name=et</code><ul>
 <li>Required. The human-readable name of the webhook, unique within the agent.</li>
 </ul>
 </li>
-<li><code>generic-web-service    password=sea</code><ul>
+<li><code>generic-web-service    allowed-ca-certs=et</code><ul>
+<li>Optional. Specifies a list of allowed custom CA certificates (in DER format) for HTTPS verification. This overrides the default SSL trust store. If this is empty or unspecified, Dialogflow will use Google&#39;s default trust store to verify certificates. N.B. Make sure the HTTPS server certificates are signed with &#34;subject alt name&#34;. For instance a certificate can be self-signed using the following command, openssl x509 -req -days 200 -in example.com.csr \ -signkey example.com.key \ -out example.com.crt \ -extfile &lt;(printf &#34;\nsubjectAltName=&#39;DNS:www.example.com&#39;&#34;)</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>password=dolor</code><ul>
 <li>The password for HTTP Basic authentication.</li>
 </ul>
 </li>
-<li><code>request-headers=key=duo</code><ul>
+<li><code>request-headers=key=erat</code><ul>
 <li>The HTTP request headers to send together with webhook requests.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>uri=sea</code><ul>
+<li><code>uri=dolore</code><ul>
 <li>Required. The webhook URI for receiving POST requests. It must use https protocol.</li>
 </ul>
 </li>
 <li>
-<p><code>username=stet</code></p>
+<p><code>username=vero</code></p>
 <ul>
 <li>The user name for HTTP Basic authentication.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=sadipscing</code></p>
+<p><code>..    name=ea</code></p>
 <ul>
 <li>The unique identifier of the webhook. Required for the Webhooks.UpdateWebhook method. Webhooks.CreateWebhook populates the name automatically. Format: <code>projects//locations//agents//webhooks/</code>.</li>
 </ul>
 </li>
-<li><code>timeout=no</code><ul>
+<li><code>service-directory.generic-web-service    allowed-ca-certs=et</code><ul>
+<li>Optional. Specifies a list of allowed custom CA certificates (in DER format) for HTTPS verification. This overrides the default SSL trust store. If this is empty or unspecified, Dialogflow will use Google&#39;s default trust store to verify certificates. N.B. Make sure the HTTPS server certificates are signed with &#34;subject alt name&#34;. For instance a certificate can be self-signed using the following command, openssl x509 -req -days 200 -in example.com.csr \ -signkey example.com.key \ -out example.com.crt \ -extfile &lt;(printf &#34;\nsubjectAltName=&#39;DNS:www.example.com&#39;&#34;)</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>password=amet.</code><ul>
+<li>The password for HTTP Basic authentication.</li>
+</ul>
+</li>
+<li><code>request-headers=key=eirmod</code><ul>
+<li>The HTTP request headers to send together with webhook requests.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>uri=sanctus</code><ul>
+<li>Required. The webhook URI for receiving POST requests. It must use https protocol.</li>
+</ul>
+</li>
+<li>
+<p><code>username=sed</code></p>
+<ul>
+<li>The user name for HTTP Basic authentication.</li>
+</ul>
+</li>
+<li>
+<p><code>..    service=dolor</code></p>
+<ul>
+<li>Required. The name of <a href="https://cloud.google.com/service-directory">Service Directory</a> service. Format: <code>projects//locations//namespaces//services/</code>. <code>Location ID</code> of the service directory must be the same as the location of the agent.</li>
+</ul>
+</li>
+<li>
+<p><code>..    timeout=et</code></p>
+<ul>
 <li>Webhook execution timeout. Execution is considered failed if Dialogflow doesn&#39;t receive a response from webhook at the end of the timeout period. Defaults to 5 seconds, maximum allowed timeout is 30 seconds.</li>
 </ul>
 </li>
@@ -783,7 +889,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-operations-cancel" class="btn btn-neutral float-right" title="Locations Operations Cancel"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-get" class="btn btn-neutral float-right" title="Locations Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../projects_locations-agents-webhooks-list" class="btn btn-neutral" title="Locations Agents Webhooks List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -815,7 +921,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../projects_locations-agents-webhooks-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-operations-cancel" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-get" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

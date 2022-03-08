@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Nodes Deployments Create - sasportal v2.0.4+20210330</title>
+  <title>Nodes Deployments Create - sasportal v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> sasportal v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> sasportal v3.0.0+20220301</a>
         
       </div>
 
@@ -527,9 +527,8 @@ You can set the scope for this method like this: <code>sasportal1-alpha1 --scope
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>SasPortalDeployment:
-  allowed-billing-modes: [string]
-  default-billing-mode: string
   display-name: string
+  frns: [string]
   name: string
   sas-user-ids: [string]
 
@@ -537,24 +536,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    allowed-billing-modes=stet</code><ul>
-<li>The allowed billing modes under this deployment.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>default-billing-mode=ut</code><ul>
-<li>Default billing mode for the deployment and devices under it.</li>
-</ul>
-</li>
-<li><code>display-name=consetetur</code><ul>
+<li><code>-r .    display-name=magna</code><ul>
 <li>The deployment&#39;s display name.</li>
 </ul>
 </li>
-<li><code>name=amet</code><ul>
+<li><code>frns=et</code><ul>
+<li>Output only. The FRNs copied from its direct parent.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>name=ipsum</code><ul>
 <li>Output only. Resource name.</li>
 </ul>
 </li>
-<li><code>sas-user-ids=vero</code><ul>
+<li><code>sas-user-ids=ipsum</code><ul>
 <li>User ID used by the devices belonging to this deployment. Each deployment should be associated with one unique user ID.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

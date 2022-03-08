@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Service Perimeters Commit - Access Context Manager v2.0.4+20210319</title>
+  <title>Service Perimeters Commit - Access Context Manager v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Access Context Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Access Context Manager v3.0.0+20220301</a>
         
       </div>
 
@@ -75,6 +75,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_access-levels-test-iam-permissions">Access Levels Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../access-policies_create">Create</a>
                     
                 </li>
@@ -86,6 +91,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_get-iam-policy">Get Iam Policy</a>
                     
                 </li>
             
@@ -152,6 +162,21 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_service-perimeters-replace-all">Service Perimeters Replace All</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_service-perimeters-test-iam-permissions">Service Perimeters Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_test-iam-permissions">Test Iam Permissions</a>
                     
                 </li>
             
@@ -248,7 +273,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Commit the dry-run spec for all the Service Perimeters in an Access Policy. A commit operation on a Service Perimeter involves copying its <code>spec</code> field to that Service Perimeter&#39;s <code>status</code> field. Only Service Perimeters with <code>use_explicit_dry_run_spec</code> field set to true are affected by a commit operation. The longrunning operation from this RPC will have a successful status once the dry-run specs for all the Service Perimeters have been committed. If a commit fails, it will cause the longrunning operation to return an error response and the entire commit operation will be cancelled. When successful, Operation.response field will contain CommitServicePerimetersResponse. The <code>dry_run</code> and the <code>spec</code> fields will be cleared after a successful commit operation.</p>
+              <p>Commits the dry-run specification for all the service perimeters in an access policy. A commit operation on a service perimeter involves copying its <code>spec</code> field to the <code>status</code> field of the service perimeter. Only service perimeters with <code>use_explicit_dry_run_spec</code> field set to true are affected by a commit operation. The long-running operation from this RPC has a successful status after the dry-run specifications for all the service perimeters have been committed. If a commit fails, it causes the long-running operation to return an error response and the entire commit operation is cancelled. When successful, the Operation.response field contains CommitServicePerimetersResponse. The <code>dry_run</code> and the <code>spec</code> fields are cleared after a successful commit operation.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -271,7 +296,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    etag=ut</code><ul>
+<li><code>-r .    etag=ipsum</code><ul>
 <li>Optional. The etag for the version of the Access Policy that this commit operation is to be performed on. If, at the time of commit, the etag for the Access Policy stored in Access Context Manager is different from the specified etag, then the commit operation will not be performed and the call will fail. This field is not required. If etag is not provided, the operation will be performed as if a valid etag is provided.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Agents Environments Experiments Patch - Dialogflow v2.0.4+20210329</title>
+  <title>Locations Agents Environments Experiments Patch - Dialogflow v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dialogflow v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Dialogflow v3.0.0+20220228</a>
         
       </div>
 
@@ -43,6 +43,16 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-get">Locations Agents Changelogs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-list">Locations Agents Changelogs List</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-create">Locations Agents Create</a>
@@ -80,12 +90,32 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-continuous-test-results-list">Locations Agents Environments Continuous Test Results List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-create">Locations Agents Environments Create</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-delete">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deploy-flow">Locations Agents Environments Deploy Flow</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-get">Locations Agents Environments Deployments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-list">Locations Agents Environments Deployments List</a>
                     
                 </li>
             
@@ -169,6 +199,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-run-continuous-test">Locations Agents Environments Run Continuous Test</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-sessions-detect-intent">Locations Agents Environments Sessions Detect Intent</a>
                     
                 </li>
@@ -224,12 +259,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-export">Locations Agents Flows Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get">Locations Agents Flows Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get-validation-result">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-import">Locations Agents Flows Import</a>
                     
                 </li>
             
@@ -300,6 +345,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-validate">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-versions-compare-versions">Locations Agents Flows Versions Compare Versions</a>
                     
                 </li>
             
@@ -514,6 +564,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
                     
                 </li>
@@ -636,6 +696,14 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   name: string
   result:
     last-update-time: string
+  rollout-config:
+    failure-condition: string
+    rollout-condition: string
+  rollout-failure-reason: string
+  rollout-state:
+    start-time: string
+    step: string
+    step-index: integer
   start-time: string
   state: string
 
@@ -643,18 +711,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=vero</code><ul>
+<li><code>-r .    create-time=sadipscing</code><ul>
 <li>Creation time of this experiment.</li>
 </ul>
 </li>
 <li>
-<p><code>definition    condition=erat</code></p>
+<p><code>definition    condition=stet</code></p>
 <ul>
 <li>The condition defines which subset of sessions are selected for this experiment. If not specified, all sessions are eligible. E.g. &#34;query_input.language_code=en&#34; See the <a href="https://cloud.google.com/dialogflow/cx/docs/reference/condition">conditions reference</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    description=sed</code></p>
+<p><code>..    description=dolor</code></p>
 <ul>
 <li>The human-readable description of the experiment.</li>
 </ul>
@@ -663,36 +731,68 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. The human-readable name of the experiment (unique in an environment). Limit of 64 characters.</li>
 </ul>
 </li>
-<li><code>end-time=dolore</code><ul>
+<li><code>end-time=vero</code><ul>
 <li>End time of this experiment.</li>
 </ul>
 </li>
-<li><code>experiment-length=et</code><ul>
+<li><code>experiment-length=vero</code><ul>
 <li>Maximum number of days to run the experiment/rollout. If auto-rollout is not enabled, default value and maximum will be 30 days. If auto-rollout is enabled, default value and maximum will be 6 days.</li>
 </ul>
 </li>
-<li><code>last-update-time=voluptua.</code><ul>
+<li><code>last-update-time=invidunt</code><ul>
 <li>Last update time of this experiment.</li>
 </ul>
 </li>
-<li><code>name=amet.</code><ul>
+<li><code>name=stet</code><ul>
 <li>The name of the experiment. Format: projects//locations//agents//environments//experiments/..</li>
 </ul>
 </li>
 <li>
-<p><code>result    last-update-time=consetetur</code></p>
+<p><code>result    last-update-time=vero</code></p>
 <ul>
 <li>The last time the experiment&#39;s stats data was updated. Will have default value if stats have never been computed for this experiment.</li>
 </ul>
 </li>
 <li>
-<p><code>..    start-time=diam</code></p>
+<p><code>..rollout-config    failure-condition=elitr</code></p>
+<ul>
+<li>The conditions that are used to evaluate the failure of a rollout step. If not specified, no rollout steps will fail. E.g. &#34;containment_rate &lt; 10% OR average_turn_count &lt; 3&#34;. See the <a href="https://cloud.google.com/dialogflow/cx/docs/reference/condition">conditions reference</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>rollout-condition=lorem</code></p>
+<ul>
+<li>The conditions that are used to evaluate the success of a rollout step. If not specified, all rollout steps will proceed to the next one unless failure conditions are met. E.g. &#34;containment_rate &gt; 60% AND callback_rate &lt; 20%&#34;. See the <a href="https://cloud.google.com/dialogflow/cx/docs/reference/condition">conditions reference</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    rollout-failure-reason=diam</code></p>
+<ul>
+<li>The reason why rollout has failed. Should only be set when state is ROLLOUT_FAILED.</li>
+</ul>
+</li>
+<li><code>rollout-state    start-time=no</code><ul>
+<li>Start time of the current step.</li>
+</ul>
+</li>
+<li><code>step=ipsum</code><ul>
+<li>Display name of the current auto rollout step.</li>
+</ul>
+</li>
+<li>
+<p><code>step-index=78</code></p>
+<ul>
+<li>Index of the current step in the auto rollout steps list.</li>
+</ul>
+</li>
+<li>
+<p><code>..    start-time=takimata</code></p>
 <ul>
 <li>Start time of this experiment.</li>
 </ul>
 </li>
-<li><code>state=dolor</code><ul>
-<li>The current state of the experiment. Transition triggered by Expriments.StartExperiment: PENDING-&gt;RUNNING. Transition triggered by Expriments.CancelExperiment: PENDING-&gt;CANCELLED or RUNNING-&gt;CANCELLED.</li>
+<li><code>state=consetetur</code><ul>
+<li>The current state of the experiment. Transition triggered by Experiments.StartExperiment: DRAFT-&gt;RUNNING. Transition triggered by Experiments.CancelExperiment: DRAFT-&gt;DONE or RUNNING-&gt;DONE.</li>
 </ul>
 </li>
 </ul>

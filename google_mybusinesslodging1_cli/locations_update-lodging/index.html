@@ -1,0 +1,4649 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Update Lodging - My Business Lodging v3.0.0+20220305</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> My Business Lodging v3.0.0+20220305</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_get-lodging">Get Lodging</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_lodging-get-google-updated">Lodging Get Google Updated</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Update Lodging</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Update Lodging</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinesslodging1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates the Lodging of a specific location.</p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. Google identifier for this location in the form: <code>locations/{location_id}/lodging</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Lodging:
+  accessibility:
+    mobility-accessible: boolean
+    mobility-accessible-elevator: boolean
+    mobility-accessible-elevator-exception: string
+    mobility-accessible-exception: string
+    mobility-accessible-parking: boolean
+    mobility-accessible-parking-exception: string
+    mobility-accessible-pool: boolean
+    mobility-accessible-pool-exception: string
+  activities:
+    beach-access: boolean
+    beach-access-exception: string
+    beach-front: boolean
+    beach-front-exception: string
+    bicycle-rental: boolean
+    bicycle-rental-exception: string
+    boutique-stores: boolean
+    boutique-stores-exception: string
+    casino: boolean
+    casino-exception: string
+    free-bicycle-rental: boolean
+    free-bicycle-rental-exception: string
+    free-watercraft-rental: boolean
+    free-watercraft-rental-exception: string
+    game-room: boolean
+    game-room-exception: string
+    golf: boolean
+    golf-exception: string
+    horseback-riding: boolean
+    horseback-riding-exception: string
+    nightclub: boolean
+    nightclub-exception: string
+    private-beach: boolean
+    private-beach-exception: string
+    scuba: boolean
+    scuba-exception: string
+    snorkeling: boolean
+    snorkeling-exception: string
+    tennis: boolean
+    tennis-exception: string
+    water-skiing: boolean
+    water-skiing-exception: string
+    watercraft-rental: boolean
+    watercraft-rental-exception: string
+  all-units:
+    bungalow-or-villa: boolean
+    bungalow-or-villa-exception: string
+    connecting-unit-available: boolean
+    connecting-unit-available-exception: string
+    executive-floor: boolean
+    executive-floor-exception: string
+    max-adult-occupants-count: integer
+    max-adult-occupants-count-exception: int64
+    max-child-occupants-count: integer
+    max-child-occupants-count-exception: int64
+    max-occupants-count: integer
+    max-occupants-count-exception: int64
+    private-home: boolean
+    private-home-exception: string
+    suite: boolean
+    suite-exception: string
+    tier: string
+    tier-exception: string
+    total-living-areas:
+      accessibility:
+        ada-compliant-unit: boolean
+        ada-compliant-unit-exception: string
+        hearing-accessible-doorbell: boolean
+        hearing-accessible-doorbell-exception: string
+        hearing-accessible-fire-alarm: boolean
+        hearing-accessible-fire-alarm-exception: string
+        hearing-accessible-unit: boolean
+        hearing-accessible-unit-exception: string
+        mobility-accessible-bathtub: boolean
+        mobility-accessible-bathtub-exception: string
+        mobility-accessible-shower: boolean
+        mobility-accessible-shower-exception: string
+        mobility-accessible-toilet: boolean
+        mobility-accessible-toilet-exception: string
+        mobility-accessible-unit: boolean
+        mobility-accessible-unit-exception: string
+      eating:
+        coffee-maker: boolean
+        coffee-maker-exception: string
+        cookware: boolean
+        cookware-exception: string
+        dishwasher: boolean
+        dishwasher-exception: string
+        indoor-grill: boolean
+        indoor-grill-exception: string
+        kettle: boolean
+        kettle-exception: string
+        kitchen-available: boolean
+        kitchen-available-exception: string
+        microwave: boolean
+        microwave-exception: string
+        minibar: boolean
+        minibar-exception: string
+        outdoor-grill: boolean
+        outdoor-grill-exception: string
+        oven: boolean
+        oven-exception: string
+        refrigerator: boolean
+        refrigerator-exception: string
+        sink: boolean
+        sink-exception: string
+        snackbar: boolean
+        snackbar-exception: string
+        stove: boolean
+        stove-exception: string
+        tea-station: boolean
+        tea-station-exception: string
+        toaster: boolean
+        toaster-exception: string
+      features:
+        air-conditioning: boolean
+        air-conditioning-exception: string
+        bathtub: boolean
+        bathtub-exception: string
+        bidet: boolean
+        bidet-exception: string
+        dryer: boolean
+        dryer-exception: string
+        electronic-room-key: boolean
+        electronic-room-key-exception: string
+        fireplace: boolean
+        fireplace-exception: string
+        hairdryer: boolean
+        hairdryer-exception: string
+        heating: boolean
+        heating-exception: string
+        inunit-safe: boolean
+        inunit-safe-exception: string
+        inunit-wifi-available: boolean
+        inunit-wifi-available-exception: string
+        ironing-equipment: boolean
+        ironing-equipment-exception: string
+        pay-per-view-movies: boolean
+        pay-per-view-movies-exception: string
+        private-bathroom: boolean
+        private-bathroom-exception: string
+        shower: boolean
+        shower-exception: string
+        toilet: boolean
+        toilet-exception: string
+        tv: boolean
+        tv-casting: boolean
+        tv-casting-exception: string
+        tv-exception: string
+        tv-streaming: boolean
+        tv-streaming-exception: string
+        universal-power-adapters: boolean
+        universal-power-adapters-exception: string
+        washer: boolean
+        washer-exception: string
+      layout:
+        balcony: boolean
+        balcony-exception: string
+        living-area-sq-meters: number
+        living-area-sq-meters-exception: string
+        loft: boolean
+        loft-exception: string
+        non-smoking: boolean
+        non-smoking-exception: string
+        patio: boolean
+        patio-exception: string
+        stairs: boolean
+        stairs-exception: string
+      sleeping:
+        beds-count: integer
+        beds-count-exception: int64
+        bunk-beds-count: integer
+        bunk-beds-count-exception: int64
+        cribs-count: integer
+        cribs-count-exception: int64
+        double-beds-count: integer
+        double-beds-count-exception: int64
+        feather-pillows: boolean
+        feather-pillows-exception: string
+        hypoallergenic-bedding: boolean
+        hypoallergenic-bedding-exception: string
+        king-beds-count: integer
+        king-beds-count-exception: int64
+        memory-foam-pillows: boolean
+        memory-foam-pillows-exception: string
+        other-beds-count: integer
+        other-beds-count-exception: int64
+        queen-beds-count: integer
+        queen-beds-count-exception: int64
+        roll-away-beds-count: integer
+        roll-away-beds-count-exception: int64
+        single-or-twin-beds-count: integer
+        single-or-twin-beds-count-exception: int64
+        sofa-beds-count: integer
+        sofa-beds-count-exception: int64
+        synthetic-pillows: boolean
+        synthetic-pillows-exception: string
+    views:
+      beach-view: boolean
+      beach-view-exception: string
+      city-view: boolean
+      city-view-exception: string
+      garden-view: boolean
+      garden-view-exception: string
+      lake-view: boolean
+      lake-view-exception: string
+      landmark-view: boolean
+      landmark-view-exception: string
+      ocean-view: boolean
+      ocean-view-exception: string
+      pool-view: boolean
+      pool-view-exception: string
+      valley-view: boolean
+      valley-view-exception: string
+  business:
+    business-center: boolean
+    business-center-exception: string
+    meeting-rooms: boolean
+    meeting-rooms-count: integer
+    meeting-rooms-count-exception: int64
+    meeting-rooms-exception: string
+  common-living-area:
+    accessibility:
+      ada-compliant-unit: boolean
+      ada-compliant-unit-exception: string
+      hearing-accessible-doorbell: boolean
+      hearing-accessible-doorbell-exception: string
+      hearing-accessible-fire-alarm: boolean
+      hearing-accessible-fire-alarm-exception: string
+      hearing-accessible-unit: boolean
+      hearing-accessible-unit-exception: string
+      mobility-accessible-bathtub: boolean
+      mobility-accessible-bathtub-exception: string
+      mobility-accessible-shower: boolean
+      mobility-accessible-shower-exception: string
+      mobility-accessible-toilet: boolean
+      mobility-accessible-toilet-exception: string
+      mobility-accessible-unit: boolean
+      mobility-accessible-unit-exception: string
+    eating:
+      coffee-maker: boolean
+      coffee-maker-exception: string
+      cookware: boolean
+      cookware-exception: string
+      dishwasher: boolean
+      dishwasher-exception: string
+      indoor-grill: boolean
+      indoor-grill-exception: string
+      kettle: boolean
+      kettle-exception: string
+      kitchen-available: boolean
+      kitchen-available-exception: string
+      microwave: boolean
+      microwave-exception: string
+      minibar: boolean
+      minibar-exception: string
+      outdoor-grill: boolean
+      outdoor-grill-exception: string
+      oven: boolean
+      oven-exception: string
+      refrigerator: boolean
+      refrigerator-exception: string
+      sink: boolean
+      sink-exception: string
+      snackbar: boolean
+      snackbar-exception: string
+      stove: boolean
+      stove-exception: string
+      tea-station: boolean
+      tea-station-exception: string
+      toaster: boolean
+      toaster-exception: string
+    features:
+      air-conditioning: boolean
+      air-conditioning-exception: string
+      bathtub: boolean
+      bathtub-exception: string
+      bidet: boolean
+      bidet-exception: string
+      dryer: boolean
+      dryer-exception: string
+      electronic-room-key: boolean
+      electronic-room-key-exception: string
+      fireplace: boolean
+      fireplace-exception: string
+      hairdryer: boolean
+      hairdryer-exception: string
+      heating: boolean
+      heating-exception: string
+      inunit-safe: boolean
+      inunit-safe-exception: string
+      inunit-wifi-available: boolean
+      inunit-wifi-available-exception: string
+      ironing-equipment: boolean
+      ironing-equipment-exception: string
+      pay-per-view-movies: boolean
+      pay-per-view-movies-exception: string
+      private-bathroom: boolean
+      private-bathroom-exception: string
+      shower: boolean
+      shower-exception: string
+      toilet: boolean
+      toilet-exception: string
+      tv: boolean
+      tv-casting: boolean
+      tv-casting-exception: string
+      tv-exception: string
+      tv-streaming: boolean
+      tv-streaming-exception: string
+      universal-power-adapters: boolean
+      universal-power-adapters-exception: string
+      washer: boolean
+      washer-exception: string
+    layout:
+      balcony: boolean
+      balcony-exception: string
+      living-area-sq-meters: number
+      living-area-sq-meters-exception: string
+      loft: boolean
+      loft-exception: string
+      non-smoking: boolean
+      non-smoking-exception: string
+      patio: boolean
+      patio-exception: string
+      stairs: boolean
+      stairs-exception: string
+    sleeping:
+      beds-count: integer
+      beds-count-exception: int64
+      bunk-beds-count: integer
+      bunk-beds-count-exception: int64
+      cribs-count: integer
+      cribs-count-exception: int64
+      double-beds-count: integer
+      double-beds-count-exception: int64
+      feather-pillows: boolean
+      feather-pillows-exception: string
+      hypoallergenic-bedding: boolean
+      hypoallergenic-bedding-exception: string
+      king-beds-count: integer
+      king-beds-count-exception: int64
+      memory-foam-pillows: boolean
+      memory-foam-pillows-exception: string
+      other-beds-count: integer
+      other-beds-count-exception: int64
+      queen-beds-count: integer
+      queen-beds-count-exception: int64
+      roll-away-beds-count: integer
+      roll-away-beds-count-exception: int64
+      single-or-twin-beds-count: integer
+      single-or-twin-beds-count-exception: int64
+      sofa-beds-count: integer
+      sofa-beds-count-exception: int64
+      synthetic-pillows: boolean
+      synthetic-pillows-exception: string
+  connectivity:
+    free-wifi: boolean
+    free-wifi-exception: string
+    public-area-wifi-available: boolean
+    public-area-wifi-available-exception: string
+    public-internet-terminal: boolean
+    public-internet-terminal-exception: string
+    wifi-available: boolean
+    wifi-available-exception: string
+  families:
+    babysitting: boolean
+    babysitting-exception: string
+    kids-activities: boolean
+    kids-activities-exception: string
+    kids-club: boolean
+    kids-club-exception: string
+  food-and-drink:
+    bar: boolean
+    bar-exception: string
+    breakfast-available: boolean
+    breakfast-available-exception: string
+    breakfast-buffet: boolean
+    breakfast-buffet-exception: string
+    buffet: boolean
+    buffet-exception: string
+    dinner-buffet: boolean
+    dinner-buffet-exception: string
+    free-breakfast: boolean
+    free-breakfast-exception: string
+    restaurant: boolean
+    restaurant-exception: string
+    restaurants-count: integer
+    restaurants-count-exception: int64
+    room-service: boolean
+    room-service-exception: string
+    table-service: boolean
+    table-service-exception: string
+    twenty-four-hour-room-service: boolean
+    twenty-four-hour-room-service-exception: string
+    vending-machine: boolean
+    vending-machine-exception: string
+  health-and-safety:
+    enhanced-cleaning:
+      commercial-grade-disinfectant-cleaning: boolean
+      commercial-grade-disinfectant-cleaning-exception: string
+      common-areas-enhanced-cleaning: boolean
+      common-areas-enhanced-cleaning-exception: string
+      employees-trained-cleaning-procedures: boolean
+      employees-trained-cleaning-procedures-exception: string
+      employees-trained-thorough-hand-washing: boolean
+      employees-trained-thorough-hand-washing-exception: string
+      employees-wear-protective-equipment: boolean
+      employees-wear-protective-equipment-exception: string
+      guest-rooms-enhanced-cleaning: boolean
+      guest-rooms-enhanced-cleaning-exception: string
+    increased-food-safety:
+      dining-areas-additional-sanitation: boolean
+      dining-areas-additional-sanitation-exception: string
+      disposable-flatware: boolean
+      disposable-flatware-exception: string
+      food-preparation-and-serving-additional-safety: boolean
+      food-preparation-and-serving-additional-safety-exception: string
+      individual-packaged-meals: boolean
+      individual-packaged-meals-exception: string
+      single-use-food-menus: boolean
+      single-use-food-menus-exception: string
+    minimized-contact:
+      contactless-checkin-checkout: boolean
+      contactless-checkin-checkout-exception: string
+      digital-guest-room-keys: boolean
+      digital-guest-room-keys-exception: string
+      housekeeping-scheduled-request-only: boolean
+      housekeeping-scheduled-request-only-exception: string
+      no-high-touch-items-common-areas: boolean
+      no-high-touch-items-common-areas-exception: string
+      no-high-touch-items-guest-rooms: boolean
+      no-high-touch-items-guest-rooms-exception: string
+      plastic-keycards-disinfected: boolean
+      plastic-keycards-disinfected-exception: string
+      room-bookings-buffer: boolean
+      room-bookings-buffer-exception: string
+    personal-protection:
+      common-areas-offer-sanitizing-items: boolean
+      common-areas-offer-sanitizing-items-exception: string
+      face-mask-required: boolean
+      face-mask-required-exception: string
+      guest-room-hygiene-kits-available: boolean
+      guest-room-hygiene-kits-available-exception: string
+      protective-equipment-available: boolean
+      protective-equipment-available-exception: string
+    physical-distancing:
+      common-areas-physical-distancing-arranged: boolean
+      common-areas-physical-distancing-arranged-exception: string
+      physical-distancing-required: boolean
+      physical-distancing-required-exception: string
+      safety-dividers: boolean
+      safety-dividers-exception: string
+      shared-areas-limited-occupancy: boolean
+      shared-areas-limited-occupancy-exception: string
+      wellness-areas-have-private-spaces: boolean
+      wellness-areas-have-private-spaces-exception: string
+  housekeeping:
+    daily-housekeeping: boolean
+    daily-housekeeping-exception: string
+    housekeeping-available: boolean
+    housekeeping-available-exception: string
+    turndown-service: boolean
+    turndown-service-exception: string
+  metadata:
+    update-time: string
+  name: string
+  parking:
+    electric-car-charging-stations: boolean
+    electric-car-charging-stations-exception: string
+    free-parking: boolean
+    free-parking-exception: string
+    free-self-parking: boolean
+    free-self-parking-exception: string
+    free-valet-parking: boolean
+    free-valet-parking-exception: string
+    parking-available: boolean
+    parking-available-exception: string
+    self-parking-available: boolean
+    self-parking-available-exception: string
+    valet-parking-available: boolean
+    valet-parking-available-exception: string
+  pets:
+    cats-allowed: boolean
+    cats-allowed-exception: string
+    dogs-allowed: boolean
+    dogs-allowed-exception: string
+    pets-allowed: boolean
+    pets-allowed-exception: string
+    pets-allowed-free: boolean
+    pets-allowed-free-exception: string
+  policies:
+    all-inclusive-available: boolean
+    all-inclusive-available-exception: string
+    all-inclusive-only: boolean
+    all-inclusive-only-exception: string
+    checkin-time:
+      hours: integer
+      minutes: integer
+      nanos: integer
+      seconds: integer
+    checkin-time-exception: string
+    checkout-time:
+      hours: integer
+      minutes: integer
+      nanos: integer
+      seconds: integer
+    checkout-time-exception: string
+    kids-stay-free: boolean
+    kids-stay-free-exception: string
+    max-child-age: integer
+    max-child-age-exception: string
+    max-kids-stay-free-count: integer
+    max-kids-stay-free-count-exception: int64
+    payment-options:
+      cash: boolean
+      cash-exception: string
+      cheque: boolean
+      cheque-exception: string
+      credit-card: boolean
+      credit-card-exception: string
+      debit-card: boolean
+      debit-card-exception: string
+      mobile-nfc: boolean
+      mobile-nfc-exception: string
+    smoke-free-property: boolean
+    smoke-free-property-exception: string
+  pools:
+    adult-pool: boolean
+    adult-pool-exception: string
+    hot-tub: boolean
+    hot-tub-exception: string
+    indoor-pool: boolean
+    indoor-pool-exception: string
+    indoor-pools-count: integer
+    indoor-pools-count-exception: int64
+    lazy-river: boolean
+    lazy-river-exception: string
+    lifeguard: boolean
+    lifeguard-exception: string
+    outdoor-pool: boolean
+    outdoor-pool-exception: string
+    outdoor-pools-count: integer
+    outdoor-pools-count-exception: int64
+    pool: boolean
+    pool-exception: string
+    pools-count: integer
+    pools-count-exception: int64
+    wading-pool: boolean
+    wading-pool-exception: string
+    water-park: boolean
+    water-park-exception: string
+    waterslide: boolean
+    waterslide-exception: string
+    wave-pool: boolean
+    wave-pool-exception: string
+  property:
+    built-year: integer
+    built-year-exception: string
+    floors-count: integer
+    floors-count-exception: int64
+    last-renovated-year: integer
+    last-renovated-year-exception: string
+    rooms-count: integer
+    rooms-count-exception: int64
+  services:
+    baggage-storage: boolean
+    baggage-storage-exception: string
+    concierge: boolean
+    concierge-exception: string
+    convenience-store: boolean
+    convenience-store-exception: string
+    currency-exchange: boolean
+    currency-exchange-exception: string
+    elevator: boolean
+    elevator-exception: string
+    front-desk: boolean
+    front-desk-exception: string
+    full-service-laundry: boolean
+    full-service-laundry-exception: string
+    gift-shop: boolean
+    gift-shop-exception: string
+    self-service-laundry: boolean
+    self-service-laundry-exception: string
+    social-hour: boolean
+    social-hour-exception: string
+    twenty-four-hour-front-desk: boolean
+    twenty-four-hour-front-desk-exception: string
+    wake-up-calls: boolean
+    wake-up-calls-exception: string
+  some-units:
+    bungalow-or-villa: boolean
+    bungalow-or-villa-exception: string
+    connecting-unit-available: boolean
+    connecting-unit-available-exception: string
+    executive-floor: boolean
+    executive-floor-exception: string
+    max-adult-occupants-count: integer
+    max-adult-occupants-count-exception: int64
+    max-child-occupants-count: integer
+    max-child-occupants-count-exception: int64
+    max-occupants-count: integer
+    max-occupants-count-exception: int64
+    private-home: boolean
+    private-home-exception: string
+    suite: boolean
+    suite-exception: string
+    tier: string
+    tier-exception: string
+    total-living-areas:
+      accessibility:
+        ada-compliant-unit: boolean
+        ada-compliant-unit-exception: string
+        hearing-accessible-doorbell: boolean
+        hearing-accessible-doorbell-exception: string
+        hearing-accessible-fire-alarm: boolean
+        hearing-accessible-fire-alarm-exception: string
+        hearing-accessible-unit: boolean
+        hearing-accessible-unit-exception: string
+        mobility-accessible-bathtub: boolean
+        mobility-accessible-bathtub-exception: string
+        mobility-accessible-shower: boolean
+        mobility-accessible-shower-exception: string
+        mobility-accessible-toilet: boolean
+        mobility-accessible-toilet-exception: string
+        mobility-accessible-unit: boolean
+        mobility-accessible-unit-exception: string
+      eating:
+        coffee-maker: boolean
+        coffee-maker-exception: string
+        cookware: boolean
+        cookware-exception: string
+        dishwasher: boolean
+        dishwasher-exception: string
+        indoor-grill: boolean
+        indoor-grill-exception: string
+        kettle: boolean
+        kettle-exception: string
+        kitchen-available: boolean
+        kitchen-available-exception: string
+        microwave: boolean
+        microwave-exception: string
+        minibar: boolean
+        minibar-exception: string
+        outdoor-grill: boolean
+        outdoor-grill-exception: string
+        oven: boolean
+        oven-exception: string
+        refrigerator: boolean
+        refrigerator-exception: string
+        sink: boolean
+        sink-exception: string
+        snackbar: boolean
+        snackbar-exception: string
+        stove: boolean
+        stove-exception: string
+        tea-station: boolean
+        tea-station-exception: string
+        toaster: boolean
+        toaster-exception: string
+      features:
+        air-conditioning: boolean
+        air-conditioning-exception: string
+        bathtub: boolean
+        bathtub-exception: string
+        bidet: boolean
+        bidet-exception: string
+        dryer: boolean
+        dryer-exception: string
+        electronic-room-key: boolean
+        electronic-room-key-exception: string
+        fireplace: boolean
+        fireplace-exception: string
+        hairdryer: boolean
+        hairdryer-exception: string
+        heating: boolean
+        heating-exception: string
+        inunit-safe: boolean
+        inunit-safe-exception: string
+        inunit-wifi-available: boolean
+        inunit-wifi-available-exception: string
+        ironing-equipment: boolean
+        ironing-equipment-exception: string
+        pay-per-view-movies: boolean
+        pay-per-view-movies-exception: string
+        private-bathroom: boolean
+        private-bathroom-exception: string
+        shower: boolean
+        shower-exception: string
+        toilet: boolean
+        toilet-exception: string
+        tv: boolean
+        tv-casting: boolean
+        tv-casting-exception: string
+        tv-exception: string
+        tv-streaming: boolean
+        tv-streaming-exception: string
+        universal-power-adapters: boolean
+        universal-power-adapters-exception: string
+        washer: boolean
+        washer-exception: string
+      layout:
+        balcony: boolean
+        balcony-exception: string
+        living-area-sq-meters: number
+        living-area-sq-meters-exception: string
+        loft: boolean
+        loft-exception: string
+        non-smoking: boolean
+        non-smoking-exception: string
+        patio: boolean
+        patio-exception: string
+        stairs: boolean
+        stairs-exception: string
+      sleeping:
+        beds-count: integer
+        beds-count-exception: int64
+        bunk-beds-count: integer
+        bunk-beds-count-exception: int64
+        cribs-count: integer
+        cribs-count-exception: int64
+        double-beds-count: integer
+        double-beds-count-exception: int64
+        feather-pillows: boolean
+        feather-pillows-exception: string
+        hypoallergenic-bedding: boolean
+        hypoallergenic-bedding-exception: string
+        king-beds-count: integer
+        king-beds-count-exception: int64
+        memory-foam-pillows: boolean
+        memory-foam-pillows-exception: string
+        other-beds-count: integer
+        other-beds-count-exception: int64
+        queen-beds-count: integer
+        queen-beds-count-exception: int64
+        roll-away-beds-count: integer
+        roll-away-beds-count-exception: int64
+        single-or-twin-beds-count: integer
+        single-or-twin-beds-count-exception: int64
+        sofa-beds-count: integer
+        sofa-beds-count-exception: int64
+        synthetic-pillows: boolean
+        synthetic-pillows-exception: string
+    views:
+      beach-view: boolean
+      beach-view-exception: string
+      city-view: boolean
+      city-view-exception: string
+      garden-view: boolean
+      garden-view-exception: string
+      lake-view: boolean
+      lake-view-exception: string
+      landmark-view: boolean
+      landmark-view-exception: string
+      ocean-view: boolean
+      ocean-view-exception: string
+      pool-view: boolean
+      pool-view-exception: string
+      valley-view: boolean
+      valley-view-exception: string
+  sustainability:
+    energy-efficiency:
+      carbon-free-energy-sources: boolean
+      carbon-free-energy-sources-exception: string
+      energy-conservation-program: boolean
+      energy-conservation-program-exception: string
+      energy-efficient-heating-and-cooling-systems: boolean
+      energy-efficient-heating-and-cooling-systems-exception: string
+      energy-efficient-lighting: boolean
+      energy-efficient-lighting-exception: string
+      energy-saving-thermostats: boolean
+      energy-saving-thermostats-exception: string
+      green-building-design: boolean
+      green-building-design-exception: string
+      independent-organization-audits-energy-use: boolean
+      independent-organization-audits-energy-use-exception: string
+    sustainability-certifications:
+      breeam-certification: string
+      breeam-certification-exception: string
+      leed-certification: string
+      leed-certification-exception: string
+    sustainable-sourcing:
+      eco-friendly-toiletries: boolean
+      eco-friendly-toiletries-exception: string
+      locally-sourced-food-and-beverages: boolean
+      locally-sourced-food-and-beverages-exception: string
+      organic-cage-free-eggs: boolean
+      organic-cage-free-eggs-exception: string
+      organic-food-and-beverages: boolean
+      organic-food-and-beverages-exception: string
+      responsible-purchasing-policy: boolean
+      responsible-purchasing-policy-exception: string
+      responsibly-sources-seafood: boolean
+      responsibly-sources-seafood-exception: string
+      vegan-meals: boolean
+      vegan-meals-exception: string
+      vegetarian-meals: boolean
+      vegetarian-meals-exception: string
+    waste-reduction:
+      compostable-food-containers-and-cutlery: boolean
+      compostable-food-containers-and-cutlery-exception: string
+      composts-excess-food: boolean
+      composts-excess-food-exception: string
+      donates-excess-food: boolean
+      donates-excess-food-exception: string
+      food-waste-reduction-program: boolean
+      food-waste-reduction-program-exception: string
+      no-single-use-plastic-straws: boolean
+      no-single-use-plastic-straws-exception: string
+      no-single-use-plastic-water-bottles: boolean
+      no-single-use-plastic-water-bottles-exception: string
+      no-styrofoam-food-containers: boolean
+      no-styrofoam-food-containers-exception: string
+      recycling-program: boolean
+      recycling-program-exception: string
+      refillable-toiletry-containers: boolean
+      refillable-toiletry-containers-exception: string
+      safely-disposes-batteries: boolean
+      safely-disposes-batteries-exception: string
+      safely-disposes-electronics: boolean
+      safely-disposes-electronics-exception: string
+      safely-disposes-lightbulbs: boolean
+      safely-disposes-lightbulbs-exception: string
+      safely-handles-hazardous-substances: boolean
+      safely-handles-hazardous-substances-exception: string
+      soap-donation-program: boolean
+      soap-donation-program-exception: string
+      toiletry-donation-program: boolean
+      toiletry-donation-program-exception: string
+      water-bottle-filling-stations: boolean
+      water-bottle-filling-stations-exception: string
+    water-conservation:
+      independent-organization-audits-water-use: boolean
+      independent-organization-audits-water-use-exception: string
+      linen-reuse-program: boolean
+      linen-reuse-program-exception: string
+      towel-reuse-program: boolean
+      towel-reuse-program-exception: string
+      water-saving-showers: boolean
+      water-saving-showers-exception: string
+      water-saving-sinks: boolean
+      water-saving-sinks-exception: string
+      water-saving-toilets: boolean
+      water-saving-toilets-exception: string
+  transportation:
+    airport-shuttle: boolean
+    airport-shuttle-exception: string
+    car-rental-on-property: boolean
+    car-rental-on-property-exception: string
+    free-airport-shuttle: boolean
+    free-airport-shuttle-exception: string
+    free-private-car-service: boolean
+    free-private-car-service-exception: string
+    local-shuttle: boolean
+    local-shuttle-exception: string
+    private-car-service: boolean
+    private-car-service-exception: string
+    transfer: boolean
+    transfer-exception: string
+  wellness:
+    doctor-on-call: boolean
+    doctor-on-call-exception: string
+    elliptical-machine: boolean
+    elliptical-machine-exception: string
+    fitness-center: boolean
+    fitness-center-exception: string
+    free-fitness-center: boolean
+    free-fitness-center-exception: string
+    free-weights: boolean
+    free-weights-exception: string
+    massage: boolean
+    massage-exception: string
+    salon: boolean
+    salon-exception: string
+    sauna: boolean
+    sauna-exception: string
+    spa: boolean
+    spa-exception: string
+    treadmill: boolean
+    treadmill-exception: string
+    weight-machine: boolean
+    weight-machine-exception: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .accessibility    mobility-accessible=true</code><ul>
+<li>Mobility accessible. Throughout the property there are physical adaptations to ease the stay of a person in a wheelchair, such as auto-opening doors, wide elevators, wide bathrooms or ramps.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-elevator=false</code><ul>
+<li>Mobility accessible elevator. A lift that transports people from one level to another and is built to accommodate a wheelchair-using passenger owing to the width of its doors and placement of call buttons.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-elevator-exception=amet.</code><ul>
+<li>Mobility accessible elevator exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-exception=takimata</code><ul>
+<li>Mobility accessible exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-parking=true</code><ul>
+<li>Mobility accessible parking. The presence of a marked, designated area of prescribed size in which only registered, labeled vehicles transporting a person with physical challenges may park.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-parking-exception=duo</code><ul>
+<li>Mobility accessible parking exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-pool=true</code><ul>
+<li>Mobility accessible pool. A swimming pool equipped with a mechanical chair that can be lowered and raised for the purpose of moving physically challenged guests into and out of the pool. May be powered by electricity or water. Also known as pool lift.</li>
+</ul>
+</li>
+<li>
+<p><code>mobility-accessible-pool-exception=gubergren</code></p>
+<ul>
+<li>Mobility accessible pool exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..activities    beach-access=true</code></p>
+<ul>
+<li>Beach access. The hotel property is in close proximity to a beach and offers a way to get to that beach. This can include a route to the beach such as stairs down if hotel is on a bluff, or a short trail. Not the same as beachfront (with beach access, the hotel&#39;s proximity is close to but not right on the beach).</li>
+</ul>
+</li>
+<li><code>beach-access-exception=gubergren</code><ul>
+<li>Beach access exception.</li>
+</ul>
+</li>
+<li><code>beach-front=false</code><ul>
+<li>Breach front. The hotel property is physically located on the beach alongside an ocean, sea, gulf, or bay. It is not on a lake, river, stream, or pond. The hotel is not separated from the beach by a public road allowing vehicular, pedestrian, or bicycle traffic.</li>
+</ul>
+</li>
+<li><code>beach-front-exception=dolor</code><ul>
+<li>Beach front exception.</li>
+</ul>
+</li>
+<li><code>bicycle-rental=true</code><ul>
+<li>Bicycle rental. The hotel owns bicycles that it permits guests to borrow and use. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>bicycle-rental-exception=invidunt</code><ul>
+<li>Bicycle rental exception.</li>
+</ul>
+</li>
+<li><code>boutique-stores=true</code><ul>
+<li>Boutique stores. There are stores selling clothing, jewelry, art and decor either on hotel premises or very close by. Does not refer to the hotel gift shop or convenience store.</li>
+</ul>
+</li>
+<li><code>boutique-stores-exception=duo</code><ul>
+<li>Boutique stores exception.</li>
+</ul>
+</li>
+<li><code>casino=true</code><ul>
+<li>Casino. A space designated for gambling and gaming featuring croupier-run table and card games, as well as electronic slot machines. May be on hotel premises or located nearby.</li>
+</ul>
+</li>
+<li><code>casino-exception=sed</code><ul>
+<li>Casino exception.</li>
+</ul>
+</li>
+<li><code>free-bicycle-rental=true</code><ul>
+<li>Free bicycle rental. The hotel owns bicycles that it permits guests to borrow and use for free.</li>
+</ul>
+</li>
+<li><code>free-bicycle-rental-exception=ipsum</code><ul>
+<li>Free bicycle rental exception.</li>
+</ul>
+</li>
+<li><code>free-watercraft-rental=true</code><ul>
+<li>Free watercraft rental. The hotel owns watercraft that it permits guests to borrow and use for free.</li>
+</ul>
+</li>
+<li><code>free-watercraft-rental-exception=est</code><ul>
+<li>Free Watercraft rental exception.</li>
+</ul>
+</li>
+<li><code>game-room=true</code><ul>
+<li>Game room. There is a room at the hotel containing electronic machines for play such as pinball, prize machines, driving simulators, and other items commonly found at a family fun center or arcade. May also include non-electronic games like pool, foosball, darts, and more. May or may not be designed for children. Also known as arcade, fun room, or family fun center.</li>
+</ul>
+</li>
+<li><code>game-room-exception=ea</code><ul>
+<li>Game room exception.</li>
+</ul>
+</li>
+<li><code>golf=false</code><ul>
+<li>Golf. There is a golf course on hotel grounds or there is a nearby, independently run golf course that allows use by hotel guests. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>golf-exception=lorem</code><ul>
+<li>Golf exception.</li>
+</ul>
+</li>
+<li><code>horseback-riding=false</code><ul>
+<li>Horseback riding. The hotel has a horse barn onsite or an affiliation with a nearby barn to allow for guests to sit astride a horse and direct it to walk, trot, cantor, gallop and/or jump. Can be in a riding ring, on designated paths, or in the wilderness. May or may not involve instruction.</li>
+</ul>
+</li>
+<li><code>horseback-riding-exception=sed</code><ul>
+<li>Horseback riding exception.</li>
+</ul>
+</li>
+<li><code>nightclub=false</code><ul>
+<li>Nightclub. There is a room at the hotel with a bar, a dance floor, and seating where designated staffers play dance music. There may also be a designated area for the performance of live music, singing and comedy acts.</li>
+</ul>
+</li>
+<li><code>nightclub-exception=sed</code><ul>
+<li>Nightclub exception.</li>
+</ul>
+</li>
+<li><code>private-beach=true</code><ul>
+<li>Private beach. The beach which is in close proximity to the hotel is open only to guests.</li>
+</ul>
+</li>
+<li><code>private-beach-exception=stet</code><ul>
+<li>Private beach exception.</li>
+</ul>
+</li>
+<li><code>scuba=true</code><ul>
+<li>Scuba. The provision for guests to dive under naturally occurring water fitted with a self-contained underwater breathing apparatus (SCUBA) for the purpose of exploring underwater life. Apparatus consists of a tank providing oxygen to the diver through a mask. Requires certification of the diver and supervision. The hotel may have the activity at its own waterfront or have an affiliation with a nearby facility. Required equipment is most often supplied to guests. Can be free or for a fee. Not snorkeling. Not done in a swimming pool.</li>
+</ul>
+</li>
+<li><code>scuba-exception=et</code><ul>
+<li>Scuba exception.</li>
+</ul>
+</li>
+<li><code>snorkeling=true</code><ul>
+<li>Snorkeling. The provision for guests to participate in a recreational water activity in which swimmers wear a diving mask, a simple, shaped breathing tube and flippers/swim fins for the purpose of exploring below the surface of an ocean, gulf or lake. Does not usually require user certification or professional supervision. Equipment may or may not be available for rent or purchase. Not scuba diving.</li>
+</ul>
+</li>
+<li><code>snorkeling-exception=vero</code><ul>
+<li>Snorkeling exception.</li>
+</ul>
+</li>
+<li><code>tennis=false</code><ul>
+<li>Tennis. The hotel has the requisite court(s) on site or has an affiliation with a nearby facility for the purpose of providing guests with the opportunity to play a two-sided court-based game in which players use a stringed racquet to hit a ball across a net to the side of the opposing player. The court can be indoors or outdoors. Instructors, racquets and balls may or may not be provided.</li>
+</ul>
+</li>
+<li><code>tennis-exception=duo</code><ul>
+<li>Tennis exception.</li>
+</ul>
+</li>
+<li><code>water-skiing=false</code><ul>
+<li>Water skiing. The provision of giving guests the opportunity to be pulled across naturally occurring water while standing on skis and holding a tow rope attached to a motorboat. Can occur on hotel premises or at a nearby waterfront. Most often performed in a lake or ocean.</li>
+</ul>
+</li>
+<li><code>water-skiing-exception=diam</code><ul>
+<li>Water skiing exception.</li>
+</ul>
+</li>
+<li><code>watercraft-rental=true</code><ul>
+<li>Watercraft rental. The hotel owns water vessels that it permits guests to borrow and use. Can be free or for a fee. Watercraft may include boats, pedal boats, rowboats, sailboats, powerboats, canoes, kayaks, or personal watercraft (such as a Jet Ski).</li>
+</ul>
+</li>
+<li>
+<p><code>watercraft-rental-exception=et</code></p>
+<ul>
+<li>Watercraft rental exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..all-units    bungalow-or-villa=false</code></p>
+<ul>
+<li>Bungalow or villa. An independent structure that is part of a hotel or resort that is rented to one party for a vacation stay. The hotel or resort may be completely comprised of bungalows or villas, or they may be one of several guestroom options. Guests in the bungalows or villas most often have the same, if not more, amenities and services offered to guests in other guestroom types.</li>
+</ul>
+</li>
+<li><code>bungalow-or-villa-exception=stet</code><ul>
+<li>Bungalow or villa exception.</li>
+</ul>
+</li>
+<li><code>connecting-unit-available=false</code><ul>
+<li>Connecting unit available. A guestroom type that features access to an adjacent guestroom for the purpose of booking both rooms. Most often used by families who need more than one room to accommodate the number of people in their group.</li>
+</ul>
+</li>
+<li><code>connecting-unit-available-exception=duo</code><ul>
+<li>Connecting unit available exception.</li>
+</ul>
+</li>
+<li><code>executive-floor=false</code><ul>
+<li>Executive floor. A floor of the hotel where the guestrooms are only bookable by members of the hotel&#39;s frequent guest membership program. Benefits of this room class include access to a designated lounge which may or may not feature free breakfast, cocktails or other perks specific to members of the program.</li>
+</ul>
+</li>
+<li><code>executive-floor-exception=vero</code><ul>
+<li>Executive floor exception.</li>
+</ul>
+</li>
+<li><code>max-adult-occupants-count=13</code><ul>
+<li>Max adult occupants count. The total number of adult guests allowed to stay overnight in the guestroom.</li>
+</ul>
+</li>
+<li><code>max-adult-occupants-count-exception=-65</code><ul>
+<li>Max adult occupants count exception.</li>
+</ul>
+</li>
+<li><code>max-child-occupants-count=25</code><ul>
+<li>Max child occupants count. The total number of children allowed to stay overnight in the room.</li>
+</ul>
+</li>
+<li><code>max-child-occupants-count-exception=-44</code><ul>
+<li>Max child occupants count exception.</li>
+</ul>
+</li>
+<li><code>max-occupants-count=95</code><ul>
+<li>Max occupants count. The total number of guests allowed to stay overnight in the guestroom.</li>
+</ul>
+</li>
+<li><code>max-occupants-count-exception=-29</code><ul>
+<li>Max occupants count exception.</li>
+</ul>
+</li>
+<li><code>private-home=true</code><ul>
+<li>Private home. A privately owned home (house, townhouse, apartment, cabin, bungalow etc) that may or not serve as the owner&#39;s residence, but is rented out in its entirety or by the room(s) to paying guest(s) for vacation stays. Not for lease-based, long-term residency.</li>
+</ul>
+</li>
+<li><code>private-home-exception=ipsum</code><ul>
+<li>Private home exception.</li>
+</ul>
+</li>
+<li><code>suite=true</code><ul>
+<li>Suite. A guestroom category that implies both a bedroom area and a separate living area. There may or may not be full walls and doors separating the two areas, but regardless, they are very distinct. Does not mean a couch or chair in a bedroom.</li>
+</ul>
+</li>
+<li><code>suite-exception=consetetur</code><ul>
+<li>Suite exception.</li>
+</ul>
+</li>
+<li><code>tier=voluptua.</code><ul>
+<li>Tier. Classification of the unit based on available features/amenities. A non-standard tier is only permitted if at least one other unit type falls under the standard tier.</li>
+</ul>
+</li>
+<li><code>tier-exception=et</code><ul>
+<li>Tier exception.</li>
+</ul>
+</li>
+<li><code>total-living-areas.accessibility    ada-compliant-unit=false</code><ul>
+<li>ADA compliant unit. A guestroom designed to accommodate the physical challenges of a guest with mobility and/or auditory and/or visual issues, as determined by legislative policy. Usually features enlarged doorways, roll-in showers with seats, bathroom grab bars, and communication equipment for the hearing and sight challenged.</li>
+</ul>
+</li>
+<li><code>ada-compliant-unit-exception=amet.</code><ul>
+<li>ADA compliant unit exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-doorbell=true</code><ul>
+<li>Hearing-accessible doorbell. A visual indicator(s) of a knock or ring at the door.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-doorbell-exception=et</code><ul>
+<li>Hearing-accessible doorbell exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-fire-alarm=false</code><ul>
+<li>Hearing-accessible fire alarm. A device that gives warning of a fire through flashing lights.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-fire-alarm-exception=dolore</code><ul>
+<li>Hearing-accessible fire alarm exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-unit=false</code><ul>
+<li>Hearing-accessible unit. A guestroom designed to accommodate the physical challenges of a guest with auditory issues.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-unit-exception=amet.</code><ul>
+<li>Hearing-accessible unit exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-bathtub=false</code><ul>
+<li>Mobility-accessible bathtub. A bathtub that accomodates the physically challenged with additional railings or hand grips, a transfer seat or lift, and/or a door to enable walking into the tub.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-bathtub-exception=lorem</code><ul>
+<li>Mobility-accessible bathtub exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-shower=true</code><ul>
+<li>Mobility-accessible shower. A shower with an enlarged door or access point to accommodate a wheelchair or a waterproof seat for the physically challenged.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-shower-exception=no</code><ul>
+<li>Mobility-accessible shower exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-toilet=true</code><ul>
+<li>Mobility-accessible toilet. A toilet with a higher seat, grab bars, and/or a larger area around it to accommodate the physically challenged.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-toilet-exception=sit</code><ul>
+<li>Mobility-accessible toilet exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-unit=true</code><ul>
+<li>Mobility-accessible unit. A guestroom designed to accommodate the physical challenges of a guest with mobility and/or auditory and/or visual issues. Usually features enlarged doorways, roll-in showers with seats, bathroom grab bars, and communication equipment for the hearing and sight challenged.</li>
+</ul>
+</li>
+<li>
+<p><code>mobility-accessible-unit-exception=aliquyam</code></p>
+<ul>
+<li>Mobility-accessible unit exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..eating    coffee-maker=true</code></p>
+<ul>
+<li>Coffee maker. An electric appliance that brews coffee by heating and forcing water through ground coffee.</li>
+</ul>
+</li>
+<li><code>coffee-maker-exception=est</code><ul>
+<li>Coffee maker exception.</li>
+</ul>
+</li>
+<li><code>cookware=true</code><ul>
+<li>Cookware. Kitchen pots, pans and utensils used in connection with the preparation of food.</li>
+</ul>
+</li>
+<li><code>cookware-exception=et</code><ul>
+<li>Cookware exception.</li>
+</ul>
+</li>
+<li><code>dishwasher=false</code><ul>
+<li>Dishwasher. A counter-height electrical cabinet containing racks for dirty dishware, cookware and cutlery, and a dispenser for soap built into the pull-down door. The cabinet is attached to the plumbing system to facilitate the automatic cleaning of its contents.</li>
+</ul>
+</li>
+<li><code>dishwasher-exception=no</code><ul>
+<li>Dishwasher exception.</li>
+</ul>
+</li>
+<li><code>indoor-grill=false</code><ul>
+<li>Indoor grill. Metal grates built into an indoor cooktop on which food is cooked over an open flame or electric heat source.</li>
+</ul>
+</li>
+<li><code>indoor-grill-exception=elitr</code><ul>
+<li>Indoor grill exception.</li>
+</ul>
+</li>
+<li><code>kettle=false</code><ul>
+<li>Kettle. A covered container with a handle and a spout used for boiling water.</li>
+</ul>
+</li>
+<li><code>kettle-exception=no</code><ul>
+<li>Kettle exception.</li>
+</ul>
+</li>
+<li><code>kitchen-available=false</code><ul>
+<li>Kitchen available. An area of the guestroom designated for the preparation and storage of food via the presence of a refrigerator, cook top, oven and sink, as well as cutlery, dishes and cookware. Usually includes small appliances such a coffee maker and a microwave. May or may not include an automatic dishwasher.</li>
+</ul>
+</li>
+<li><code>kitchen-available-exception=at</code><ul>
+<li>Kitchen available exception.</li>
+</ul>
+</li>
+<li><code>microwave=true</code><ul>
+<li>Microwave. An electric oven that quickly cooks and heats food by microwave energy. Smaller than a standing or wall mounted oven. Usually placed on a kitchen counter, a shelf or tabletop or mounted above a cooktop.</li>
+</ul>
+</li>
+<li><code>microwave-exception=aliquyam</code><ul>
+<li>Microwave exception.</li>
+</ul>
+</li>
+<li><code>minibar=true</code><ul>
+<li>Minibar. A small refrigerated cabinet in the guestroom containing bottles/cans of soft drinks, mini bottles of alcohol, and snacks. The items are most commonly available for a fee.</li>
+</ul>
+</li>
+<li><code>minibar-exception=sadipscing</code><ul>
+<li>Minibar exception.</li>
+</ul>
+</li>
+<li><code>outdoor-grill=false</code><ul>
+<li>Outdoor grill. Metal grates on which food is cooked over an open flame or electric heat source. Part of an outdoor apparatus that supports the grates. Also known as barbecue grill or barbecue.</li>
+</ul>
+</li>
+<li><code>outdoor-grill-exception=amet</code><ul>
+<li>Outdoor grill exception.</li>
+</ul>
+</li>
+<li><code>oven=true</code><ul>
+<li>Oven. A temperature controlled, heated metal cabinet powered by gas or electricity in which food is placed for the purpose of cooking or reheating.</li>
+</ul>
+</li>
+<li><code>oven-exception=et</code><ul>
+<li>Oven exception.</li>
+</ul>
+</li>
+<li><code>refrigerator=false</code><ul>
+<li>Refrigerator. A large, climate-controlled electrical cabinet with vertical doors. Built for the purpose of chilling and storing perishable foods.</li>
+</ul>
+</li>
+<li><code>refrigerator-exception=consetetur</code><ul>
+<li>Refrigerator exception.</li>
+</ul>
+</li>
+<li><code>sink=true</code><ul>
+<li>Sink. A basin with a faucet attached to a water source and used for the purpose of washing and rinsing.</li>
+</ul>
+</li>
+<li><code>sink-exception=est</code><ul>
+<li>Sink exception.</li>
+</ul>
+</li>
+<li><code>snackbar=false</code><ul>
+<li>Snackbar. A small cabinet in the guestroom containing snacks. The items are most commonly available for a fee.</li>
+</ul>
+</li>
+<li><code>snackbar-exception=elitr</code><ul>
+<li>Snackbar exception.</li>
+</ul>
+</li>
+<li><code>stove=true</code><ul>
+<li>Stove. A kitchen appliance powered by gas or electricity for the purpose of creating a flame or hot surface on which pots of food can be cooked. Also known as cooktop or hob.</li>
+</ul>
+</li>
+<li><code>stove-exception=est</code><ul>
+<li>Stove exception.</li>
+</ul>
+</li>
+<li><code>tea-station=true</code><ul>
+<li>Tea station. A small area with the supplies needed to heat water and make tea.</li>
+</ul>
+</li>
+<li><code>tea-station-exception=sed</code><ul>
+<li>Tea station exception.</li>
+</ul>
+</li>
+<li><code>toaster=false</code><ul>
+<li>Toaster. A small, temperature controlled electric appliance with rectangular slots at the top that are lined with heated coils for the purpose of browning slices of bread products.</li>
+</ul>
+</li>
+<li>
+<p><code>toaster-exception=lorem</code></p>
+<ul>
+<li>Toaster exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..features    air-conditioning=true</code></p>
+<ul>
+<li>Air conditioning. An electrical machine used to cool the temperature of the guestroom.</li>
+</ul>
+</li>
+<li><code>air-conditioning-exception=sea</code><ul>
+<li>Air conditioning exception.</li>
+</ul>
+</li>
+<li><code>bathtub=false</code><ul>
+<li>Bathtub. A fixed plumbing feature set on the floor and consisting of a large container that accommodates the body of an adult for the purpose of seated bathing. Includes knobs or fixtures to control the temperature of the water, a faucet through which the water flows, and a drain that can be closed for filling and opened for draining.</li>
+</ul>
+</li>
+<li><code>bathtub-exception=at</code><ul>
+<li>Bathtub exception.</li>
+</ul>
+</li>
+<li><code>bidet=false</code><ul>
+<li>Bidet. A plumbing fixture attached to a toilet or a low, fixed sink designed for the purpose of washing after toilet use.</li>
+</ul>
+</li>
+<li><code>bidet-exception=eirmod</code><ul>
+<li>Bidet exception.</li>
+</ul>
+</li>
+<li><code>dryer=true</code><ul>
+<li>Dryer. An electrical machine designed to dry clothing.</li>
+</ul>
+</li>
+<li><code>dryer-exception=accusam</code><ul>
+<li>Dryer exception.</li>
+</ul>
+</li>
+<li><code>electronic-room-key=true</code><ul>
+<li>Electronic room key. A card coded by the check-in computer that is read by the lock on the hotel guestroom door to allow for entry.</li>
+</ul>
+</li>
+<li><code>electronic-room-key-exception=erat</code><ul>
+<li>Electronic room key exception.</li>
+</ul>
+</li>
+<li><code>fireplace=true</code><ul>
+<li>Fireplace. A framed opening (aka hearth) at the base of a chimney in which logs or an electrical fire feature are burned to provide a relaxing ambiance or to heat the room. Often made of bricks or stone.</li>
+</ul>
+</li>
+<li><code>fireplace-exception=erat</code><ul>
+<li>Fireplace exception.</li>
+</ul>
+</li>
+<li><code>hairdryer=false</code><ul>
+<li>Hairdryer. A handheld electric appliance that blows temperature-controlled air for the purpose of drying wet hair. Can be mounted to a bathroom wall or a freestanding device stored in the guestroom&#39;s bathroom or closet.</li>
+</ul>
+</li>
+<li><code>hairdryer-exception=sea</code><ul>
+<li>Hairdryer exception.</li>
+</ul>
+</li>
+<li><code>heating=true</code><ul>
+<li>Heating. An electrical machine used to warm the temperature of the guestroom.</li>
+</ul>
+</li>
+<li><code>heating-exception=lorem</code><ul>
+<li>Heating exception.</li>
+</ul>
+</li>
+<li><code>inunit-safe=false</code><ul>
+<li>In-unit safe. A strong fireproof cabinet with a programmable lock, used for the protected storage of valuables in a guestroom. Often built into a closet.</li>
+</ul>
+</li>
+<li><code>inunit-safe-exception=dolor</code><ul>
+<li>In-unit safe exception.</li>
+</ul>
+</li>
+<li><code>inunit-wifi-available=true</code><ul>
+<li>In-unit Wifi available. Guests can wirelessly connect to the Internet in the guestroom. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>inunit-wifi-available-exception=erat</code><ul>
+<li>In-unit Wifi available exception.</li>
+</ul>
+</li>
+<li><code>ironing-equipment=true</code><ul>
+<li>Ironing equipment. A device, usually with a flat metal base, that is heated to smooth, finish, or press clothes and a flat, padded, cloth-covered surface on which the clothes are worked.</li>
+</ul>
+</li>
+<li><code>ironing-equipment-exception=et</code><ul>
+<li>Ironing equipment exception.</li>
+</ul>
+</li>
+<li><code>pay-per-view-movies=true</code><ul>
+<li>Pay per view movies. Televisions with channels that offer films that can be viewed for a fee, and have an interface to allow the viewer to accept the terms and approve payment.</li>
+</ul>
+</li>
+<li><code>pay-per-view-movies-exception=consetetur</code><ul>
+<li>Pay per view movies exception.</li>
+</ul>
+</li>
+<li><code>private-bathroom=false</code><ul>
+<li>Private bathroom. A bathroom designated for the express use of the guests staying in a specific guestroom.</li>
+</ul>
+</li>
+<li><code>private-bathroom-exception=aliquyam</code><ul>
+<li>Private bathroom exception.</li>
+</ul>
+</li>
+<li><code>shower=false</code><ul>
+<li>Shower. A fixed plumbing fixture for standing bathing that features a tall spray spout or faucet through which water flows, a knob or knobs that control the water&#39;s temperature, and a drain in the floor.</li>
+</ul>
+</li>
+<li><code>shower-exception=dolores</code><ul>
+<li>Shower exception.</li>
+</ul>
+</li>
+<li><code>toilet=true</code><ul>
+<li>Toilet. A fixed bathroom feature connected to a sewer or septic system and consisting of a water-flushed bowl with a seat, as well as a device that elicites the water-flushing action. Used for the process and disposal of human waste.</li>
+</ul>
+</li>
+<li><code>toilet-exception=gubergren</code><ul>
+<li>Toilet exception.</li>
+</ul>
+</li>
+<li><code>tv=true</code><ul>
+<li>TV. A television is available in the guestroom.</li>
+</ul>
+</li>
+<li><code>tv-casting=true</code><ul>
+<li>TV casting. A television equipped with a device through which the video entertainment accessed on a personal computer, phone or tablet can be wirelessly delivered to and viewed on the guestroom&#39;s television.</li>
+</ul>
+</li>
+<li><code>tv-casting-exception=lorem</code><ul>
+<li>TV exception.</li>
+</ul>
+</li>
+<li><code>tv-exception=accusam</code><ul>
+<li>TV exception.</li>
+</ul>
+</li>
+<li><code>tv-streaming=true</code><ul>
+<li>TV streaming. Televisions that embed a range of web-based apps to allow for watching media from those apps.</li>
+</ul>
+</li>
+<li><code>tv-streaming-exception=sadipscing</code><ul>
+<li>TV streaming exception.</li>
+</ul>
+</li>
+<li><code>universal-power-adapters=true</code><ul>
+<li>Universal power adapters. A power supply for electronic devices which plugs into a wall for the purpose of converting AC to a single DC voltage. Also know as AC adapter or charger.</li>
+</ul>
+</li>
+<li><code>universal-power-adapters-exception=duo</code><ul>
+<li>Universal power adapters exception.</li>
+</ul>
+</li>
+<li><code>washer=true</code><ul>
+<li>Washer. An electrical machine connected to a running water source designed to launder clothing.</li>
+</ul>
+</li>
+<li>
+<p><code>washer-exception=magna</code></p>
+<ul>
+<li>Washer exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..layout    balcony=true</code></p>
+<ul>
+<li>Balcony. An outdoor platform attached to a building and surrounded by a short wall, fence or other safety railing. The balcony is accessed through a door in a guestroom or suite and is for use by the guest staying in that room. May or may not include seating or outdoor furniture. Is not located on the ground floor. Also lanai.</li>
+</ul>
+</li>
+<li><code>balcony-exception=dolor</code><ul>
+<li>Balcony exception.</li>
+</ul>
+</li>
+<li><code>living-area-sq-meters=0.7462932559602827</code><ul>
+<li>Living area sq meters. The measurement in meters of the area of a guestroom&#39;s living space.</li>
+</ul>
+</li>
+<li><code>living-area-sq-meters-exception=amet.</code><ul>
+<li>Living area sq meters exception.</li>
+</ul>
+</li>
+<li><code>loft=false</code><ul>
+<li>Loft. A three-walled upper area accessed by stairs or a ladder that overlooks the lower area of a room.</li>
+</ul>
+</li>
+<li><code>loft-exception=sed</code><ul>
+<li>Loft exception.</li>
+</ul>
+</li>
+<li><code>non-smoking=false</code><ul>
+<li>Non smoking. A guestroom in which the smoking of cigarettes, cigars and pipes is prohibited.</li>
+</ul>
+</li>
+<li><code>non-smoking-exception=sanctus</code><ul>
+<li>Non smoking exception.</li>
+</ul>
+</li>
+<li><code>patio=false</code><ul>
+<li>Patio. A paved, outdoor area with seating attached to and accessed through a ground-floor guestroom for use by the occupants of the guestroom.</li>
+</ul>
+</li>
+<li><code>patio-exception=rebum.</code><ul>
+<li>Patio exception.</li>
+</ul>
+</li>
+<li><code>stairs=true</code><ul>
+<li>Stairs. There are steps leading from one level or story to another in the unit.</li>
+</ul>
+</li>
+<li>
+<p><code>stairs-exception=dolore</code></p>
+<ul>
+<li>Stairs exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..sleeping    beds-count=76</code></p>
+<ul>
+<li>Beds count. The number of permanent beds present in a guestroom. Does not include rollaway beds, cribs or sofabeds.</li>
+</ul>
+</li>
+<li><code>beds-count-exception=-52</code><ul>
+<li>Beds count exception.</li>
+</ul>
+</li>
+<li><code>bunk-beds-count=17</code><ul>
+<li>Bunk beds count. The number of furniture pieces in which one framed mattress is fixed directly above another by means of a physical frame. This allows one person(s) to sleep in the bottom bunk and one person(s) to sleep in the top bunk. Also known as double decker bed.</li>
+</ul>
+</li>
+<li><code>bunk-beds-count-exception=-97</code><ul>
+<li>Bunk beds count exception.</li>
+</ul>
+</li>
+<li><code>cribs-count=64</code><ul>
+<li>Cribs count. The number of small beds for an infant or toddler that the guestroom can obtain. The bed is surrounded by a high railing to prevent the child from falling or climbing out of the bed</li>
+</ul>
+</li>
+<li><code>cribs-count-exception=-27</code><ul>
+<li>Cribs count exception.</li>
+</ul>
+</li>
+<li><code>double-beds-count=48</code><ul>
+<li>Double beds count. The number of medium beds measuring 53&#34;W x 75&#34;L (135cm x 191cm). Also known as full size bed.</li>
+</ul>
+</li>
+<li><code>double-beds-count-exception=-76</code><ul>
+<li>Double beds count exception.</li>
+</ul>
+</li>
+<li><code>feather-pillows=true</code><ul>
+<li>Feather pillows. The option for guests to obtain bed pillows that are stuffed with the feathers and down of ducks or geese.</li>
+</ul>
+</li>
+<li><code>feather-pillows-exception=ut</code><ul>
+<li>Feather pillows exception.</li>
+</ul>
+</li>
+<li><code>hypoallergenic-bedding=false</code><ul>
+<li>Hypoallergenic bedding. Bedding such as linens, pillows, mattress covers and/or mattresses that are made of materials known to be resistant to allergens such as mold, dust and dander.</li>
+</ul>
+</li>
+<li><code>hypoallergenic-bedding-exception=kasd</code><ul>
+<li>Hypoallergenic bedding exception.</li>
+</ul>
+</li>
+<li><code>king-beds-count=6</code><ul>
+<li>King beds count. The number of large beds measuring 76&#34;W x 80&#34;L (193cm x 102cm). Most often meant to accompany two people. Includes California king and super king.</li>
+</ul>
+</li>
+<li><code>king-beds-count-exception=-39</code><ul>
+<li>King beds count exception.</li>
+</ul>
+</li>
+<li><code>memory-foam-pillows=false</code><ul>
+<li>Memory foam pillows. The option for guests to obtain bed pillows that are stuffed with a man-made foam that responds to body heat by conforming to the body closely, and then recovers its shape when the pillow cools down.</li>
+</ul>
+</li>
+<li><code>memory-foam-pillows-exception=lorem</code><ul>
+<li>Memory foam pillows exception.</li>
+</ul>
+</li>
+<li><code>other-beds-count=68</code><ul>
+<li>Other beds count. The number of beds that are not standard mattress and boxspring setups such as Japanese tatami mats, trundle beds, air mattresses and cots.</li>
+</ul>
+</li>
+<li><code>other-beds-count-exception=-59</code><ul>
+<li>Other beds count exception.</li>
+</ul>
+</li>
+<li><code>queen-beds-count=35</code><ul>
+<li>Queen beds count. The number of medium-large beds measuring 60&#34;W x 80&#34;L (152cm x 102cm).</li>
+</ul>
+</li>
+<li><code>queen-beds-count-exception=-27</code><ul>
+<li>Queen beds count exception.</li>
+</ul>
+</li>
+<li><code>roll-away-beds-count=13</code><ul>
+<li>Roll away beds count. The number of mattresses on wheeled frames that can be folded in half and rolled away for easy storage that the guestroom can obtain upon request.</li>
+</ul>
+</li>
+<li><code>roll-away-beds-count-exception=-14</code><ul>
+<li>Roll away beds count exception.</li>
+</ul>
+</li>
+<li><code>single-or-twin-beds-count=86</code><ul>
+<li>Single or twin count beds. The number of smaller beds measuring 38&#34;W x 75&#34;L (97cm x 191cm) that can accommodate one adult.</li>
+</ul>
+</li>
+<li><code>single-or-twin-beds-count-exception=-82</code><ul>
+<li>Single or twin beds count exception.</li>
+</ul>
+</li>
+<li><code>sofa-beds-count=64</code><ul>
+<li>Sofa beds count. The number of specially designed sofas that can be made to serve as a bed by lowering its hinged upholstered back to horizontal position or by pulling out a concealed mattress.</li>
+</ul>
+</li>
+<li><code>sofa-beds-count-exception=-3</code><ul>
+<li>Sofa beds count exception.</li>
+</ul>
+</li>
+<li><code>synthetic-pillows=false</code><ul>
+<li>Synthetic pillows. The option for guests to obtain bed pillows stuffed with polyester material crafted to reproduce the feel of a pillow stuffed with down and feathers.</li>
+</ul>
+</li>
+<li>
+<p><code>synthetic-pillows-exception=dolores</code></p>
+<ul>
+<li>Synthetic pillows exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...views    beach-view=true</code></p>
+<ul>
+<li>Beach view. A guestroom that features a window through which guests can see the beach.</li>
+</ul>
+</li>
+<li><code>beach-view-exception=clita</code><ul>
+<li>Beach view exception.</li>
+</ul>
+</li>
+<li><code>city-view=false</code><ul>
+<li>City view. A guestroom that features a window through which guests can see the buildings, parks and/or streets of the city.</li>
+</ul>
+</li>
+<li><code>city-view-exception=aliquyam</code><ul>
+<li>City view exception.</li>
+</ul>
+</li>
+<li><code>garden-view=false</code><ul>
+<li>Garden view. A guestroom that features a window through which guests can see a garden.</li>
+</ul>
+</li>
+<li><code>garden-view-exception=diam</code><ul>
+<li>Garden view exception.</li>
+</ul>
+</li>
+<li><code>lake-view=false</code><ul>
+<li>Lake view.</li>
+</ul>
+</li>
+<li><code>lake-view-exception=et</code><ul>
+<li>Lake view exception.</li>
+</ul>
+</li>
+<li><code>landmark-view=true</code><ul>
+<li>Landmark view. A guestroom that features a window through which guests can see a landmark such as the countryside, a golf course, the forest, a park, a rain forst, a mountain or a slope.</li>
+</ul>
+</li>
+<li><code>landmark-view-exception=sed</code><ul>
+<li>Landmark view exception.</li>
+</ul>
+</li>
+<li><code>ocean-view=false</code><ul>
+<li>Ocean view. A guestroom that features a window through which guests can see the ocean.</li>
+</ul>
+</li>
+<li><code>ocean-view-exception=diam</code><ul>
+<li>Ocean view exception.</li>
+</ul>
+</li>
+<li><code>pool-view=false</code><ul>
+<li>Pool view. A guestroom that features a window through which guests can see the hotel&#39;s swimming pool.</li>
+</ul>
+</li>
+<li><code>pool-view-exception=erat</code><ul>
+<li>Pool view exception.</li>
+</ul>
+</li>
+<li><code>valley-view=false</code><ul>
+<li>Valley view. A guestroom that features a window through which guests can see over a valley.</li>
+</ul>
+</li>
+<li>
+<p><code>valley-view-exception=ipsum</code></p>
+<ul>
+<li>Valley view exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...business    business-center=false</code></p>
+<ul>
+<li>Business center. A designated room at the hotel with one or more desks and equipped with guest-use computers, printers, fax machines and/or photocopiers. May or may not be open 24/7. May or may not require a key to access. Not a meeting room or conference room.</li>
+</ul>
+</li>
+<li><code>business-center-exception=dolores</code><ul>
+<li>Business center exception.</li>
+</ul>
+</li>
+<li><code>meeting-rooms=false</code><ul>
+<li>Meeting rooms. Rooms at the hotel designated for business-related gatherings. Rooms are usually equipped with tables or desks, office chairs and audio/visual facilities to allow for presentations and conference calls. Also known as conference rooms.</li>
+</ul>
+</li>
+<li><code>meeting-rooms-count=90</code><ul>
+<li>Meeting rooms count. The number of meeting rooms at the property.</li>
+</ul>
+</li>
+<li><code>meeting-rooms-count-exception=-21</code><ul>
+<li>Meeting rooms count exception.</li>
+</ul>
+</li>
+<li>
+<p><code>meeting-rooms-exception=sadipscing</code></p>
+<ul>
+<li>Meeting rooms exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..common-living-area.accessibility    ada-compliant-unit=true</code></p>
+<ul>
+<li>ADA compliant unit. A guestroom designed to accommodate the physical challenges of a guest with mobility and/or auditory and/or visual issues, as determined by legislative policy. Usually features enlarged doorways, roll-in showers with seats, bathroom grab bars, and communication equipment for the hearing and sight challenged.</li>
+</ul>
+</li>
+<li><code>ada-compliant-unit-exception=sea</code><ul>
+<li>ADA compliant unit exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-doorbell=true</code><ul>
+<li>Hearing-accessible doorbell. A visual indicator(s) of a knock or ring at the door.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-doorbell-exception=stet</code><ul>
+<li>Hearing-accessible doorbell exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-fire-alarm=true</code><ul>
+<li>Hearing-accessible fire alarm. A device that gives warning of a fire through flashing lights.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-fire-alarm-exception=ipsum</code><ul>
+<li>Hearing-accessible fire alarm exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-unit=true</code><ul>
+<li>Hearing-accessible unit. A guestroom designed to accommodate the physical challenges of a guest with auditory issues.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-unit-exception=sit</code><ul>
+<li>Hearing-accessible unit exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-bathtub=true</code><ul>
+<li>Mobility-accessible bathtub. A bathtub that accomodates the physically challenged with additional railings or hand grips, a transfer seat or lift, and/or a door to enable walking into the tub.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-bathtub-exception=lorem</code><ul>
+<li>Mobility-accessible bathtub exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-shower=false</code><ul>
+<li>Mobility-accessible shower. A shower with an enlarged door or access point to accommodate a wheelchair or a waterproof seat for the physically challenged.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-shower-exception=sed</code><ul>
+<li>Mobility-accessible shower exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-toilet=false</code><ul>
+<li>Mobility-accessible toilet. A toilet with a higher seat, grab bars, and/or a larger area around it to accommodate the physically challenged.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-toilet-exception=sea</code><ul>
+<li>Mobility-accessible toilet exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-unit=false</code><ul>
+<li>Mobility-accessible unit. A guestroom designed to accommodate the physical challenges of a guest with mobility and/or auditory and/or visual issues. Usually features enlarged doorways, roll-in showers with seats, bathroom grab bars, and communication equipment for the hearing and sight challenged.</li>
+</ul>
+</li>
+<li>
+<p><code>mobility-accessible-unit-exception=kasd</code></p>
+<ul>
+<li>Mobility-accessible unit exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..eating    coffee-maker=false</code></p>
+<ul>
+<li>Coffee maker. An electric appliance that brews coffee by heating and forcing water through ground coffee.</li>
+</ul>
+</li>
+<li><code>coffee-maker-exception=erat</code><ul>
+<li>Coffee maker exception.</li>
+</ul>
+</li>
+<li><code>cookware=false</code><ul>
+<li>Cookware. Kitchen pots, pans and utensils used in connection with the preparation of food.</li>
+</ul>
+</li>
+<li><code>cookware-exception=invidunt</code><ul>
+<li>Cookware exception.</li>
+</ul>
+</li>
+<li><code>dishwasher=false</code><ul>
+<li>Dishwasher. A counter-height electrical cabinet containing racks for dirty dishware, cookware and cutlery, and a dispenser for soap built into the pull-down door. The cabinet is attached to the plumbing system to facilitate the automatic cleaning of its contents.</li>
+</ul>
+</li>
+<li><code>dishwasher-exception=erat</code><ul>
+<li>Dishwasher exception.</li>
+</ul>
+</li>
+<li><code>indoor-grill=true</code><ul>
+<li>Indoor grill. Metal grates built into an indoor cooktop on which food is cooked over an open flame or electric heat source.</li>
+</ul>
+</li>
+<li><code>indoor-grill-exception=voluptua.</code><ul>
+<li>Indoor grill exception.</li>
+</ul>
+</li>
+<li><code>kettle=false</code><ul>
+<li>Kettle. A covered container with a handle and a spout used for boiling water.</li>
+</ul>
+</li>
+<li><code>kettle-exception=elitr</code><ul>
+<li>Kettle exception.</li>
+</ul>
+</li>
+<li><code>kitchen-available=true</code><ul>
+<li>Kitchen available. An area of the guestroom designated for the preparation and storage of food via the presence of a refrigerator, cook top, oven and sink, as well as cutlery, dishes and cookware. Usually includes small appliances such a coffee maker and a microwave. May or may not include an automatic dishwasher.</li>
+</ul>
+</li>
+<li><code>kitchen-available-exception=et</code><ul>
+<li>Kitchen available exception.</li>
+</ul>
+</li>
+<li><code>microwave=true</code><ul>
+<li>Microwave. An electric oven that quickly cooks and heats food by microwave energy. Smaller than a standing or wall mounted oven. Usually placed on a kitchen counter, a shelf or tabletop or mounted above a cooktop.</li>
+</ul>
+</li>
+<li><code>microwave-exception=takimata</code><ul>
+<li>Microwave exception.</li>
+</ul>
+</li>
+<li><code>minibar=true</code><ul>
+<li>Minibar. A small refrigerated cabinet in the guestroom containing bottles/cans of soft drinks, mini bottles of alcohol, and snacks. The items are most commonly available for a fee.</li>
+</ul>
+</li>
+<li><code>minibar-exception=nonumy</code><ul>
+<li>Minibar exception.</li>
+</ul>
+</li>
+<li><code>outdoor-grill=false</code><ul>
+<li>Outdoor grill. Metal grates on which food is cooked over an open flame or electric heat source. Part of an outdoor apparatus that supports the grates. Also known as barbecue grill or barbecue.</li>
+</ul>
+</li>
+<li><code>outdoor-grill-exception=diam</code><ul>
+<li>Outdoor grill exception.</li>
+</ul>
+</li>
+<li><code>oven=false</code><ul>
+<li>Oven. A temperature controlled, heated metal cabinet powered by gas or electricity in which food is placed for the purpose of cooking or reheating.</li>
+</ul>
+</li>
+<li><code>oven-exception=sed</code><ul>
+<li>Oven exception.</li>
+</ul>
+</li>
+<li><code>refrigerator=false</code><ul>
+<li>Refrigerator. A large, climate-controlled electrical cabinet with vertical doors. Built for the purpose of chilling and storing perishable foods.</li>
+</ul>
+</li>
+<li><code>refrigerator-exception=ipsum</code><ul>
+<li>Refrigerator exception.</li>
+</ul>
+</li>
+<li><code>sink=true</code><ul>
+<li>Sink. A basin with a faucet attached to a water source and used for the purpose of washing and rinsing.</li>
+</ul>
+</li>
+<li><code>sink-exception=at</code><ul>
+<li>Sink exception.</li>
+</ul>
+</li>
+<li><code>snackbar=true</code><ul>
+<li>Snackbar. A small cabinet in the guestroom containing snacks. The items are most commonly available for a fee.</li>
+</ul>
+</li>
+<li><code>snackbar-exception=sit</code><ul>
+<li>Snackbar exception.</li>
+</ul>
+</li>
+<li><code>stove=false</code><ul>
+<li>Stove. A kitchen appliance powered by gas or electricity for the purpose of creating a flame or hot surface on which pots of food can be cooked. Also known as cooktop or hob.</li>
+</ul>
+</li>
+<li><code>stove-exception=stet</code><ul>
+<li>Stove exception.</li>
+</ul>
+</li>
+<li><code>tea-station=false</code><ul>
+<li>Tea station. A small area with the supplies needed to heat water and make tea.</li>
+</ul>
+</li>
+<li><code>tea-station-exception=elitr</code><ul>
+<li>Tea station exception.</li>
+</ul>
+</li>
+<li><code>toaster=false</code><ul>
+<li>Toaster. A small, temperature controlled electric appliance with rectangular slots at the top that are lined with heated coils for the purpose of browning slices of bread products.</li>
+</ul>
+</li>
+<li>
+<p><code>toaster-exception=et</code></p>
+<ul>
+<li>Toaster exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..features    air-conditioning=true</code></p>
+<ul>
+<li>Air conditioning. An electrical machine used to cool the temperature of the guestroom.</li>
+</ul>
+</li>
+<li><code>air-conditioning-exception=rebum.</code><ul>
+<li>Air conditioning exception.</li>
+</ul>
+</li>
+<li><code>bathtub=true</code><ul>
+<li>Bathtub. A fixed plumbing feature set on the floor and consisting of a large container that accommodates the body of an adult for the purpose of seated bathing. Includes knobs or fixtures to control the temperature of the water, a faucet through which the water flows, and a drain that can be closed for filling and opened for draining.</li>
+</ul>
+</li>
+<li><code>bathtub-exception=aliquyam</code><ul>
+<li>Bathtub exception.</li>
+</ul>
+</li>
+<li><code>bidet=false</code><ul>
+<li>Bidet. A plumbing fixture attached to a toilet or a low, fixed sink designed for the purpose of washing after toilet use.</li>
+</ul>
+</li>
+<li><code>bidet-exception=sit</code><ul>
+<li>Bidet exception.</li>
+</ul>
+</li>
+<li><code>dryer=true</code><ul>
+<li>Dryer. An electrical machine designed to dry clothing.</li>
+</ul>
+</li>
+<li><code>dryer-exception=tempor</code><ul>
+<li>Dryer exception.</li>
+</ul>
+</li>
+<li><code>electronic-room-key=true</code><ul>
+<li>Electronic room key. A card coded by the check-in computer that is read by the lock on the hotel guestroom door to allow for entry.</li>
+</ul>
+</li>
+<li><code>electronic-room-key-exception=amet</code><ul>
+<li>Electronic room key exception.</li>
+</ul>
+</li>
+<li><code>fireplace=true</code><ul>
+<li>Fireplace. A framed opening (aka hearth) at the base of a chimney in which logs or an electrical fire feature are burned to provide a relaxing ambiance or to heat the room. Often made of bricks or stone.</li>
+</ul>
+</li>
+<li><code>fireplace-exception=ipsum</code><ul>
+<li>Fireplace exception.</li>
+</ul>
+</li>
+<li><code>hairdryer=false</code><ul>
+<li>Hairdryer. A handheld electric appliance that blows temperature-controlled air for the purpose of drying wet hair. Can be mounted to a bathroom wall or a freestanding device stored in the guestroom&#39;s bathroom or closet.</li>
+</ul>
+</li>
+<li><code>hairdryer-exception=eirmod</code><ul>
+<li>Hairdryer exception.</li>
+</ul>
+</li>
+<li><code>heating=false</code><ul>
+<li>Heating. An electrical machine used to warm the temperature of the guestroom.</li>
+</ul>
+</li>
+<li><code>heating-exception=dolor</code><ul>
+<li>Heating exception.</li>
+</ul>
+</li>
+<li><code>inunit-safe=true</code><ul>
+<li>In-unit safe. A strong fireproof cabinet with a programmable lock, used for the protected storage of valuables in a guestroom. Often built into a closet.</li>
+</ul>
+</li>
+<li><code>inunit-safe-exception=consetetur</code><ul>
+<li>In-unit safe exception.</li>
+</ul>
+</li>
+<li><code>inunit-wifi-available=true</code><ul>
+<li>In-unit Wifi available. Guests can wirelessly connect to the Internet in the guestroom. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>inunit-wifi-available-exception=lorem</code><ul>
+<li>In-unit Wifi available exception.</li>
+</ul>
+</li>
+<li><code>ironing-equipment=true</code><ul>
+<li>Ironing equipment. A device, usually with a flat metal base, that is heated to smooth, finish, or press clothes and a flat, padded, cloth-covered surface on which the clothes are worked.</li>
+</ul>
+</li>
+<li><code>ironing-equipment-exception=diam</code><ul>
+<li>Ironing equipment exception.</li>
+</ul>
+</li>
+<li><code>pay-per-view-movies=false</code><ul>
+<li>Pay per view movies. Televisions with channels that offer films that can be viewed for a fee, and have an interface to allow the viewer to accept the terms and approve payment.</li>
+</ul>
+</li>
+<li><code>pay-per-view-movies-exception=invidunt</code><ul>
+<li>Pay per view movies exception.</li>
+</ul>
+</li>
+<li><code>private-bathroom=false</code><ul>
+<li>Private bathroom. A bathroom designated for the express use of the guests staying in a specific guestroom.</li>
+</ul>
+</li>
+<li><code>private-bathroom-exception=at</code><ul>
+<li>Private bathroom exception.</li>
+</ul>
+</li>
+<li><code>shower=false</code><ul>
+<li>Shower. A fixed plumbing fixture for standing bathing that features a tall spray spout or faucet through which water flows, a knob or knobs that control the water&#39;s temperature, and a drain in the floor.</li>
+</ul>
+</li>
+<li><code>shower-exception=amet</code><ul>
+<li>Shower exception.</li>
+</ul>
+</li>
+<li><code>toilet=false</code><ul>
+<li>Toilet. A fixed bathroom feature connected to a sewer or septic system and consisting of a water-flushed bowl with a seat, as well as a device that elicites the water-flushing action. Used for the process and disposal of human waste.</li>
+</ul>
+</li>
+<li><code>toilet-exception=eirmod</code><ul>
+<li>Toilet exception.</li>
+</ul>
+</li>
+<li><code>tv=false</code><ul>
+<li>TV. A television is available in the guestroom.</li>
+</ul>
+</li>
+<li><code>tv-casting=true</code><ul>
+<li>TV casting. A television equipped with a device through which the video entertainment accessed on a personal computer, phone or tablet can be wirelessly delivered to and viewed on the guestroom&#39;s television.</li>
+</ul>
+</li>
+<li><code>tv-casting-exception=accusam</code><ul>
+<li>TV exception.</li>
+</ul>
+</li>
+<li><code>tv-exception=et</code><ul>
+<li>TV exception.</li>
+</ul>
+</li>
+<li><code>tv-streaming=false</code><ul>
+<li>TV streaming. Televisions that embed a range of web-based apps to allow for watching media from those apps.</li>
+</ul>
+</li>
+<li><code>tv-streaming-exception=accusam</code><ul>
+<li>TV streaming exception.</li>
+</ul>
+</li>
+<li><code>universal-power-adapters=false</code><ul>
+<li>Universal power adapters. A power supply for electronic devices which plugs into a wall for the purpose of converting AC to a single DC voltage. Also know as AC adapter or charger.</li>
+</ul>
+</li>
+<li><code>universal-power-adapters-exception=consetetur</code><ul>
+<li>Universal power adapters exception.</li>
+</ul>
+</li>
+<li><code>washer=false</code><ul>
+<li>Washer. An electrical machine connected to a running water source designed to launder clothing.</li>
+</ul>
+</li>
+<li>
+<p><code>washer-exception=amet</code></p>
+<ul>
+<li>Washer exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..layout    balcony=true</code></p>
+<ul>
+<li>Balcony. An outdoor platform attached to a building and surrounded by a short wall, fence or other safety railing. The balcony is accessed through a door in a guestroom or suite and is for use by the guest staying in that room. May or may not include seating or outdoor furniture. Is not located on the ground floor. Also lanai.</li>
+</ul>
+</li>
+<li><code>balcony-exception=invidunt</code><ul>
+<li>Balcony exception.</li>
+</ul>
+</li>
+<li><code>living-area-sq-meters=0.713862500521518</code><ul>
+<li>Living area sq meters. The measurement in meters of the area of a guestroom&#39;s living space.</li>
+</ul>
+</li>
+<li><code>living-area-sq-meters-exception=duo</code><ul>
+<li>Living area sq meters exception.</li>
+</ul>
+</li>
+<li><code>loft=true</code><ul>
+<li>Loft. A three-walled upper area accessed by stairs or a ladder that overlooks the lower area of a room.</li>
+</ul>
+</li>
+<li><code>loft-exception=stet</code><ul>
+<li>Loft exception.</li>
+</ul>
+</li>
+<li><code>non-smoking=false</code><ul>
+<li>Non smoking. A guestroom in which the smoking of cigarettes, cigars and pipes is prohibited.</li>
+</ul>
+</li>
+<li><code>non-smoking-exception=no</code><ul>
+<li>Non smoking exception.</li>
+</ul>
+</li>
+<li><code>patio=true</code><ul>
+<li>Patio. A paved, outdoor area with seating attached to and accessed through a ground-floor guestroom for use by the occupants of the guestroom.</li>
+</ul>
+</li>
+<li><code>patio-exception=ipsum</code><ul>
+<li>Patio exception.</li>
+</ul>
+</li>
+<li><code>stairs=true</code><ul>
+<li>Stairs. There are steps leading from one level or story to another in the unit.</li>
+</ul>
+</li>
+<li>
+<p><code>stairs-exception=sit</code></p>
+<ul>
+<li>Stairs exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..sleeping    beds-count=99</code></p>
+<ul>
+<li>Beds count. The number of permanent beds present in a guestroom. Does not include rollaway beds, cribs or sofabeds.</li>
+</ul>
+</li>
+<li><code>beds-count-exception=-55</code><ul>
+<li>Beds count exception.</li>
+</ul>
+</li>
+<li><code>bunk-beds-count=74</code><ul>
+<li>Bunk beds count. The number of furniture pieces in which one framed mattress is fixed directly above another by means of a physical frame. This allows one person(s) to sleep in the bottom bunk and one person(s) to sleep in the top bunk. Also known as double decker bed.</li>
+</ul>
+</li>
+<li><code>bunk-beds-count-exception=-26</code><ul>
+<li>Bunk beds count exception.</li>
+</ul>
+</li>
+<li><code>cribs-count=42</code><ul>
+<li>Cribs count. The number of small beds for an infant or toddler that the guestroom can obtain. The bed is surrounded by a high railing to prevent the child from falling or climbing out of the bed</li>
+</ul>
+</li>
+<li><code>cribs-count-exception=-12</code><ul>
+<li>Cribs count exception.</li>
+</ul>
+</li>
+<li><code>double-beds-count=27</code><ul>
+<li>Double beds count. The number of medium beds measuring 53&#34;W x 75&#34;L (135cm x 191cm). Also known as full size bed.</li>
+</ul>
+</li>
+<li><code>double-beds-count-exception=-88</code><ul>
+<li>Double beds count exception.</li>
+</ul>
+</li>
+<li><code>feather-pillows=false</code><ul>
+<li>Feather pillows. The option for guests to obtain bed pillows that are stuffed with the feathers and down of ducks or geese.</li>
+</ul>
+</li>
+<li><code>feather-pillows-exception=gubergren</code><ul>
+<li>Feather pillows exception.</li>
+</ul>
+</li>
+<li><code>hypoallergenic-bedding=false</code><ul>
+<li>Hypoallergenic bedding. Bedding such as linens, pillows, mattress covers and/or mattresses that are made of materials known to be resistant to allergens such as mold, dust and dander.</li>
+</ul>
+</li>
+<li><code>hypoallergenic-bedding-exception=ipsum</code><ul>
+<li>Hypoallergenic bedding exception.</li>
+</ul>
+</li>
+<li><code>king-beds-count=88</code><ul>
+<li>King beds count. The number of large beds measuring 76&#34;W x 80&#34;L (193cm x 102cm). Most often meant to accompany two people. Includes California king and super king.</li>
+</ul>
+</li>
+<li><code>king-beds-count-exception=-34</code><ul>
+<li>King beds count exception.</li>
+</ul>
+</li>
+<li><code>memory-foam-pillows=true</code><ul>
+<li>Memory foam pillows. The option for guests to obtain bed pillows that are stuffed with a man-made foam that responds to body heat by conforming to the body closely, and then recovers its shape when the pillow cools down.</li>
+</ul>
+</li>
+<li><code>memory-foam-pillows-exception=amet</code><ul>
+<li>Memory foam pillows exception.</li>
+</ul>
+</li>
+<li><code>other-beds-count=51</code><ul>
+<li>Other beds count. The number of beds that are not standard mattress and boxspring setups such as Japanese tatami mats, trundle beds, air mattresses and cots.</li>
+</ul>
+</li>
+<li><code>other-beds-count-exception=-101</code><ul>
+<li>Other beds count exception.</li>
+</ul>
+</li>
+<li><code>queen-beds-count=82</code><ul>
+<li>Queen beds count. The number of medium-large beds measuring 60&#34;W x 80&#34;L (152cm x 102cm).</li>
+</ul>
+</li>
+<li><code>queen-beds-count-exception=-96</code><ul>
+<li>Queen beds count exception.</li>
+</ul>
+</li>
+<li><code>roll-away-beds-count=86</code><ul>
+<li>Roll away beds count. The number of mattresses on wheeled frames that can be folded in half and rolled away for easy storage that the guestroom can obtain upon request.</li>
+</ul>
+</li>
+<li><code>roll-away-beds-count-exception=-23</code><ul>
+<li>Roll away beds count exception.</li>
+</ul>
+</li>
+<li><code>single-or-twin-beds-count=55</code><ul>
+<li>Single or twin count beds. The number of smaller beds measuring 38&#34;W x 75&#34;L (97cm x 191cm) that can accommodate one adult.</li>
+</ul>
+</li>
+<li><code>single-or-twin-beds-count-exception=-9</code><ul>
+<li>Single or twin beds count exception.</li>
+</ul>
+</li>
+<li><code>sofa-beds-count=58</code><ul>
+<li>Sofa beds count. The number of specially designed sofas that can be made to serve as a bed by lowering its hinged upholstered back to horizontal position or by pulling out a concealed mattress.</li>
+</ul>
+</li>
+<li><code>sofa-beds-count-exception=-91</code><ul>
+<li>Sofa beds count exception.</li>
+</ul>
+</li>
+<li><code>synthetic-pillows=true</code><ul>
+<li>Synthetic pillows. The option for guests to obtain bed pillows stuffed with polyester material crafted to reproduce the feel of a pillow stuffed with down and feathers.</li>
+</ul>
+</li>
+<li>
+<p><code>synthetic-pillows-exception=eos</code></p>
+<ul>
+<li>Synthetic pillows exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...connectivity    free-wifi=true</code></p>
+<ul>
+<li>Free wifi. The hotel offers guests wifi for free.</li>
+</ul>
+</li>
+<li><code>free-wifi-exception=sed</code><ul>
+<li>Free wifi exception.</li>
+</ul>
+</li>
+<li><code>public-area-wifi-available=false</code><ul>
+<li>Public area wifi available. Guests have the ability to wirelessly connect to the internet in the areas of the hotel accessible to anyone. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>public-area-wifi-available-exception=eirmod</code><ul>
+<li>Public area wifi available exception.</li>
+</ul>
+</li>
+<li><code>public-internet-terminal=true</code><ul>
+<li>Public internet terminal. An area of the hotel supplied with computers and designated for the purpose of providing guests with the ability to access the internet.</li>
+</ul>
+</li>
+<li><code>public-internet-terminal-exception=at</code><ul>
+<li>Public internet terminal exception.</li>
+</ul>
+</li>
+<li><code>wifi-available=true</code><ul>
+<li>Wifi available. The hotel provides the ability for guests to wirelessly connect to the internet. Can be in the public areas of the hotel and/or in the guest rooms. Can be free or for a fee.</li>
+</ul>
+</li>
+<li>
+<p><code>wifi-available-exception=lorem</code></p>
+<ul>
+<li>Wifi available exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..families    babysitting=true</code></p>
+<ul>
+<li>Babysitting. Child care that is offered by hotel staffers or coordinated by hotel staffers with local child care professionals. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>babysitting-exception=amet</code><ul>
+<li>Babysitting exception.</li>
+</ul>
+</li>
+<li><code>kids-activities=false</code><ul>
+<li>Kids activities. Recreational options such as sports, films, crafts and games designed for the enjoyment of children and offered at the hotel. May or may not be supervised. May or may not be at a designated time or place. Cab be free or for a fee.</li>
+</ul>
+</li>
+<li><code>kids-activities-exception=magna</code><ul>
+<li>Kids activities exception.</li>
+</ul>
+</li>
+<li><code>kids-club=false</code><ul>
+<li>Kids club. An organized program of group activities held at the hotel and designed for the enjoyment of children. Facilitated by hotel staff (or staff procured by the hotel) in an area(s) designated for the purpose of entertaining children without their parents. May include games, outings, water sports, team sports, arts and crafts, and films. Usually has set hours. Can be free or for a fee. Also known as Kids Camp or Kids program.</li>
+</ul>
+</li>
+<li>
+<p><code>kids-club-exception=et</code></p>
+<ul>
+<li>Kids club exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..food-and-drink    bar=true</code></p>
+<ul>
+<li>Bar. A designated room, lounge or area of an on-site restaurant with seating at a counter behind which a hotel staffer takes the guest&#39;s order and provides the requested alcoholic drink. Can be indoors or outdoors. Also known as Pub.</li>
+</ul>
+</li>
+<li><code>bar-exception=erat</code><ul>
+<li>Bar exception.</li>
+</ul>
+</li>
+<li><code>breakfast-available=false</code><ul>
+<li>Breakfast available. The morning meal is offered to all guests. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>breakfast-available-exception=vero</code><ul>
+<li>Breakfast available exception.</li>
+</ul>
+</li>
+<li><code>breakfast-buffet=true</code><ul>
+<li>Breakfast buffet. Breakfast meal service where guests serve themselves from a variety of dishes/foods that are put out on a table.</li>
+</ul>
+</li>
+<li><code>breakfast-buffet-exception=amet.</code><ul>
+<li>Breakfast buffet exception.</li>
+</ul>
+</li>
+<li><code>buffet=true</code><ul>
+<li>Buffet. A type of meal where guests serve themselves from a variety of dishes/foods that are put out on a table. Includes lunch and/or dinner meals. A breakfast-only buffet is not sufficient.</li>
+</ul>
+</li>
+<li><code>buffet-exception=sanctus</code><ul>
+<li>Buffet exception.</li>
+</ul>
+</li>
+<li><code>dinner-buffet=false</code><ul>
+<li>Dinner buffet. Dinner meal service where guests serve themselves from a variety of dishes/foods that are put out on a table.</li>
+</ul>
+</li>
+<li><code>dinner-buffet-exception=dolor</code><ul>
+<li>Dinner buffet exception.</li>
+</ul>
+</li>
+<li><code>free-breakfast=false</code><ul>
+<li>Free breakfast. Breakfast is offered for free to all guests. Does not apply if limited to certain room packages.</li>
+</ul>
+</li>
+<li><code>free-breakfast-exception=erat</code><ul>
+<li>Free breakfast exception.</li>
+</ul>
+</li>
+<li><code>restaurant=true</code><ul>
+<li>Restaurant. A business onsite at the hotel that is open to the public as well as guests, and offers meals and beverages to consume at tables or counters. May or may not include table service. Also known as cafe, buffet, eatery. A &#34;breakfast room&#34; where the hotel serves breakfast only to guests (not the general public) does not count as a restaurant.</li>
+</ul>
+</li>
+<li><code>restaurant-exception=ea</code><ul>
+<li>Restaurant exception.</li>
+</ul>
+</li>
+<li><code>restaurants-count=69</code><ul>
+<li>Restaurants count. The number of restaurants at the hotel.</li>
+</ul>
+</li>
+<li><code>restaurants-count-exception=-91</code><ul>
+<li>Restaurants count exception.</li>
+</ul>
+</li>
+<li><code>room-service=true</code><ul>
+<li>Room service. A hotel staffer delivers meals prepared onsite to a guest&#39;s room as per their request. May or may not be available during specific hours. Services should be available to all guests (not based on rate/room booked/reward program, etc).</li>
+</ul>
+</li>
+<li><code>room-service-exception=eirmod</code><ul>
+<li>Room service exception.</li>
+</ul>
+</li>
+<li><code>table-service=true</code><ul>
+<li>Table service. A restaurant in which a staff member is assigned to a guest&#39;s table to take their order, deliver and clear away food, and deliver the bill, if applicable. Also known as sit-down restaurant.</li>
+</ul>
+</li>
+<li><code>table-service-exception=aliquyam</code><ul>
+<li>Table service exception.</li>
+</ul>
+</li>
+<li><code>twenty-four-hour-room-service=false</code><ul>
+<li>24hr room service. Room service is available 24 hours a day.</li>
+</ul>
+</li>
+<li><code>twenty-four-hour-room-service-exception=dolor</code><ul>
+<li>24hr room service exception.</li>
+</ul>
+</li>
+<li><code>vending-machine=false</code><ul>
+<li>Vending machine. A glass-fronted mechanized cabinet displaying and dispensing snacks and beverages for purchase by coins, paper money and/or credit cards.</li>
+</ul>
+</li>
+<li>
+<p><code>vending-machine-exception=magna</code></p>
+<ul>
+<li>Vending machine exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..health-and-safety.enhanced-cleaning    commercial-grade-disinfectant-cleaning=false</code></p>
+<ul>
+<li>Commercial-grade disinfectant used to clean the property.</li>
+</ul>
+</li>
+<li><code>commercial-grade-disinfectant-cleaning-exception=aliquyam</code><ul>
+<li>Commercial grade disinfectant cleaning exception.</li>
+</ul>
+</li>
+<li><code>common-areas-enhanced-cleaning=false</code><ul>
+<li>Enhanced cleaning of common areas.</li>
+</ul>
+</li>
+<li><code>common-areas-enhanced-cleaning-exception=ea</code><ul>
+<li>Common areas enhanced cleaning exception.</li>
+</ul>
+</li>
+<li><code>employees-trained-cleaning-procedures=false</code><ul>
+<li>Employees trained in COVID-19 cleaning procedures.</li>
+</ul>
+</li>
+<li><code>employees-trained-cleaning-procedures-exception=elitr</code><ul>
+<li>Employees trained cleaning procedures exception.</li>
+</ul>
+</li>
+<li><code>employees-trained-thorough-hand-washing=false</code><ul>
+<li>Employees trained in thorough hand-washing.</li>
+</ul>
+</li>
+<li><code>employees-trained-thorough-hand-washing-exception=lorem</code><ul>
+<li>Employees trained thorough hand washing exception.</li>
+</ul>
+</li>
+<li><code>employees-wear-protective-equipment=false</code><ul>
+<li>Employees wear masks, face shields, and/or gloves.</li>
+</ul>
+</li>
+<li><code>employees-wear-protective-equipment-exception=gubergren</code><ul>
+<li>Employees wear protective equipment exception.</li>
+</ul>
+</li>
+<li><code>guest-rooms-enhanced-cleaning=false</code><ul>
+<li>Enhanced cleaning of guest rooms.</li>
+</ul>
+</li>
+<li>
+<p><code>guest-rooms-enhanced-cleaning-exception=ea</code></p>
+<ul>
+<li>Guest rooms enhanced cleaning exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..increased-food-safety    dining-areas-additional-sanitation=false</code></p>
+<ul>
+<li>Additional sanitation in dining areas.</li>
+</ul>
+</li>
+<li><code>dining-areas-additional-sanitation-exception=sanctus</code><ul>
+<li>Dining areas additional sanitation exception.</li>
+</ul>
+</li>
+<li><code>disposable-flatware=true</code><ul>
+<li>Disposable flatware.</li>
+</ul>
+</li>
+<li><code>disposable-flatware-exception=et</code><ul>
+<li>Disposable flatware exception.</li>
+</ul>
+</li>
+<li><code>food-preparation-and-serving-additional-safety=true</code><ul>
+<li>Additional safety measures during food prep and serving.</li>
+</ul>
+</li>
+<li><code>food-preparation-and-serving-additional-safety-exception=sanctus</code><ul>
+<li>Food preparation and serving additional safety exception.</li>
+</ul>
+</li>
+<li><code>individual-packaged-meals=true</code><ul>
+<li>Individually-packaged meals.</li>
+</ul>
+</li>
+<li><code>individual-packaged-meals-exception=eirmod</code><ul>
+<li>Individual packaged meals exception.</li>
+</ul>
+</li>
+<li><code>single-use-food-menus=false</code><ul>
+<li>Single-use menus.</li>
+</ul>
+</li>
+<li>
+<p><code>single-use-food-menus-exception=voluptua.</code></p>
+<ul>
+<li>Single use food menus exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..minimized-contact    contactless-checkin-checkout=true</code></p>
+<ul>
+<li>No-contact check-in and check-out.</li>
+</ul>
+</li>
+<li><code>contactless-checkin-checkout-exception=sea</code><ul>
+<li>Contactless check-in check-out exception.</li>
+</ul>
+</li>
+<li><code>digital-guest-room-keys=false</code><ul>
+<li>Keyless mobile entry to guest rooms.</li>
+</ul>
+</li>
+<li><code>digital-guest-room-keys-exception=gubergren</code><ul>
+<li>Digital guest room keys exception.</li>
+</ul>
+</li>
+<li><code>housekeeping-scheduled-request-only=false</code><ul>
+<li>Housekeeping scheduled by request only.</li>
+</ul>
+</li>
+<li><code>housekeeping-scheduled-request-only-exception=takimata</code><ul>
+<li>Housekeeping scheduled request only exception.</li>
+</ul>
+</li>
+<li><code>no-high-touch-items-common-areas=false</code><ul>
+<li>High-touch items, such as magazines, removed from common areas.</li>
+</ul>
+</li>
+<li><code>no-high-touch-items-common-areas-exception=tempor</code><ul>
+<li>No high touch items common areas exception.</li>
+</ul>
+</li>
+<li><code>no-high-touch-items-guest-rooms=true</code><ul>
+<li>High-touch items, such as decorative pillows, removed from guest rooms.</li>
+</ul>
+</li>
+<li><code>no-high-touch-items-guest-rooms-exception=sed</code><ul>
+<li>No high touch items guest rooms exception.</li>
+</ul>
+</li>
+<li><code>plastic-keycards-disinfected=true</code><ul>
+<li>Plastic key cards are disinfected or discarded.</li>
+</ul>
+</li>
+<li><code>plastic-keycards-disinfected-exception=stet</code><ul>
+<li>Plastic keycards disinfected exception.</li>
+</ul>
+</li>
+<li><code>room-bookings-buffer=true</code><ul>
+<li>Buffer maintained between room bookings.</li>
+</ul>
+</li>
+<li>
+<p><code>room-bookings-buffer-exception=clita</code></p>
+<ul>
+<li>Room bookings buffer exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..personal-protection    common-areas-offer-sanitizing-items=false</code></p>
+<ul>
+<li>Hand-sanitizer and/or sanitizing wipes are offered in common areas.</li>
+</ul>
+</li>
+<li><code>common-areas-offer-sanitizing-items-exception=dolores</code><ul>
+<li>Common areas offer sanitizing items exception.</li>
+</ul>
+</li>
+<li><code>face-mask-required=true</code><ul>
+<li>Masks required on the property.</li>
+</ul>
+</li>
+<li><code>face-mask-required-exception=sea</code><ul>
+<li>Face mask required exception.</li>
+</ul>
+</li>
+<li><code>guest-room-hygiene-kits-available=true</code><ul>
+<li>In-room hygiene kits with masks, hand sanitizer, and/or antibacterial wipes.</li>
+</ul>
+</li>
+<li><code>guest-room-hygiene-kits-available-exception=kasd</code><ul>
+<li>Guest room hygiene kits available exception.</li>
+</ul>
+</li>
+<li><code>protective-equipment-available=false</code><ul>
+<li>Masks and/or gloves available for guests.</li>
+</ul>
+</li>
+<li>
+<p><code>protective-equipment-available-exception=dolores</code></p>
+<ul>
+<li>Protective equipment available exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..physical-distancing    common-areas-physical-distancing-arranged=true</code></p>
+<ul>
+<li>Common areas arranged to maintain physical distancing.</li>
+</ul>
+</li>
+<li><code>common-areas-physical-distancing-arranged-exception=magna</code><ul>
+<li>Common areas physical distancing arranged exception.</li>
+</ul>
+</li>
+<li><code>physical-distancing-required=true</code><ul>
+<li>Physical distancing required.</li>
+</ul>
+</li>
+<li><code>physical-distancing-required-exception=amet</code><ul>
+<li>Physical distancing required exception.</li>
+</ul>
+</li>
+<li><code>safety-dividers=true</code><ul>
+<li>Safety dividers at front desk and other locations.</li>
+</ul>
+</li>
+<li><code>safety-dividers-exception=sadipscing</code><ul>
+<li>Safety dividers exception.</li>
+</ul>
+</li>
+<li><code>shared-areas-limited-occupancy=false</code><ul>
+<li>Guest occupancy limited within shared facilities.</li>
+</ul>
+</li>
+<li><code>shared-areas-limited-occupancy-exception=amet</code><ul>
+<li>Shared areas limited occupancy exception.</li>
+</ul>
+</li>
+<li><code>wellness-areas-have-private-spaces=true</code><ul>
+<li>Private spaces designated in spa and wellness areas.</li>
+</ul>
+</li>
+<li>
+<p><code>wellness-areas-have-private-spaces-exception=invidunt</code></p>
+<ul>
+<li>Wellness areas have private spaces exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...housekeeping    daily-housekeeping=true</code></p>
+<ul>
+<li>Daily housekeeping. Guest units are cleaned by hotel staff daily during guest&#39;s stay.</li>
+</ul>
+</li>
+<li><code>daily-housekeeping-exception=sed</code><ul>
+<li>Daily housekeeping exception.</li>
+</ul>
+</li>
+<li><code>housekeeping-available=true</code><ul>
+<li>Housekeeping available. Guest units are cleaned by hotel staff during guest&#39;s stay. Schedule may vary from daily, weekly, or specific days of the week.</li>
+</ul>
+</li>
+<li><code>housekeeping-available-exception=et</code><ul>
+<li>Housekeeping available exception.</li>
+</ul>
+</li>
+<li><code>turndown-service=false</code><ul>
+<li>Turndown service. Hotel staff enters guest units to prepare the bed for sleep use. May or may not include some light housekeeping. May or may not include an evening snack or candy. Also known as evening service.</li>
+</ul>
+</li>
+<li>
+<p><code>turndown-service-exception=sadipscing</code></p>
+<ul>
+<li>Turndown service exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..metadata    update-time=diam</code></p>
+<ul>
+<li>Required. The latest time at which the Lodging data is asserted to be true in the real world. This is not necessarily the time at which the request is made.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=at</code></p>
+<ul>
+<li>Required. Google identifier for this location in the form: <code>locations/{location_id}/lodging</code></li>
+</ul>
+</li>
+<li><code>parking    electric-car-charging-stations=false</code><ul>
+<li>Electric car charging stations. Electric power stations, usually located outdoors, into which guests plug their electric cars to receive a charge.</li>
+</ul>
+</li>
+<li><code>electric-car-charging-stations-exception=kasd</code><ul>
+<li>Electric car charging stations exception.</li>
+</ul>
+</li>
+<li><code>free-parking=true</code><ul>
+<li>Free parking. The hotel allows the cars of guests to be parked for free. Parking facility may be an outdoor lot or an indoor garage, but must be onsite. Nearby parking does not apply. Parking may be performed by the guest or by hotel staff. Free parking must be available to all guests (limited conditions does not apply).</li>
+</ul>
+</li>
+<li><code>free-parking-exception=est</code><ul>
+<li>Free parking exception.</li>
+</ul>
+</li>
+<li><code>free-self-parking=true</code><ul>
+<li>Free self parking. Guests park their own cars for free. Parking facility may be an outdoor lot or an indoor garage, but must be onsite. Nearby parking does not apply.</li>
+</ul>
+</li>
+<li><code>free-self-parking-exception=eos</code><ul>
+<li>Free self parking exception.</li>
+</ul>
+</li>
+<li><code>free-valet-parking=true</code><ul>
+<li>Free valet parking. Hotel staff member parks the cars of guests. Parking with this service is free.</li>
+</ul>
+</li>
+<li><code>free-valet-parking-exception=stet</code><ul>
+<li>Free valet parking exception.</li>
+</ul>
+</li>
+<li><code>parking-available=true</code><ul>
+<li>Parking available. The hotel allows the cars of guests to be parked. Can be free or for a fee. Parking facility may be an outdoor lot or an indoor garage, but must be onsite. Nearby parking does not apply. Parking may be performed by the guest or by hotel staff.</li>
+</ul>
+</li>
+<li><code>parking-available-exception=diam</code><ul>
+<li>Parking available exception.</li>
+</ul>
+</li>
+<li><code>self-parking-available=true</code><ul>
+<li>Self parking available. Guests park their own cars. Parking facility may be an outdoor lot or an indoor garage, but must be onsite. Nearby parking does not apply. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>self-parking-available-exception=sea</code><ul>
+<li>Self parking available exception.</li>
+</ul>
+</li>
+<li><code>valet-parking-available=false</code><ul>
+<li>Valet parking available. Hotel staff member parks the cars of guests. Parking with this service can be free or for a fee.</li>
+</ul>
+</li>
+<li>
+<p><code>valet-parking-available-exception=lorem</code></p>
+<ul>
+<li>Valet parking available exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..pets    cats-allowed=true</code></p>
+<ul>
+<li>Cats allowed. Domesticated felines are permitted at the property and allowed to stay in the guest room of their owner. May or may not require a fee.</li>
+</ul>
+</li>
+<li><code>cats-allowed-exception=lorem</code><ul>
+<li>Cats allowed exception.</li>
+</ul>
+</li>
+<li><code>dogs-allowed=true</code><ul>
+<li>Dogs allowed. Domesticated canines are permitted at the property and allowed to stay in the guest room of their owner. May or may not require a fee.</li>
+</ul>
+</li>
+<li><code>dogs-allowed-exception=diam</code><ul>
+<li>Dogs allowed exception.</li>
+</ul>
+</li>
+<li><code>pets-allowed=false</code><ul>
+<li>Pets allowed. Household animals are allowed at the property and in the specific guest room of their owner. May or may not include dogs, cats, reptiles and/or fish. May or may not require a fee. Service animals are not considered to be pets, so not governed by this policy.</li>
+</ul>
+</li>
+<li><code>pets-allowed-exception=et</code><ul>
+<li>Pets allowed exception.</li>
+</ul>
+</li>
+<li><code>pets-allowed-free=true</code><ul>
+<li>Pets allowed free. Household animals are allowed at the property and in the specific guest room of their owner for free. May or may not include dogs, cats, reptiles, and/or fish.</li>
+</ul>
+</li>
+<li>
+<p><code>pets-allowed-free-exception=et</code></p>
+<ul>
+<li>Pets allowed free exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..policies    all-inclusive-available=true</code></p>
+<ul>
+<li>All inclusive available. The hotel offers a rate option that includes the cost of the room, meals, activities, and other amenities that might otherwise be charged separately.</li>
+</ul>
+</li>
+<li><code>all-inclusive-available-exception=dolores</code><ul>
+<li>All inclusive available exception.</li>
+</ul>
+</li>
+<li><code>all-inclusive-only=true</code><ul>
+<li>All inclusive only. The only rate option offered by the hotel is a rate that includes the cost of the room, meals, activities and other amenities that might otherwise be charged separately.</li>
+</ul>
+</li>
+<li><code>all-inclusive-only-exception=sea</code><ul>
+<li>All inclusive only exception.</li>
+</ul>
+</li>
+<li><code>checkin-time    hours=67</code><ul>
+<li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
+</ul>
+</li>
+<li><code>minutes=32</code><ul>
+<li>Minutes of hour of day. Must be from 0 to 59.</li>
+</ul>
+</li>
+<li><code>nanos=13</code><ul>
+<li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
+</ul>
+</li>
+<li>
+<p><code>seconds=12</code></p>
+<ul>
+<li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>..    checkin-time-exception=et</code></p>
+<ul>
+<li>Check-in time exception.</li>
+</ul>
+</li>
+<li><code>checkout-time    hours=23</code><ul>
+<li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
+</ul>
+</li>
+<li><code>minutes=16</code><ul>
+<li>Minutes of hour of day. Must be from 0 to 59.</li>
+</ul>
+</li>
+<li><code>nanos=44</code><ul>
+<li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
+</ul>
+</li>
+<li>
+<p><code>seconds=86</code></p>
+<ul>
+<li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>..    checkout-time-exception=dolor</code></p>
+<ul>
+<li>Check-out time exception.</li>
+</ul>
+</li>
+<li><code>kids-stay-free=false</code><ul>
+<li>Kids stay free. The children of guests are allowed to stay in the room/suite of a parent or adult without an additional fee. The policy may or may not stipulate a limit of the child&#39;s age or the overall number of children allowed.</li>
+</ul>
+</li>
+<li><code>kids-stay-free-exception=labore</code><ul>
+<li>Kids stay free exception.</li>
+</ul>
+</li>
+<li><code>max-child-age=15</code><ul>
+<li>Max child age. The hotel allows children up to a certain age to stay in the room/suite of a parent or adult without an additional fee.</li>
+</ul>
+</li>
+<li><code>max-child-age-exception=et</code><ul>
+<li>Max child age exception.</li>
+</ul>
+</li>
+<li><code>max-kids-stay-free-count=19</code><ul>
+<li>Max kids stay free count. The hotel allows a specific, defined number of children to stay in the room/suite of a parent or adult without an additional fee.</li>
+</ul>
+</li>
+<li><code>max-kids-stay-free-count-exception=-37</code><ul>
+<li>Max kids stay free count exception.</li>
+</ul>
+</li>
+<li><code>payment-options    cash=true</code><ul>
+<li>Cash. The hotel accepts payment by paper/coin currency.</li>
+</ul>
+</li>
+<li><code>cash-exception=gubergren</code><ul>
+<li>Cash exception.</li>
+</ul>
+</li>
+<li><code>cheque=true</code><ul>
+<li>Cheque. The hotel accepts a printed document issued by the guest&#39;s bank in the guest&#39;s name as a form of payment.</li>
+</ul>
+</li>
+<li><code>cheque-exception=rebum.</code><ul>
+<li>Cheque exception.</li>
+</ul>
+</li>
+<li><code>credit-card=true</code><ul>
+<li>Credit card. The hotel accepts payment by a card issued by a bank or credit card company. Also known as charge card, debit card, bank card, or charge plate.</li>
+</ul>
+</li>
+<li><code>credit-card-exception=erat</code><ul>
+<li>Credit card exception.</li>
+</ul>
+</li>
+<li><code>debit-card=false</code><ul>
+<li>Debit card. The hotel accepts a bank-issued card that immediately deducts the charged funds from the guest&#39;s bank account upon processing.</li>
+</ul>
+</li>
+<li><code>debit-card-exception=amet.</code><ul>
+<li>Debit card exception.</li>
+</ul>
+</li>
+<li><code>mobile-nfc=true</code><ul>
+<li>Mobile nfc. The hotel has the compatible computer hardware terminal that reads and charges a payment app on the guest&#39;s smartphone without requiring the two devices to make physical contact. Also known as Apple Pay, Google Pay, Samsung Pay.</li>
+</ul>
+</li>
+<li>
+<p><code>mobile-nfc-exception=eirmod</code></p>
+<ul>
+<li>Mobile nfc exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..    smoke-free-property=true</code></p>
+<ul>
+<li>Smoke free property. Smoking is not allowed inside the building, on balconies, or in outside spaces. Hotels that offer a designated area for guests to smoke are not considered smoke-free properties.</li>
+</ul>
+</li>
+<li>
+<p><code>smoke-free-property-exception=takimata</code></p>
+<ul>
+<li>Smoke free property exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..pools    adult-pool=true</code></p>
+<ul>
+<li>Adult pool. A pool restricted for use by adults only. Can be indoors or outdoors.</li>
+</ul>
+</li>
+<li><code>adult-pool-exception=et</code><ul>
+<li>Adult pool exception.</li>
+</ul>
+</li>
+<li><code>hot-tub=true</code><ul>
+<li>Hot tub. A man-made pool containing bubbling water maintained at a higher temperature and circulated by aerating jets for the purpose of soaking, relaxation and hydrotherapy. Can be indoors or outdoors. Not used for active swimming. Also known as Jacuzzi. Hot tub must be in a common area where all guests can access it. Does not apply to room-specific hot tubs that are only accessible to guest occupying that room.</li>
+</ul>
+</li>
+<li><code>hot-tub-exception=sit</code><ul>
+<li>Hot tub exception.</li>
+</ul>
+</li>
+<li><code>indoor-pool=false</code><ul>
+<li>Indoor pool. A pool located inside the hotel and available for guests to use for swimming and/or soaking. Use may or may not be restricted to adults and/or children.</li>
+</ul>
+</li>
+<li><code>indoor-pool-exception=invidunt</code><ul>
+<li>Indoor pool exception.</li>
+</ul>
+</li>
+<li><code>indoor-pools-count=7</code><ul>
+<li>Indoor pools count. The sum of all indoor pools at the hotel.</li>
+</ul>
+</li>
+<li><code>indoor-pools-count-exception=-28</code><ul>
+<li>Indoor pools count exception.</li>
+</ul>
+</li>
+<li><code>lazy-river=false</code><ul>
+<li>Lazy river. A man-made pool or several interconnected recreational pools built to mimic the shape and current of a winding river where guests float in the water on inflated rubber tubes. Can be indoors or outdoors.</li>
+</ul>
+</li>
+<li><code>lazy-river-exception=amet.</code><ul>
+<li>Lazy river exception.</li>
+</ul>
+</li>
+<li><code>lifeguard=false</code><ul>
+<li>Lifeguard. A trained member of the hotel staff stationed by the hotel&#39;s indoor or outdoor swimming area and responsible for the safety of swimming guests.</li>
+</ul>
+</li>
+<li><code>lifeguard-exception=et</code><ul>
+<li>Lifeguard exception.</li>
+</ul>
+</li>
+<li><code>outdoor-pool=false</code><ul>
+<li>Outdoor pool. A pool located outside on the grounds of the hotel and available for guests to use for swimming, soaking or recreation. Use may or may not be restricted to adults and/or children.</li>
+</ul>
+</li>
+<li><code>outdoor-pool-exception=no</code><ul>
+<li>Outdoor pool exception.</li>
+</ul>
+</li>
+<li><code>outdoor-pools-count=3</code><ul>
+<li>Outdoor pools count. The sum of all outdoor pools at the hotel.</li>
+</ul>
+</li>
+<li><code>outdoor-pools-count-exception=-7</code><ul>
+<li>Outdoor pools count exception.</li>
+</ul>
+</li>
+<li><code>pool=false</code><ul>
+<li>Pool. The presence of a pool, either indoors or outdoors, for guests to use for swimming and/or soaking. Use may or may not be restricted to adults and/or children.</li>
+</ul>
+</li>
+<li><code>pool-exception=et</code><ul>
+<li>Pool exception.</li>
+</ul>
+</li>
+<li><code>pools-count=5</code><ul>
+<li>Pools count. The sum of all pools at the hotel.</li>
+</ul>
+</li>
+<li><code>pools-count-exception=-27</code><ul>
+<li>Pools count exception.</li>
+</ul>
+</li>
+<li><code>wading-pool=false</code><ul>
+<li>Wading pool. A shallow pool designed for small children to play in. Can be indoors or outdoors. Also known as kiddie pool.</li>
+</ul>
+</li>
+<li><code>wading-pool-exception=voluptua.</code><ul>
+<li>Wading pool exception.</li>
+</ul>
+</li>
+<li><code>water-park=true</code><ul>
+<li>Water park. An aquatic recreation area with a large pool or series of pools that has features such as a water slide or tube, wavepool, fountains, rope swings, and/or obstacle course. Can be indoors or outdoors. Also known as adventure pool.</li>
+</ul>
+</li>
+<li><code>water-park-exception=amet.</code><ul>
+<li>Water park exception.</li>
+</ul>
+</li>
+<li><code>waterslide=false</code><ul>
+<li>Waterslide. A continuously wetted chute positioned by an indoor or outdoor pool which people slide down into the water.</li>
+</ul>
+</li>
+<li><code>waterslide-exception=accusam</code><ul>
+<li>Waterslide exception.</li>
+</ul>
+</li>
+<li><code>wave-pool=true</code><ul>
+<li>Wave pool. A large indoor or outdoor pool with a machine that produces water currents to mimic the ocean&#39;s crests.</li>
+</ul>
+</li>
+<li>
+<p><code>wave-pool-exception=duo</code></p>
+<ul>
+<li>Wave pool exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..property    built-year=38</code></p>
+<ul>
+<li>Built year. The year that construction of the property was completed.</li>
+</ul>
+</li>
+<li><code>built-year-exception=eos</code><ul>
+<li>Built year exception.</li>
+</ul>
+</li>
+<li><code>floors-count=90</code><ul>
+<li>Floors count. The number of stories the building has from the ground floor to the top floor that are accessible to guests.</li>
+</ul>
+</li>
+<li><code>floors-count-exception=-63</code><ul>
+<li>Floors count exception.</li>
+</ul>
+</li>
+<li><code>last-renovated-year=43</code><ul>
+<li>Last renovated year. The year when the most recent renovation of the property was completed. Renovation may include all or any combination of the following: the units, the public spaces, the exterior, or the interior.</li>
+</ul>
+</li>
+<li><code>last-renovated-year-exception=gubergren</code><ul>
+<li>Last renovated year exception.</li>
+</ul>
+</li>
+<li><code>rooms-count=78</code><ul>
+<li>Rooms count. The total number of rooms and suites bookable by guests for an overnight stay. Does not include event space, public spaces, conference rooms, fitness rooms, business centers, spa, salon, restaurants/bars, or shops.</li>
+</ul>
+</li>
+<li>
+<p><code>rooms-count-exception=-51</code></p>
+<ul>
+<li>Rooms count exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..services    baggage-storage=true</code></p>
+<ul>
+<li>Baggage storage. A provision for guests to leave their bags at the hotel when they arrive for their stay before the official check-in time. May or may not apply for guests who wish to leave their bags after check-out and before departing the locale. Also known as bag dropoff.</li>
+</ul>
+</li>
+<li><code>baggage-storage-exception=sea</code><ul>
+<li>Baggage storage exception.</li>
+</ul>
+</li>
+<li><code>concierge=false</code><ul>
+<li>Concierge. Hotel staff member(s) responsible for facilitating an easy, comfortable stay through making reservations for meals, sourcing theater tickets, arranging tours, finding a doctor, making recommendations, and answering questions.</li>
+</ul>
+</li>
+<li><code>concierge-exception=amet</code><ul>
+<li>Concierge exception.</li>
+</ul>
+</li>
+<li><code>convenience-store=true</code><ul>
+<li>Convenience store. A shop at the hotel primarily selling snacks, drinks, non-prescription medicines, health and beauty aids, magazines and newspapers.</li>
+</ul>
+</li>
+<li><code>convenience-store-exception=tempor</code><ul>
+<li>Convenience store exception.</li>
+</ul>
+</li>
+<li><code>currency-exchange=true</code><ul>
+<li>Currency exchange. A staff member or automated machine tasked with the transaction of providing the native currency of the hotel&#39;s locale in exchange for the foreign currency provided by a guest.</li>
+</ul>
+</li>
+<li><code>currency-exchange-exception=amet</code><ul>
+<li>Currency exchange exception.</li>
+</ul>
+</li>
+<li><code>elevator=true</code><ul>
+<li>Elevator. A passenger elevator that transports guests from one story to another. Also known as lift.</li>
+</ul>
+</li>
+<li><code>elevator-exception=et</code><ul>
+<li>Elevator exception.</li>
+</ul>
+</li>
+<li><code>front-desk=true</code><ul>
+<li>Front desk. A counter or desk in the lobby or the immediate interior of the hotel where a member of the staff greets guests and processes the information related to their stay (including check-in and check-out). May or may not be manned and open 24/7.</li>
+</ul>
+</li>
+<li><code>front-desk-exception=dolor</code><ul>
+<li>Front desk exception.</li>
+</ul>
+</li>
+<li><code>full-service-laundry=false</code><ul>
+<li>Full service laundry. Laundry and dry cleaning facilitated and handled by the hotel on behalf of the guest. Does not include the provision for guests to do their own laundry in on-site machines.</li>
+</ul>
+</li>
+<li><code>full-service-laundry-exception=et</code><ul>
+<li>Full service laundry exception.</li>
+</ul>
+</li>
+<li><code>gift-shop=false</code><ul>
+<li>Gift shop. An on-site store primarily selling souvenirs, mementos and other gift items. May or may not also sell sundries, magazines and newspapers, clothing, or snacks.</li>
+</ul>
+</li>
+<li><code>gift-shop-exception=no</code><ul>
+<li>Gift shop exception.</li>
+</ul>
+</li>
+<li><code>self-service-laundry=false</code><ul>
+<li>Self service laundry. On-site clothes washers and dryers accessible to guests for the purpose of washing and drying their own clothes. May or may not require payment to use the machines.</li>
+</ul>
+</li>
+<li><code>self-service-laundry-exception=ipsum</code><ul>
+<li>Self service laundry exception.</li>
+</ul>
+</li>
+<li><code>social-hour=true</code><ul>
+<li>Social hour. A reception with complimentary soft drinks, tea, coffee, wine and/or cocktails in the afternoon or evening. Can be hosted by hotel staff or guests may serve themselves. Also known as wine hour. The availability of coffee/tea in the lobby throughout the day does not constitute a social or wine hour.</li>
+</ul>
+</li>
+<li><code>social-hour-exception=ipsum</code><ul>
+<li>Social hour exception.</li>
+</ul>
+</li>
+<li><code>twenty-four-hour-front-desk=true</code><ul>
+<li>24hr front desk. Front desk is staffed 24 hours a day.</li>
+</ul>
+</li>
+<li><code>twenty-four-hour-front-desk-exception=dolores</code><ul>
+<li>24hr front desk exception.</li>
+</ul>
+</li>
+<li><code>wake-up-calls=true</code><ul>
+<li>Wake up calls. By direction of the guest, a hotel staff member will phone the guest unit at the requested hour. Also known as morning call.</li>
+</ul>
+</li>
+<li>
+<p><code>wake-up-calls-exception=diam</code></p>
+<ul>
+<li>Wake up calls exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..some-units    bungalow-or-villa=false</code></p>
+<ul>
+<li>Bungalow or villa. An independent structure that is part of a hotel or resort that is rented to one party for a vacation stay. The hotel or resort may be completely comprised of bungalows or villas, or they may be one of several guestroom options. Guests in the bungalows or villas most often have the same, if not more, amenities and services offered to guests in other guestroom types.</li>
+</ul>
+</li>
+<li><code>bungalow-or-villa-exception=lorem</code><ul>
+<li>Bungalow or villa exception.</li>
+</ul>
+</li>
+<li><code>connecting-unit-available=true</code><ul>
+<li>Connecting unit available. A guestroom type that features access to an adjacent guestroom for the purpose of booking both rooms. Most often used by families who need more than one room to accommodate the number of people in their group.</li>
+</ul>
+</li>
+<li><code>connecting-unit-available-exception=no</code><ul>
+<li>Connecting unit available exception.</li>
+</ul>
+</li>
+<li><code>executive-floor=true</code><ul>
+<li>Executive floor. A floor of the hotel where the guestrooms are only bookable by members of the hotel&#39;s frequent guest membership program. Benefits of this room class include access to a designated lounge which may or may not feature free breakfast, cocktails or other perks specific to members of the program.</li>
+</ul>
+</li>
+<li><code>executive-floor-exception=sit</code><ul>
+<li>Executive floor exception.</li>
+</ul>
+</li>
+<li><code>max-adult-occupants-count=81</code><ul>
+<li>Max adult occupants count. The total number of adult guests allowed to stay overnight in the guestroom.</li>
+</ul>
+</li>
+<li><code>max-adult-occupants-count-exception=-65</code><ul>
+<li>Max adult occupants count exception.</li>
+</ul>
+</li>
+<li><code>max-child-occupants-count=72</code><ul>
+<li>Max child occupants count. The total number of children allowed to stay overnight in the room.</li>
+</ul>
+</li>
+<li><code>max-child-occupants-count-exception=-73</code><ul>
+<li>Max child occupants count exception.</li>
+</ul>
+</li>
+<li><code>max-occupants-count=67</code><ul>
+<li>Max occupants count. The total number of guests allowed to stay overnight in the guestroom.</li>
+</ul>
+</li>
+<li><code>max-occupants-count-exception=-40</code><ul>
+<li>Max occupants count exception.</li>
+</ul>
+</li>
+<li><code>private-home=true</code><ul>
+<li>Private home. A privately owned home (house, townhouse, apartment, cabin, bungalow etc) that may or not serve as the owner&#39;s residence, but is rented out in its entirety or by the room(s) to paying guest(s) for vacation stays. Not for lease-based, long-term residency.</li>
+</ul>
+</li>
+<li><code>private-home-exception=ut</code><ul>
+<li>Private home exception.</li>
+</ul>
+</li>
+<li><code>suite=true</code><ul>
+<li>Suite. A guestroom category that implies both a bedroom area and a separate living area. There may or may not be full walls and doors separating the two areas, but regardless, they are very distinct. Does not mean a couch or chair in a bedroom.</li>
+</ul>
+</li>
+<li><code>suite-exception=sadipscing</code><ul>
+<li>Suite exception.</li>
+</ul>
+</li>
+<li><code>tier=sit</code><ul>
+<li>Tier. Classification of the unit based on available features/amenities. A non-standard tier is only permitted if at least one other unit type falls under the standard tier.</li>
+</ul>
+</li>
+<li><code>tier-exception=ipsum</code><ul>
+<li>Tier exception.</li>
+</ul>
+</li>
+<li><code>total-living-areas.accessibility    ada-compliant-unit=false</code><ul>
+<li>ADA compliant unit. A guestroom designed to accommodate the physical challenges of a guest with mobility and/or auditory and/or visual issues, as determined by legislative policy. Usually features enlarged doorways, roll-in showers with seats, bathroom grab bars, and communication equipment for the hearing and sight challenged.</li>
+</ul>
+</li>
+<li><code>ada-compliant-unit-exception=ut</code><ul>
+<li>ADA compliant unit exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-doorbell=true</code><ul>
+<li>Hearing-accessible doorbell. A visual indicator(s) of a knock or ring at the door.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-doorbell-exception=at</code><ul>
+<li>Hearing-accessible doorbell exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-fire-alarm=true</code><ul>
+<li>Hearing-accessible fire alarm. A device that gives warning of a fire through flashing lights.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-fire-alarm-exception=stet</code><ul>
+<li>Hearing-accessible fire alarm exception.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-unit=true</code><ul>
+<li>Hearing-accessible unit. A guestroom designed to accommodate the physical challenges of a guest with auditory issues.</li>
+</ul>
+</li>
+<li><code>hearing-accessible-unit-exception=voluptua.</code><ul>
+<li>Hearing-accessible unit exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-bathtub=false</code><ul>
+<li>Mobility-accessible bathtub. A bathtub that accomodates the physically challenged with additional railings or hand grips, a transfer seat or lift, and/or a door to enable walking into the tub.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-bathtub-exception=rebum.</code><ul>
+<li>Mobility-accessible bathtub exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-shower=true</code><ul>
+<li>Mobility-accessible shower. A shower with an enlarged door or access point to accommodate a wheelchair or a waterproof seat for the physically challenged.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-shower-exception=stet</code><ul>
+<li>Mobility-accessible shower exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-toilet=true</code><ul>
+<li>Mobility-accessible toilet. A toilet with a higher seat, grab bars, and/or a larger area around it to accommodate the physically challenged.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-toilet-exception=ipsum</code><ul>
+<li>Mobility-accessible toilet exception.</li>
+</ul>
+</li>
+<li><code>mobility-accessible-unit=false</code><ul>
+<li>Mobility-accessible unit. A guestroom designed to accommodate the physical challenges of a guest with mobility and/or auditory and/or visual issues. Usually features enlarged doorways, roll-in showers with seats, bathroom grab bars, and communication equipment for the hearing and sight challenged.</li>
+</ul>
+</li>
+<li>
+<p><code>mobility-accessible-unit-exception=justo</code></p>
+<ul>
+<li>Mobility-accessible unit exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..eating    coffee-maker=true</code></p>
+<ul>
+<li>Coffee maker. An electric appliance that brews coffee by heating and forcing water through ground coffee.</li>
+</ul>
+</li>
+<li><code>coffee-maker-exception=duo</code><ul>
+<li>Coffee maker exception.</li>
+</ul>
+</li>
+<li><code>cookware=false</code><ul>
+<li>Cookware. Kitchen pots, pans and utensils used in connection with the preparation of food.</li>
+</ul>
+</li>
+<li><code>cookware-exception=eirmod</code><ul>
+<li>Cookware exception.</li>
+</ul>
+</li>
+<li><code>dishwasher=true</code><ul>
+<li>Dishwasher. A counter-height electrical cabinet containing racks for dirty dishware, cookware and cutlery, and a dispenser for soap built into the pull-down door. The cabinet is attached to the plumbing system to facilitate the automatic cleaning of its contents.</li>
+</ul>
+</li>
+<li><code>dishwasher-exception=kasd</code><ul>
+<li>Dishwasher exception.</li>
+</ul>
+</li>
+<li><code>indoor-grill=false</code><ul>
+<li>Indoor grill. Metal grates built into an indoor cooktop on which food is cooked over an open flame or electric heat source.</li>
+</ul>
+</li>
+<li><code>indoor-grill-exception=nonumy</code><ul>
+<li>Indoor grill exception.</li>
+</ul>
+</li>
+<li><code>kettle=true</code><ul>
+<li>Kettle. A covered container with a handle and a spout used for boiling water.</li>
+</ul>
+</li>
+<li><code>kettle-exception=lorem</code><ul>
+<li>Kettle exception.</li>
+</ul>
+</li>
+<li><code>kitchen-available=true</code><ul>
+<li>Kitchen available. An area of the guestroom designated for the preparation and storage of food via the presence of a refrigerator, cook top, oven and sink, as well as cutlery, dishes and cookware. Usually includes small appliances such a coffee maker and a microwave. May or may not include an automatic dishwasher.</li>
+</ul>
+</li>
+<li><code>kitchen-available-exception=vero</code><ul>
+<li>Kitchen available exception.</li>
+</ul>
+</li>
+<li><code>microwave=true</code><ul>
+<li>Microwave. An electric oven that quickly cooks and heats food by microwave energy. Smaller than a standing or wall mounted oven. Usually placed on a kitchen counter, a shelf or tabletop or mounted above a cooktop.</li>
+</ul>
+</li>
+<li><code>microwave-exception=consetetur</code><ul>
+<li>Microwave exception.</li>
+</ul>
+</li>
+<li><code>minibar=false</code><ul>
+<li>Minibar. A small refrigerated cabinet in the guestroom containing bottles/cans of soft drinks, mini bottles of alcohol, and snacks. The items are most commonly available for a fee.</li>
+</ul>
+</li>
+<li><code>minibar-exception=magna</code><ul>
+<li>Minibar exception.</li>
+</ul>
+</li>
+<li><code>outdoor-grill=true</code><ul>
+<li>Outdoor grill. Metal grates on which food is cooked over an open flame or electric heat source. Part of an outdoor apparatus that supports the grates. Also known as barbecue grill or barbecue.</li>
+</ul>
+</li>
+<li><code>outdoor-grill-exception=clita</code><ul>
+<li>Outdoor grill exception.</li>
+</ul>
+</li>
+<li><code>oven=false</code><ul>
+<li>Oven. A temperature controlled, heated metal cabinet powered by gas or electricity in which food is placed for the purpose of cooking or reheating.</li>
+</ul>
+</li>
+<li><code>oven-exception=accusam</code><ul>
+<li>Oven exception.</li>
+</ul>
+</li>
+<li><code>refrigerator=true</code><ul>
+<li>Refrigerator. A large, climate-controlled electrical cabinet with vertical doors. Built for the purpose of chilling and storing perishable foods.</li>
+</ul>
+</li>
+<li><code>refrigerator-exception=sanctus</code><ul>
+<li>Refrigerator exception.</li>
+</ul>
+</li>
+<li><code>sink=false</code><ul>
+<li>Sink. A basin with a faucet attached to a water source and used for the purpose of washing and rinsing.</li>
+</ul>
+</li>
+<li><code>sink-exception=sit</code><ul>
+<li>Sink exception.</li>
+</ul>
+</li>
+<li><code>snackbar=false</code><ul>
+<li>Snackbar. A small cabinet in the guestroom containing snacks. The items are most commonly available for a fee.</li>
+</ul>
+</li>
+<li><code>snackbar-exception=et</code><ul>
+<li>Snackbar exception.</li>
+</ul>
+</li>
+<li><code>stove=true</code><ul>
+<li>Stove. A kitchen appliance powered by gas or electricity for the purpose of creating a flame or hot surface on which pots of food can be cooked. Also known as cooktop or hob.</li>
+</ul>
+</li>
+<li><code>stove-exception=et</code><ul>
+<li>Stove exception.</li>
+</ul>
+</li>
+<li><code>tea-station=false</code><ul>
+<li>Tea station. A small area with the supplies needed to heat water and make tea.</li>
+</ul>
+</li>
+<li><code>tea-station-exception=justo</code><ul>
+<li>Tea station exception.</li>
+</ul>
+</li>
+<li><code>toaster=true</code><ul>
+<li>Toaster. A small, temperature controlled electric appliance with rectangular slots at the top that are lined with heated coils for the purpose of browning slices of bread products.</li>
+</ul>
+</li>
+<li>
+<p><code>toaster-exception=accusam</code></p>
+<ul>
+<li>Toaster exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..features    air-conditioning=true</code></p>
+<ul>
+<li>Air conditioning. An electrical machine used to cool the temperature of the guestroom.</li>
+</ul>
+</li>
+<li><code>air-conditioning-exception=invidunt</code><ul>
+<li>Air conditioning exception.</li>
+</ul>
+</li>
+<li><code>bathtub=true</code><ul>
+<li>Bathtub. A fixed plumbing feature set on the floor and consisting of a large container that accommodates the body of an adult for the purpose of seated bathing. Includes knobs or fixtures to control the temperature of the water, a faucet through which the water flows, and a drain that can be closed for filling and opened for draining.</li>
+</ul>
+</li>
+<li><code>bathtub-exception=gubergren</code><ul>
+<li>Bathtub exception.</li>
+</ul>
+</li>
+<li><code>bidet=false</code><ul>
+<li>Bidet. A plumbing fixture attached to a toilet or a low, fixed sink designed for the purpose of washing after toilet use.</li>
+</ul>
+</li>
+<li><code>bidet-exception=justo</code><ul>
+<li>Bidet exception.</li>
+</ul>
+</li>
+<li><code>dryer=false</code><ul>
+<li>Dryer. An electrical machine designed to dry clothing.</li>
+</ul>
+</li>
+<li><code>dryer-exception=sed</code><ul>
+<li>Dryer exception.</li>
+</ul>
+</li>
+<li><code>electronic-room-key=false</code><ul>
+<li>Electronic room key. A card coded by the check-in computer that is read by the lock on the hotel guestroom door to allow for entry.</li>
+</ul>
+</li>
+<li><code>electronic-room-key-exception=et</code><ul>
+<li>Electronic room key exception.</li>
+</ul>
+</li>
+<li><code>fireplace=false</code><ul>
+<li>Fireplace. A framed opening (aka hearth) at the base of a chimney in which logs or an electrical fire feature are burned to provide a relaxing ambiance or to heat the room. Often made of bricks or stone.</li>
+</ul>
+</li>
+<li><code>fireplace-exception=at</code><ul>
+<li>Fireplace exception.</li>
+</ul>
+</li>
+<li><code>hairdryer=true</code><ul>
+<li>Hairdryer. A handheld electric appliance that blows temperature-controlled air for the purpose of drying wet hair. Can be mounted to a bathroom wall or a freestanding device stored in the guestroom&#39;s bathroom or closet.</li>
+</ul>
+</li>
+<li><code>hairdryer-exception=at</code><ul>
+<li>Hairdryer exception.</li>
+</ul>
+</li>
+<li><code>heating=true</code><ul>
+<li>Heating. An electrical machine used to warm the temperature of the guestroom.</li>
+</ul>
+</li>
+<li><code>heating-exception=clita</code><ul>
+<li>Heating exception.</li>
+</ul>
+</li>
+<li><code>inunit-safe=false</code><ul>
+<li>In-unit safe. A strong fireproof cabinet with a programmable lock, used for the protected storage of valuables in a guestroom. Often built into a closet.</li>
+</ul>
+</li>
+<li><code>inunit-safe-exception=amet</code><ul>
+<li>In-unit safe exception.</li>
+</ul>
+</li>
+<li><code>inunit-wifi-available=false</code><ul>
+<li>In-unit Wifi available. Guests can wirelessly connect to the Internet in the guestroom. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>inunit-wifi-available-exception=dolore</code><ul>
+<li>In-unit Wifi available exception.</li>
+</ul>
+</li>
+<li><code>ironing-equipment=false</code><ul>
+<li>Ironing equipment. A device, usually with a flat metal base, that is heated to smooth, finish, or press clothes and a flat, padded, cloth-covered surface on which the clothes are worked.</li>
+</ul>
+</li>
+<li><code>ironing-equipment-exception=diam</code><ul>
+<li>Ironing equipment exception.</li>
+</ul>
+</li>
+<li><code>pay-per-view-movies=false</code><ul>
+<li>Pay per view movies. Televisions with channels that offer films that can be viewed for a fee, and have an interface to allow the viewer to accept the terms and approve payment.</li>
+</ul>
+</li>
+<li><code>pay-per-view-movies-exception=lorem</code><ul>
+<li>Pay per view movies exception.</li>
+</ul>
+</li>
+<li><code>private-bathroom=true</code><ul>
+<li>Private bathroom. A bathroom designated for the express use of the guests staying in a specific guestroom.</li>
+</ul>
+</li>
+<li><code>private-bathroom-exception=et</code><ul>
+<li>Private bathroom exception.</li>
+</ul>
+</li>
+<li><code>shower=false</code><ul>
+<li>Shower. A fixed plumbing fixture for standing bathing that features a tall spray spout or faucet through which water flows, a knob or knobs that control the water&#39;s temperature, and a drain in the floor.</li>
+</ul>
+</li>
+<li><code>shower-exception=vero</code><ul>
+<li>Shower exception.</li>
+</ul>
+</li>
+<li><code>toilet=false</code><ul>
+<li>Toilet. A fixed bathroom feature connected to a sewer or septic system and consisting of a water-flushed bowl with a seat, as well as a device that elicites the water-flushing action. Used for the process and disposal of human waste.</li>
+</ul>
+</li>
+<li><code>toilet-exception=et</code><ul>
+<li>Toilet exception.</li>
+</ul>
+</li>
+<li><code>tv=true</code><ul>
+<li>TV. A television is available in the guestroom.</li>
+</ul>
+</li>
+<li><code>tv-casting=false</code><ul>
+<li>TV casting. A television equipped with a device through which the video entertainment accessed on a personal computer, phone or tablet can be wirelessly delivered to and viewed on the guestroom&#39;s television.</li>
+</ul>
+</li>
+<li><code>tv-casting-exception=sanctus</code><ul>
+<li>TV exception.</li>
+</ul>
+</li>
+<li><code>tv-exception=magna</code><ul>
+<li>TV exception.</li>
+</ul>
+</li>
+<li><code>tv-streaming=true</code><ul>
+<li>TV streaming. Televisions that embed a range of web-based apps to allow for watching media from those apps.</li>
+</ul>
+</li>
+<li><code>tv-streaming-exception=no</code><ul>
+<li>TV streaming exception.</li>
+</ul>
+</li>
+<li><code>universal-power-adapters=true</code><ul>
+<li>Universal power adapters. A power supply for electronic devices which plugs into a wall for the purpose of converting AC to a single DC voltage. Also know as AC adapter or charger.</li>
+</ul>
+</li>
+<li><code>universal-power-adapters-exception=dolores</code><ul>
+<li>Universal power adapters exception.</li>
+</ul>
+</li>
+<li><code>washer=false</code><ul>
+<li>Washer. An electrical machine connected to a running water source designed to launder clothing.</li>
+</ul>
+</li>
+<li>
+<p><code>washer-exception=sadipscing</code></p>
+<ul>
+<li>Washer exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..layout    balcony=true</code></p>
+<ul>
+<li>Balcony. An outdoor platform attached to a building and surrounded by a short wall, fence or other safety railing. The balcony is accessed through a door in a guestroom or suite and is for use by the guest staying in that room. May or may not include seating or outdoor furniture. Is not located on the ground floor. Also lanai.</li>
+</ul>
+</li>
+<li><code>balcony-exception=ut</code><ul>
+<li>Balcony exception.</li>
+</ul>
+</li>
+<li><code>living-area-sq-meters=0.9498854953081356</code><ul>
+<li>Living area sq meters. The measurement in meters of the area of a guestroom&#39;s living space.</li>
+</ul>
+</li>
+<li><code>living-area-sq-meters-exception=amet</code><ul>
+<li>Living area sq meters exception.</li>
+</ul>
+</li>
+<li><code>loft=false</code><ul>
+<li>Loft. A three-walled upper area accessed by stairs or a ladder that overlooks the lower area of a room.</li>
+</ul>
+</li>
+<li><code>loft-exception=ipsum</code><ul>
+<li>Loft exception.</li>
+</ul>
+</li>
+<li><code>non-smoking=true</code><ul>
+<li>Non smoking. A guestroom in which the smoking of cigarettes, cigars and pipes is prohibited.</li>
+</ul>
+</li>
+<li><code>non-smoking-exception=est</code><ul>
+<li>Non smoking exception.</li>
+</ul>
+</li>
+<li><code>patio=true</code><ul>
+<li>Patio. A paved, outdoor area with seating attached to and accessed through a ground-floor guestroom for use by the occupants of the guestroom.</li>
+</ul>
+</li>
+<li><code>patio-exception=nonumy</code><ul>
+<li>Patio exception.</li>
+</ul>
+</li>
+<li><code>stairs=false</code><ul>
+<li>Stairs. There are steps leading from one level or story to another in the unit.</li>
+</ul>
+</li>
+<li>
+<p><code>stairs-exception=et</code></p>
+<ul>
+<li>Stairs exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..sleeping    beds-count=19</code></p>
+<ul>
+<li>Beds count. The number of permanent beds present in a guestroom. Does not include rollaway beds, cribs or sofabeds.</li>
+</ul>
+</li>
+<li><code>beds-count-exception=-8</code><ul>
+<li>Beds count exception.</li>
+</ul>
+</li>
+<li><code>bunk-beds-count=21</code><ul>
+<li>Bunk beds count. The number of furniture pieces in which one framed mattress is fixed directly above another by means of a physical frame. This allows one person(s) to sleep in the bottom bunk and one person(s) to sleep in the top bunk. Also known as double decker bed.</li>
+</ul>
+</li>
+<li><code>bunk-beds-count-exception=-89</code><ul>
+<li>Bunk beds count exception.</li>
+</ul>
+</li>
+<li><code>cribs-count=67</code><ul>
+<li>Cribs count. The number of small beds for an infant or toddler that the guestroom can obtain. The bed is surrounded by a high railing to prevent the child from falling or climbing out of the bed</li>
+</ul>
+</li>
+<li><code>cribs-count-exception=-84</code><ul>
+<li>Cribs count exception.</li>
+</ul>
+</li>
+<li><code>double-beds-count=46</code><ul>
+<li>Double beds count. The number of medium beds measuring 53&#34;W x 75&#34;L (135cm x 191cm). Also known as full size bed.</li>
+</ul>
+</li>
+<li><code>double-beds-count-exception=-9</code><ul>
+<li>Double beds count exception.</li>
+</ul>
+</li>
+<li><code>feather-pillows=true</code><ul>
+<li>Feather pillows. The option for guests to obtain bed pillows that are stuffed with the feathers and down of ducks or geese.</li>
+</ul>
+</li>
+<li><code>feather-pillows-exception=ipsum</code><ul>
+<li>Feather pillows exception.</li>
+</ul>
+</li>
+<li><code>hypoallergenic-bedding=false</code><ul>
+<li>Hypoallergenic bedding. Bedding such as linens, pillows, mattress covers and/or mattresses that are made of materials known to be resistant to allergens such as mold, dust and dander.</li>
+</ul>
+</li>
+<li><code>hypoallergenic-bedding-exception=sed</code><ul>
+<li>Hypoallergenic bedding exception.</li>
+</ul>
+</li>
+<li><code>king-beds-count=80</code><ul>
+<li>King beds count. The number of large beds measuring 76&#34;W x 80&#34;L (193cm x 102cm). Most often meant to accompany two people. Includes California king and super king.</li>
+</ul>
+</li>
+<li><code>king-beds-count-exception=-67</code><ul>
+<li>King beds count exception.</li>
+</ul>
+</li>
+<li><code>memory-foam-pillows=true</code><ul>
+<li>Memory foam pillows. The option for guests to obtain bed pillows that are stuffed with a man-made foam that responds to body heat by conforming to the body closely, and then recovers its shape when the pillow cools down.</li>
+</ul>
+</li>
+<li><code>memory-foam-pillows-exception=dolores</code><ul>
+<li>Memory foam pillows exception.</li>
+</ul>
+</li>
+<li><code>other-beds-count=54</code><ul>
+<li>Other beds count. The number of beds that are not standard mattress and boxspring setups such as Japanese tatami mats, trundle beds, air mattresses and cots.</li>
+</ul>
+</li>
+<li><code>other-beds-count-exception=-98</code><ul>
+<li>Other beds count exception.</li>
+</ul>
+</li>
+<li><code>queen-beds-count=55</code><ul>
+<li>Queen beds count. The number of medium-large beds measuring 60&#34;W x 80&#34;L (152cm x 102cm).</li>
+</ul>
+</li>
+<li><code>queen-beds-count-exception=-13</code><ul>
+<li>Queen beds count exception.</li>
+</ul>
+</li>
+<li><code>roll-away-beds-count=24</code><ul>
+<li>Roll away beds count. The number of mattresses on wheeled frames that can be folded in half and rolled away for easy storage that the guestroom can obtain upon request.</li>
+</ul>
+</li>
+<li><code>roll-away-beds-count-exception=-66</code><ul>
+<li>Roll away beds count exception.</li>
+</ul>
+</li>
+<li><code>single-or-twin-beds-count=63</code><ul>
+<li>Single or twin count beds. The number of smaller beds measuring 38&#34;W x 75&#34;L (97cm x 191cm) that can accommodate one adult.</li>
+</ul>
+</li>
+<li><code>single-or-twin-beds-count-exception=-62</code><ul>
+<li>Single or twin beds count exception.</li>
+</ul>
+</li>
+<li><code>sofa-beds-count=88</code><ul>
+<li>Sofa beds count. The number of specially designed sofas that can be made to serve as a bed by lowering its hinged upholstered back to horizontal position or by pulling out a concealed mattress.</li>
+</ul>
+</li>
+<li><code>sofa-beds-count-exception=-68</code><ul>
+<li>Sofa beds count exception.</li>
+</ul>
+</li>
+<li><code>synthetic-pillows=true</code><ul>
+<li>Synthetic pillows. The option for guests to obtain bed pillows stuffed with polyester material crafted to reproduce the feel of a pillow stuffed with down and feathers.</li>
+</ul>
+</li>
+<li>
+<p><code>synthetic-pillows-exception=labore</code></p>
+<ul>
+<li>Synthetic pillows exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...views    beach-view=true</code></p>
+<ul>
+<li>Beach view. A guestroom that features a window through which guests can see the beach.</li>
+</ul>
+</li>
+<li><code>beach-view-exception=voluptua.</code><ul>
+<li>Beach view exception.</li>
+</ul>
+</li>
+<li><code>city-view=true</code><ul>
+<li>City view. A guestroom that features a window through which guests can see the buildings, parks and/or streets of the city.</li>
+</ul>
+</li>
+<li><code>city-view-exception=ut</code><ul>
+<li>City view exception.</li>
+</ul>
+</li>
+<li><code>garden-view=true</code><ul>
+<li>Garden view. A guestroom that features a window through which guests can see a garden.</li>
+</ul>
+</li>
+<li><code>garden-view-exception=invidunt</code><ul>
+<li>Garden view exception.</li>
+</ul>
+</li>
+<li><code>lake-view=true</code><ul>
+<li>Lake view.</li>
+</ul>
+</li>
+<li><code>lake-view-exception=et</code><ul>
+<li>Lake view exception.</li>
+</ul>
+</li>
+<li><code>landmark-view=true</code><ul>
+<li>Landmark view. A guestroom that features a window through which guests can see a landmark such as the countryside, a golf course, the forest, a park, a rain forst, a mountain or a slope.</li>
+</ul>
+</li>
+<li><code>landmark-view-exception=lorem</code><ul>
+<li>Landmark view exception.</li>
+</ul>
+</li>
+<li><code>ocean-view=true</code><ul>
+<li>Ocean view. A guestroom that features a window through which guests can see the ocean.</li>
+</ul>
+</li>
+<li><code>ocean-view-exception=sadipscing</code><ul>
+<li>Ocean view exception.</li>
+</ul>
+</li>
+<li><code>pool-view=false</code><ul>
+<li>Pool view. A guestroom that features a window through which guests can see the hotel&#39;s swimming pool.</li>
+</ul>
+</li>
+<li><code>pool-view-exception=labore</code><ul>
+<li>Pool view exception.</li>
+</ul>
+</li>
+<li><code>valley-view=true</code><ul>
+<li>Valley view. A guestroom that features a window through which guests can see over a valley.</li>
+</ul>
+</li>
+<li>
+<p><code>valley-view-exception=dolor</code></p>
+<ul>
+<li>Valley view exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...sustainability.energy-efficiency    carbon-free-energy-sources=false</code></p>
+<ul>
+<li>Carbon free energy sources. Property sources carbon-free electricity via at least one of the following methods: on-site clean energy generation, power purchase agreement(s) with clean energy generators, green power provided by electricity supplier, or purchases of Energy Attribute Certificates (such as Renewable Energy Certificates or Guarantees of Origin).</li>
+</ul>
+</li>
+<li><code>carbon-free-energy-sources-exception=duo</code><ul>
+<li>Carbon free energy sources exception.</li>
+</ul>
+</li>
+<li><code>energy-conservation-program=true</code><ul>
+<li>Energy conservation program. The property tracks corporate-level Scope 1 and 2 GHG emissions, and Scope 3 emissions if available. The property has a commitment to implement initiatives that reduce GHG emissions year over year. The property has shown an absolute reduction in emissions for at least 2 years. Emissions are either verfied by a third-party and/or published in external communications.</li>
+</ul>
+</li>
+<li><code>energy-conservation-program-exception=tempor</code><ul>
+<li>Energy conservation program exception.</li>
+</ul>
+</li>
+<li><code>energy-efficient-heating-and-cooling-systems=false</code><ul>
+<li>Energy efficient heating and cooling systems. The property doesn&#39;t use chlorofluorocarbon (CFC)-based refrigerants in heating, ventilating, and air-conditioning systems unless a third-party audit shows it&#39;s not economically feasible. The CFC-based refrigerants which are used should have a Global Warming Potential (GWP) ≤ 10. The property uses occupancy sensors on HVAC systems in back-of-house spaces, meeting rooms, and other low-traffic areas.</li>
+</ul>
+</li>
+<li><code>energy-efficient-heating-and-cooling-systems-exception=ea</code><ul>
+<li>Energy efficient heating and cooling systems exception.</li>
+</ul>
+</li>
+<li><code>energy-efficient-lighting=false</code><ul>
+<li>Energy efficient lighting. At least 75% of the property&#39;s lighting is energy efficient, using lighting that is more than 45 lumens per watt – typically LED or CFL lightbulbs.</li>
+</ul>
+</li>
+<li><code>energy-efficient-lighting-exception=ipsum</code><ul>
+<li>Energy efficient lighting exception.</li>
+</ul>
+</li>
+<li><code>energy-saving-thermostats=true</code><ul>
+<li>Energy saving thermostats. The property installed energy-saving thermostats throughout the building to conserve energy when rooms or areas are not in use. Energy-saving thermostats are devices that control heating/cooling in the building by learning temperature preferences and automatically adjusting to energy-saving temperatures as the default. The thermostats are automatically set to a temperature between 68-78 degrees F (20-26 °C), depending on seasonality. In the winter, set the thermostat to 68°F (20°C) when the room is occupied, lowering room temperature when unoccupied. In the summer, set the thermostat to 78°F (26°C) when the room is occupied.</li>
+</ul>
+</li>
+<li><code>energy-saving-thermostats-exception=kasd</code><ul>
+<li>Energy saving thermostats exception.</li>
+</ul>
+</li>
+<li><code>green-building-design=false</code><ul>
+<li>Output only. Green building design. True if BREEAM-<em> or LEED-</em> certified.</li>
+</ul>
+</li>
+<li><code>green-building-design-exception=ea</code><ul>
+<li>Output only. Green building design exception.</li>
+</ul>
+</li>
+<li><code>independent-organization-audits-energy-use=true</code><ul>
+<li>Independent organization audits energy use. The property conducts an energy audit at least every 5 years, the results of which are either verified by a third-party and/or published in external communications. An energy audit is a detailed assessment of the facility which provides recommendations to existing operations and procedures to improve energy efficiency, available incentives or rebates,and opportunities for improvements through renovations or upgrades. Examples of organizations that conduct credible third party audits include: Engie Impact, DNV GL (EU), Dexma, and local utility providers (they often provide energy and water audits).</li>
+</ul>
+</li>
+<li>
+<p><code>independent-organization-audits-energy-use-exception=lorem</code></p>
+<ul>
+<li>Independent organization audits energy use exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..sustainability-certifications    breeam-certification=sed</code></p>
+<ul>
+<li>BREEAM certification.</li>
+</ul>
+</li>
+<li><code>breeam-certification-exception=takimata</code><ul>
+<li>BREEAM certification exception.</li>
+</ul>
+</li>
+<li><code>leed-certification=voluptua.</code><ul>
+<li>LEED certification.</li>
+</ul>
+</li>
+<li>
+<p><code>leed-certification-exception=justo</code></p>
+<ul>
+<li>LEED certification exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..sustainable-sourcing    eco-friendly-toiletries=true</code></p>
+<ul>
+<li>Eco friendly toiletries. Soap, shampoo, lotion, and other toiletries provided for guests have a nationally or internationally recognized sustainability certification, such as USDA Organic, EU Organic, or cruelty-free.</li>
+</ul>
+</li>
+<li><code>eco-friendly-toiletries-exception=justo</code><ul>
+<li>Eco friendly toiletries exception.</li>
+</ul>
+</li>
+<li><code>locally-sourced-food-and-beverages=true</code><ul>
+<li>Locally sourced food and beverages. Property sources locally in order to lower the environmental footprint from reduced transportation and to stimulate the local economy. Products produced less than 62 miles from the establishment are normally considered as locally produced.</li>
+</ul>
+</li>
+<li><code>locally-sourced-food-and-beverages-exception=sea</code><ul>
+<li>Locally sourced food and beverages exception.</li>
+</ul>
+</li>
+<li><code>organic-cage-free-eggs=false</code><ul>
+<li>Organic cage free eggs. The property sources 100% certified organic and cage-free eggs (shell, liquid, and egg products). Cage-free means hens are able to walk, spread their wings and lay their eggs in nests).</li>
+</ul>
+</li>
+<li><code>organic-cage-free-eggs-exception=ipsum</code><ul>
+<li>Organic cage free eggs exception.</li>
+</ul>
+</li>
+<li><code>organic-food-and-beverages=true</code><ul>
+<li>Organic food and beverages. At least 25% of food and beverages, by spend, are certified organic. Organic means products that are certified to one of the organic standard listed in the IFOAM family of standards. Qualifying certifications include USDA Organic and EU Organic, among others.</li>
+</ul>
+</li>
+<li><code>organic-food-and-beverages-exception=elitr</code><ul>
+<li>Organic food and beverages exception.</li>
+</ul>
+</li>
+<li><code>responsible-purchasing-policy=false</code><ul>
+<li>Responsible purchasing policy. The property has a responsible procurement policy in place. Responsible means integration of social, ethical, and/or environmental performance factors into the procurement process when selecting suppliers.</li>
+</ul>
+</li>
+<li><code>responsible-purchasing-policy-exception=amet.</code><ul>
+<li>Responsible purchasing policy exception.</li>
+</ul>
+</li>
+<li><code>responsibly-sources-seafood=true</code><ul>
+<li>Responsibly sources seafood. The property does not source seafood from the Monterey Bay Aquarium Seafood Watch &#34;avoid&#34; list, and must sustainably source seafood listed as &#34;good alternative,&#34; &#34;eco-certified,&#34; and &#34;best choice&#34;. The property has a policy outlining a commitment to source Marine Stewardship Council (MSC) and/or Aquaculture Stewardship Council (ASC) Chain of Custody certified seafood.</li>
+</ul>
+</li>
+<li><code>responsibly-sources-seafood-exception=justo</code><ul>
+<li>Responsibly sources seafood exception.</li>
+</ul>
+</li>
+<li><code>vegan-meals=true</code><ul>
+<li>Vegan meals. The property provides vegan menu options for guests. Vegan food does not contain animal products or byproducts.</li>
+</ul>
+</li>
+<li><code>vegan-meals-exception=at</code><ul>
+<li>Vegan meals exception.</li>
+</ul>
+</li>
+<li><code>vegetarian-meals=true</code><ul>
+<li>Vegetarian meals. The property provides vegetarian menu options for guests. Vegetarian food does not contain meat, poultry, fish, or seafood.</li>
+</ul>
+</li>
+<li>
+<p><code>vegetarian-meals-exception=et</code></p>
+<ul>
+<li>Vegetarian meals exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..waste-reduction    compostable-food-containers-and-cutlery=false</code></p>
+<ul>
+<li>Compostable food containers and cutlery. 100% of food service containers and to-go cutlery are compostable, and reusable utensils are offered wherever possible. Compostable materials are capable of undergoing biological decomposition in a compost site, such that material is not visually distinguishable and breaks down into carbon dioxide, water, inorganic compounds, and biomass.</li>
+</ul>
+</li>
+<li><code>compostable-food-containers-and-cutlery-exception=lorem</code><ul>
+<li>Compostable food containers and cutlery exception.</li>
+</ul>
+</li>
+<li><code>composts-excess-food=false</code><ul>
+<li>Composts excess food. The property has a program and/or policy for diverting waste from landfill by composting food and yard waste, either through compost collection and off-site processing or on-site compost processing.</li>
+</ul>
+</li>
+<li><code>composts-excess-food-exception=lorem</code><ul>
+<li>Composts excess food exception.</li>
+</ul>
+</li>
+<li><code>donates-excess-food=true</code><ul>
+<li>Donates excess food. The property has a program and/or policy for diverting waste from landfill that may include efforts to donate for human consumption or divert food for animal feed.</li>
+</ul>
+</li>
+<li><code>donates-excess-food-exception=eos</code><ul>
+<li>Donates excess food exception.</li>
+</ul>
+</li>
+<li><code>food-waste-reduction-program=false</code><ul>
+<li>Food waste reduction program. The property has established a food waste reduction and donation program, aiming to reduce food waste by half. These programs typically use tools such as the Hotel Kitchen Toolkit and others to track waste and measure progress.</li>
+</ul>
+</li>
+<li><code>food-waste-reduction-program-exception=stet</code><ul>
+<li>Food waste reduction program exception.</li>
+</ul>
+</li>
+<li><code>no-single-use-plastic-straws=true</code><ul>
+<li>No single use plastic straws. The property bans single-use plastic straws.</li>
+</ul>
+</li>
+<li><code>no-single-use-plastic-straws-exception=stet</code><ul>
+<li>No single use plastic straws exception.</li>
+</ul>
+</li>
+<li><code>no-single-use-plastic-water-bottles=true</code><ul>
+<li>No single use plastic water bottles. The property bans single-use plastic water bottles.</li>
+</ul>
+</li>
+<li><code>no-single-use-plastic-water-bottles-exception=ea</code><ul>
+<li>No single use plastic water bottles exception.</li>
+</ul>
+</li>
+<li><code>no-styrofoam-food-containers=true</code><ul>
+<li>No styrofoam food containers. The property eliminates the use of Styrofoam in disposable food service items.</li>
+</ul>
+</li>
+<li><code>no-styrofoam-food-containers-exception=ea</code><ul>
+<li>No styrofoam food containers exception.</li>
+</ul>
+</li>
+<li><code>recycling-program=false</code><ul>
+<li>Recycling program. The property has a recycling program, aligned with LEED waste requirements, and a policy outlining efforts to send less than 50% of waste to landfill. The recycling program includes storage locations for recyclable materials, including mixed paper, corrugated cardboard, glass, plastics, and metals.</li>
+</ul>
+</li>
+<li><code>recycling-program-exception=dolores</code><ul>
+<li>Recycling program exception.</li>
+</ul>
+</li>
+<li><code>refillable-toiletry-containers=true</code><ul>
+<li>Refillable toiletry containers. The property has replaced miniature individual containers with refillable amenity dispensers for shampoo, conditioner, soap, and lotion.</li>
+</ul>
+</li>
+<li><code>refillable-toiletry-containers-exception=stet</code><ul>
+<li>Refillable toiletry containers exception.</li>
+</ul>
+</li>
+<li><code>safely-disposes-batteries=true</code><ul>
+<li>Safely disposes batteries. The property safely stores and disposes batteries.</li>
+</ul>
+</li>
+<li><code>safely-disposes-batteries-exception=sit</code><ul>
+<li>Safely disposes batteries exception.</li>
+</ul>
+</li>
+<li><code>safely-disposes-electronics=false</code><ul>
+<li>Safely disposes electronics. The property has a reputable recycling program that keeps hazardous electronic parts and chemical compounds out of landfills, dumps and other unauthorized abandonment sites, and recycles/reuses applicable materials. (e.g. certified electronics recyclers).</li>
+</ul>
+</li>
+<li><code>safely-disposes-electronics-exception=et</code><ul>
+<li>Safely disposes electronics exception.</li>
+</ul>
+</li>
+<li><code>safely-disposes-lightbulbs=true</code><ul>
+<li>Safely disposes lightbulbs. The property safely stores and disposes lightbulbs.</li>
+</ul>
+</li>
+<li><code>safely-disposes-lightbulbs-exception=sit</code><ul>
+<li>Safely disposes lightbulbs exception.</li>
+</ul>
+</li>
+<li><code>safely-handles-hazardous-substances=false</code><ul>
+<li>Safely handles hazardous substances. The property has a hazardous waste management program aligned wit GreenSeal and LEED requirements, and meets all regulatory requirements for hazardous waste disposal and recycling. Hazardous means substances that are classified as &#34;hazardous&#34; by an authoritative body (such as OSHA or DOT), are labeled with signal words such as &#34;Danger,&#34; &#34;Caution,&#34; &#34;Warning,&#34; or are flammable, corrosive, or ignitable. Requirements include: - The property shall maintain records of the efforts it has made to replace the hazardous substances it uses with less hazardous alternatives. - An inventory of the hazardous materials stored on-site. - Products intended for cleaning, dishwashing, laundry, and pool maintenance shall be stored in clearly labeled containers. These containers shall be checked regularly for leaks, and replaced a necessary. - Spill containment devices shall be installed to collect spills, drips, or leaching of chemicals.</li>
+</ul>
+</li>
+<li><code>safely-handles-hazardous-substances-exception=sea</code><ul>
+<li>Safely handles hazardous substances exception.</li>
+</ul>
+</li>
+<li><code>soap-donation-program=false</code><ul>
+<li>Soap donation program. The property participates in a soap donation program such as Clean the World or something similar.</li>
+</ul>
+</li>
+<li><code>soap-donation-program-exception=justo</code><ul>
+<li>Soap donation program exception.</li>
+</ul>
+</li>
+<li><code>toiletry-donation-program=false</code><ul>
+<li>Toiletry donation program. The property participates in a toiletry donation program such as Clean the World or something similar.</li>
+</ul>
+</li>
+<li><code>toiletry-donation-program-exception=eirmod</code><ul>
+<li>Toiletry donation program exception.</li>
+</ul>
+</li>
+<li><code>water-bottle-filling-stations=false</code><ul>
+<li>Water bottle filling stations. The property offers water stations throughout the building for guest use.</li>
+</ul>
+</li>
+<li>
+<p><code>water-bottle-filling-stations-exception=invidunt</code></p>
+<ul>
+<li>Water bottle filling stations exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..water-conservation    independent-organization-audits-water-use=false</code></p>
+<ul>
+<li>Independent organization audits water use. The property conducts a water conservation audit every 5 years, the results of which are either verified by a third-party and/or published in external communications. A water conservation audit is a detailed assessment of the facility, providing recommendations to existing operations and procedures to improve water efficiency, available incentives or rebates, and opportunities for improvements through renovations or upgrades. Examples of organizations who conduct credible third party audits include: Engie Impact, and local utility providers (they often provide energy and water audits).</li>
+</ul>
+</li>
+<li><code>independent-organization-audits-water-use-exception=sea</code><ul>
+<li>Independent organization audits water use exception.</li>
+</ul>
+</li>
+<li><code>linen-reuse-program=true</code><ul>
+<li>Linen reuse program. The property offers a linen reuse program.</li>
+</ul>
+</li>
+<li><code>linen-reuse-program-exception=dolor</code><ul>
+<li>Linen reuse program exception.</li>
+</ul>
+</li>
+<li><code>towel-reuse-program=false</code><ul>
+<li>Towel reuse program. The property offers a towel reuse program.</li>
+</ul>
+</li>
+<li><code>towel-reuse-program-exception=et</code><ul>
+<li>Towel reuse program exception.</li>
+</ul>
+</li>
+<li><code>water-saving-showers=false</code><ul>
+<li>Water saving showers. All of the property&#39;s guest rooms have shower heads that use no more than 2.0 gallons per minute (gpm).</li>
+</ul>
+</li>
+<li><code>water-saving-showers-exception=duo</code><ul>
+<li>Water saving showers exception.</li>
+</ul>
+</li>
+<li><code>water-saving-sinks=false</code><ul>
+<li>Water saving sinks. All of the property&#39;s guest rooms have bathroom faucets that use a maximum of 1.5 gallons per minute (gpm), public restroom faucets do not exceed 0.5 gpm, and kitchen faucets (excluding faucets used exclusively for filling operations) do not exceed 2.2 gpm.</li>
+</ul>
+</li>
+<li><code>water-saving-sinks-exception=voluptua.</code><ul>
+<li>Water saving sinks exception.</li>
+</ul>
+</li>
+<li><code>water-saving-toilets=true</code><ul>
+<li>Water saving toilets. All of the property&#39;s toilets use 1.6 gallons per flush, or less.</li>
+</ul>
+</li>
+<li>
+<p><code>water-saving-toilets-exception=voluptua.</code></p>
+<ul>
+<li>Water saving toilets exception.</li>
+</ul>
+</li>
+<li>
+<p><code>...transportation    airport-shuttle=true</code></p>
+<ul>
+<li>Airport shuttle. The hotel provides guests with a chauffeured van or bus to and from the airport. Can be free or for a fee. Guests may share the vehicle with other guests unknown to them. Applies if the hotel has a third-party shuttle service (office/desk etc.) within the hotel. As long as hotel provides this service, it doesn&#39;t matter if it&#39;s directly with them or a third party they work with. Does not apply if guest has to coordinate with an entity outside/other than the hotel.</li>
+</ul>
+</li>
+<li><code>airport-shuttle-exception=takimata</code><ul>
+<li>Airport shuttle exception.</li>
+</ul>
+</li>
+<li><code>car-rental-on-property=false</code><ul>
+<li>Car rental on property. A branch of a rental car company with a processing desk in the hotel. Available cars for rent may be awaiting at the hotel or in a nearby lot.</li>
+</ul>
+</li>
+<li><code>car-rental-on-property-exception=no</code><ul>
+<li>Car rental on property exception.</li>
+</ul>
+</li>
+<li><code>free-airport-shuttle=true</code><ul>
+<li>Free airport shuttle. Airport shuttle is free to guests. Must be free to all guests without any conditions.</li>
+</ul>
+</li>
+<li><code>free-airport-shuttle-exception=ut</code><ul>
+<li>Free airport shuttle exception.</li>
+</ul>
+</li>
+<li><code>free-private-car-service=true</code><ul>
+<li>Free private car service. Private chauffeured car service is free to guests.</li>
+</ul>
+</li>
+<li><code>free-private-car-service-exception=lorem</code><ul>
+<li>Free private car service exception.</li>
+</ul>
+</li>
+<li><code>local-shuttle=false</code><ul>
+<li>Local shuttle. A car, van or bus provided by the hotel to transport guests to destinations within a specified range of distance around the hotel. Usually shopping and/or convention centers, downtown districts, or beaches. Can be free or for a fee.</li>
+</ul>
+</li>
+<li><code>local-shuttle-exception=sed</code><ul>
+<li>Local shuttle exception.</li>
+</ul>
+</li>
+<li><code>private-car-service=true</code><ul>
+<li>Private car service. Hotel provides a private chauffeured car to transport guests to destinations. Passengers in the car are either alone or are known to one another and have requested the car together. Service can be free or for a fee and travel distance is usually limited to a specific range. Not a taxi.</li>
+</ul>
+</li>
+<li><code>private-car-service-exception=eirmod</code><ul>
+<li>Private car service exception.</li>
+</ul>
+</li>
+<li><code>transfer=true</code><ul>
+<li>Transfer. Hotel provides a shuttle service or car service to take guests to and from the nearest airport or train station. Can be free or for a fee. Guests may share the vehicle with other guests unknown to them.</li>
+</ul>
+</li>
+<li>
+<p><code>transfer-exception=no</code></p>
+<ul>
+<li>Transfer exception.</li>
+</ul>
+</li>
+<li>
+<p><code>..wellness    doctor-on-call=true</code></p>
+<ul>
+<li>Doctor on call. The hotel has a contract with a medical professional who provides services to hotel guests should they fall ill during their stay. The doctor may or may not have an on-site office or be at the hotel at all times.</li>
+</ul>
+</li>
+<li><code>doctor-on-call-exception=stet</code><ul>
+<li>Doctor on call exception.</li>
+</ul>
+</li>
+<li><code>elliptical-machine=false</code><ul>
+<li>Elliptical machine. An electric, stationary fitness machine with pedals that simulates climbing, walking or running and provides a user-controlled range of speeds and tensions. May not have arm-controlled levers to work out the upper body as well. Commonly found in a gym, fitness room, health center, or health club.</li>
+</ul>
+</li>
+<li><code>elliptical-machine-exception=lorem</code><ul>
+<li>Elliptical machine exception.</li>
+</ul>
+</li>
+<li><code>fitness-center=false</code><ul>
+<li>Fitness center. A room or building at the hotel containing equipment to promote physical activity, such as treadmills, elliptical machines, stationary bikes, weight machines, free weights, and/or stretching mats. Use of the fitness center can be free or for a fee. May or may not be staffed. May or may not offer instructor-led classes in various styles of physical conditioning. May or may not be open 24/7. May or may not include locker rooms and showers. Also known as health club, gym, fitness room, health center.</li>
+</ul>
+</li>
+<li><code>fitness-center-exception=nonumy</code><ul>
+<li>Fitness center exception.</li>
+</ul>
+</li>
+<li><code>free-fitness-center=true</code><ul>
+<li>Free fitness center. Guests may use the fitness center for free.</li>
+</ul>
+</li>
+<li><code>free-fitness-center-exception=et</code><ul>
+<li>Free fitness center exception.</li>
+</ul>
+</li>
+<li><code>free-weights=true</code><ul>
+<li>Free weights. Individual handheld fitness equipment of varied weights used for upper body strength training or bodybuilding. Also known as barbells, dumbbells, or kettlebells. Often stored on a rack with the weights arranged from light to heavy. Commonly found in a gym, fitness room, health center, or health club.</li>
+</ul>
+</li>
+<li><code>free-weights-exception=et</code><ul>
+<li>Free weights exception.</li>
+</ul>
+</li>
+<li><code>massage=false</code><ul>
+<li>Massage. A service provided by a trained massage therapist involving the physical manipulation of a guest&#39;s muscles in order to achieve relaxation or pain relief.</li>
+</ul>
+</li>
+<li><code>massage-exception=elitr</code><ul>
+<li>Massage exception.</li>
+</ul>
+</li>
+<li><code>salon=true</code><ul>
+<li>Salon. A room at the hotel where professionals provide hair styling services such as shampooing, blow drying, hair dos, hair cutting and hair coloring. Also known as hairdresser or beauty salon.</li>
+</ul>
+</li>
+<li><code>salon-exception=dolor</code><ul>
+<li>Salon exception.</li>
+</ul>
+</li>
+<li><code>sauna=true</code><ul>
+<li>Sauna. A wood-paneled room heated to a high temperature where guests sit on built-in wood benches for the purpose of perspiring and relaxing their muscles. Can be dry or slightly wet heat. Not a steam room.</li>
+</ul>
+</li>
+<li><code>sauna-exception=est</code><ul>
+<li>Sauna exception.</li>
+</ul>
+</li>
+<li><code>spa=true</code><ul>
+<li>Spa. A designated area, room or building at the hotel offering health and beauty treatment through such means as steam baths, exercise equipment, and massage. May also offer facials, nail care, and hair care. Services are usually available by appointment and for an additional fee. Does not apply if hotel only offers a steam room; must offer other beauty and/or health treatments as well.</li>
+</ul>
+</li>
+<li><code>spa-exception=duo</code><ul>
+<li>Spa exception.</li>
+</ul>
+</li>
+<li><code>treadmill=false</code><ul>
+<li>Treadmill. An electric stationary fitness machine that simulates a moving path to promote walking or running within a range of user-controlled speeds and inclines. Also known as running machine. Commonly found in a gym, fitness room, health center, or health club.</li>
+</ul>
+</li>
+<li><code>treadmill-exception=invidunt</code><ul>
+<li>Treadmill exception.</li>
+</ul>
+</li>
+<li><code>weight-machine=true</code><ul>
+<li>Weight machine. Non-electronic fitness equipment designed for the user to target the exertion of different muscles. Usually incorporates a padded seat, a stack of flat weights and various bars and pulleys. May be designed for toning a specific part of the body or may involve different user-controlled settings, hardware and pulleys so as to provide an overall workout in one machine. Commonly found in a gym, fitness center, fitness room, or health club.</li>
+</ul>
+</li>
+<li><code>weight-machine-exception=tempor</code><ul>
+<li>Weight machine exception.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p update-mask=string</strong><ul>
+<li>Required. The specific fields to update. Use &#34;*&#34; to update all fields, which may include unsetting empty fields in the request. Repeated field items cannot be individually updated.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../locations_lodging-get-google-updated" class="btn btn-neutral" title="Lodging Get Google Updated"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../locations_lodging-get-google-updated" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

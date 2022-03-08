@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Game Server Deployments Configs List - Game Services v2.0.4+20210312</title>
+  <title>Locations Game Server Deployments Configs List - Game Services v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Game Services v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Game Services v3.0.0+20220223</a>
         
       </div>
 
@@ -287,7 +287,7 @@ You can set the scope for this method like this: <code>gameservices1 --scope &lt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The parent resource name, in the following form: <code>projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/*</code>.</li>
+<li>Required. The parent resource name, in the following form: <code>projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/configs/*</code>.</li>
 </ul>
 </li>
 </ul>
@@ -310,19 +310,19 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Optional. The filter to apply to list results.</li>
+<li>Optional. The filter to apply to list results (see <a href="https://google.aip.dev/160">Filtering</a>).</li>
 </ul>
 </li>
 <li>
 <p><strong>-p order-by=string</strong></p>
 <ul>
-<li>Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.</li>
+<li>Optional. Specifies the ordering of results following <a href="https://cloud.google.com/apis/design/design_patterns#sorting_order">Cloud API syntax</a>.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>Optional. The maximum number of items to return. If unspecified, server will pick an appropriate default. Server may return fewer items than requested. A caller should only rely on response&#39;s next_page_token to determine if there are more GameServerConfigs left to be queried.</li>
+<li>Optional. The maximum number of items to return. If unspecified, the server picks an appropriate default. The server may return fewer items than requested. A caller should only rely on response&#39;s next_page_token to determine if there are more GameServerConfigs left to be queried.</li>
 </ul>
 </li>
 <li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Instances Tables Restore - Bigtable Admin v2.0.4+20210323</title>
+  <title>Instances Tables Restore - Bigtable Admin v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Bigtable Admin v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Bigtable Admin v3.0.0+20220222</a>
         
       </div>
 
@@ -152,6 +152,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_instances-clusters-list">Instances Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-clusters-partial-update-cluster">Instances Clusters Partial Update Cluster</a>
                     
                 </li>
             
@@ -332,7 +337,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Create a new table by restoring from a completed backup. The new table must be in the same instance as the instance containing the backup. The returned table long-running operation can be used to track the progress of the operation, and to cancel it. The metadata field type is RestoreTableMetadata. The response type is Table, if successful.</p>
+              <p>Create a new table by restoring from a completed backup. The new table must be in the same project as the instance containing the backup. The returned table long-running operation can be used to track the progress of the operation, and to cancel it. The metadata field type is RestoreTableMetadata. The response type is Table, if successful.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -347,7 +352,7 @@ You can set the scope for this method like this: <code>bigtableadmin2 --scope &l
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The name of the instance in which to create the restored table. This instance must be the parent of the source backup. Values are of the form <code>projects//instances/</code>.</li>
+<li>Required. The name of the instance in which to create the restored table. This instance must be in the same project as the source backup. Values are of the form <code>projects//instances/</code>.</li>
 </ul>
 </li>
 </ul>
@@ -363,11 +368,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    backup=et</code><ul>
+<li><code>-r .    backup=no</code><ul>
 <li>Name of the backup from which to restore. Values are of the form <code>projects//instances//clusters//backups/</code>.</li>
 </ul>
 </li>
-<li><code>table-id=erat</code><ul>
+<li><code>table-id=est</code><ul>
 <li>Required. The id of the table to create and restore to. This table must not already exist. The <code>table_id</code> appended to <code>parent</code> forms the full table name of the form <code>projects//instances//tables/</code>.</li>
 </ul>
 </li>

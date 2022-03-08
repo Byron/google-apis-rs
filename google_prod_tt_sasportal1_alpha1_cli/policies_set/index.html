@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Set - SAS Portal Testing v2.0.4+20210330</title>
+  <title>Set - SAS Portal Testing v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SAS Portal Testing v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> SAS Portal Testing v3.0.0+20220303</a>
         
       </div>
 
@@ -517,6 +517,7 @@ You can set the scope for this method like this: <code>prod-tt-sasportal1-alpha1
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>SasPortalSetPolicyRequest:
+  disable-notification: boolean
   policy:
     etag: string
   resource: string
@@ -525,14 +526,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
+<li><code>-r .    disable-notification=true</code><ul>
+<li>Optional. Set the field as true when we would like to disable the onboarding notification.</li>
+</ul>
+</li>
 <li>
-<p><code>-r .policy    etag=sit</code></p>
+<p><code>policy    etag=et</code></p>
 <ul>
 <li>The etag is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the etag in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An etag is returned in the response to GetPolicy, and systems are expected to put that etag in the request to SetPolicy to ensure that their change will be applied to the same version of the policy. If no etag is provided in the call to GetPolicy, then the existing policy is overwritten blindly.</li>
 </ul>
 </li>
 <li>
-<p><code>..    resource=lorem</code></p>
+<p><code>..    resource=dolor</code></p>
 <ul>
 <li>Required. The resource for which the policy is being specified. This policy replaces any existing policy.</li>
 </ul>

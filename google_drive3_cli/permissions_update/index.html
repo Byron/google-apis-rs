@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - drive v2.0.4+20210322</title>
+  <title>Update - drive v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
         
       </div>
 
@@ -421,6 +421,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   expiration-time: string
   id: string
   kind: string
+  pending-owner: boolean
   photo-link: string
   role: string
   type: string
@@ -434,11 +435,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the permission allows the file to be discovered through search. This is only applicable for permissions of type domain or anyone.</li>
 </ul>
 </li>
-<li><code>deleted=true</code><ul>
+<li><code>deleted=false</code><ul>
 <li>Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
 </ul>
 </li>
-<li><code>display-name=dolores</code><ul>
+<li><code>display-name=dolore</code><ul>
 <li>The &#34;pretty&#34; name of the value of the permission. The following is a list of examples for each type of permission:  <ul>
 <li>user - User&#39;s full name, as defined for their Google account, such as &#34;Joe Smith.&#34; </li>
 <li>group - Name of the Google Group, such as &#34;The Company Administrators.&#34; </li>
@@ -448,15 +449,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>domain=elitr</code><ul>
+<li><code>domain=eirmod</code><ul>
 <li>The domain to which this permission refers.</li>
 </ul>
 </li>
-<li><code>email-address=diam</code><ul>
+<li><code>email-address=lorem</code><ul>
 <li>The email address of the user or group to which this permission refers.</li>
 </ul>
 </li>
-<li><code>expiration-time=sed</code><ul>
+<li><code>expiration-time=ut</code><ul>
 <li>The time at which this permission will expire (RFC 3339 date-time). Expiration times have the following restrictions:  <ul>
 <li>They can only be set on user and group permissions </li>
 <li>The time must be in the future </li>
@@ -465,15 +466,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>id=lorem</code><ul>
+<li><code>id=est</code><ul>
 <li>The ID of this permission. This is a unique identifier for the grantee, and is published in User resources as permissionId. IDs should be treated as opaque values.</li>
 </ul>
 </li>
-<li><code>kind=magna</code><ul>
+<li><code>kind=sadipscing</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;drive#permission&#34;.</li>
 </ul>
 </li>
-<li><code>photo-link=duo</code><ul>
+<li><code>pending-owner=false</code><ul>
+<li>Whether the account associated with this permission is a pending owner. Only populated for user type permissions for files that are not in a shared drive.</li>
+</ul>
+</li>
+<li><code>photo-link=amet.</code><ul>
 <li>A link to the user&#39;s profile photo, if available.</li>
 </ul>
 </li>
@@ -489,7 +494,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>type=no</code><ul>
+<li><code>type=ut</code><ul>
 <li>The type of the grantee. Valid values are:  <ul>
 <li>user </li>
 <li>group </li>
@@ -499,7 +504,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>view=sadipscing</code><ul>
+<li><code>view=et</code><ul>
 <li>Indicates the view for this permission. Only populated for permissions that belong to a view. published is the only supported value.</li>
 </ul>
 </li>
@@ -549,7 +554,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p transfer-ownership=boolean</strong></p>
 <ul>
-<li>Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.</li>
+<li>Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect. File owners can only transfer ownership of files existing on My Drive. Files existing in a shared drive are owned by the organization that owns that shared drive. Ownership transfers are not supported for files and folders in shared drives. Organizers of a shared drive can move items from that shared drive into their My Drive which transfers the ownership to them.</li>
 </ul>
 </li>
 <li>

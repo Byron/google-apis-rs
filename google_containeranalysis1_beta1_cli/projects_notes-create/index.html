@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Notes Create - Container Analysis v2.0.4+20210326</title>
+  <title>Notes Create - Container Analysis v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container Analysis v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Container Analysis v3.0.0+20220225</a>
         
       </div>
 
@@ -273,7 +273,35 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   package:
     name: string
   related-note-names: [string]
+  sbom:
+    data-licence: string
+    spdx-version: string
   short-description: string
+  spdx-file:
+    checksum: [string]
+    file-type: string
+    title: string
+  spdx-package:
+    analyzed: boolean
+    attribution: string
+    checksum: string
+    copyright: string
+    detailed-description: string
+    download-location: string
+    files-license-info: [string]
+    home-page: string
+    license-declared:
+      comments: string
+      expression: string
+    originator: string
+    package-type: string
+    summary-description: string
+    supplier: string
+    title: string
+    verification-code: string
+    version: string
+  spdx-relationship:
+    type: string
   update-time: string
   vulnerability:
     cvss-score: number
@@ -416,71 +444,183 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>short-description=duo</code><ul>
+<li><code>sbom    data-licence=duo</code><ul>
+<li>Compliance with the SPDX specification includes populating the SPDX fields therein with data related to such fields (&#34;SPDX-Metadata&#34;)</li>
+</ul>
+</li>
+<li>
+<p><code>spdx-version=ipsum</code></p>
+<ul>
+<li>Provide a reference number that can be used to understand how to parse and interpret the rest of the file</li>
+</ul>
+</li>
+<li>
+<p><code>..    short-description=sed</code></p>
+<ul>
 <li>A one sentence description of this note.</li>
 </ul>
 </li>
-<li><code>update-time=ipsum</code><ul>
+<li><code>spdx-file    checksum=ut</code><ul>
+<li>Provide a unique identifier to match analysis information on each specific file in a package</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>file-type=gubergren</code><ul>
+<li>This field provides information about the type of file identified</li>
+</ul>
+</li>
+<li>
+<p><code>title=rebum.</code></p>
+<ul>
+<li>Identify the full path and filename that corresponds to the file information in this section</li>
+</ul>
+</li>
+<li>
+<p><code>..spdx-package    analyzed=true</code></p>
+<ul>
+<li>Indicates whether the file content of this package has been available for or subjected to analysis when creating the SPDX document</li>
+</ul>
+</li>
+<li><code>attribution=ipsum</code><ul>
+<li>A place for the SPDX data creator to record, at the package level, acknowledgements that may be needed to be communicated in some contexts</li>
+</ul>
+</li>
+<li><code>checksum=ipsum</code><ul>
+<li>Provide an independently reproducible mechanism that permits unique identification of a specific package that correlates to the data in this SPDX file</li>
+</ul>
+</li>
+<li><code>copyright=est</code><ul>
+<li>Identify the copyright holders of the package, as well as any dates present</li>
+</ul>
+</li>
+<li><code>detailed-description=gubergren</code><ul>
+<li>A more detailed description of the package</li>
+</ul>
+</li>
+<li><code>download-location=ea</code><ul>
+<li>This section identifies the download Universal Resource Locator (URL), or a specific location within a version control system (VCS) for the package at the time that the SPDX file was created</li>
+</ul>
+</li>
+<li><code>files-license-info=dolor</code><ul>
+<li>Contain the license the SPDX file creator has concluded as governing the This field is to contain a list of all licenses found in the package. The relationship between licenses (i.e., conjunctive, disjunctive) is not specified in this field – it is simply a listing of all licenses found</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>home-page=lorem</code><ul>
+<li>Provide a place for the SPDX file creator to record a web site that serves as the package&#39;s home page</li>
+</ul>
+</li>
+<li><code>license-declared    comments=eos</code><ul>
+<li>Comments</li>
+</ul>
+</li>
+<li>
+<p><code>expression=labore</code></p>
+<ul>
+<li>Expression: https://spdx.github.io/spdx-spec/appendix-IV-SPDX-license-expressions/</li>
+</ul>
+</li>
+<li>
+<p><code>..    originator=sed</code></p>
+<ul>
+<li>If the package identified in the SPDX file originated from a different person or organization than identified as Package Supplier, this field identifies from where or whom the package originally came</li>
+</ul>
+</li>
+<li><code>package-type=duo</code><ul>
+<li>The type of package: OS, MAVEN, GO, GO_STDLIB, etc.</li>
+</ul>
+</li>
+<li><code>summary-description=sed</code><ul>
+<li>A short description of the package</li>
+</ul>
+</li>
+<li><code>supplier=no</code><ul>
+<li>Identify the actual distribution source for the package/directory identified in the SPDX file</li>
+</ul>
+</li>
+<li><code>title=stet</code><ul>
+<li>Identify the full name of the package as given by the Package Originator</li>
+</ul>
+</li>
+<li><code>verification-code=kasd</code><ul>
+<li>This field provides an independently reproducible mechanism identifying specific contents of a package based on the actual files (except the SPDX file itself, if it is included in the package) that make up each package and that correlates to the data in this SPDX file</li>
+</ul>
+</li>
+<li>
+<p><code>version=et</code></p>
+<ul>
+<li>Identify the version of the package</li>
+</ul>
+</li>
+<li>
+<p><code>..spdx-relationship    type=sed</code></p>
+<ul>
+<li>The type of relationship between the source and target SPDX elements</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-time=et</code></p>
+<ul>
 <li>Output only. The time this note was last updated. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
-<li><code>vulnerability    cvss-score=0.9001265173058445</code><ul>
+<li><code>vulnerability    cvss-score=0.2648561880289837</code><ul>
 <li>The CVSS score for this vulnerability.</li>
 </ul>
 </li>
-<li><code>cvss-v3    attack-complexity=ut</code><ul>
+<li><code>cvss-v3    attack-complexity=vero</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>attack-vector=gubergren</code><ul>
+<li><code>attack-vector=erat</code><ul>
 <li>Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.</li>
 </ul>
 </li>
-<li><code>availability-impact=rebum.</code><ul>
+<li><code>availability-impact=sed</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>base-score=0.34810194289930996</code><ul>
+<li><code>base-score=0.6383502522516505</code><ul>
 <li>The base score is a function of the base metric scores.</li>
 </ul>
 </li>
-<li><code>confidentiality-impact=ipsum</code><ul>
+<li><code>confidentiality-impact=et</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>exploitability-score=0.4033695817113857</code><ul>
+<li><code>exploitability-score=0.9697780726648698</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>impact-score=0.737544430792817</code><ul>
+<li><code>impact-score=0.7735052857092053</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>integrity-impact=gubergren</code><ul>
+<li><code>integrity-impact=diam</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>privileges-required=ea</code><ul>
+<li><code>privileges-required=dolor</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>scope=dolor</code><ul>
+<li><code>scope=et</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>user-interaction=lorem</code></p>
+<p><code>user-interaction=et</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..    severity=eos</code></p>
+<p><code>..    severity=sadipscing</code></p>
 <ul>
 <li>Note provider assigned impact of the vulnerability.</li>
 </ul>
 </li>
-<li><code>source-update-time=labore</code><ul>
+<li><code>source-update-time=stet</code><ul>
 <li>The time this information was last changed at the source. This is an upstream timestamp from the underlying information source - e.g. Ubuntu security tracker.</li>
 </ul>
 </li>

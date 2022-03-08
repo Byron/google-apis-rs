@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search All Resources - Cloud Asset v2.0.4+20210319</title>
+  <title>Search All Resources - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -82,6 +104,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../methods_analyze-iam-policy-longrunning">Analyze Iam Policy Longrunning</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
                     
                 </li>
             
@@ -132,6 +159,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
                     
                 </li>
             
@@ -208,7 +266,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p order-by=string</strong></p>
 <ul>
-<li>Optional. A comma separated list of fields specifying the sorting order of the results. The default order is ascending. Add &#34; DESC&#34; after the field name to indicate descending order. Redundant space characters are ignored. Example: &#34;location DESC, name&#34;. Only string fields in the response are sortable, including <code>name</code>, <code>displayName</code>, <code>description</code>, <code>location</code>. All the other fields such as repeated fields (e.g., <code>networkTags</code>), map fields (e.g., <code>labels</code>) and struct fields (e.g., <code>additionalAttributes</code>) are not supported.</li>
+<li>Optional. A comma-separated list of fields specifying the sorting order of the results. The default order is ascending. Add &#34; DESC&#34; after the field name to indicate descending order. Redundant space characters are ignored. Example: &#34;location DESC, name&#34;. Only singular primitive fields in the response are sortable: * name * assetType * project * displayName * description * location * kmsKey * createTime * updateTime * state * parentFullResourceName * parentAssetType All the other fields such as repeated fields (e.g., <code>networkTags</code>), map fields (e.g., <code>labels</code>) and struct fields (e.g., <code>additionalAttributes</code>) are not supported.</li>
 </ul>
 </li>
 <li>
@@ -226,7 +284,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p query=string</strong></p>
 <ul>
-<li>Optional. The query statement. See <a href="https://cloud.google.com/asset-inventory/docs/searching-resources#how_to_construct_a_query">how to construct a query</a> for more information. If not specified or empty, it will search all the resources within the specified <code>scope</code>. Examples: * <code>name:Important</code> to find Cloud resources whose name contains &#34;Important&#34; as a word. * <code>name=Important</code> to find the Cloud resource whose name is exactly &#34;Important&#34;. * <code>displayName:Impor*</code> to find Cloud resources whose display name contains &#34;Impor&#34; as a prefix of any word in the field. * <code>location:us-west*</code> to find Cloud resources whose location contains both &#34;us&#34; and &#34;west&#34; as prefixes. * <code>labels:prod</code> to find Cloud resources whose labels contain &#34;prod&#34; as a key or value. * <code>labels.env:prod</code> to find Cloud resources that have a label &#34;env&#34; and its value is &#34;prod&#34;. * <code>labels.env:*</code> to find Cloud resources that have a label &#34;env&#34;. * <code>kmsKey:key</code> to find Cloud resources encrypted with a customer-managed encryption key whose name contains the word &#34;key&#34;. * <code>state:ACTIVE</code> to find Cloud resources whose state contains &#34;ACTIVE&#34; as a word. * <code>createTime&amp;lt;1609459200</code> to find Cloud resources that were created before &#34;2021-01-01 00:00:00 UTC&#34;. 1609459200 is the epoch timestamp of &#34;2021-01-01 00:00:00 UTC&#34; in seconds. * <code>updateTime&amp;gt;1609459200</code> to find Cloud resources that were updated after &#34;2021-01-01 00:00:00 UTC&#34;. 1609459200 is the epoch timestamp of &#34;2021-01-01 00:00:00 UTC&#34; in seconds. * <code>Important</code> to find Cloud resources that contain &#34;Important&#34; as a word in any of the searchable fields. * <code>Impor*</code> to find Cloud resources that contain &#34;Impor&#34; as a prefix of any word in any of the searchable fields. * <code>Important location:(us-west1 OR global)</code> to find Cloud resources that contain &#34;Important&#34; as a word in any of the searchable fields and are also located in the &#34;us-west1&#34; region or the &#34;global&#34; location.</li>
+<li>Optional. The query statement. See <a href="https://cloud.google.com/asset-inventory/docs/searching-resources#how_to_construct_a_query">how to construct a query</a> for more information. If not specified or empty, it will search all the resources within the specified <code>scope</code>. Examples: * <code>name:Important</code> to find Cloud resources whose name contains &#34;Important&#34; as a word. * <code>name=Important</code> to find the Cloud resource whose name is exactly &#34;Important&#34;. * <code>displayName:Impor*</code> to find Cloud resources whose display name contains &#34;Impor&#34; as a prefix of any word in the field. * <code>location:us-west*</code> to find Cloud resources whose location contains both &#34;us&#34; and &#34;west&#34; as prefixes. * <code>labels:prod</code> to find Cloud resources whose labels contain &#34;prod&#34; as a key or value. * <code>labels.env:prod</code> to find Cloud resources that have a label &#34;env&#34; and its value is &#34;prod&#34;. * <code>labels.env:*</code> to find Cloud resources that have a label &#34;env&#34;. * <code>kmsKey:key</code> to find Cloud resources encrypted with a customer-managed encryption key whose name contains the word &#34;key&#34;. * <code>state:ACTIVE</code> to find Cloud resources whose state contains &#34;ACTIVE&#34; as a word. * <code>NOT state:ACTIVE</code> to find Cloud resources whose state doesn&#39;t contain &#34;ACTIVE&#34; as a word. * <code>createTime&amp;lt;1609459200</code> to find Cloud resources that were created before &#34;2021-01-01 00:00:00 UTC&#34;. 1609459200 is the epoch timestamp of &#34;2021-01-01 00:00:00 UTC&#34; in seconds. * <code>updateTime&amp;gt;1609459200</code> to find Cloud resources that were updated after &#34;2021-01-01 00:00:00 UTC&#34;. 1609459200 is the epoch timestamp of &#34;2021-01-01 00:00:00 UTC&#34; in seconds. * <code>Important</code> to find Cloud resources that contain &#34;Important&#34; as a word in any of the searchable fields. * <code>Impor*</code> to find Cloud resources that contain &#34;Impor&#34; as a prefix of any word in any of the searchable fields. * <code>Important location:(us-west1 OR global)</code> to find Cloud resources that contain &#34;Important&#34; as a word in any of the searchable fields and are also located in the &#34;us-west1&#34; region or the &#34;global&#34; location.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p read-mask=string</strong></p>
+<ul>
+<li>Optional. A comma-separated list of fields specifying which fields to be returned in ResourceSearchResult. Only &#39;<em>&#39; or combination of top level fields can be specified. Field names of both snake_case and camelCase are supported. Examples: <code>&amp;#34;*&amp;#34;</code>, <code>&amp;#34;name,location&amp;#34;</code>, <code>&amp;#34;name,versionedResources&amp;#34;</code>. The read_mask paths must be valid field paths listed but not limited to (both snake_case and camelCase are supported): * name * assetType * project * displayName * description * location * labels * networkTags * kmsKey * createTime * updateTime * state * additionalAttributes * versionedResources If read_mask is not specified, all fields except versionedResources will be returned. If only &#39;</em>&#39; is specified, all fields including versionedResources will be returned. Any invalid field path will trigger INVALID_ARGUMENT error.</li>
 </ul>
 </li>
 </ul>

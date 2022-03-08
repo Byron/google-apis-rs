@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Get Supported Languages - Translate v2.0.4+20210312</title>
+  <title>Get Supported Languages - Translate v3.0.0+20220121</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Translate v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Translate v3.0.0+20220121</a>
         
       </div>
 
@@ -70,6 +70,11 @@
                             
                         
                         </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batch-translate-document">Locations Batch Translate Document</a>
                     
                 </li>
             
@@ -140,6 +145,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-wait">Locations Operations Wait</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-translate-document">Locations Translate Document</a>
                     
                 </li>
             
@@ -230,7 +240,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p model=string</strong></p>
 <ul>
-<li>Optional. Get supported languages of this model. The format depends on model type: - AutoML Translation models: <code>projects/{project-number-or-id}/locations/{location-id}/models/{model-id}</code> - General (built-in) models: <code>projects/{project-number-or-id}/locations/{location-id}/models/general/nmt</code>, <code>projects/{project-number-or-id}/locations/{location-id}/models/general/base</code> Returns languages supported by the specified model. If missing, we get supported languages of Google general base (PBMT) model.</li>
+<li>Optional. Get supported languages of this model. The format depends on model type: - AutoML Translation models: <code>projects/{project-number-or-id}/locations/{location-id}/models/{model-id}</code> - General (built-in) models: <code>projects/{project-number-or-id}/locations/{location-id}/models/general/nmt</code>, Returns languages supported by the specified model. If missing, we get supported languages of Google general NMT model.</li>
 </ul>
 </li>
 </ul>
@@ -311,7 +321,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-batch-translate-text" class="btn btn-neutral float-right" title="Locations Batch Translate Text"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-batch-translate-document" class="btn btn-neutral float-right" title="Locations Batch Translate Document"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../projects_detect-language" class="btn btn-neutral" title="Detect Language"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -343,7 +353,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../projects_detect-language" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-batch-translate-text" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-batch-translate-document" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

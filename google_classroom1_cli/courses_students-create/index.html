@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Students Create - classroom v2.0.4+20210323</title>
+  <title>Students Create - classroom v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> classroom v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> classroom v3.0.0+20220224</a>
         
       </div>
 
@@ -427,7 +427,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Adds a user as a student of a course. This method returns the following error codes: * <code>PERMISSION_DENIED</code> if the requesting user is not permitted to create students in this course or for access errors. * <code>NOT_FOUND</code> if the requested course ID does not exist. * <code>FAILED_PRECONDITION</code> if the requested user&#39;s account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * UserGroupsMembershipLimitReached * <code>ALREADY_EXISTS</code> if the user is already a student or teacher in the course.</p>
+              <p>Adds a user as a student of a course. Domain administrators are permitted to <a href="https://developers.google.com/classroom/guides/manage-users">directly add</a> users within their domain as students to courses within their domain. Students are permitted to add themselves to a course using an enrollment code. This method returns the following error codes: * <code>PERMISSION_DENIED</code> if the requesting user is not permitted to create students in this course or for access errors. * <code>NOT_FOUND</code> if the requested course ID does not exist. * <code>FAILED_PRECONDITION</code> if the requested user&#39;s account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * UserGroupsMembershipLimitReached * <code>ALREADY_EXISTS</code> if the user is already a student or teacher in the course.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -469,46 +469,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    course-id=erat</code><ul>
+<li><code>-r .    course-id=consetetur</code><ul>
 <li>Identifier of the course. Read-only.</li>
 </ul>
 </li>
-<li><code>profile    email-address=sea</code><ul>
+<li><code>profile    email-address=sit</code><ul>
 <li>Email address of the user. Read-only.</li>
 </ul>
 </li>
-<li><code>id=nonumy</code><ul>
+<li><code>id=aliquyam</code><ul>
 <li>Identifier of the user. Read-only.</li>
 </ul>
 </li>
-<li><code>name    family-name=et</code><ul>
+<li><code>name    family-name=eos</code><ul>
 <li>The user&#39;s last name. Read-only.</li>
 </ul>
 </li>
-<li><code>full-name=gubergren</code><ul>
+<li><code>full-name=at</code><ul>
 <li>The user&#39;s full name formed by concatenating the first and last name values. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>given-name=justo</code></p>
+<p><code>given-name=dolores</code></p>
 <ul>
 <li>The user&#39;s first name. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>..    photo-url=sea</code></p>
+<p><code>..    photo-url=consetetur</code></p>
 <ul>
 <li>URL of user&#39;s profile photo. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>verified-teacher=false</code></p>
+<p><code>verified-teacher=true</code></p>
 <ul>
 <li>Represents whether a G Suite for Education user&#39;s domain administrator has explicitly verified them as being a teacher. If the user is not a member of a G Suite for Education domain, than this field is always false. Read-only</li>
 </ul>
 </li>
 <li>
-<p><code>..student-work-folder    alternate-link=sit</code></p>
+<p><code>..student-work-folder    alternate-link=dolor</code></p>
 <ul>
 <li>URL that can be used to access the Drive folder. Read-only.</li>
 </ul>
@@ -518,13 +518,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>title=eos</code></p>
+<p><code>title=no</code></p>
 <ul>
 <li>Title of the Drive folder. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>..    user-id=at</code></p>
+<p><code>..    user-id=amet.</code></p>
 <ul>
 <li>Identifier of the user. When specified as a parameter of a request, this identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal <code>&amp;#34;me&amp;#34;</code>, indicating the requesting user</li>
 </ul>

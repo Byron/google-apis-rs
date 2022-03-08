@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Android Apps Patch - Firebase Management v2.0.4+20210329</title>
+  <title>Android Apps Patch - Firebase Management v3.0.0+20220304</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firebase Management v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Firebase Management v3.0.0+20220304</a>
         
       </div>
 
@@ -292,6 +292,7 @@ You can set the scope for this method like this: <code>firebase1-beta1 --scope &
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>AndroidApp:
+  api-key-id: string
   app-id: string
   display-name: string
   name: string
@@ -302,7 +303,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    app-id=amet.</code><ul>
+<li><code>-r .    api-key-id=takimata</code><ul>
+<li>The key_id of the GCP ApiKey associated with this App. If set must have no restrictions, or only have restrictions that are valid for the associated Firebase App. Cannot be set in create requests, instead an existing valid API Key will be chosen, or if no valid API Keys exist, one will be provisioned for you. Cannot be set to an empty value in update requests.</li>
+</ul>
+</li>
+<li><code>app-id=amet.</code><ul>
 <li>Immutable. The globally unique, Firebase-assigned identifier for the <code>AndroidApp</code>. This identifier should be treated as an opaque token, as the data format is not specified.</li>
 </ul>
 </li>

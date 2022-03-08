@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - calendar v2.0.4+20210327</title>
+  <title>Update - calendar v3.0.0+20220217</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> calendar v2.0.4+20210327</a>
+        <a href=".." class="icon icon-home"> calendar v3.0.0+20220217</a>
         
       </div>
 
@@ -446,7 +446,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    anyone-can-add-self=false</code><ul>
-<li>Whether anyone can invite themselves to the event (currently works for Google+ events only). Optional. The default is False.</li>
+<li>Whether anyone can invite themselves to the event (deprecated). Optional. The default is False.</li>
 </ul>
 </li>
 <li><code>attendees-omitted=false</code><ul>
@@ -460,11 +460,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li><code>conference-data    conference-id=sadipscing</code><ul>
 <li>The ID of the conference.
     Can be used by developers to keep track of conferences, should not be displayed to users.
-    Values for solution types:  <ul>
-<li>&#34;eventHangout&#34;: unset.</li>
-<li>&#34;eventNamedHangout&#34;: the name of the Hangout.</li>
-<li>&#34;hangoutsMeet&#34;: the 10-letter meeting code, for example &#34;aaa-bbbb-ccc&#34;.</li>
-<li>&#34;addOn&#34;: defined by 3P conference provider.  Optional.</li>
+    The ID value is formed differently for each conference solution type:  <ul>
+<li>eventHangout: ID is not set. (This conference type is deprecated.)</li>
+<li>eventNamedHangout: ID is the name of the Hangout. (This conference type is deprecated.)</li>
+<li>hangoutsMeet: ID is the 10-letter meeting code, for example aaa-bbbb-ccc.</li>
+<li>addOn: ID is defined by the third-party provider.  Optional.</li>
 </ul>
 </li>
 </ul>
@@ -479,8 +479,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The conference solution type.
     If a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.
     The possible values are:  <ul>
-<li>&#34;eventHangout&#34; for Hangouts for consumers (http://hangouts.google.com)</li>
-<li>&#34;eventNamedHangout&#34; for classic Hangouts for Google Workspace users (http://hangouts.google.com)</li>
+<li>&#34;eventHangout&#34; for Hangouts for consumers (deprecated; existing events may show this conference solution type but new conferences cannot be created)</li>
+<li>&#34;eventNamedHangout&#34; for classic Hangouts for Google Workspace users (deprecated; existing events may show this conference solution type but new conferences cannot be created)</li>
 <li>&#34;hangoutsMeet&#34; for Google Meet (http://meet.google.com)</li>
 <li>&#34;addOn&#34; for 3P conference providers</li>
 </ul>
@@ -499,8 +499,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The conference solution type.
     If a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.
     The possible values are:  <ul>
-<li>&#34;eventHangout&#34; for Hangouts for consumers (http://hangouts.google.com)</li>
-<li>&#34;eventNamedHangout&#34; for classic Hangouts for Google Workspace users (http://hangouts.google.com)</li>
+<li>&#34;eventHangout&#34; for Hangouts for consumers (deprecated; existing events may show this conference solution type but new conferences cannot be created)</li>
+<li>&#34;eventNamedHangout&#34; for classic Hangouts for Google Workspace users (deprecated; existing events may show this conference solution type but new conferences cannot be created)</li>
 <li>&#34;hangoutsMeet&#34; for Google Meet (http://meet.google.com)</li>
 <li>&#34;addOn&#34; for 3P conference providers</li>
 </ul>
@@ -543,7 +543,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p><code>...    signature=ipsum</code></p>
 <ul>
 <li>The signature of the conference data.
-    Generated on server side. Must be preserved while copying the conference data between events, otherwise the conference data will not be copied.
+    Generated on server side.
     Unset for a conference with a failed create request.
     Optional for a conference with a pending create request.</li>
 </ul>
@@ -563,7 +563,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>id=at</code><ul>
-<li>The creator&#39;s Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API</li>
+<li>The creator&#39;s Profile ID, if available.</li>
 </ul>
 </li>
 <li>
@@ -605,7 +605,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li><code>event-type=accusam</code><ul>
 <li>Specific type of the event. Read-only. Possible values are:  <ul>
 <li>&#34;default&#34; - A regular event or not further specified. </li>
-<li>&#34;outOfOffice&#34; - An out-of-office event.</li>
+<li>&#34;outOfOffice&#34; - An out-of-office event. </li>
+<li>&#34;focusTime&#34; - A focus-time event.</li>
 </ul>
 </li>
 </ul>
@@ -678,7 +679,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>hangout-link=stet</code><ul>
-<li>An absolute link to the Google+ hangout associated with this event. Read-only.</li>
+<li>An absolute link to the Google Hangout associated with this event. Read-only.</li>
 </ul>
 </li>
 <li><code>html-link=sadipscing</code><ul>
@@ -722,7 +723,7 @@ Note that the icalUID and the id are not identical and only one of them should b
 </ul>
 </li>
 <li><code>id=at</code><ul>
-<li>The organizer&#39;s Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API</li>
+<li>The organizer&#39;s Profile ID, if available.</li>
 </ul>
 </li>
 <li>

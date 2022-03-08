@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Batch Translate Text - Translate v2.0.4+20210312</title>
+  <title>Locations Batch Translate Text - Translate v3.0.0+20220121</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Translate v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Translate v3.0.0+20220121</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_get-supported-languages">Get Supported Languages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batch-translate-document">Locations Batch Translate Document</a>
                     
                 </li>
             
@@ -146,6 +151,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-translate-document">Locations Translate Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-translate-text">Locations Translate Text</a>
                     
                 </li>
@@ -220,29 +230,29 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    labels=key=voluptua.</code><ul>
+<li><code>-r .    labels=key=takimata</code><ul>
 <li>Optional. The labels with user-defined metadata for the request. Label keys and values can be no longer than 63 characters (Unicode codepoints), can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter. See https://cloud.google.com/translate/docs/advanced/labels for more information.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>models=key=at</code><ul>
-<li>Optional. The models to use for translation. Map&#39;s key is target language code. Map&#39;s value is model name. Value can be a built-in general model, or an AutoML Translation model. The value format depends on model type: - AutoML Translation models: <code>projects/{project-number-or-id}/locations/{location-id}/models/{model-id}</code> - General (built-in) models: <code>projects/{project-number-or-id}/locations/{location-id}/models/general/nmt</code>, <code>projects/{project-number-or-id}/locations/{location-id}/models/general/base</code> If the map is empty or a specific model is not requested for a language pair, then default google model (nmt) is used.</li>
+<li><code>models=key=amet.</code><ul>
+<li>Optional. The models to use for translation. Map&#39;s key is target language code. Map&#39;s value is model name. Value can be a built-in general model, or an AutoML Translation model. The value format depends on model type: - AutoML Translation models: <code>projects/{project-number-or-id}/locations/{location-id}/models/{model-id}</code> - General (built-in) models: <code>projects/{project-number-or-id}/locations/{location-id}/models/general/nmt</code>, If the map is empty or a specific model is not requested for a language pair, then default google model (nmt) is used.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>output-config.gcs-destination    output-uri-prefix=sanctus</code></p>
+<p><code>output-config.gcs-destination    output-uri-prefix=duo</code></p>
 <ul>
 <li>Required. The bucket used in &#39;output_uri_prefix&#39; must exist and there must be no files under &#39;output_uri_prefix&#39;. &#39;output_uri_prefix&#39; must end with &#34;/&#34; and start with &#34;gs://&#34;. One &#39;output_uri_prefix&#39; can only be used by one batch translation job at a time. Otherwise an INVALID_ARGUMENT (400) error is returned.</li>
 </ul>
 </li>
 <li>
-<p><code>...    source-language-code=sed</code></p>
+<p><code>...    source-language-code=ipsum</code></p>
 <ul>
 <li>Required. Source language code.</li>
 </ul>
 </li>
-<li><code>target-language-codes=amet.</code><ul>
+<li><code>target-language-codes=gubergren</code><ul>
 <li>Required. Specify up to 10 language codes here.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -347,7 +357,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         <a href="../projects_locations-detect-language" class="btn btn-neutral float-right" title="Locations Detect Language"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_get-supported-languages" class="btn btn-neutral" title="Get Supported Languages"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-batch-translate-document" class="btn btn-neutral" title="Locations Batch Translate Document"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -375,7 +385,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_get-supported-languages" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-batch-translate-document" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-detect-language" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

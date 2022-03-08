@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Device Users Client States Get - Cloud Identity v2.0.4+20210310</title>
+  <title>Device Users Client States Get - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -78,6 +78,9 @@
                     <a class="current" href=".">Device Users Client States Get</a>
                     
                         <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
                         
                             <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
                             
@@ -167,6 +170,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../groups_list">List</a>
                     
                 </li>
@@ -236,6 +244,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -273,10 +286,18 @@
           <div role="main">
             <div class="section">
               <p>Gets the client state for the device user</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-identity.devices</em></li>
+<li><em>https://www.googleapis.com/auth/cloud-identity.devices.readonly</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-identity.devices.readonly</em>.
+You can set the scope for this method like this: <code>cloudidentity1 --scope &lt;scope&gt; devices device-users-client-states-get ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the ClientState in format: <code>devices/{device_id}/deviceUsers/{device_user_id}/clientStates/{partner_id}</code>, where <code>device_id</code> is the unique ID assigned to the Device, <code>device_user_id</code> is the unique ID assigned to the User and <code>partner_id</code> identifies the partner storing the data. To get the client state for devices belonging to your own organization, the <code>partnerId</code> is in the format: <code>customerId-*anystring*</code>. Where the <code>customerId</code> is your organization&#39;s customer ID and <code>anystring</code> is any suffix. This suffix is used in setting up Custom Access Levels in Context-Aware Access. You may use <code>my_customer</code> instead of the customer ID for devices managed by your own organization. You may specify <code>-</code> in place of the <code>{device_id}</code>, so the ClientState resource name can be: <code>devices/-/deviceUsers/{device_user_resource_id}/clientStates/{partner_id}</code>.</li>
+<li>Required. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the ClientState in format: <code>devices/{device}/deviceUsers/{device_user}/clientStates/{partner}</code>, where <code>device</code> is the unique ID assigned to the Device, <code>device_user</code> is the unique ID assigned to the User and <code>partner</code> identifies the partner storing the data. To get the client state for devices belonging to your own organization, the <code>partnerId</code> is in the format: <code>customerId-*anystring*</code>. Where the <code>customerId</code> is your organization&#39;s customer ID and <code>anystring</code> is any suffix. This suffix is used in setting up Custom Access Levels in Context-Aware Access. You may use <code>my_customer</code> instead of the customer ID for devices managed by your own organization. You may specify <code>-</code> in place of the <code>{device}</code>, so the ClientState resource name can be: <code>devices/-/deviceUsers/{device_user_resource}/clientStates/{partner}</code>.</li>
 </ul>
 </li>
 </ul>
@@ -297,7 +318,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p customer=string</strong><ul>
-<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code> If you&#39;re using this API to manage another organization, use <code>customers/{customer_id}</code>, where customer_id is the customer to whom the device belongs.</li>
+<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code> If you&#39;re using this API to manage another organization, use <code>customers/{customer}</code>, where customer is the customer to whom the device belongs.</li>
 </ul>
 </li>
 </ul>

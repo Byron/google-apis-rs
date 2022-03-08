@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Instances App Profiles Patch - Bigtable Admin v2.0.4+20210323</title>
+  <title>Instances App Profiles Patch - Bigtable Admin v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Bigtable Admin v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Bigtable Admin v3.0.0+20220222</a>
         
       </div>
 
@@ -176,6 +176,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_instances-clusters-list">Instances Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-clusters-partial-update-cluster">Instances Clusters Partial Update Cluster</a>
                     
                 </li>
             
@@ -362,6 +367,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>AppProfile:
   description: string
   etag: string
+  multi-cluster-routing-use-any:
+    cluster-ids: [string]
   name: string
   single-cluster-routing:
     allow-transactional-writes: boolean
@@ -371,15 +378,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    description=at</code><ul>
+<li><code>-r .    description=takimata</code><ul>
 <li>Long form description of the use case for this AppProfile.</li>
 </ul>
 </li>
-<li><code>etag=sanctus</code><ul>
+<li><code>etag=amet.</code><ul>
 <li>Strongly validated etag for optimistic concurrency control. Preserve the value returned from <code>GetAppProfile</code> when calling <code>UpdateAppProfile</code> to fail the request if there has been a modification in the mean time. The <code>update_mask</code> of the request need not include <code>etag</code> for this protection to apply. See <a href="https://en.wikipedia.org/wiki/HTTP_ETag">Wikipedia</a> and <a href="https://tools.ietf.org/html/rfc7232#section-2.3">RFC 7232</a> for more details.</li>
 </ul>
 </li>
-<li><code>name=sed</code><ul>
+<li>
+<p><code>multi-cluster-routing-use-any    cluster-ids=duo</code></p>
+<ul>
+<li>The set of clusters to route to. The order is ignored; clusters will be tried in order of distance. If left empty, all clusters are eligible.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=ipsum</code></p>
+<ul>
 <li>The unique name of the app profile. Values are of the form <code>projects/{project}/instances/{instance}/appProfiles/_a-zA-Z0-9*</code>.</li>
 </ul>
 </li>
@@ -387,7 +403,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether or not <code>CheckAndMutateRow</code> and <code>ReadModifyWriteRow</code> requests are allowed by this app profile. It is unsafe to send these requests to the same table/row/column in multiple clusters.</li>
 </ul>
 </li>
-<li><code>cluster-id=amet.</code><ul>
+<li><code>cluster-id=lorem</code><ul>
 <li>The cluster to which read/write requests should be routed.</li>
 </ul>
 </li>

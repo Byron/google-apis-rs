@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Agents Environments Experiments Create - Dialogflow v2.0.4+20210329</title>
+  <title>Locations Agents Environments Experiments Create - Dialogflow v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dialogflow v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Dialogflow v3.0.0+20220228</a>
         
       </div>
 
@@ -43,6 +43,16 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-get">Locations Agents Changelogs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-list">Locations Agents Changelogs List</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-create">Locations Agents Create</a>
@@ -80,12 +90,32 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-continuous-test-results-list">Locations Agents Environments Continuous Test Results List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-create">Locations Agents Environments Create</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-delete">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deploy-flow">Locations Agents Environments Deploy Flow</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-get">Locations Agents Environments Deployments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-list">Locations Agents Environments Deployments List</a>
                     
                 </li>
             
@@ -166,6 +196,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-run-continuous-test">Locations Agents Environments Run Continuous Test</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-sessions-detect-intent">Locations Agents Environments Sessions Detect Intent</a>
                     
                 </li>
@@ -221,12 +256,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-export">Locations Agents Flows Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get">Locations Agents Flows Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get-validation-result">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-import">Locations Agents Flows Import</a>
                     
                 </li>
             
@@ -297,6 +342,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-validate">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-versions-compare-versions">Locations Agents Flows Versions Compare Versions</a>
                     
                 </li>
             
@@ -511,6 +561,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
                     
                 </li>
@@ -633,6 +693,14 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   name: string
   result:
     last-update-time: string
+  rollout-config:
+    failure-condition: string
+    rollout-condition: string
+  rollout-failure-reason: string
+  rollout-state:
+    start-time: string
+    step: string
+    step-index: integer
   start-time: string
   state: string
 
@@ -640,7 +708,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=labore</code><ul>
+<li><code>-r .    create-time=et</code><ul>
 <li>Creation time of this experiment.</li>
 </ul>
 </li>
@@ -651,35 +719,67 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    description=duo</code></p>
+<p><code>..    description=et</code></p>
 <ul>
 <li>The human-readable description of the experiment.</li>
 </ul>
 </li>
-<li><code>display-name=sed</code><ul>
+<li><code>display-name=et</code><ul>
 <li>Required. The human-readable name of the experiment (unique in an environment). Limit of 64 characters.</li>
 </ul>
 </li>
-<li><code>end-time=no</code><ul>
+<li><code>end-time=vero</code><ul>
 <li>End time of this experiment.</li>
 </ul>
 </li>
-<li><code>experiment-length=stet</code><ul>
+<li><code>experiment-length=erat</code><ul>
 <li>Maximum number of days to run the experiment/rollout. If auto-rollout is not enabled, default value and maximum will be 30 days. If auto-rollout is enabled, default value and maximum will be 6 days.</li>
 </ul>
 </li>
-<li><code>last-update-time=kasd</code><ul>
+<li><code>last-update-time=sed</code><ul>
 <li>Last update time of this experiment.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=duo</code><ul>
 <li>The name of the experiment. Format: projects//locations//agents//environments//experiments/..</li>
 </ul>
 </li>
 <li>
-<p><code>result    last-update-time=sed</code></p>
+<p><code>result    last-update-time=dolore</code></p>
 <ul>
 <li>The last time the experiment&#39;s stats data was updated. Will have default value if stats have never been computed for this experiment.</li>
+</ul>
+</li>
+<li>
+<p><code>..rollout-config    failure-condition=et</code></p>
+<ul>
+<li>The conditions that are used to evaluate the failure of a rollout step. If not specified, no rollout steps will fail. E.g. &#34;containment_rate &lt; 10% OR average_turn_count &lt; 3&#34;. See the <a href="https://cloud.google.com/dialogflow/cx/docs/reference/condition">conditions reference</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>rollout-condition=voluptua.</code></p>
+<ul>
+<li>The conditions that are used to evaluate the success of a rollout step. If not specified, all rollout steps will proceed to the next one unless failure conditions are met. E.g. &#34;containment_rate &gt; 60% AND callback_rate &lt; 20%&#34;. See the <a href="https://cloud.google.com/dialogflow/cx/docs/reference/condition">conditions reference</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    rollout-failure-reason=amet.</code></p>
+<ul>
+<li>The reason why rollout has failed. Should only be set when state is ROLLOUT_FAILED.</li>
+</ul>
+</li>
+<li><code>rollout-state    start-time=consetetur</code><ul>
+<li>Start time of the current step.</li>
+</ul>
+</li>
+<li><code>step=diam</code><ul>
+<li>Display name of the current auto rollout step.</li>
+</ul>
+</li>
+<li>
+<p><code>step-index=52</code></p>
+<ul>
+<li>Index of the current step in the auto rollout steps list.</li>
 </ul>
 </li>
 <li>
@@ -689,7 +789,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>state=et</code><ul>
-<li>The current state of the experiment. Transition triggered by Expriments.StartExperiment: PENDING-&gt;RUNNING. Transition triggered by Expriments.CancelExperiment: PENDING-&gt;CANCELLED or RUNNING-&gt;CANCELLED.</li>
+<li>The current state of the experiment. Transition triggered by Experiments.StartExperiment: DRAFT-&gt;RUNNING. Transition triggered by Experiments.CancelExperiment: DRAFT-&gt;DONE or RUNNING-&gt;DONE.</li>
 </ul>
 </li>
 </ul>
@@ -792,7 +892,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         <a href="../projects_locations-agents-environments-experiments-delete" class="btn btn-neutral float-right" title="Locations Agents Environments Experiments Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-agents-environments-delete" class="btn btn-neutral" title="Locations Agents Environments Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-agents-environments-deployments-list" class="btn btn-neutral" title="Locations Agents Environments Deployments List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -820,7 +920,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-agents-environments-delete" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-agents-environments-deployments-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-agents-environments-experiments-delete" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

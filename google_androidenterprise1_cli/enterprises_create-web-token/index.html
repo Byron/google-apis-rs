@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create Web Token - Android Enterprise v2.0.4+20210324</title>
+  <title>Create Web Token - Android Enterprise v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Enterprise v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> Android Enterprise v3.0.0+20220303</a>
         
       </div>
 
@@ -596,6 +596,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     enabled: boolean
   web-apps:
     enabled: boolean
+  zero-touch:
+    enabled: boolean
 
 </code></pre>
 
@@ -644,6 +646,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p><code>..web-apps    enabled=true</code></p>
 <ul>
 <li>Whether the Web Apps page is displayed. Default is true.</li>
+</ul>
+</li>
+<li>
+<p><code>..zero-touch    enabled=false</code></p>
+<ul>
+<li>Whether zero-touch embedded UI is usable with this token. If enabled, the admin can link zero-touch customers to this enterprise.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Saved Queries Delete - Vault v2.0.4+20210316</title>
+  <title>Saved Queries Delete - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -267,7 +267,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Deletes a saved query by Id.</p>
+              <p>Deletes the specified saved query.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/ediscovery</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/ediscovery</em>.
@@ -275,11 +275,11 @@ You can set the scope for this method like this: <code>vault1 --scope &lt;scope&
 <h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
 <ul>
 <li><strong>&lt;matter-id&gt;</strong> <em>(string)</em><ul>
-<li>The matter ID of the parent matter for which the saved query is to be deleted.</li>
+<li>The ID of the matter to delete the saved query from.</li>
 </ul>
 </li>
 <li><strong>&lt;saved-query-id&gt;</strong> <em>(string)</em><ul>
-<li>ID of the saved query to be deleted.</li>
+<li>ID of the saved query to delete.</li>
 </ul>
 </li>
 </ul>

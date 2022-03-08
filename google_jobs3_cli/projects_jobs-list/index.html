@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Jobs List - Cloud Talent Solution v2.0.4+20210309</title>
+  <title>Jobs List - Cloud Talent Solution v3.0.0+20220211</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Talent Solution v2.0.4+20210309</a>
+        <a href=".." class="icon icon-home"> Cloud Talent Solution v3.0.0+20220211</a>
         
       </div>
 
@@ -209,7 +209,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Required. The filter string specifies the jobs to be enumerated. Supported operator: =, AND The fields eligible for filtering are: * <code>companyName</code> (Required) * <code>requisitionId</code> (Optional) Sample Query: * companyName = &#34;projects/api-test-project/companies/123&#34; * companyName = &#34;projects/api-test-project/companies/123&#34; AND requisitionId = &#34;req-1&#34;</li>
+<li>Required. The filter string specifies the jobs to be enumerated. Supported operator: =, AND The fields eligible for filtering are: * <code>companyName</code> * <code>requisitionId</code> * <code>status</code> Available values: OPEN, EXPIRED, ALL. Defaults to OPEN if no value is specified. At least one of <code>companyName</code> and <code>requisitionId</code> must present or an INVALID_ARGUMENT error is thrown. Sample Query: * companyName = &#34;projects/api-test-project/companies/123&#34; * companyName = &#34;projects/api-test-project/companies/123&#34; AND requisitionId = &#34;req-1&#34; * companyName = &#34;projects/api-test-project/companies/123&#34; AND status = &#34;EXPIRED&#34; * requisitionId = &#34;req-1&#34; * requisitionId = &#34;req-1&#34; AND status = &#34;EXPIRED&#34;</li>
 </ul>
 </li>
 <li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Triggers Patch - Eventarc v2.0.4+20210325</title>
+  <title>Locations Triggers Patch - Eventarc v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Eventarc v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Eventarc v3.0.0+20220301</a>
         
       </div>
 
@@ -43,6 +43,36 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-channel-connections-get-iam-policy">Locations Channel Connections Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-channel-connections-set-iam-policy">Locations Channel Connections Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-channel-connections-test-iam-permissions">Locations Channel Connections Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-channels-get-iam-policy">Locations Channels Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-channels-set-iam-policy">Locations Channels Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-channels-test-iam-permissions">Locations Channels Test Iam Permissions</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -71,6 +101,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-providers-get">Locations Providers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-providers-list">Locations Providers List</a>
                     
                 </li>
             
@@ -182,7 +222,7 @@ You can set the scope for this method like this: <code>eventarc1 --scope &lt;sco
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The resource name of the trigger. Must be unique within the location on the project and must be in <code>projects/{project}/locations/{location}/triggers/{trigger}</code> format.</li>
+<li>Required. The resource name of the trigger. Must be unique within the location of the project and must be in <code>projects/{project}/locations/{location}/triggers/{trigger}</code> format.</li>
 </ul>
 </li>
 </ul>
@@ -193,9 +233,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>Trigger:
   create-time: string
   destination:
+    cloud-function: string
     cloud-run:
       path: string
       region: string
+      service: string
+    gke:
+      cluster: string
+      location: string
+      namespace: string
+      path: string
       service: string
   etag: string
   labels: { string: string }
@@ -212,60 +259,88 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=ipsum</code><ul>
+<li><code>-r .    create-time=gubergren</code><ul>
 <li>Output only. The creation time.</li>
 </ul>
 </li>
-<li><code>destination.cloud-run    path=gubergren</code><ul>
-<li>Optional. The relative path on the Cloud Run service the events should be sent to. The value must conform to the definition of URI path segment (section 3.3 of RFC2396). Examples: &#34;/route&#34;, &#34;route&#34;, &#34;route/subroute&#34;.</li>
+<li><code>destination    cloud-function=rebum.</code><ul>
+<li>The Cloud Function resource name. Only Cloud Functions V2 is supported. Format: <code>projects/{project}/locations/{location}/functions/{function}</code></li>
 </ul>
 </li>
-<li><code>region=lorem</code><ul>
+<li><code>cloud-run    path=est</code><ul>
+<li>Optional. The relative path on the Cloud Run service the events should be sent to. The value must conform to the definition of a URI path segment (section 3.3 of RFC2396). Examples: &#34;/route&#34;, &#34;route&#34;, &#34;route/subroute&#34;.</li>
+</ul>
+</li>
+<li><code>region=ipsum</code><ul>
 <li>Required. The region the Cloud Run service is deployed in.</li>
 </ul>
 </li>
 <li>
-<p><code>service=gubergren</code></p>
+<p><code>service=ipsum</code></p>
 <ul>
-<li>Required. The name of the Cloud Run service being addressed. See https://cloud.google.com/run/docs/reference/rest/v1/namespaces.services. Only services located in the same project of the trigger object can be addressed.</li>
+<li>Required. The name of the Cloud Run service being addressed. See https://cloud.google.com/run/docs/reference/rest/v1/namespaces.services. Only services located in the same project as the trigger object can be addressed.</li>
+</ul>
+</li>
+<li>
+<p><code>..gke    cluster=est</code></p>
+<ul>
+<li>Required. The name of the cluster the GKE service is running in. The cluster must be running in the same project as the trigger being created.</li>
+</ul>
+</li>
+<li><code>location=gubergren</code><ul>
+<li>Required. The name of the Google Compute Engine in which the cluster resides, which can either be compute zone (for example, us-central1-a) for the zonal clusters or region (for example, us-central1) for regional clusters.</li>
+</ul>
+</li>
+<li><code>namespace=ea</code><ul>
+<li>Required. The namespace the GKE service is running in.</li>
+</ul>
+</li>
+<li><code>path=dolor</code><ul>
+<li>Optional. The relative path on the GKE service the events should be sent to. The value must conform to the definition of a URI path segment (section 3.3 of RFC2396). Examples: &#34;/route&#34;, &#34;route&#34;, &#34;route/subroute&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>service=lorem</code></p>
+<ul>
+<li>Required. Name of the GKE service.</li>
 </ul>
 </li>
 <li>
 <p><code>...    etag=eos</code></p>
 <ul>
-<li>Output only. This checksum is computed by the server based on the value of other fields, and may be sent only on create requests to ensure the client has an up-to-date value before proceeding.</li>
+<li>Output only. This checksum is computed by the server based on the value of other fields, and might be sent only on create requests to ensure that the client has an up-to-date value before proceeding.</li>
 </ul>
 </li>
-<li><code>labels=key=dolor</code><ul>
+<li><code>labels=key=labore</code><ul>
 <li>Optional. User labels attached to the triggers that can be used to group resources.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=ea</code><ul>
-<li>Required. The resource name of the trigger. Must be unique within the location on the project and must be in <code>projects/{project}/locations/{location}/triggers/{trigger}</code> format.</li>
+<li><code>name=sed</code><ul>
+<li>Required. The resource name of the trigger. Must be unique within the location of the project and must be in <code>projects/{project}/locations/{location}/triggers/{trigger}</code> format.</li>
 </ul>
 </li>
-<li><code>service-account=ipsum</code><ul>
-<li>Optional. The IAM service account email associated with the trigger. The service account represents the identity of the trigger. The principal who calls this API must have <code>iam.serviceAccounts.actAs</code> permission in the service account. See https://cloud.google.com/iam/docs/understanding-service-accounts?hl=en#sa_common for more information. For Cloud Run destinations, this service account is used to generate identity tokens when invoking the service. See https://cloud.google.com/run/docs/triggering/pubsub-push#create-service-account for information on how to invoke authenticated Cloud Run services. In order to create Audit Log triggers, the service account should also have <code>roles/eventarc.eventReceiver</code> IAM role.</li>
+<li><code>service-account=duo</code><ul>
+<li>Optional. The IAM service account email associated with the trigger. The service account represents the identity of the trigger. The principal who calls this API must have the <code>iam.serviceAccounts.actAs</code> permission in the service account. See https://cloud.google.com/iam/docs/understanding-service-accounts?hl=en#sa_common for more information. For Cloud Run destinations, this service account is used to generate identity tokens when invoking the service. See https://cloud.google.com/run/docs/triggering/pubsub-push#create-service-account for information on how to invoke authenticated Cloud Run services. To create Audit Log triggers, the service account should also have the <code>roles/eventarc.eventReceiver</code> IAM role.</li>
 </ul>
 </li>
-<li><code>transport.pubsub    subscription=invidunt</code><ul>
-<li>Output only. The name of the Pub/Sub subscription created and managed by Eventarc system as a transport for the event delivery. Format: <code>projects/{PROJECT_ID}/subscriptions/{SUBSCRIPTION_NAME}</code>.</li>
-</ul>
-</li>
-<li>
-<p><code>topic=amet</code></p>
-<ul>
-<li>Optional. The name of the Pub/Sub topic created and managed by Eventarc system as a transport for the event delivery. Format: <code>projects/{PROJECT_ID}/topics/{TOPIC_NAME}</code>. You may set an existing topic for triggers of the type <code>google.cloud.pubsub.topic.v1.messagePublished</code> only. The topic you provide here will not be deleted by Eventarc at trigger deletion.</li>
+<li><code>transport.pubsub    subscription=sed</code><ul>
+<li>Output only. The name of the Pub/Sub subscription created and managed by Eventarc as a transport for the event delivery. Format: <code>projects/{PROJECT_ID}/subscriptions/{SUBSCRIPTION_NAME}</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...    uid=duo</code></p>
+<p><code>topic=no</code></p>
 <ul>
-<li>Output only. Server assigned unique identifier for the trigger. The value is a UUID4 string and guaranteed to remain unchanged until the resource is deleted.</li>
+<li>Optional. The name of the Pub/Sub topic created and managed by Eventarc as a transport for the event delivery. Format: <code>projects/{PROJECT_ID}/topics/{TOPIC_NAME}</code>. You can set an existing topic for triggers of the type <code>google.cloud.pubsub.topic.v1.messagePublished</code>. The topic you provide here is not deleted by Eventarc at trigger deletion.</li>
 </ul>
 </li>
-<li><code>update-time=ipsum</code><ul>
+<li>
+<p><code>...    uid=stet</code></p>
+<ul>
+<li>Output only. Server-assigned unique identifier for the trigger. The value is a UUID4 string and guaranteed to remain unchanged until the resource is deleted.</li>
+</ul>
+</li>
+<li><code>update-time=kasd</code><ul>
 <li>Output only. The last-modified time.</li>
 </ul>
 </li>
@@ -303,13 +378,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p update-mask=string</strong></p>
 <ul>
-<li>The fields to be updated; only fields explicitly provided will be updated. If no field mask is provided, all provided fields in the request will be updated. To update all fields, provide a field mask of &#34;*&#34;.</li>
+<li>The fields to be updated; only fields explicitly provided are updated. If no field mask is provided, all provided fields in the request are updated. To update all fields, provide a field mask of &#34;*&#34;.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p validate-only=boolean</strong></p>
 <ul>
-<li>Required. If set, validate the request and preview the review, but do not actually post it.</li>
+<li>Required. If set, validate the request and preview the review, but do not post it.</li>
 </ul>
 </li>
 </ul>

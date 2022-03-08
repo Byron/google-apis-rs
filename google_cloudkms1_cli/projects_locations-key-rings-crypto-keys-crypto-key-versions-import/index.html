@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Key Rings Crypto Keys Crypto Key Versions Import - Cloud KMS v2.0.4+20210318</title>
+  <title>Locations Key Rings Crypto Keys Crypto Key Versions Import - Cloud KMS v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud KMS v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Cloud KMS v3.0.0+20220225</a>
         
       </div>
 
@@ -43,6 +43,46 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-create">Locations Ekm Connections Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get">Locations Ekm Connections Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-get-iam-policy">Locations Ekm Connections Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-list">Locations Ekm Connections List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-patch">Locations Ekm Connections Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-set-iam-policy">Locations Ekm Connections Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-ekm-connections-test-iam-permissions">Locations Ekm Connections Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-generate-random-bytes">Locations Generate Random Bytes</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -117,6 +157,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-list">Locations Key Rings Crypto Keys Crypto Key Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign">Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify">Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify</a>
                     
                 </li>
             
@@ -271,7 +321,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Imports a new CryptoKeyVersion into an existing CryptoKey using the wrapped key material provided in the request. The version ID will be assigned the next sequential id within the CryptoKey.</p>
+              <p>Import wrapped key material into a CryptoKeyVersion. All requests must specify a CryptoKey. If a CryptoKeyVersion is additionally specified in the request, key material will be reimported into that version. Otherwise, a new version will be created, and will be assigned the next sequential id within the CryptoKey.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -283,7 +333,7 @@ You can set the scope for this method like this: <code>cloudkms1 --scope &lt;sco
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The name of the CryptoKey to be imported into.</li>
+<li>Required. The name of the CryptoKey to be imported into. The create permission is only required on this key when creating a new CryptoKeyVersion.</li>
 </ul>
 </li>
 </ul>
@@ -293,6 +343,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>ImportCryptoKeyVersionRequest:
   algorithm: string
+  crypto-key-version: string
   import-job: string
   rsa-aes-wrapped-key: string
 
@@ -300,16 +351,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    algorithm=sed</code><ul>
+<li><code>-r .    algorithm=accusam</code><ul>
 <li>Required. The algorithm of the key being imported. This does not need to match the version_template of the CryptoKey this version imports into.</li>
 </ul>
 </li>
-<li><code>import-job=duo</code><ul>
+<li><code>crypto-key-version=takimata</code><ul>
+<li>Optional. The optional name of an existing CryptoKeyVersion to target for an import operation. If this field is not present, a new CryptoKeyVersion containing the supplied key material is created. If this field is present, the supplied key material is imported into the existing CryptoKeyVersion. To import into an existing CryptoKeyVersion, the CryptoKeyVersion must be a child of ImportCryptoKeyVersionRequest.parent, have been previously created via ImportCryptoKeyVersion, and be in DESTROYED or IMPORT_FAILED state. The key material and algorithm must match the previous CryptoKeyVersion exactly if the CryptoKeyVersion has ever contained key material.</li>
+</ul>
+</li>
+<li><code>import-job=consetetur</code><ul>
 <li>Required. The name of the ImportJob that was used to wrap this key material.</li>
 </ul>
 </li>
-<li><code>rsa-aes-wrapped-key=dolore</code><ul>
-<li>Wrapped key material produced with RSA_OAEP_3072_SHA1_AES_256 or RSA_OAEP_4096_SHA1_AES_256. This field contains the concatenation of two wrapped keys: 1. An ephemeral AES-256 wrapping key wrapped with the public_key using RSAES-OAEP with SHA-1, MGF1 with SHA-1, and an empty label. 2. The key to be imported, wrapped with the ephemeral AES-256 key using AES-KWP (RFC 5649). If importing symmetric key material, it is expected that the unwrapped key contains plain bytes. If importing asymmetric key material, it is expected that the unwrapped key is in PKCS#8-encoded DER format (the PrivateKeyInfo structure from RFC 5208). This format is the same as the format produced by PKCS#11 mechanism CKM_RSA_AES_KEY_WRAP.</li>
+<li><code>rsa-aes-wrapped-key=voluptua.</code><ul>
+<li>Wrapped key material produced with RSA_OAEP_3072_SHA1_AES_256 or RSA_OAEP_4096_SHA1_AES_256. This field contains the concatenation of two wrapped keys: 1. An ephemeral AES-256 wrapping key wrapped with the public_key using RSAES-OAEP with SHA-1/SHA-256, MGF1 with SHA-1/SHA-256, and an empty label. 2. The key to be imported, wrapped with the ephemeral AES-256 key using AES-KWP (RFC 5649). If importing symmetric key material, it is expected that the unwrapped key contains plain bytes. If importing asymmetric key material, it is expected that the unwrapped key is in PKCS#8-encoded DER format (the PrivateKeyInfo structure from RFC 5208). This format is the same as the format produced by PKCS#11 mechanism CKM_RSA_AES_KEY_WRAP.</li>
 </ul>
 </li>
 </ul>

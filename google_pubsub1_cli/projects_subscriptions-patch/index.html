@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Subscriptions Patch - Pubsub v2.0.4+20210322</title>
+  <title>Subscriptions Patch - Pubsub v3.0.0+20220221</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pubsub v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Pubsub v3.0.0+20220221</a>
         
       </div>
 
@@ -338,6 +338,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       dead-letter-topic: string
       max-delivery-attempts: integer
     detached: boolean
+    enable-exactly-once-delivery: boolean
     enable-message-ordering: boolean
     expiration-policy:
       ttl: string
@@ -355,23 +356,25 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     retry-policy:
       maximum-backoff: string
       minimum-backoff: string
+    state: string
     topic: string
+    topic-message-retention-duration: string
   update-mask: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .subscription    ack-deadline-seconds=8</code><ul>
+<li><code>-r .subscription    ack-deadline-seconds=9</code><ul>
 <li>The approximate amount of time (on a best-effort basis) Pub/Sub waits for the subscriber to acknowledge receipt before resending the message. In the interval after the message is delivered and before it is acknowledged, it is considered to be <em>outstanding</em>. During that time period, the message will not be redelivered (on a best-effort basis). For pull subscriptions, this value is used as the initial value for the ack deadline. To override this value for a given message, call <code>ModifyAckDeadline</code> with the corresponding <code>ack_id</code> if using non-streaming pull or send the <code>ack_id</code> in a <code>StreamingModifyAckDeadlineRequest</code> if using streaming pull. The minimum custom deadline you can specify is 10 seconds. The maximum custom deadline you can specify is 600 seconds (10 minutes). If this parameter is 0, a default value of 10 seconds is used. For push delivery, this value is also used to set the request timeout for the call to the push endpoint. If the subscriber never acknowledges the message, the Pub/Sub system will eventually redeliver the message.</li>
 </ul>
 </li>
-<li><code>dead-letter-policy    dead-letter-topic=duo</code><ul>
+<li><code>dead-letter-policy    dead-letter-topic=dolor</code><ul>
 <li>The name of the topic to which dead letter messages should be published. Format is <code>projects/{project}/topics/{topic}</code>.The Cloud Pub/Sub service account associated with the enclosing subscription&#39;s parent project (i.e., service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have permission to Publish() to this topic. The operation will fail if the topic does not exist. Users should ensure that there is a subscription attached to this topic since messages published to a topic with no subscriptions are lost.</li>
 </ul>
 </li>
 <li>
-<p><code>max-delivery-attempts=67</code></p>
+<p><code>max-delivery-attempts=83</code></p>
 <ul>
 <li>The maximum number of delivery attempts for any message. The value must be between 5 and 100. The number of delivery attempts is defined as 1 + (the sum of number of NACKs and number of times the acknowledgement deadline has been exceeded for the message). A NACK is any call to ModifyAckDeadline with a 0 deadline. Note that client libraries may automatically extend ack_deadlines. This field will be honored on a best effort basis. If this parameter is 0, a default value of 5 is used.</li>
 </ul>
@@ -382,80 +385,94 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Indicates whether the subscription is detached from its topic. Detached subscriptions don&#39;t receive messages from their topic and don&#39;t retain any backlog. <code>Pull</code> and <code>StreamingPull</code> requests will return FAILED_PRECONDITION. If the subscription is a push subscription, pushes to the endpoint will not be made.</li>
 </ul>
 </li>
+<li><code>enable-exactly-once-delivery=false</code><ul>
+<li>If true, Pub/Sub provides the following guarantees for the delivery of a message with a given value of <code>message_id</code> on this subscription: * The message sent to a subscriber is guaranteed not to be resent before the message&#39;s acknowledgement deadline expires. * An acknowledged message will not be resent to a subscriber. Note that subscribers may still receive multiple copies of a message when <code>enable_exactly_once_delivery</code> is true if the message was published multiple times by a publisher client. These copies are considered distinct by Pub/Sub and have distinct <code>message_id</code> values.</li>
+</ul>
+</li>
 <li><code>enable-message-ordering=false</code><ul>
 <li>If true, messages published with the same <code>ordering_key</code> in <code>PubsubMessage</code> will be delivered to the subscribers in the order in which they are received by the Pub/Sub system. Otherwise, they may be delivered in any order.</li>
 </ul>
 </li>
 <li>
-<p><code>expiration-policy    ttl=dolor</code></p>
+<p><code>expiration-policy    ttl=vero</code></p>
 <ul>
 <li>Specifies the &#34;time-to-live&#34; duration for an associated resource. The resource expires if it is not active for a period of <code>ttl</code>. The definition of &#34;activity&#34; depends on the type of the associated resource. The minimum and maximum allowed values for <code>ttl</code> depend on the type of the associated resource, as well. If <code>ttl</code> is not set, the associated resource never expires.</li>
 </ul>
 </li>
 <li>
-<p><code>..    filter=et</code></p>
+<p><code>..    filter=invidunt</code></p>
 <ul>
 <li>An expression written in the Pub/Sub <a href="https://cloud.google.com/pubsub/docs/filtering">filter language</a>. If non-empty, then only <code>PubsubMessage</code>s whose <code>attributes</code> field matches the filter are delivered on this subscription. If empty, then no messages are filtered out.</li>
 </ul>
 </li>
-<li><code>labels=key=et</code><ul>
+<li><code>labels=key=stet</code><ul>
 <li>See Creating and managing labels.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>message-retention-duration=sadipscing</code><ul>
+<li><code>message-retention-duration=vero</code><ul>
 <li>How long to retain unacknowledged messages in the subscription&#39;s backlog, from the moment a message is published. If <code>retain_acked_messages</code> is true, then this also configures the retention of acknowledged messages, and thus configures how far back in time a <code>Seek</code> can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10 minutes.</li>
 </ul>
 </li>
-<li><code>name=stet</code><ul>
+<li><code>name=elitr</code><ul>
 <li>Required. The name of the subscription. It must have the format <code>&amp;#34;projects/{project}/subscriptions/{subscription}&amp;#34;</code>. <code>{subscription}</code> must start with a letter, and contain only letters (<code>[A-Za-z]</code>), numbers (<code>[0-9]</code>), dashes (<code>-</code>), underscores (<code>_</code>), periods (<code>.</code>), tildes (<code>~</code>), plus (<code>+</code>) or percent signs (<code>%</code>). It must be between 3 and 255 characters in length, and it must not start with <code>&amp;#34;goog&amp;#34;</code>.</li>
 </ul>
 </li>
-<li><code>push-config    attributes=key=dolor</code><ul>
+<li><code>push-config    attributes=key=lorem</code><ul>
 <li>Endpoint configuration attributes that can be used to control different aspects of the message delivery. The only currently supported attribute is <code>x-goog-version</code>, which you can use to change the format of the pushed message. This attribute indicates the version of the data expected by the endpoint. This controls the shape of the pushed message (i.e., its fields and metadata). If not present during the <code>CreateSubscription</code> call, it will default to the version of the Pub/Sub API used to make such call. If not present in a <code>ModifyPushConfig</code> call, its value will not be changed. <code>GetSubscription</code> calls will always return a valid version, even if the subscription was created without this attribute. The only supported values for the <code>x-goog-version</code> attribute are: * <code>v1beta1</code>: uses the push format defined in the v1beta1 Pub/Sub API. * <code>v1</code> or <code>v1beta2</code>: uses the push format defined in the v1 Pub/Sub API. For example: attributes { &#34;x-goog-version&#34;: &#34;v1&#34; } </li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>oidc-token    audience=duo</code><ul>
+<li><code>oidc-token    audience=diam</code><ul>
 <li>Audience to be used when generating OIDC token. The audience claim identifies the recipients that the JWT is intended for. The audience value is a single case-sensitive string. Having multiple values (array) for the audience field is not supported. More info about the OIDC JWT token audience here: https://tools.ietf.org/html/rfc7519#section-4.1.3 Note: if not specified, the Push endpoint URL will be used.</li>
 </ul>
 </li>
 <li>
-<p><code>service-account-email=vero</code></p>
+<p><code>service-account-email=no</code></p>
 <ul>
 <li><a href="https://cloud.google.com/iam/docs/service-accounts">Service account email</a> to be used for generating the OIDC token. The caller (for CreateSubscription, UpdateSubscription, and ModifyPushConfig RPCs) must have the iam.serviceAccounts.actAs permission for the service account.</li>
 </ul>
 </li>
 <li>
-<p><code>..    push-endpoint=vero</code></p>
+<p><code>..    push-endpoint=ipsum</code></p>
 <ul>
 <li>A URL locating the endpoint to which messages should be pushed. For example, a Webhook endpoint might use <code>https://example.com/push</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    retain-acked-messages=false</code></p>
+<p><code>..    retain-acked-messages=true</code></p>
 <ul>
 <li>Indicates whether to retain acknowledged messages. If true, then messages are not expunged from the subscription&#39;s backlog, even if they are acknowledged, until they fall out of the <code>message_retention_duration</code> window. This must be true if you would like to [<code>Seek</code> to a timestamp] (https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in the past to replay previously-acknowledged messages.</li>
 </ul>
 </li>
-<li><code>retry-policy    maximum-backoff=stet</code><ul>
+<li><code>retry-policy    maximum-backoff=consetetur</code><ul>
 <li>The maximum delay between consecutive deliveries of a given message. Value should be between 0 and 600 seconds. Defaults to 600 seconds.</li>
 </ul>
 </li>
 <li>
-<p><code>minimum-backoff=vero</code></p>
+<p><code>minimum-backoff=voluptua.</code></p>
 <ul>
 <li>The minimum delay between consecutive deliveries of a given message. Value should be between 0 and 600 seconds. Defaults to 10 seconds.</li>
 </ul>
 </li>
 <li>
-<p><code>..    topic=elitr</code></p>
+<p><code>..    state=et</code></p>
 <ul>
+<li>Output only. An output-only field indicating whether or not the subscription can receive messages.</li>
+</ul>
+</li>
+<li><code>topic=erat</code><ul>
 <li>Required. The name of the topic from which this subscription is receiving messages. Format is <code>projects/{project}/topics/{topic}</code>. The value of this field will be <code>_deleted-topic_</code> if the topic has been deleted.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-mask=lorem</code></p>
+<p><code>topic-message-retention-duration=consetetur</code></p>
+<ul>
+<li>Output only. Indicates the minimum duration for which a message is retained after it is published to the subscription&#39;s topic. If this field is set, messages published to the subscription&#39;s topic in the last <code>topic_message_retention_duration</code> are always available to subscribers. See the <code>message_retention_duration</code> field in <code>Topic</code>. This field is set only in responses from the server; it is ignored if it is set in any requests.</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-mask=amet.</code></p>
 <ul>
 <li>Required. Indicates which fields in the provided subscription to update. Must be specified and non-empty.</li>
 </ul>

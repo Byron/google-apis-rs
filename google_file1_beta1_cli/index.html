@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Filestore v2.0.4+20210304</title>
+  <title>Cloud Filestore v3.0.0+20220214</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Filestore v2.0.4+20210304</a>
+        <a href="." class="icon icon-home"> Cloud Filestore v3.0.0+20220214</a>
         
       </div>
 
@@ -101,6 +101,36 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-instances-restore/">Locations Instances Restore</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-revert/">Locations Instances Revert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-snapshots-create/">Locations Instances Snapshots Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-snapshots-delete/">Locations Instances Snapshots Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-snapshots-get/">Locations Instances Snapshots Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-snapshots-list/">Locations Instances Snapshots List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-snapshots-patch/">Locations Instances Snapshots Patch</a>
                     
                 </li>
             
@@ -184,7 +214,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/file1_beta1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Filestore</em> API at revision <em>20210304</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Filestore</em> API at revision <em>20220214</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">file1-beta1 [options]
         projects
                 locations-backups-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -199,6 +229,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-instances-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-restore &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-revert &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-snapshots-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-snapshots-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-snapshots-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-snapshots-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-snapshots-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-cancel &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

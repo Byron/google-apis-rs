@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Run Realtime Report - AnalyticsData v2.0.4+20210329</title>
+  <title>Run Realtime Report - AnalyticsData v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> AnalyticsData v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> AnalyticsData v3.0.0+20220303</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../properties_batch-run-reports">Batch Run Reports</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../properties_check-compatibility">Check Compatibility</a>
                     
                 </li>
             
@@ -204,52 +209,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .dimension-filter.filter.between-filter.from-value    double-value=0.6792626134346527</code><ul>
+<li><code>-r .dimension-filter.filter.between-filter.from-value    double-value=0.012465497817154336</code><ul>
 <li>Double value</li>
 </ul>
 </li>
 <li>
-<p><code>int64-value=et</code></p>
+<p><code>int64-value=accusam</code></p>
 <ul>
 <li>Integer value</li>
 </ul>
 </li>
 <li>
-<p><code>..to-value    double-value=0.45715758654038996</code></p>
+<p><code>..to-value    double-value=0.333591971041029</code></p>
 <ul>
-<li>Double value</li>
-</ul>
-</li>
-<li>
-<p><code>int64-value=et</code></p>
-<ul>
-<li>Integer value</li>
-</ul>
-</li>
-<li>
-<p><code>...    field-name=vero</code></p>
-<ul>
-<li>The dimension name or metric name. Must be a name defined in dimensions or metrics.</li>
-</ul>
-</li>
-<li><code>in-list-filter    case-sensitive=false</code><ul>
-<li>If true, the string value is case sensitive.</li>
-</ul>
-</li>
-<li>
-<p><code>values=duo</code></p>
-<ul>
-<li>The list of string values. Must be non-empty.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>..numeric-filter    operation=dolore</code></p>
-<ul>
-<li>The operation type for this filter.</li>
-</ul>
-</li>
-<li><code>value    double-value=0.9694857568940014</code><ul>
 <li>Double value</li>
 </ul>
 </li>
@@ -260,50 +232,83 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...string-filter    case-sensitive=false</code></p>
+<p><code>...    field-name=et</code></p>
 <ul>
+<li>The dimension name or metric name. Must be a name defined in dimensions or metrics.</li>
+</ul>
+</li>
+<li><code>in-list-filter    case-sensitive=false</code><ul>
 <li>If true, the string value is case sensitive.</li>
 </ul>
 </li>
-<li><code>match-type=diam</code><ul>
-<li>The match type for this filter.</li>
-</ul>
-</li>
 <li>
-<p><code>value=dolor</code></p>
+<p><code>values=amet.</code></p>
 <ul>
-<li>The string value used for the matching.</li>
-</ul>
-</li>
-<li>
-<p><code>....    limit=et</code></p>
-<ul>
-<li>The number of rows to return. If unspecified, 10,000 rows are returned. The API returns a maximum of 100,000 rows per request, no matter how many you ask for. <code>limit</code> must be positive. The API can also return fewer rows than the requested <code>limit</code>, if there aren&#39;t as many dimension values as the <code>limit</code>. For instance, there are fewer than 300 possible values for the dimension <code>country</code>, so when reporting on only <code>country</code>, you can&#39;t get more than 300 rows, even if you set <code>limit</code> to a higher value.</li>
-</ul>
-</li>
-<li><code>metric-aggregations=et</code><ul>
-<li>Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to &#34;RESERVED_(MetricAggregation)&#34;.</li>
+<li>The list of string values. Must be non-empty.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>metric-filter.filter.between-filter.from-value    double-value=0.05383208152352925</code><ul>
+<li>
+<p><code>..numeric-filter    operation=sed</code></p>
+<ul>
+<li>The operation type for this filter.</li>
+</ul>
+</li>
+<li><code>value    double-value=0.726541471822237</code><ul>
 <li>Double value</li>
 </ul>
 </li>
 <li>
-<p><code>int64-value=dolor</code></p>
+<p><code>int64-value=gubergren</code></p>
 <ul>
 <li>Integer value</li>
 </ul>
 </li>
 <li>
-<p><code>..to-value    double-value=0.6349978834153693</code></p>
+<p><code>...string-filter    case-sensitive=false</code></p>
+<ul>
+<li>If true, the string value is case sensitive.</li>
+</ul>
+</li>
+<li><code>match-type=accusam</code><ul>
+<li>The match type for this filter.</li>
+</ul>
+</li>
+<li>
+<p><code>value=voluptua.</code></p>
+<ul>
+<li>The string value used for the matching.</li>
+</ul>
+</li>
+<li>
+<p><code>....    limit=dolore</code></p>
+<ul>
+<li>The number of rows to return. If unspecified, 10,000 rows are returned. The API returns a maximum of 100,000 rows per request, no matter how many you ask for. <code>limit</code> must be positive. The API can also return fewer rows than the requested <code>limit</code>, if there aren&#39;t as many dimension values as the <code>limit</code>. For instance, there are fewer than 300 possible values for the dimension <code>country</code>, so when reporting on only <code>country</code>, you can&#39;t get more than 300 rows, even if you set <code>limit</code> to a higher value.</li>
+</ul>
+</li>
+<li><code>metric-aggregations=dolore</code><ul>
+<li>Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to &#34;RESERVED_(MetricAggregation)&#34;.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>metric-filter.filter.between-filter.from-value    double-value=0.5284480987860815</code><ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=amet.</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>..to-value    double-value=0.6626374874296354</code></p>
 <ul>
 <li>Double value</li>
 </ul>
 </li>
 <li>
-<p><code>int64-value=vero</code></p>
+<p><code>int64-value=lorem</code></p>
 <ul>
 <li>Integer value</li>
 </ul>
@@ -319,24 +324,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>values=vero</code></p>
+<p><code>values=sit</code></p>
 <ul>
 <li>The list of string values. Must be non-empty.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..numeric-filter    operation=elitr</code></p>
+<p><code>..numeric-filter    operation=et</code></p>
 <ul>
 <li>The operation type for this filter.</li>
 </ul>
 </li>
-<li><code>value    double-value=0.7491113388279885</code><ul>
+<li><code>value    double-value=0.4875873367661776</code><ul>
 <li>Double value</li>
 </ul>
 </li>
 <li>
-<p><code>int64-value=diam</code></p>
+<p><code>int64-value=ipsum</code></p>
 <ul>
 <li>Integer value</li>
 </ul>
@@ -347,12 +352,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>If true, the string value is case sensitive.</li>
 </ul>
 </li>
-<li><code>match-type=ipsum</code><ul>
+<li><code>match-type=est</code><ul>
 <li>The match type for this filter.</li>
 </ul>
 </li>
 <li>
-<p><code>value=accusam</code></p>
+<p><code>value=sed</code></p>
 <ul>
 <li>The string value used for the matching.</li>
 </ul>

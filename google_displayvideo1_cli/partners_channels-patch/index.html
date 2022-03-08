@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Channels Patch - Display Video v2.0.4+20210325</title>
+  <title>Channels Patch - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -462,12 +472,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -494,12 +534,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -610,6 +665,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -857,13 +917,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   channel-id: string
   display-name: string
   name: string
+  negatively-targeted-line-item-count: int64
   partner-id: string
+  positively-targeted-line-item-count: int64
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    advertiser-id=rebum.</code><ul>
+<li><code>-r .    advertiser-id=et</code><ul>
 <li>The ID of the advertiser that owns the channel.</li>
 </ul>
 </li>
@@ -871,16 +933,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. The unique ID of the channel. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>display-name=voluptua.</code><ul>
+<li><code>display-name=sit</code><ul>
 <li>Required. The display name of the channel. Must be UTF-8 encoded with a maximum length of 240 bytes.</li>
 </ul>
 </li>
-<li><code>name=erat</code><ul>
+<li><code>name=labore</code><ul>
 <li>Output only. The resource name of the channel.</li>
 </ul>
 </li>
-<li><code>partner-id=nonumy</code><ul>
+<li><code>negatively-targeted-line-item-count=-22</code><ul>
+<li>Output only. Number of line items that are directly targeting this channel negatively.</li>
+</ul>
+</li>
+<li><code>partner-id=sed</code><ul>
 <li>The ID of the partner that owns the channel.</li>
+</ul>
+</li>
+<li><code>positively-targeted-line-item-count=-34</code><ul>
+<li>Output only. Number of line items that are directly targeting this channel positively.</li>
 </ul>
 </li>
 </ul>

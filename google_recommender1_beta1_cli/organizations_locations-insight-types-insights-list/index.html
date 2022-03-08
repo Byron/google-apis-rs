@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Insight Types Insights List - Recommender v2.0.4+20210319</title>
+  <title>Locations Insight Types Insights List - Recommender v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Recommender v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Recommender v3.0.0+20220228</a>
         
       </div>
 
@@ -137,6 +137,16 @@
         <span>Organizations</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../organizations_locations-insight-types-config">Locations Insight Types Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../organizations_locations-insight-types-get-config">Locations Insight Types Get Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../organizations_locations-insight-types-insights-get">Locations Insight Types Insights Get</a>
                     
                 </li>
@@ -167,6 +177,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../organizations_locations-insight-types-insights-mark-accepted">Locations Insight Types Insights Mark Accepted</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../organizations_locations-recommenders-config">Locations Recommenders Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../organizations_locations-recommenders-get-config">Locations Recommenders Get Config</a>
                     
                 </li>
             
@@ -202,6 +222,11 @@
         <span>Projects</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-insight-types-get-config">Locations Insight Types Get Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-insight-types-insights-get">Locations Insight Types Insights Get</a>
                     
                 </li>
@@ -213,6 +238,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-insight-types-insights-mark-accepted">Locations Insight Types Insights Mark Accepted</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-insight-types-update-config">Locations Insight Types Update Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-recommenders-get-config">Locations Recommenders Get Config</a>
                     
                 </li>
             
@@ -238,6 +273,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-recommenders-recommendations-mark-succeeded">Locations Recommenders Recommendations Mark Succeeded</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-recommenders-update-config">Locations Recommenders Update Config</a>
                     
                 </li>
             
@@ -277,7 +317,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists insights for a Cloud project. Requires the recommender.*.list IAM permission for the specified insight type.</p>
+              <p>Lists insights for the specified Cloud Resource. Requires the recommender.*.list IAM permission for the specified insight type.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -285,7 +325,7 @@ You can set the scope for this method like this: <code>recommender1-beta1 --scop
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The container resource on which to execute the request. Acceptable formats: 1. <code>projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> 2. <code>billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> 3. <code>folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> 4. <code>organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ INSIGHT_TYPE_ID refers to supported insight types: https://cloud.google.com/recommender/docs/insights/insight-types.</li>
+<li>Required. The container resource on which to execute the request. Acceptable formats: * <code>projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> * <code>projects/[PROJECT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> * <code>billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> * <code>folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> * <code>organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]</code> LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ INSIGHT_TYPE_ID refers to supported insight types: https://cloud.google.com/recommender/docs/insights/insight-types.</li>
 </ul>
 </li>
 </ul>
@@ -308,7 +348,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Optional. Filter expression to restrict the insights returned. Supported filter fields: state Eg: `state:&#34;DISMISSED&#34; or state:&#34;ACTIVE&#34;</li>
+<li>Optional. Filter expression to restrict the insights returned. Supported filter fields: * <code>stateInfo.state</code> * <code>insightSubtype</code> * <code>severity</code> Examples: * <code>stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED</code> * <code>insightSubtype = PERMISSIONS_USAGE</code> * <code>severity = CRITICAL OR severity = HIGH</code> * <code>stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)</code> (These expressions are based on the filter language described at https://google.aip.dev/160)</li>
 </ul>
 </li>
 <li>

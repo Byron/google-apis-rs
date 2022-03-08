@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Catalogs Patch - Cloud Retail v2.0.4+20210319</title>
+  <title>Locations Catalogs Patch - Cloud Retail v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Retail v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Retail v3.0.0+20220224</a>
         
       </div>
 
@@ -46,6 +46,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-branches-operations-get">Locations Catalogs Branches Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-add-fulfillment-places">Locations Catalogs Branches Products Add Fulfillment Places</a>
                     
                 </li>
             
@@ -70,7 +75,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-list">Locations Catalogs Branches Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-branches-products-patch">Locations Catalogs Branches Products Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-set-inventory">Locations Catalogs Branches Products Set Inventory</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-complete-query">Locations Catalogs Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-completion-data-import">Locations Catalogs Completion Data Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-get-default-branch">Locations Catalogs Get Default Branch</a>
                     
                 </li>
             
@@ -124,6 +159,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-placements-search">Locations Catalogs Placements Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-set-default-branch">Locations Catalogs Set Default Branch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-user-events-collect">Locations Catalogs User Events Collect</a>
                     
                 </li>
@@ -155,6 +200,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
                     
                 </li>
             
@@ -221,20 +276,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    display-name=sed</code><ul>
+<li><code>-r .    display-name=accusam</code><ul>
 <li>Required. Immutable. The catalog display name. This field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>Required. Immutable. The fully qualified resource name of the catalog.</li>
 </ul>
 </li>
-<li><code>product-level-config    ingestion-product-type=et</code><ul>
-<li>The type of Products allowed to be ingested into the catalog. Acceptable values are: * <code>primary</code> (default): You can only ingest Product.Type.PRIMARY Products. This means Product.primary_product_id can only be empty or set to the same value as Product.id. * <code>variant</code>: You can only ingest Product.Type.VARIANT Products. This means Product.primary_product_id cannot be empty. If this field is set to an invalid value other than these, an INVALID_ARGUMENT error is returned. If this field is <code>variant</code> and merchant_center_product_id_field is <code>itemGroupId</code>, an INVALID_ARGUMENT error is returned. See <a href="..//retail/recommendations-ai/docs/catalog#catalog-levels">Using catalog levels</a> for more details.</li>
+<li><code>product-level-config    ingestion-product-type=sadipscing</code><ul>
+<li>The type of Products allowed to be ingested into the catalog. Acceptable values are: * <code>primary</code> (default): You can ingest Products of all types. When ingesting a Product, its type will default to Product.Type.PRIMARY if unset. * <code>variant</code>: You can only ingest Product.Type.VARIANT Products. This means Product.primary_product_id cannot be empty. If this field is set to an invalid value other than these, an INVALID_ARGUMENT error is returned. If this field is <code>variant</code> and merchant_center_product_id_field is <code>itemGroupId</code>, an INVALID_ARGUMENT error is returned. See <a href="https://cloud.google.com/retail/recommendations-ai/docs/catalog#product-levels">Using product levels</a> for more details.</li>
 </ul>
 </li>
-<li><code>merchant-center-product-id-field=vero</code><ul>
-<li>Which field of <a href="..//bigquery-transfer/docs/merchant-center-products-schema">Merchant Center Product</a> should be imported as Product.id. Acceptable values are: * <code>offerId</code> (default): Import <code>offerId</code> as the product ID. * <code>itemGroupId</code>: Import <code>itemGroupId</code> as the product ID. Notice that Retail API will choose one item from the ones with the same <code>itemGroupId</code>, and use it to represent the item group. If this field is set to an invalid value other than these, an INVALID_ARGUMENT error is returned. If this field is <code>itemGroupId</code> and ingestion_product_type is <code>variant</code>, an INVALID_ARGUMENT error is returned. See <a href="..//retail/recommendations-ai/docs/catalog#catalog-levels">Using catalog levels</a> for more details.</li>
+<li><code>merchant-center-product-id-field=at</code><ul>
+<li>Which field of <a href="..//bigquery-transfer/docs/merchant-center-products-schema">Merchant Center Product</a> should be imported as Product.id. Acceptable values are: * <code>offerId</code> (default): Import <code>offerId</code> as the product ID. * <code>itemGroupId</code>: Import <code>itemGroupId</code> as the product ID. Notice that Retail API will choose one item from the ones with the same <code>itemGroupId</code>, and use it to represent the item group. If this field is set to an invalid value other than these, an INVALID_ARGUMENT error is returned. If this field is <code>itemGroupId</code> and ingestion_product_type is <code>variant</code>, an INVALID_ARGUMENT error is returned. See <a href="https://cloud.google.com/retail/recommendations-ai/docs/catalog#product-levels">Using product levels</a> for more details.</li>
 </ul>
 </li>
 </ul>
@@ -263,7 +318,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>Indicates which fields in the provided Catalog to update. If not set, will only update the Catalog.product_level_config field, which is also the only currently supported field to update. If an unsupported or unknown field is provided, an INVALID_ARGUMENT error is returned.</li>
+<li>Indicates which fields in the provided Catalog to update. If an unsupported or unknown field is provided, an INVALID_ARGUMENT error is returned.</li>
 </ul>
 </li>
 </ul>

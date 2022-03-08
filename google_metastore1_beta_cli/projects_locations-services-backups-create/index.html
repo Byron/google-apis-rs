@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Services Backups Create - Dataproc Metastore v2.0.4+20210325</title>
+  <title>Locations Services Backups Create - Dataproc Metastore v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc Metastore v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Dataproc Metastore v3.0.0+20220222</a>
         
       </div>
 
@@ -109,12 +109,57 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-get-iam-policy">Locations Services Backups Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-backups-list">Locations Services Backups List</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-set-iam-policy">Locations Services Backups Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-test-iam-permissions">Locations Services Backups Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-create">Locations Services Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-get-iam-policy">Locations Services Databases Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-set-iam-policy">Locations Services Databases Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-get-iam-policy">Locations Services Databases Tables Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-set-iam-policy">Locations Services Databases Tables Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-test-iam-permissions">Locations Services Databases Tables Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-test-iam-permissions">Locations Services Databases Test Iam Permissions</a>
                     
                 </li>
             
@@ -169,6 +214,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-remove-iam-policy">Locations Services Remove Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-restore">Locations Services Restore</a>
                     
                 </li>
@@ -219,7 +269,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates a new Backup in a given project and location.</p>
+              <p>Creates a new backup in a given project and location.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -240,12 +290,17 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   description: string
   end-time: string
   name: string
+  restoring-services: [string]
   service-revision:
     artifact-gcs-uri: string
     create-time: string
+    database-type: string
+    encryption-config:
+      kms-key: string
     endpoint-uri: string
     hive-metastore-config:
       config-overrides: { string: string }
+      endpoint-protocol: string
       kerberos-config:
         keytab:
           cloud-secret: string
@@ -290,112 +345,133 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Immutable. The relative resource name of the backup, in the following form:projects/{project_number}/locations/{location_id}/services/{service_id}/backups/{backup_id}</li>
 </ul>
 </li>
-<li><code>service-revision    artifact-gcs-uri=voluptua.</code><ul>
+<li><code>restoring-services=voluptua.</code><ul>
+<li>Output only. Services that are restoring from the backup.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>service-revision    artifact-gcs-uri=at</code><ul>
 <li>Output only. A Cloud Storage URI (starting with gs://) that specifies where artifacts related to the metastore service are stored.</li>
 </ul>
 </li>
-<li><code>create-time=at</code><ul>
+<li><code>create-time=sanctus</code><ul>
 <li>Output only. The time when the metastore service was created.</li>
 </ul>
 </li>
-<li><code>endpoint-uri=sanctus</code><ul>
-<li>Output only. The URI of the endpoint used to access the metastore service.</li>
-</ul>
-</li>
-<li><code>hive-metastore-config    config-overrides=key=sed</code><ul>
-<li>A mapping of Hive metastore configuration key-value pairs to apply to the Hive metastore (configured in hive-site.xml). The mappings override system defaults (some keys cannot be overridden).</li>
-<li>the value will be associated with the given <code>key</code></li>
+<li><code>database-type=sed</code><ul>
+<li>Immutable. The database type that the Metastore service stores its data.</li>
 </ul>
 </li>
 <li>
-<p><code>kerberos-config.keytab    cloud-secret=amet.</code></p>
+<p><code>encryption-config    kms-key=amet.</code></p>
+<ul>
+<li>The fully qualified customer provided Cloud KMS key name to use for customer data encryption, in the following form:projects/{project_number}/locations/{location_id}/keyRings/{key_ring_id}/cryptoKeys/{crypto_key_id}.</li>
+</ul>
+</li>
+<li>
+<p><code>..    endpoint-uri=takimata</code></p>
+<ul>
+<li>Output only. The URI of the endpoint used to access the metastore service.</li>
+</ul>
+</li>
+<li><code>hive-metastore-config    config-overrides=key=amet.</code><ul>
+<li>A mapping of Hive metastore configuration key-value pairs to apply to the Hive metastore (configured in hive-site.xml). The mappings override system defaults (some keys cannot be overridden). These overrides are also applied to auxiliary versions and can be further customized in the auxiliary version&#39;s AuxiliaryVersionConfig.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>endpoint-protocol=duo</code><ul>
+<li>The protocol to use for the metastore service endpoint. If unspecified, defaults to THRIFT.</li>
+</ul>
+</li>
+<li>
+<p><code>kerberos-config.keytab    cloud-secret=ipsum</code></p>
 <ul>
 <li>The relative resource name of a Secret Manager secret version, in the following form:projects/{project_number}/secrets/{secret_id}/versions/{version_id}.</li>
 </ul>
 </li>
 <li>
-<p><code>..    krb5-config-gcs-uri=takimata</code></p>
+<p><code>..    krb5-config-gcs-uri=gubergren</code></p>
 <ul>
 <li>A Cloud Storage URI that specifies the path to a krb5.conf file. It is of the form gs://{bucket_name}/path/to/krb5.conf, although the file does not need to be named krb5.conf explicitly.</li>
 </ul>
 </li>
 <li>
-<p><code>principal=amet.</code></p>
+<p><code>principal=lorem</code></p>
 <ul>
 <li>A Kerberos principal that exists in the both the keytab the KDC to authenticate as. A typical principal is of the form primary/instance@REALM, but there is no exact format.</li>
 </ul>
 </li>
 <li>
-<p><code>..    version=duo</code></p>
+<p><code>..    version=gubergren</code></p>
 <ul>
 <li>Immutable. The Hive metastore schema version.</li>
 </ul>
 </li>
 <li>
-<p><code>..    labels=key=ipsum</code></p>
+<p><code>..    labels=key=eos</code></p>
 <ul>
 <li>User-defined labels for the metastore service.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>maintenance-window    day-of-week=gubergren</code><ul>
+<li><code>maintenance-window    day-of-week=dolor</code><ul>
 <li>The day of week, when the window starts.</li>
 </ul>
 </li>
 <li>
-<p><code>hour-of-day=50</code></p>
+<p><code>hour-of-day=84</code></p>
 <ul>
 <li>The hour of day (0-23) when the window starts.</li>
 </ul>
 </li>
 <li>
-<p><code>..metadata-integration.data-catalog-config    enabled=false</code></p>
+<p><code>..metadata-integration.data-catalog-config    enabled=true</code></p>
 <ul>
 <li>Defines whether the metastore metadata should be synced to Data Catalog. The default value is to disable syncing metastore metadata to Data Catalog.</li>
 </ul>
 </li>
 <li>
-<p><code>...    name=dolor</code></p>
+<p><code>...    name=invidunt</code></p>
 <ul>
 <li>Immutable. The relative resource name of the metastore service, of the form:projects/{project_number}/locations/{location_id}/services/{service_id}.</li>
 </ul>
 </li>
-<li><code>network=ea</code><ul>
+<li><code>network=amet</code><ul>
 <li>Immutable. The relative resource name of the VPC network on which the instance can be accessed. It is specified in the following form:projects/{project_number}/global/networks/{network_id}.</li>
 </ul>
 </li>
-<li><code>port=46</code><ul>
+<li><code>port=81</code><ul>
 <li>The TCP port at which the metastore service is reached. Default: 9083.</li>
 </ul>
 </li>
-<li><code>release-channel=invidunt</code><ul>
+<li><code>release-channel=ipsum</code><ul>
 <li>Immutable. The release channel of the service. If unspecified, defaults to STABLE.</li>
 </ul>
 </li>
-<li><code>state=amet</code><ul>
+<li><code>state=sed</code><ul>
 <li>Output only. The current state of the metastore service.</li>
 </ul>
 </li>
-<li><code>state-message=duo</code><ul>
+<li><code>state-message=ut</code><ul>
 <li>Output only. Additional information about the current state of the metastore service, if available.</li>
 </ul>
 </li>
-<li><code>tier=ipsum</code><ul>
+<li><code>tier=gubergren</code><ul>
 <li>The tier of the service.</li>
 </ul>
 </li>
-<li><code>uid=sed</code><ul>
+<li><code>uid=rebum.</code><ul>
 <li>Output only. The globally unique resource identifier of the metastore service.</li>
 </ul>
 </li>
 <li>
-<p><code>update-time=ut</code></p>
+<p><code>update-time=est</code></p>
 <ul>
 <li>Output only. The time when the metastore service was last updated.</li>
 </ul>
 </li>
 <li>
-<p><code>..    state=gubergren</code></p>
+<p><code>..    state=ipsum</code></p>
 <ul>
 <li>Output only. The current state of the backup.</li>
 </ul>

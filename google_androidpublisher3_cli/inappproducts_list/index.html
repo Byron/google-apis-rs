@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Android Publisher v2.0.4+20210401</title>
+  <title>List - Android Publisher v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Publisher v2.0.4+20210401</a>
+        <a href=".." class="icon icon-home"> Android Publisher v3.0.0+20220307</a>
         
       </div>
 
@@ -71,6 +71,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../edits_commit">Commit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../edits_countryavailability-get">Countryavailability Get</a>
                     
                 </li>
             
@@ -223,6 +228,43 @@
 
     
         
+        <span>Generatedapks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../generatedapks_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../generatedapks_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Grants</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../grants_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../grants_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../grants_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
         <span>Inappproducts</span>
             
                 <li class="toctree-l1 ">
@@ -287,6 +329,17 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../internalappsharingartifacts_uploadbundle">Uploadbundle</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Monetization</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../monetization_convert-region-prices">Convert Region Prices</a>
                     
                 </li>
             
@@ -402,6 +455,32 @@
         
 
     
+        
+        <span>Users</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -435,7 +514,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists all in-app products - both managed products and subscriptions.</p>
+              <p>Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field <code>tokenPagination.nextPageToken</code> will be set and the caller should provide its value as a <code>token</code> request parameter to retrieve the next page.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/androidpublisher</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/androidpublisher</em>.
@@ -466,13 +545,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p max-results=integer</strong></p>
 <ul>
-<li>How many results the list operation should return.</li>
+<li>Deprecated and ignored. The page size is determined by the server.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p start-index=integer</strong></p>
 <ul>
-<li>The index of the first element to return.</li>
+<li>Deprecated and ignored. Set the <code>token</code> parameter to rertieve the next page.</li>
 </ul>
 </li>
 <li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Executions Create - AI Platform Notebooks v2.0.4+20210305</title>
+  <title>Locations Executions Create - AI Platform Notebooks v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> AI Platform Notebooks v2.0.4+20210305</a>
+        <a href=".." class="icon icon-home"> AI Platform Notebooks v3.0.0+20220224</a>
         
       </div>
 
@@ -164,6 +164,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-rollback">Locations Instances Rollback</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-instances-set-accelerator">Locations Instances Set Accelerator</a>
                     
                 </li>
@@ -199,6 +204,21 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-update-config">Locations Instances Update Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-update-metadata-items">Locations Instances Update Metadata Items</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-update-shielded-instance-config">Locations Instances Update Shielded Instance Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-instances-upgrade">Locations Instances Upgrade</a>
                     
                 </li>
@@ -230,6 +250,66 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-create">Locations Runtimes Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-delete">Locations Runtimes Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-get">Locations Runtimes Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-get-iam-policy">Locations Runtimes Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-list">Locations Runtimes List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-report-event">Locations Runtimes Report Event</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-reset">Locations Runtimes Reset</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-set-iam-policy">Locations Runtimes Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-start">Locations Runtimes Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-stop">Locations Runtimes Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-switch">Locations Runtimes Switch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-runtimes-test-iam-permissions">Locations Runtimes Test Iam Permissions</a>
                     
                 </li>
             
@@ -294,7 +374,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates a new Scheduled Notebook in a given project and location.</p>
+              <p>Creates a new Execution in a given project and location.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -319,13 +399,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       core-count: int64
       type: string
     container-image-uri: string
+    dataproc-parameters:
+      cluster: string
     input-notebook-file: string
+    job-type: string
+    kernel-spec: string
     labels: { string: string }
     master-type: string
     output-notebook-folder: string
     parameters: string
     params-yaml-file: string
     scale-tier: string
+    service-account: string
+    tensorboard: string
+    vertex-ai-parameters:
+      env: { string: string }
+      network: string
+  job-uri: string
   name: string
   output-notebook-file: string
   state: string
@@ -363,52 +453,89 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Container Image URI to a DLVM Example: &#39;gcr.io/deeplearning-platform-release/base-cu100&#39; More examples can be found at: https://cloud.google.com/ai-platform/deep-learning-containers/docs/choosing-container</li>
 </ul>
 </li>
-<li><code>input-notebook-file=eos</code><ul>
-<li>Path to the notebook file to execute. Must be in a Google Cloud Storage bucket. Format: gs://{project_id}/{folder}/{notebook_file_name} Ex: gs://notebook_user/scheduled_notebooks/sentiment_notebook.ipynb</li>
+<li>
+<p><code>dataproc-parameters    cluster=eos</code></p>
+<ul>
+<li>URI for cluster used to run Dataproc execution. Format: <code>projects/{PROJECT_ID}/regions/{REGION}/clusters/{CLUSTER_NAME}</code></li>
 </ul>
 </li>
-<li><code>labels=key=dolor</code><ul>
+<li>
+<p><code>..    input-notebook-file=dolor</code></p>
+<ul>
+<li>Path to the notebook file to execute. Must be in a Google Cloud Storage bucket. Format: <code>gs://{bucket_name}/{folder}/{notebook_file_name}</code> Ex: <code>gs://notebook_user/scheduled_notebooks/sentiment_notebook.ipynb</code></li>
+</ul>
+</li>
+<li><code>job-type=ea</code><ul>
+<li>The type of Job to be used on this execution.</li>
+</ul>
+</li>
+<li><code>kernel-spec=ipsum</code><ul>
+<li>Name of the kernel spec to use. This must be specified if the kernel spec name on the execution target does not match the name in the input notebook file.</li>
+</ul>
+</li>
+<li><code>labels=key=invidunt</code><ul>
 <li>Labels for execution. If execution is scheduled, a field included will be &#39;nbs-scheduled&#39;. Otherwise, it is an immediate execution, and an included field will be &#39;nbs-immediate&#39;. Use fields to efficiently index between various types of executions.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>master-type=ea</code><ul>
-<li>Specifies the type of virtual machine to use for your training job&#39;s master worker. You must specify this field when <code>scaleTier</code> is set to <code>CUSTOM</code>. You can use certain Compute Engine machine types directly in this field. The following types are supported: - <code>n1-standard-4</code> - <code>n1-standard-8</code> - <code>n1-standard-16</code> - <code>n1-standard-32</code> - <code>n1-standard-64</code> - <code>n1-standard-96</code> - <code>n1-highmem-2</code> - <code>n1-highmem-4</code> - <code>n1-highmem-8</code> - <code>n1-highmem-16</code> - <code>n1-highmem-32</code> - <code>n1-highmem-64</code> - <code>n1-highmem-96</code> - <code>n1-highcpu-16</code> - <code>n1-highcpu-32</code> - <code>n1-highcpu-64</code> - <code>n1-highcpu-96</code> Alternatively, you can use the following legacy machine types: - <code>standard</code> - <code>large_model</code> - <code>complex_model_s</code> - <code>complex_model_m</code> - <code>complex_model_l</code> - <code>standard_gpu</code> - <code>complex_model_m_gpu</code> - <code>complex_model_l_gpu</code> - <code>standard_p100</code> - <code>complex_model_m_p100</code> - <code>standard_v100</code> - <code>large_model_v100</code> - <code>complex_model_m_v100</code> - <code>complex_model_l_v100</code> Finally, if you want to use a TPU for training, specify <code>cloud_tpu</code> in this field. Learn more about the [special configuration options for training with TPU.</li>
+<li><code>master-type=amet</code><ul>
+<li>Specifies the type of virtual machine to use for your training job&#39;s master worker. You must specify this field when <code>scaleTier</code> is set to <code>CUSTOM</code>. You can use certain Compute Engine machine types directly in this field. The following types are supported: - <code>n1-standard-4</code> - <code>n1-standard-8</code> - <code>n1-standard-16</code> - <code>n1-standard-32</code> - <code>n1-standard-64</code> - <code>n1-standard-96</code> - <code>n1-highmem-2</code> - <code>n1-highmem-4</code> - <code>n1-highmem-8</code> - <code>n1-highmem-16</code> - <code>n1-highmem-32</code> - <code>n1-highmem-64</code> - <code>n1-highmem-96</code> - <code>n1-highcpu-16</code> - <code>n1-highcpu-32</code> - <code>n1-highcpu-64</code> - <code>n1-highcpu-96</code> Alternatively, you can use the following legacy machine types: - <code>standard</code> - <code>large_model</code> - <code>complex_model_s</code> - <code>complex_model_m</code> - <code>complex_model_l</code> - <code>standard_gpu</code> - <code>complex_model_m_gpu</code> - <code>complex_model_l_gpu</code> - <code>standard_p100</code> - <code>complex_model_m_p100</code> - <code>standard_v100</code> - <code>large_model_v100</code> - <code>complex_model_m_v100</code> - <code>complex_model_l_v100</code> Finally, if you want to use a TPU for training, specify <code>cloud_tpu</code> in this field. Learn more about the <a href="https://cloud.google.com/ai-platform/training/docs/using-tpus#configuring_a_custom_tpu_machine">special configuration options for training with TPU</a>.</li>
 </ul>
 </li>
-<li><code>output-notebook-folder=ipsum</code><ul>
-<li>Path to the notebook folder to write to. Must be in a Google Cloud Storage bucket path. Format: gs://{project_id}/{folder} Ex: gs://notebook_user/scheduled_notebooks</li>
+<li><code>output-notebook-folder=duo</code><ul>
+<li>Path to the notebook folder to write to. Must be in a Google Cloud Storage bucket path. Format: <code>gs://{bucket_name}/{folder}</code> Ex: <code>gs://notebook_user/scheduled_notebooks</code></li>
 </ul>
 </li>
-<li><code>parameters=invidunt</code><ul>
+<li><code>parameters=ipsum</code><ul>
 <li>Parameters used within the &#39;input_notebook_file&#39; notebook.</li>
 </ul>
 </li>
-<li><code>params-yaml-file=amet</code><ul>
-<li>Parameters to be overridden in the notebook during execution. Ref https://papermill.readthedocs.io/en/latest/usage-parameterize.html on how to specifying parameters in the input notebook and pass them here in an YAML file. Ex: gs://notebook_user/scheduled_notebooks/sentiment_notebook_params.yaml</li>
+<li><code>params-yaml-file=sed</code><ul>
+<li>Parameters to be overridden in the notebook during execution. Ref https://papermill.readthedocs.io/en/latest/usage-parameterize.html on how to specifying parameters in the input notebook and pass them here in an YAML file. Ex: <code>gs://notebook_user/scheduled_notebooks/sentiment_notebook_params.yaml</code></li>
+</ul>
+</li>
+<li><code>scale-tier=ut</code><ul>
+<li>Required. Scale tier of the hardware used for notebook execution. DEPRECATED Will be discontinued. As right now only CUSTOM is supported.</li>
+</ul>
+</li>
+<li><code>service-account=gubergren</code><ul>
+<li>The email address of a service account to use when running the execution. You must have the <code>iam.serviceAccounts.actAs</code> permission for the specified service account.</li>
+</ul>
+</li>
+<li><code>tensorboard=rebum.</code><ul>
+<li>The name of a Vertex AI [Tensorboard] resource to which this execution will upload Tensorboard logs. Format: <code>projects/{project}/locations/{location}/tensorboards/{tensorboard}</code></li>
+</ul>
+</li>
+<li><code>vertex-ai-parameters    env=key=est</code><ul>
+<li>Environment variables. At most 100 environment variables can be specified and unique. Example: GCP_BUCKET=gs://my-bucket/samples/</li>
+<li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>scale-tier=duo</code></p>
+<p><code>network=ipsum</code></p>
 <ul>
-<li>Required. Scale tier of the hardware used for notebook execution.</li>
+<li>The full name of the Compute Engine <a href="..//compute/docs/networks-and-firewalls#networks">network</a> to which the Job should be peered. For example, <code>projects/12345/global/networks/myVPC</code>. <a href="https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert">Format</a> is of the form <code>projects/{project}/global/networks/{network}</code>. Where {project} is a project number, as in <code>12345</code>, and {network} is a network name. Private services access must already be configured for the network. If left unspecified, the job is not peered with any network.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=ipsum</code></p>
+<p><code>...    job-uri=ipsum</code></p>
 <ul>
-<li>Output only. The resource name of the execute. Format: `projects/{project_id}/locations/{location}/execution/{execution_id}</li>
+<li>Output only. The URI of the external job used to execute the notebook.</li>
 </ul>
 </li>
-<li><code>output-notebook-file=sed</code><ul>
+<li><code>name=est</code><ul>
+<li>Output only. The resource name of the execute. Format: <code>projects/{project_id}/locations/{location}/executions/{execution_id}</code></li>
+</ul>
+</li>
+<li><code>output-notebook-file=gubergren</code><ul>
 <li>Output notebook file generated by this execution</li>
 </ul>
 </li>
-<li><code>state=ut</code><ul>
+<li><code>state=ea</code><ul>
 <li>Output only. State of the underlying AI Platform job.</li>
 </ul>
 </li>
-<li><code>update-time=gubergren</code><ul>
+<li><code>update-time=dolor</code><ul>
 <li>Output only. Time the Execution was last updated.</li>
 </ul>
 </li>

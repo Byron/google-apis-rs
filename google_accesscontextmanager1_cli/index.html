@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Access Context Manager v2.0.4+20210319</title>
+  <title>Access Context Manager v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Access Context Manager v2.0.4+20210319</a>
+        <a href="." class="icon icon-home"> Access Context Manager v3.0.0+20220301</a>
         
       </div>
 
@@ -75,6 +75,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="access-policies_access-levels-test-iam-permissions/">Access Levels Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="access-policies_create/">Create</a>
                     
                 </li>
@@ -86,6 +91,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="access-policies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="access-policies_get-iam-policy/">Get Iam Policy</a>
                     
                 </li>
             
@@ -131,6 +141,21 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="access-policies_service-perimeters-replace-all/">Service Perimeters Replace All</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="access-policies_service-perimeters-test-iam-permissions/">Service Perimeters Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="access-policies_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="access-policies_test-iam-permissions/">Test Iam Permissions</a>
                     
                 </li>
             
@@ -246,7 +271,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/accesscontextmanager1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Access Context Manager</em> API at revision <em>20210319</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Access Context Manager</em> API at revision <em>20220301</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">accesscontextmanager1 [options]
         access-policies
                 access-levels-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -255,9 +280,11 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 access-levels-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 access-levels-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 access-levels-replace-all &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                access-levels-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 create (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-perimeters-commit &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -267,6 +294,9 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 service-perimeters-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-perimeters-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-perimeters-replace-all &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                service-perimeters-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         operations
                 cancel &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

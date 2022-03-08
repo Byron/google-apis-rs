@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Domains v2.0.4+20210216</title>
+  <title>Cloud Domains v3.0.0+20220128</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Domains v2.0.4+20210216</a>
+        <a href="." class="icon icon-home"> Cloud Domains v3.0.0+20220128</a>
         
       </div>
 
@@ -130,6 +130,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-registrations-retrieve-transfer-parameters/">Locations Registrations Retrieve Transfer Parameters</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-registrations-search-domains/">Locations Registrations Search Domains</a>
                     
                 </li>
@@ -141,6 +146,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-registrations-test-iam-permissions/">Locations Registrations Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-registrations-transfer/">Locations Registrations Transfer</a>
                     
                 </li>
             
@@ -199,7 +209,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/domains1_beta1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Domains</em> API at revision <em>20210216</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Domains</em> API at revision <em>20220128</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">domains1-beta1 [options]
         projects
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -219,9 +229,11 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-registrations-reset-authorization-code &lt;registration&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-registrations-retrieve-authorization-code &lt;registration&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-registrations-retrieve-register-parameters &lt;location&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-registrations-retrieve-transfer-parameters &lt;location&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-registrations-search-domains &lt;location&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-registrations-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-registrations-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-registrations-transfer &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   domains1-beta1 --help
 
 Configuration:

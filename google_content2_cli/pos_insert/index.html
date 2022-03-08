@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - Shopping Content v2.0.4+20210325</title>
+  <title>Insert - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -649,24 +649,50 @@ You can set the scope for this method like this: <code>content2 --scope &lt;scop
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>PosStore:
+  gcid-category: [string]
   kind: string
+  phone-number: string
+  place-id: string
   store-address: string
   store-code: string
+  store-name: string
+  website-url: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    kind=invidunt</code><ul>
+<li><code>-r .    gcid-category=stet</code><ul>
+<li>The business type of the store.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>kind=aliquyam</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;<code>content#posStore</code>&#34;</li>
 </ul>
 </li>
-<li><code>store-address=clita</code><ul>
+<li><code>phone-number=ut</code><ul>
+<li>The store phone number.</li>
+</ul>
+</li>
+<li><code>place-id=sit</code><ul>
+<li>The Google Place Id of the store location.</li>
+</ul>
+</li>
+<li><code>store-address=vero</code><ul>
 <li>Required. The street address of the store.</li>
 </ul>
 </li>
-<li><code>store-code=stet</code><ul>
+<li><code>store-code=rebum.</code><ul>
 <li>Required. A store identifier that is unique for the given merchant.</li>
+</ul>
+</li>
+<li><code>store-name=dolores</code><ul>
+<li>The merchant or store name.</li>
+</ul>
+</li>
+<li><code>website-url=consetetur</code><ul>
+<li>The website url for the store or merchant.</li>
 </ul>
 </li>
 </ul>

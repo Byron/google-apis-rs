@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Deidentify - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Deidentify - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -496,6 +496,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-configure-search">Locations Datasets Fhir Stores Configure Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-create">Locations Datasets Fhir Stores Create</a>
                     
                 </li>
@@ -859,6 +864,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       remove-list:
         tags: [string]
       skip-id-redaction: boolean
+    fhir:
+      default-keep-extensions: boolean
     image:
       text-redaction-mode: string
   destination-dataset: string
@@ -904,15 +911,21 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..image    text-redaction-mode=elitr</code></p>
+<p><code>..fhir    default-keep-extensions=false</code></p>
+<ul>
+<li>The behaviour for handling FHIR extensions that aren&#39;t otherwise specified for de-identification. If true, all extensions are preserved during de-identification by default. If false or unspecified, all extensions are removed during de-identification by default.</li>
+</ul>
+</li>
+<li>
+<p><code>..image    text-redaction-mode=duo</code></p>
 <ul>
 <li>Determines how to redact text from image.</li>
 </ul>
 </li>
 <li>
-<p><code>...    destination-dataset=duo</code></p>
+<p><code>...    destination-dataset=diam</code></p>
 <ul>
-<li>The name of the dataset resource to create and write the redacted data to. * The destination dataset must not exist. * The destination dataset must be in the same project and location as the source dataset. De-identifying data across multiple projects or locations is not supported.</li>
+<li>The name of the dataset resource to create and write the redacted data to. * The destination dataset must not exist. * The destination dataset must be in the same location as the source dataset. De-identifying data across multiple locations is not supported.</li>
 </ul>
 </li>
 </ul>

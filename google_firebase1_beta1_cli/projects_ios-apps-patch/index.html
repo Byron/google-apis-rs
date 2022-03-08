@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Ios Apps Patch - Firebase Management v2.0.4+20210329</title>
+  <title>Ios Apps Patch - Firebase Management v3.0.0+20220304</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firebase Management v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Firebase Management v3.0.0+20220304</a>
         
       </div>
 
@@ -292,26 +292,32 @@ You can set the scope for this method like this: <code>firebase1-beta1 --scope &
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>IosApp:
+  api-key-id: string
   app-id: string
   app-store-id: string
   bundle-id: string
   display-name: string
   name: string
   project-id: string
+  team-id: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    app-id=ut</code><ul>
+<li><code>-r .    api-key-id=rebum.</code><ul>
+<li>The key_id of the GCP ApiKey associated with this App. If set must have no restrictions, or only have restrictions that are valid for the associated Firebase App. Cannot be set in create requests, instead an existing valid API Key will be chosen, or if no valid API Keys exist, one will be provisioned for you. Cannot be set to an empty value in update requests.</li>
+</ul>
+</li>
+<li><code>app-id=est</code><ul>
 <li>Immutable. The globally unique, Firebase-assigned identifier for the <code>IosApp</code>. This identifier should be treated as an opaque token, as the data format is not specified.</li>
 </ul>
 </li>
-<li><code>app-store-id=gubergren</code><ul>
+<li><code>app-store-id=ipsum</code><ul>
 <li>The automatically generated Apple ID assigned to the iOS app by Apple in the iOS App Store.</li>
 </ul>
 </li>
-<li><code>bundle-id=rebum.</code><ul>
+<li><code>bundle-id=ipsum</code><ul>
 <li>Immutable. The canonical bundle ID of the iOS app as it would appear in the iOS AppStore.</li>
 </ul>
 </li>
@@ -319,12 +325,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The user-assigned display name for the <code>IosApp</code>.</li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>The resource name of the IosApp, in the format: projects/PROJECT_IDENTIFIER /iosApps/APP_ID * PROJECT_IDENTIFIER: the parent Project&#39;s <a href="../../projects#FirebaseProject.FIELDS.project_number"><code>ProjectNumber</code></a> <strong><em>(recommended)</em></strong> or its <a href="../../projects#FirebaseProject.FIELDS.project_id"><code>ProjectId</code></a>. Learn more about using project identifiers in Google&#39;s <a href="https://google.aip.dev/cloud/2510">AIP 2510 standard</a>. Note that the value for PROJECT_IDENTIFIER in any response body will be the <code>ProjectId</code>. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see <a href="../../projects.iosApps#IosApp.FIELDS.app_id"><code>appId</code></a>).</li>
 </ul>
 </li>
-<li><code>project-id=ipsum</code><ul>
+<li><code>project-id=ea</code><ul>
 <li>Immutable. A user-assigned unique identifier of the parent FirebaseProject for the <code>IosApp</code>.</li>
+</ul>
+</li>
+<li><code>team-id=dolor</code><ul>
+<li>The Apple Developer Team ID associated with the App in the App Store.</li>
 </ul>
 </li>
 </ul>

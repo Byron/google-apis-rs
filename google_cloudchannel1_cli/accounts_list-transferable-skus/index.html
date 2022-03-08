@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List Transferable Skus - Cloudchannel v2.0.4+20210326</title>
+  <title>List Transferable Skus - Cloudchannel v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloudchannel v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Cloudchannel v3.0.0+20220303</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_channel-partner-links-customers-get">Channel Partner Links Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_channel-partner-links-customers-import">Channel Partner Links Customers Import</a>
                     
                 </li>
             
@@ -145,6 +150,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-entitlements-lookup-offer">Customers Entitlements Lookup Offer</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-entitlements-start-paid-service">Customers Entitlements Start Paid Service</a>
                     
                 </li>
@@ -156,6 +166,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-get">Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-import">Customers Import</a>
                     
                 </li>
             
@@ -351,27 +366,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    auth-token=ut</code><ul>
+<li><code>-r .    auth-token=dolor</code><ul>
 <li>The super admin of the resold customer generates this token to authorize a reseller to access their Cloud Identity and purchase entitlements on their behalf. You can omit this token after authorization. See https://support.google.com/a/answer/7643790 for more details.</li>
 </ul>
 </li>
-<li><code>cloud-identity-id=sit</code><ul>
+<li><code>cloud-identity-id=diam</code><ul>
 <li>Customer&#39;s Cloud Identity ID</li>
 </ul>
 </li>
-<li><code>customer-name=vero</code><ul>
+<li><code>customer-name=at</code><ul>
 <li>A reseller is required to create a customer and use the resource name of the created customer here. Customer_name uses the format: accounts/{account_id}/customers/{customer_id}</li>
 </ul>
 </li>
-<li><code>language-code=rebum.</code><ul>
+<li><code>language-code=erat</code><ul>
 <li>The BCP-47 language code. For example, &#34;en-US&#34;. The response will localize in the corresponding language code, if specified. The default value is &#34;en-US&#34;. Optional.</li>
 </ul>
 </li>
-<li><code>page-size=82</code><ul>
+<li><code>page-size=30</code><ul>
 <li>The requested page size. Server might return fewer results than requested. If unspecified, returns at most 100 SKUs. The maximum value is 1000; the server will coerce values above 1000. Optional.</li>
 </ul>
 </li>
-<li><code>page-token=consetetur</code><ul>
+<li><code>page-token=ipsum</code><ul>
 <li>A token for a page of results other than the first page. Obtained using ListTransferableSkusResponse.next_page_token of the previous CloudChannelService.ListTransferableSkus call. Optional.</li>
 </ul>
 </li>

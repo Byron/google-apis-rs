@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Sources Check Valid Creds - BigQuery Data Transfer v2.0.4+20210324</title>
+  <title>Data Sources Check Valid Creds - BigQuery Data Transfer v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Data Transfer v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Data Transfer v3.0.0+20220225</a>
         
       </div>
 
@@ -81,6 +81,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_enroll-data-sources">Enroll Data Sources</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-data-sources-check-valid-creds">Locations Data Sources Check Valid Creds</a>
                     
                 </li>
@@ -92,6 +97,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-data-sources-list">Locations Data Sources List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-enroll-data-sources">Locations Enroll Data Sources</a>
                     
                 </li>
             
@@ -251,12 +261,11 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Returns true if valid credentials exist for the given data source and requesting user. Some data sources doesn&#39;t support service account, so we need to talk to them on behalf of the end user. This API just checks whether we have OAuth token for the particular user, which is a pre-requisite before user can create a transfer config.</p>
+              <p>Returns true if valid credentials exist for the given data source and requesting user.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
 <li><em>https://www.googleapis.com/auth/bigquery</em></li>
-<li><em>https://www.googleapis.com/auth/bigquery.readonly</em></li>
 <li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
 <li><em>https://www.googleapis.com/auth/cloud-platform.read-only</em></li>
 </ul>

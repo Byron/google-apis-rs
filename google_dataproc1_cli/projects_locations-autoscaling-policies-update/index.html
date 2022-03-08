@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Autoscaling Policies Update - Dataproc v2.0.4+20210322</title>
+  <title>Locations Autoscaling Policies Update - Dataproc v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Dataproc v3.0.0+20220224</a>
         
       </div>
 
@@ -102,6 +102,26 @@
                             
                         
                         </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-create">Locations Batches Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-delete">Locations Batches Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-get">Locations Batches Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-list">Locations Batches List</a>
                     
                 </li>
             
@@ -232,6 +252,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_regions-clusters-patch">Regions Clusters Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-repair">Regions Clusters Repair</a>
                     
                 </li>
             
@@ -445,6 +470,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>AutoscalingPolicy:
   basic-algorithm:
     cooldown-period: string
+    spark-standalone-config:
+      graceful-decommission-timeout: string
+      scale-down-factor: number
+      scale-down-min-worker-fraction: number
+      scale-up-factor: number
+      scale-up-min-worker-fraction: number
     yarn-config:
       graceful-decommission-timeout: string
       scale-down-factor: number
@@ -452,6 +483,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       scale-up-factor: number
       scale-up-min-worker-fraction: number
   id: string
+  labels: { string: string }
   name: string
   secondary-worker-config:
     max-instances: integer
@@ -466,67 +498,96 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .basic-algorithm    cooldown-period=amet</code><ul>
+<li><code>-r .basic-algorithm    cooldown-period=est</code><ul>
 <li>Optional. Duration between scaling events. A scaling period starts after the update operation from the previous event has completed.Bounds: 2m, 1d. Default: 2m.</li>
 </ul>
 </li>
-<li><code>yarn-config    graceful-decommission-timeout=duo</code><ul>
-<li>Required. Timeout for YARN graceful decommissioning of Node Managers. Specifies the duration to wait for jobs to complete before forcefully removing workers (and potentially interrupting jobs). Only applicable to downscaling operations.Bounds: 0s, 1d.</li>
+<li><code>spark-standalone-config    graceful-decommission-timeout=ipsum</code><ul>
+<li>Required. Timeout for Spark graceful decommissioning of spark workers. Specifies the duration to wait for spark worker to complete spark decomissioning tasks before forcefully removing workers. Only applicable to downscaling operations.Bounds: 0s, 1d.</li>
 </ul>
 </li>
-<li><code>scale-down-factor=0.39873905405496446</code><ul>
-<li>Required. Fraction of average YARN pending memory in the last cooldown period for which to remove workers. A scale-down factor of 1 will result in scaling down so that there is no available memory remaining after the update (more aggressive scaling). A scale-down factor of 0 disables removing workers, which can be beneficial for autoscaling a single job. See How autoscaling works (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works) for more information.Bounds: 0.0, 1.0.</li>
+<li><code>scale-down-factor=0.4033695817113857</code><ul>
+<li>Required. Fraction of required executors to remove from Spark Serverless clusters. A scale-down factor of 1.0 will result in scaling down so that there are no more executors for the Spark Job.(more aggressive scaling). A scale-down factor closer to 0 will result in a smaller magnitude of scaling donw (less aggressive scaling).Bounds: 0.0, 1.0.</li>
 </ul>
 </li>
-<li><code>scale-down-min-worker-fraction=0.06534313042009643</code><ul>
+<li><code>scale-down-min-worker-fraction=0.737544430792817</code><ul>
 <li>Optional. Minimum scale-down threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2 worker scale-down for the cluster to scale. A threshold of 0 means the autoscaler will scale down on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.</li>
 </ul>
 </li>
-<li><code>scale-up-factor=0.6992083316156428</code><ul>
-<li>Required. Fraction of average YARN pending memory in the last cooldown period for which to add workers. A scale-up factor of 1.0 will result in scaling up so that there is no pending memory remaining after the update (more aggressive scaling). A scale-up factor closer to 0 will result in a smaller magnitude of scaling up (less aggressive scaling). See How autoscaling works (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works) for more information.Bounds: 0.0, 1.0.</li>
+<li><code>scale-up-factor=0.3108500366192227</code><ul>
+<li>Required. Fraction of required workers to add to Spark Standalone clusters. A scale-up factor of 1.0 will result in scaling up so that there are no more required workers for the Spark Job (more aggressive scaling). A scale-up factor closer to 0 will result in a smaller magnitude of scaling up (less aggressive scaling).Bounds: 0.0, 1.0.</li>
 </ul>
 </li>
 <li>
-<p><code>scale-up-min-worker-fraction=0.34810194289930996</code></p>
+<p><code>scale-up-min-worker-fraction=0.017825676742989738</code></p>
 <ul>
 <li>Optional. Minimum scale-up threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2-worker scale-up for the cluster to scale. A threshold of 0 means the autoscaler will scale up on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.</li>
 </ul>
 </li>
 <li>
-<p><code>...    id=ipsum</code></p>
+<p><code>..yarn-config    graceful-decommission-timeout=lorem</code></p>
+<ul>
+<li>Required. Timeout for YARN graceful decommissioning of Node Managers. Specifies the duration to wait for jobs to complete before forcefully removing workers (and potentially interrupting jobs). Only applicable to downscaling operations.Bounds: 0s, 1d.</li>
+</ul>
+</li>
+<li><code>scale-down-factor=0.5944568076620798</code><ul>
+<li>Required. Fraction of average YARN pending memory in the last cooldown period for which to remove workers. A scale-down factor of 1 will result in scaling down so that there is no available memory remaining after the update (more aggressive scaling). A scale-down factor of 0 disables removing workers, which can be beneficial for autoscaling a single job. See How autoscaling works (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works) for more information.Bounds: 0.0, 1.0.</li>
+</ul>
+</li>
+<li><code>scale-down-min-worker-fraction=0.46093367968783205</code><ul>
+<li>Optional. Minimum scale-down threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2 worker scale-down for the cluster to scale. A threshold of 0 means the autoscaler will scale down on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.</li>
+</ul>
+</li>
+<li><code>scale-up-factor=0.9575633866430626</code><ul>
+<li>Required. Fraction of average YARN pending memory in the last cooldown period for which to add workers. A scale-up factor of 1.0 will result in scaling up so that there is no pending memory remaining after the update (more aggressive scaling). A scale-up factor closer to 0 will result in a smaller magnitude of scaling up (less aggressive scaling). See How autoscaling works (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works) for more information.Bounds: 0.0, 1.0.</li>
+</ul>
+</li>
+<li>
+<p><code>scale-up-min-worker-fraction=0.7957202632117738</code></p>
+<ul>
+<li>Optional. Minimum scale-up threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2-worker scale-up for the cluster to scale. A threshold of 0 means the autoscaler will scale up on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.</li>
+</ul>
+</li>
+<li>
+<p><code>...    id=no</code></p>
 <ul>
 <li>Required. The policy id.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.</li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>labels=key=stet</code><ul>
+<li>Optional. The labels to associate with this autoscaling policy. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with an autoscaling policy.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>name=kasd</code><ul>
 <li>Output only. The &#34;resource name&#34; of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}</li>
 </ul>
 </li>
-<li><code>secondary-worker-config    max-instances=94</code><ul>
+<li><code>secondary-worker-config    max-instances=77</code><ul>
 <li>Required. Maximum number of instances for this group. Required for primary workers. Note that by default, clusters will not use secondary workers. Required for secondary workers if the minimum secondary instances is set.Primary workers - Bounds: [min_instances, ). Secondary workers - Bounds: [min_instances, ). Default: 0.</li>
 </ul>
 </li>
-<li><code>min-instances=39</code><ul>
+<li><code>min-instances=58</code><ul>
 <li>Optional. Minimum number of instances for this group.Primary workers - Bounds: 2, max_instances. Default: 2. Secondary workers - Bounds: 0, max_instances. Default: 0.</li>
 </ul>
 </li>
 <li>
-<p><code>weight=84</code></p>
+<p><code>weight=77</code></p>
 <ul>
 <li>Optional. Weight for the instance group, which is used to determine the fraction of total workers in the cluster from this instance group. For example, if primary workers have weight 2, and secondary workers have weight 1, the cluster will have approximately 2 primary workers for each secondary worker.The cluster may not reach the specified balance if constrained by min/max bounds or other autoscaling settings. For example, if max_instances for secondary workers is 0, then only primary workers will be added. The cluster can also be out of balance when created.If weight is not set on any instance group, the cluster will default to equal weight for all groups: the cluster will attempt to maintain an equal number of workers in each group within the configured size bounds for each group. If weight is set for one group only, the cluster will default to zero weight on the unset group. For example if weight is set only on primary workers, the cluster will use primary workers only and no secondary workers.</li>
 </ul>
 </li>
 <li>
-<p><code>..worker-config    max-instances=2</code></p>
+<p><code>..worker-config    max-instances=33</code></p>
 <ul>
 <li>Required. Maximum number of instances for this group. Required for primary workers. Note that by default, clusters will not use secondary workers. Required for secondary workers if the minimum secondary instances is set.Primary workers - Bounds: [min_instances, ). Secondary workers - Bounds: [min_instances, ). Default: 0.</li>
 </ul>
 </li>
-<li><code>min-instances=45</code><ul>
+<li><code>min-instances=25</code><ul>
 <li>Optional. Minimum number of instances for this group.Primary workers - Bounds: 2, max_instances. Default: 2. Secondary workers - Bounds: 0, max_instances. Default: 0.</li>
 </ul>
 </li>
-<li><code>weight=76</code><ul>
+<li><code>weight=70</code><ul>
 <li>Optional. Weight for the instance group, which is used to determine the fraction of total workers in the cluster from this instance group. For example, if primary workers have weight 2, and secondary workers have weight 1, the cluster will have approximately 2 primary workers for each secondary worker.The cluster may not reach the specified balance if constrained by min/max bounds or other autoscaling settings. For example, if max_instances for secondary workers is 0, then only primary workers will be added. The cluster can also be out of balance when created.If weight is not set on any instance group, the cluster will default to equal weight for all groups: the cluster will attempt to maintain an equal number of workers in each group within the configured size bounds for each group. If weight is set for one group only, the cluster will default to zero weight on the unset group. For example if weight is set only on primary workers, the cluster will use primary workers only and no secondary workers.</li>
 </ul>
 </li>
@@ -627,7 +688,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-workflow-templates-create" class="btn btn-neutral float-right" title="Locations Workflow Templates Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-batches-create" class="btn btn-neutral float-right" title="Locations Batches Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../projects_locations-autoscaling-policies-test-iam-permissions" class="btn btn-neutral" title="Locations Autoscaling Policies Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -659,7 +720,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../projects_locations-autoscaling-policies-test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-workflow-templates-create" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-batches-create" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

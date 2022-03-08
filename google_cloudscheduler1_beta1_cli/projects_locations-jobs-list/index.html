@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Jobs List - Cloud Scheduler v2.0.4+20210315</title>
+  <title>Locations Jobs List - Cloud Scheduler v3.0.0+20220212</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Scheduler v2.0.4+20210315</a>
+        <a href=".." class="icon icon-home"> Cloud Scheduler v3.0.0+20220212</a>
         
       </div>
 
@@ -177,6 +177,12 @@ You can set the scope for this method like this: <code>cloudscheduler1-beta1 --s
 or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
 <code>-p</code> for completeness.</p>
 <ul>
+<li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li><code>filter</code> can be used to specify a subset of jobs. If <code>filter</code> equals <code>target_config=&amp;#34;HttpConfig&amp;#34;</code>, then the http target jobs are retrieved. If <code>filter</code> equals <code>target_config=&amp;#34;PubSubConfig&amp;#34;</code>, then the Pub/Sub target jobs are retrieved. If <code>filter</code> equals <code>labels.foo=value1 labels.foo=value2</code> then only jobs which are labeled with foo=value1 AND foo=value2 will be returned.</li>
+</ul>
+</li>
 <li>
 <p><strong>-p legacy-app-engine-cron=boolean</strong></p>
 <ul>

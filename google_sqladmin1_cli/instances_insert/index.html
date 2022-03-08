@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Insert - SQL Admin v3.0.0+20220226</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Backup Runs</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backup-runs_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backup-runs_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backup-runs_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Databases</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../databases_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../databases_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../databases_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../databases_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../databases_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../databases_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Flags</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../flags_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_add-server-ca">Add Server Ca</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_clone">Clone</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_demote-master">Demote Master</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_export">Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_failover">Failover</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_import">Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Insert</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_list-server-cas">List Server Cas</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_promote-replica">Promote Replica</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_reset-ssl-config">Reset Ssl Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_restart">Restart</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_restore-backup">Restore Backup</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_rotate-server-ca">Rotate Server Ca</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_start-replica">Start Replica</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_stop-replica">Stop Replica</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_truncate-log">Truncate Log</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../operations_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-reschedule-maintenance">Instances Reschedule Maintenance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-start-external-sync">Instances Start External Sync</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-verify-external-sync-settings">Instances Verify External Sync Settings</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Ssl Certs</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certs_create-ephemeral">Create Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certs_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certs_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certs_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Tiers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tiers_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Users</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Insert</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/sqladmin1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Creates a new Cloud SQL instance.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/sqlservice.admin</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>sqladmin1 --scope &lt;scope&gt; instances insert ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;project&gt;</strong> <em>(string)</em><ul>
+<li>Project ID of the project to which the newly created Cloud SQL instances should belong.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>DatabaseInstance:
+  available-maintenance-versions: [string]
+  backend-type: string
+  connection-name: string
+  create-time: string
+  current-disk-size: string
+  database-installed-version: string
+  database-version: string
+  disk-encryption-configuration:
+    kind: string
+    kms-key-name: string
+  disk-encryption-status:
+    kind: string
+    kms-key-version-name: string
+  etag: string
+  failover-replica:
+    available: boolean
+    name: string
+  gce-zone: string
+  instance-type: string
+  ipv6-address: string
+  kind: string
+  maintenance-version: string
+  master-instance-name: string
+  max-disk-size: string
+  name: string
+  on-premises-configuration:
+    ca-certificate: string
+    client-certificate: string
+    client-key: string
+    dump-file-path: string
+    host-port: string
+    kind: string
+    password: string
+    source-instance:
+      name: string
+      project: string
+      region: string
+    username: string
+  out-of-disk-report:
+    sql-min-recommended-increase-size-gb: integer
+    sql-out-of-disk-state: string
+  project: string
+  region: string
+  replica-configuration:
+    failover-target: boolean
+    kind: string
+    mysql-replica-configuration:
+      ca-certificate: string
+      client-certificate: string
+      client-key: string
+      connect-retry-interval: integer
+      dump-file-path: string
+      kind: string
+      master-heartbeat-period: string
+      password: string
+      ssl-cipher: string
+      username: string
+      verify-server-certificate: boolean
+  replica-names: [string]
+  root-password: string
+  satisfies-pzs: boolean
+  scheduled-maintenance:
+    can-defer: boolean
+    can-reschedule: boolean
+    schedule-deadline-time: string
+    start-time: string
+  secondary-gce-zone: string
+  self-link: string
+  server-ca-cert:
+    cert: string
+    cert-serial-number: string
+    common-name: string
+    create-time: string
+    expiration-time: string
+    instance: string
+    kind: string
+    self-link: string
+    sha1-fingerprint: string
+  service-account-email-address: string
+  settings:
+    activation-policy: string
+    active-directory-config:
+      domain: string
+      kind: string
+    authorized-gae-applications: [string]
+    availability-type: string
+    backup-configuration:
+      backup-retention-settings:
+        retained-backups: integer
+        retention-unit: string
+      binary-log-enabled: boolean
+      enabled: boolean
+      kind: string
+      location: string
+      point-in-time-recovery-enabled: boolean
+      replication-log-archiving-enabled: boolean
+      start-time: string
+      transaction-log-retention-days: integer
+    collation: string
+    crash-safe-replication-enabled: boolean
+    data-disk-size-gb: string
+    data-disk-type: string
+    database-replication-enabled: boolean
+    insights-config:
+      query-insights-enabled: boolean
+      query-plans-per-minute: integer
+      query-string-length: integer
+      record-application-tags: boolean
+      record-client-address: boolean
+    ip-configuration:
+      allocated-ip-range: string
+      ipv4-enabled: boolean
+      private-network: string
+      require-ssl: boolean
+    kind: string
+    location-preference:
+      follow-gae-application: string
+      kind: string
+      secondary-zone: string
+      zone: string
+    maintenance-window:
+      day: integer
+      hour: integer
+      kind: string
+      update-track: string
+    password-validation-policy:
+      complexity: string
+      disallow-username-substring: boolean
+      min-length: integer
+      password-change-interval: string
+      reuse-interval: integer
+    pricing-plan: string
+    replication-type: string
+    settings-version: string
+    sql-server-audit-config:
+      bucket: string
+      kind: string
+    storage-auto-resize: boolean
+    storage-auto-resize-limit: string
+    tier: string
+    user-labels: { string: string }
+  state: string
+  suspension-reason: [string]
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    available-maintenance-versions=et</code><ul>
+<li>List all maintenance versions applicable on the instance</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>backend-type=sanctus</code><ul>
+<li>The backend type. <code>SECOND_GEN</code>: Cloud SQL database instance. <code>EXTERNAL</code>: A database server that is not managed by Google. This property is read-only; use the <code>tier</code> property in the <code>settings</code> object to determine the database type.</li>
+</ul>
+</li>
+<li><code>connection-name=lorem</code><ul>
+<li>Connection name of the Cloud SQL instance used in connection strings.</li>
+</ul>
+</li>
+<li><code>create-time=est</code><ul>
+<li>Output only. The time when the instance was created in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code>.</li>
+</ul>
+</li>
+<li><code>current-disk-size=sed</code><ul>
+<li>The current disk usage of the instance in bytes. This property has been deprecated. Use the &#34;cloudsql.googleapis.com/database/disk/bytes_used&#34; metric in Cloud Monitoring API instead. Please see <a href="https://groups.google.com/d/msg/google-cloud-sql-announce/I_7-F9EBhT0/BtvFtdFeAgAJ">this announcement</a> for details.</li>
+</ul>
+</li>
+<li><code>database-installed-version=diam</code><ul>
+<li>Output only. Stores the current database version running on the instance including minor version such as <code>MYSQL_8_0_18</code>.</li>
+</ul>
+</li>
+<li><code>database-version=dolores</code><ul>
+<li>The database engine type and version. The <code>databaseVersion</code> field cannot be changed after instance creation.</li>
+</ul>
+</li>
+<li><code>disk-encryption-configuration    kind=dolores</code><ul>
+<li>This is always <code>sql#diskEncryptionConfiguration</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>kms-key-name=et</code></p>
+<ul>
+<li>Resource name of KMS key for disk encryption</li>
+</ul>
+</li>
+<li>
+<p><code>..disk-encryption-status    kind=sed</code></p>
+<ul>
+<li>This is always <code>sql#diskEncryptionStatus</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>kms-key-version-name=no</code></p>
+<ul>
+<li>KMS key version used to encrypt the Cloud SQL instance resource</li>
+</ul>
+</li>
+<li>
+<p><code>..    etag=et</code></p>
+<ul>
+<li>This field is deprecated and will be removed from a future version of the API. Use the <code>settings.settingsVersion</code> field instead.</li>
+</ul>
+</li>
+<li><code>failover-replica    available=false</code><ul>
+<li>The availability status of the failover replica. A false status indicates that the failover replica is out of sync. The primary instance can only failover to the failover replica when the status is true.</li>
+</ul>
+</li>
+<li>
+<p><code>name=sed</code></p>
+<ul>
+<li>The name of the failover replica. If specified at instance creation, a failover replica is created for the instance. The name doesn&#39;t include the project ID.</li>
+</ul>
+</li>
+<li>
+<p><code>..    gce-zone=no</code></p>
+<ul>
+<li>The Compute Engine zone that the instance is currently serving from. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary zone. WARNING: Changing this might restart the instance.</li>
+</ul>
+</li>
+<li><code>instance-type=nonumy</code><ul>
+<li>The instance type.</li>
+</ul>
+</li>
+<li><code>ipv6-address=at</code><ul>
+<li>The IPv6 address assigned to the instance. (Deprecated) This property was applicable only to First Generation instances.</li>
+</ul>
+</li>
+<li><code>kind=sadipscing</code><ul>
+<li>This is always <code>sql#instance</code>.</li>
+</ul>
+</li>
+<li><code>maintenance-version=aliquyam</code><ul>
+<li>The current software version on the instance.</li>
+</ul>
+</li>
+<li><code>master-instance-name=dolores</code><ul>
+<li>The name of the instance which will act as primary in the replication setup.</li>
+</ul>
+</li>
+<li><code>max-disk-size=sadipscing</code><ul>
+<li>The maximum disk size of the instance in bytes.</li>
+</ul>
+</li>
+<li><code>name=erat</code><ul>
+<li>Name of the Cloud SQL instance. This does not include the project ID.</li>
+</ul>
+</li>
+<li><code>on-premises-configuration    ca-certificate=aliquyam</code><ul>
+<li>PEM representation of the trusted CA&#39;s x509 certificate.</li>
+</ul>
+</li>
+<li><code>client-certificate=amet</code><ul>
+<li>PEM representation of the replica&#39;s x509 certificate.</li>
+</ul>
+</li>
+<li><code>client-key=est</code><ul>
+<li>PEM representation of the replica&#39;s private key. The corresponsing public key is encoded in the client&#39;s certificate.</li>
+</ul>
+</li>
+<li><code>dump-file-path=et</code><ul>
+<li>The dump file to create the Cloud SQL replica.</li>
+</ul>
+</li>
+<li><code>host-port=sea</code><ul>
+<li>The host and port of the on-premises instance in host:port format</li>
+</ul>
+</li>
+<li><code>kind=consetetur</code><ul>
+<li>This is always <code>sql#onPremisesConfiguration</code>.</li>
+</ul>
+</li>
+<li><code>password=consetetur</code><ul>
+<li>The password for connecting to on-premises instance.</li>
+</ul>
+</li>
+<li><code>source-instance    name=stet</code><ul>
+<li>The name of the Cloud SQL instance being referenced. This does not include the project ID.</li>
+</ul>
+</li>
+<li><code>project=est</code><ul>
+<li>The project ID of the Cloud SQL instance being referenced. The default is the same project ID as the instance references it.</li>
+</ul>
+</li>
+<li>
+<p><code>region=aliquyam</code></p>
+<ul>
+<li>The region of the Cloud SQL instance being referenced.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=elitr</code></p>
+<ul>
+<li>The username for connecting to on-premises instance.</li>
+</ul>
+</li>
+<li>
+<p><code>..out-of-disk-report    sql-min-recommended-increase-size-gb=81</code></p>
+<ul>
+<li>The minimum recommended increase size in GigaBytes This field is consumed by the frontend * Writers: * the proactive database wellness job for OOD. * Readers:</li>
+</ul>
+</li>
+<li>
+<p><code>sql-out-of-disk-state=diam</code></p>
+<ul>
+<li>This field represents the state generated by the proactive database wellness job for OutOfDisk issues. * Writers: * the proactive database wellness job for OOD. * Readers: * the proactive database wellness job</li>
+</ul>
+</li>
+<li>
+<p><code>..    project=est</code></p>
+<ul>
+<li>The project ID of the project containing the Cloud SQL instance. The Google apps domain is prefixed if applicable.</li>
+</ul>
+</li>
+<li><code>region=sit</code><ul>
+<li>The geographical region. Can be: * <code>us-central</code> (<code>FIRST_GEN</code> instances only) * <code>us-central1</code> (<code>SECOND_GEN</code> instances only) * <code>asia-east1</code> or <code>europe-west1</code>. Defaults to <code>us-central</code> or <code>us-central1</code> depending on the instance type. The region cannot be changed after instance creation.</li>
+</ul>
+</li>
+<li><code>replica-configuration    failover-target=false</code><ul>
+<li>Specifies if the replica is the failover target. If the field is set to <code>true</code>, the replica will be designated as a failover replica. In case the primary instance fails, the replica instance will be promoted as the new primary instance. Only one replica can be specified as failover target, and the replica has to be in different zone with the primary instance.</li>
+</ul>
+</li>
+<li><code>kind=eos</code><ul>
+<li>This is always <code>sql#replicaConfiguration</code>.</li>
+</ul>
+</li>
+<li><code>mysql-replica-configuration    ca-certificate=lorem</code><ul>
+<li>PEM representation of the trusted CA&#39;s x509 certificate.</li>
+</ul>
+</li>
+<li><code>client-certificate=ea</code><ul>
+<li>PEM representation of the replica&#39;s x509 certificate.</li>
+</ul>
+</li>
+<li><code>client-key=stet</code><ul>
+<li>PEM representation of the replica&#39;s private key. The corresponsing public key is encoded in the client&#39;s certificate.</li>
+</ul>
+</li>
+<li><code>connect-retry-interval=82</code><ul>
+<li>Seconds to wait between connect retries. MySQL&#39;s default is 60 seconds.</li>
+</ul>
+</li>
+<li><code>dump-file-path=eos</code><ul>
+<li>Path to a SQL dump file in Google Cloud Storage from which the replica instance is to be created. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are also supported. Dumps have the binlog co-ordinates from which replication begins. This can be accomplished by setting --master-data to 1 when using mysqldump.</li>
+</ul>
+</li>
+<li><code>kind=et</code><ul>
+<li>This is always <code>sql#mysqlReplicaConfiguration</code>.</li>
+</ul>
+</li>
+<li><code>master-heartbeat-period=sea</code><ul>
+<li>Interval in milliseconds between replication heartbeats.</li>
+</ul>
+</li>
+<li><code>password=et</code><ul>
+<li>The password for the replication connection.</li>
+</ul>
+</li>
+<li><code>ssl-cipher=at</code><ul>
+<li>A list of permissible ciphers to use for SSL encryption.</li>
+</ul>
+</li>
+<li><code>username=dolore</code><ul>
+<li>The username for the replication connection.</li>
+</ul>
+</li>
+<li>
+<p><code>verify-server-certificate=true</code></p>
+<ul>
+<li>Whether or not to check the primary instance&#39;s Common Name value in the certificate that it sends during the SSL handshake.</li>
+</ul>
+</li>
+<li>
+<p><code>...    replica-names=lorem</code></p>
+<ul>
+<li>The replicas of the instance.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>root-password=accusam</code><ul>
+<li>Initial root password. Use only on creation.</li>
+</ul>
+</li>
+<li><code>satisfies-pzs=true</code><ul>
+<li>The status indicating if instance satisfiesPzs. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>scheduled-maintenance    can-defer=true</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>can-reschedule=false</code><ul>
+<li>If the scheduled maintenance can be rescheduled.</li>
+</ul>
+</li>
+<li><code>schedule-deadline-time=accusam</code><ul>
+<li>Maintenance cannot be rescheduled to start beyond this deadline.</li>
+</ul>
+</li>
+<li>
+<p><code>start-time=sea</code></p>
+<ul>
+<li>The start time of any upcoming scheduled maintenance for this instance.</li>
+</ul>
+</li>
+<li>
+<p><code>..    secondary-gce-zone=takimata</code></p>
+<ul>
+<li>The Compute Engine zone that the failover instance is currently serving from for a regional instance. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary/failover zone.</li>
+</ul>
+</li>
+<li><code>self-link=lorem</code><ul>
+<li>The URI of this resource.</li>
+</ul>
+</li>
+<li><code>server-ca-cert    cert=et</code><ul>
+<li>PEM representation.</li>
+</ul>
+</li>
+<li><code>cert-serial-number=at</code><ul>
+<li>Serial number, as extracted from the certificate.</li>
+</ul>
+</li>
+<li><code>common-name=dolor</code><ul>
+<li>User supplied name. Constrained to [a-zA-Z.-_ ]+.</li>
+</ul>
+</li>
+<li><code>create-time=et</code><ul>
+<li>The time when the certificate was created in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code></li>
+</ul>
+</li>
+<li><code>expiration-time=sit</code><ul>
+<li>The time when the certificate expires in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code>.</li>
+</ul>
+</li>
+<li><code>instance=erat</code><ul>
+<li>Name of the database instance.</li>
+</ul>
+</li>
+<li><code>kind=sea</code><ul>
+<li>This is always <code>sql#sslCert</code>.</li>
+</ul>
+</li>
+<li><code>self-link=nonumy</code><ul>
+<li>The URI of this resource.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-fingerprint=et</code></p>
+<ul>
+<li>Sha1 Fingerprint.</li>
+</ul>
+</li>
+<li>
+<p><code>..    service-account-email-address=gubergren</code></p>
+<ul>
+<li>The service account email address assigned to the instance.\This property is read-only.</li>
+</ul>
+</li>
+<li><code>settings    activation-policy=justo</code><ul>
+<li>The activation policy specifies when the instance is activated; it is applicable only when the instance state is RUNNABLE. Valid values: * <code>ALWAYS</code>: The instance is on, and remains so even in the absence of connection requests. * <code>NEVER</code>: The instance is off; it is not activated, even if a connection request arrives.</li>
+</ul>
+</li>
+<li><code>active-directory-config    domain=sea</code><ul>
+<li>The name of the domain (e.g., mydomain.com).</li>
+</ul>
+</li>
+<li>
+<p><code>kind=consetetur</code></p>
+<ul>
+<li>This is always sql#activeDirectoryConfig.</li>
+</ul>
+</li>
+<li>
+<p><code>..    authorized-gae-applications=sit</code></p>
+<ul>
+<li>The App Engine app IDs that can access this instance. (Deprecated) Applied to First Generation instances only.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>availability-type=aliquyam</code><ul>
+<li>Availability type. Potential values: * <code>ZONAL</code>: The instance serves data from only one zone. Outages in that zone affect data accessibility. * <code>REGIONAL</code>: The instance can serve data from more than one zone in a region (it is highly available)./ For more information, see <a href="https://cloud.google.com/sql/docs/mysql/high-availability">Overview of the High Availability Configuration</a>.</li>
+</ul>
+</li>
+<li><code>backup-configuration.backup-retention-settings    retained-backups=76</code><ul>
+<li>Depending on the value of retention_unit, this is used to determine if a backup needs to be deleted. If retention_unit is &#39;COUNT&#39;, we will retain this many backups.</li>
+</ul>
+</li>
+<li>
+<p><code>retention-unit=at</code></p>
+<ul>
+<li>The unit that &#39;retained_backups&#39; represents.</li>
+</ul>
+</li>
+<li>
+<p><code>..    binary-log-enabled=true</code></p>
+<ul>
+<li>(MySQL only) Whether binary log is enabled. If backup configuration is disabled, binarylog must be disabled as well.</li>
+</ul>
+</li>
+<li><code>enabled=true</code><ul>
+<li>Whether this configuration is enabled.</li>
+</ul>
+</li>
+<li><code>kind=dolor</code><ul>
+<li>This is always <code>sql#backupConfiguration</code>.</li>
+</ul>
+</li>
+<li><code>location=aliquyam</code><ul>
+<li>Location of the backup</li>
+</ul>
+</li>
+<li><code>point-in-time-recovery-enabled=true</code><ul>
+<li>(Postgres only) Whether point in time recovery is enabled.</li>
+</ul>
+</li>
+<li><code>replication-log-archiving-enabled=true</code><ul>
+<li>Reserved for future use.</li>
+</ul>
+</li>
+<li><code>start-time=lorem</code><ul>
+<li>Start time for the daily backup configuration in UTC timezone in the 24 hour format - <code>HH:MM</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>transaction-log-retention-days=28</code></p>
+<ul>
+<li>The number of days of transaction logs we retain for point in time restore, from 1-7.</li>
+</ul>
+</li>
+<li>
+<p><code>..    collation=gubergren</code></p>
+<ul>
+<li>The name of server Instance collation.</li>
+</ul>
+</li>
+<li><code>crash-safe-replication-enabled=true</code><ul>
+<li>Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled. This property was only applicable to First Generation instances.</li>
+</ul>
+</li>
+<li><code>data-disk-size-gb=at</code><ul>
+<li>The size of data disk, in GB. The data disk size minimum is 10GB.</li>
+</ul>
+</li>
+<li><code>data-disk-type=sit</code><ul>
+<li>The type of data disk: <code>PD_SSD</code> (default) or <code>PD_HDD</code>. Not used for First Generation instances.</li>
+</ul>
+</li>
+<li><code>database-replication-enabled=true</code><ul>
+<li>Configuration specific to read replica instances. Indicates whether replication is enabled or not. WARNING: Changing this restarts the instance.</li>
+</ul>
+</li>
+<li><code>insights-config    query-insights-enabled=false</code><ul>
+<li>Whether Query Insights feature is enabled.</li>
+</ul>
+</li>
+<li><code>query-plans-per-minute=79</code><ul>
+<li>Number of query execution plans captured by Insights per minute for all queries combined. Default is 5.</li>
+</ul>
+</li>
+<li><code>query-string-length=35</code><ul>
+<li>Maximum query length stored in bytes. Default value: 1024 bytes. Range: 256-4500 bytes. Query length more than this field value will be truncated to this value. When unset, query length will be the default value. Changing query length will restart the database.</li>
+</ul>
+</li>
+<li><code>record-application-tags=false</code><ul>
+<li>Whether Query Insights will record application tags from query when enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>record-client-address=true</code></p>
+<ul>
+<li>Whether Query Insights will record client address when enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>..ip-configuration    allocated-ip-range=no</code></p>
+<ul>
+<li>The name of the allocated ip range for the private ip CloudSQL instance. For example: &#34;google-managed-services-default&#34;. If set, the instance ip will be created in the allocated range. The range name must comply with <a href="https://tools.ietf.org/html/rfc1035">RFC 1035</a>. Specifically, the name must be 1-63 characters long and match the regular expression <code>[a-z]([-a-z0-9]*[a-z0-9])?.</code></li>
+</ul>
+</li>
+<li><code>ipv4-enabled=false</code><ul>
+<li>Whether the instance is assigned a public IP address or not.</li>
+</ul>
+</li>
+<li><code>private-network=sed</code><ul>
+<li>The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, <code>/projects/myProject/global/networks/default</code>. This setting can be updated, but it cannot be removed after it is set.</li>
+</ul>
+</li>
+<li>
+<p><code>require-ssl=false</code></p>
+<ul>
+<li>Whether SSL connections over IP are enforced or not.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=sanctus</code></p>
+<ul>
+<li>This is always <code>sql#settings</code>.</li>
+</ul>
+</li>
+<li><code>location-preference    follow-gae-application=nonumy</code><ul>
+<li>The App Engine application to follow, it must be in the same region as the Cloud SQL instance. WARNING: Changing this might restart the instance.</li>
+</ul>
+</li>
+<li><code>kind=rebum.</code><ul>
+<li>This is always <code>sql#locationPreference</code>.</li>
+</ul>
+</li>
+<li><code>secondary-zone=tempor</code><ul>
+<li>The preferred Compute Engine zone for the secondary/failover (for example: us-central1-a, us-central1-b, etc.).</li>
+</ul>
+</li>
+<li>
+<p><code>zone=dolore</code></p>
+<ul>
+<li>The preferred Compute Engine zone (for example: us-central1-a, us-central1-b, etc.). WARNING: Changing this might restart the instance.</li>
+</ul>
+</li>
+<li>
+<p><code>..maintenance-window    day=76</code></p>
+<ul>
+<li>day of week (1-7), starting on Monday.</li>
+</ul>
+</li>
+<li><code>hour=49</code><ul>
+<li>hour of day - 0 to 23.</li>
+</ul>
+</li>
+<li><code>kind=dolore</code><ul>
+<li>This is always <code>sql#maintenanceWindow</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>update-track=amet</code></p>
+<ul>
+<li>Maintenance timing setting: <code>canary</code> (Earlier) or <code>stable</code> (Later). <a href="https://cloud.google.com/sql/docs/mysql/instance-settings#maintenance-timing-2ndgen">Learn more</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..password-validation-policy    complexity=ut</code></p>
+<ul>
+<li>The complexity of the password.</li>
+</ul>
+</li>
+<li><code>disallow-username-substring=true</code><ul>
+<li>Disallow username as a part of the password.</li>
+</ul>
+</li>
+<li><code>min-length=25</code><ul>
+<li>Minimum number of characters allowed.</li>
+</ul>
+</li>
+<li><code>password-change-interval=duo</code><ul>
+<li>Minimum interval after which the password can be changed. This flag is only supported for PostgresSQL.</li>
+</ul>
+</li>
+<li>
+<p><code>reuse-interval=56</code></p>
+<ul>
+<li>Number of previous passwords that cannot be reused.</li>
+</ul>
+</li>
+<li>
+<p><code>..    pricing-plan=ut</code></p>
+<ul>
+<li>The pricing plan for this instance. This can be either <code>PER_USE</code> or <code>PACKAGE</code>. Only <code>PER_USE</code> is supported for Second Generation instances.</li>
+</ul>
+</li>
+<li><code>replication-type=rebum.</code><ul>
+<li>The type of replication this instance uses. This can be either <code>ASYNCHRONOUS</code> or <code>SYNCHRONOUS</code>. (Deprecated) This property was only applicable to First Generation instances.</li>
+</ul>
+</li>
+<li><code>settings-version=duo</code><ul>
+<li>The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.</li>
+</ul>
+</li>
+<li><code>sql-server-audit-config    bucket=kasd</code><ul>
+<li>The name of the destination bucket (e.g., gs://mybucket).</li>
+</ul>
+</li>
+<li>
+<p><code>kind=sadipscing</code></p>
+<ul>
+<li>This is always sql#sqlServerAuditConfig</li>
+</ul>
+</li>
+<li>
+<p><code>..    storage-auto-resize=true</code></p>
+<ul>
+<li>Configuration to increase storage size automatically. The default value is true.</li>
+</ul>
+</li>
+<li><code>storage-auto-resize-limit=sea</code><ul>
+<li>The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit.</li>
+</ul>
+</li>
+<li><code>tier=et</code><ul>
+<li>The tier (or machine type) for this instance, for example <code>db-custom-1-3840</code>. WARNING: Changing this restarts the instance.</li>
+</ul>
+</li>
+<li>
+<p><code>user-labels=key=lorem</code></p>
+<ul>
+<li>User-provided labels, represented as a dictionary where each label is a single key value pair.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    state=magna</code></p>
+<ul>
+<li>The current serving state of the Cloud SQL instance.</li>
+</ul>
+</li>
+<li><code>suspension-reason=takimata</code><ul>
+<li>If the instance state is SUSPENDED, the reason for the suspension.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../instances_list" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../instances_import" class="btn btn-neutral" title="Import"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../instances_import" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../instances_list" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

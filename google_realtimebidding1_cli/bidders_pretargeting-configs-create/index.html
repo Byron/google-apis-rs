@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pretargeting Configs Create - Real-time Bidding v2.0.4+20210331</title>
+  <title>Pretargeting Configs Create - Real-time Bidding v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Real-time Bidding v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Real-time Bidding v3.0.0+20220307</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../bidders_endpoints-list">Endpoints List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../bidders_endpoints-patch">Endpoints Patch</a>
                     
                 </li>
             
@@ -332,52 +337,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    allowed-user-targeting-modes=sanctus</code><ul>
+<li><code>-r .    allowed-user-targeting-modes=duo</code><ul>
 <li>Targeting modes included by this configuration. A bid request must allow all the specified targeting modes. An unset value allows all bid requests to be sent, regardless of which targeting modes they allow.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>app-targeting.mobile-app-category-targeting    excluded-ids=sed</code><ul>
-<li>The IDs excluded in a configuration.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>included-ids=amet.</code></p>
-<ul>
-<li>The IDs included in a configuration.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>..mobile-app-targeting    targeting-mode=takimata</code></p>
-<ul>
-<li>How the items in this list should be targeted.</li>
-</ul>
-</li>
-<li>
-<p><code>values=amet.</code></p>
-<ul>
-<li>The values specified.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>...    billing-id=duo</code></p>
-<ul>
-<li>Output only. The identifier that corresponds to this pretargeting configuration that helps buyers track and attribute their spend across their own arbitrary divisions. If a bid request matches more than one configuration, the buyer chooses which billing_id to attribute each of their bids.</li>
-</ul>
-</li>
-<li><code>display-name=ipsum</code><ul>
-<li>The diplay name associated with this configuration. This name must be unique among all the pretargeting configurations a bidder has.</li>
-</ul>
-</li>
-<li><code>excluded-content-label-ids=gubergren</code><ul>
-<li>The sensitive content category label IDs excluded in this configuration. Bid requests for inventory with any of the specified content label IDs will not be sent. Refer to this file https://storage.googleapis.com/adx-rtb-dictionaries/content-labels.txt for category IDs.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>geo-targeting    excluded-ids=lorem</code><ul>
+<li><code>app-targeting.mobile-app-category-targeting    excluded-ids=ipsum</code><ul>
 <li>The IDs excluded in a configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -390,108 +355,148 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    included-environments=eos</code></p>
+<p><code>..mobile-app-targeting    targeting-mode=lorem</code></p>
 <ul>
-<li>Environments that are being included. Bid requests will not be sent for a given environment if it is not included. Further restrictions can be applied to included environments to target only a subset of its inventory. An unset value includes all environments.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>included-formats=dolor</code><ul>
-<li>Creative formats included by this configuration. Only bid requests eligible for at least one of the specified creative formats will be sent. An unset value will allow all bid requests to be sent, regardless of format.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>included-languages=ea</code><ul>
-<li>The languages included in this configuration, represented by their language code. See https://developers.google.com/adwords/api/docs/appendix/languagecodes.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>included-mobile-operating-system-ids=ipsum</code><ul>
-<li>The mobile operating systems included in this configuration as defined in https://storage.googleapis.com/adx-rtb-dictionaries/mobile-os.csv</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>included-platforms=invidunt</code><ul>
-<li>The platforms included by this configration. Bid requests for devices with the specified platform types will be sent. An unset value allows all bid requests to be sent, regardless of platform.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>included-user-id-types=amet</code><ul>
-<li>User identifier types included in this configuration. At least one of the user identifier types specified in this list must be available for the bid request to be sent.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>interstitial-targeting=duo</code><ul>
-<li>The interstitial targeting specified for this configuration. The unset value will allow bid requests to be sent regardless of whether they are for interstitials or not.</li>
-</ul>
-</li>
-<li><code>invalid-geo-ids=ipsum</code><ul>
-<li>Output only. Existing included or excluded geos that are invalid. Previously targeted geos may become invalid due to privacy restrictions.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>maximum-qps=sed</code><ul>
-<li>The maximum QPS threshold for this configuration. The bidder should receive no more than this number of bid requests matching this configuration per second across all their bidding endpoints among all trading locations. Further information available at https://developers.google.com/authorized-buyers/rtb/peer-guide</li>
-</ul>
-</li>
-<li><code>minimum-viewability-decile=64</code><ul>
-<li>The targeted minimum viewability decile, ranging in values [0, 10]. A value of 5 means that the configuration will only match adslots for which we predict at least 50% viewability. Values &gt; 10 will be rounded down to 10. An unset value or a value of 0 indicates that bid requests will be sent regardless of viewability.</li>
-</ul>
-</li>
-<li><code>name=gubergren</code><ul>
-<li>Output only. Name of the pretargeting configuration that must follow the pattern <code>bidders/{bidder_account_id}/pretargetingConfigs/{config_id}</code></li>
-</ul>
-</li>
-<li><code>publisher-targeting    targeting-mode=rebum.</code><ul>
 <li>How the items in this list should be targeted.</li>
 </ul>
 </li>
 <li>
-<p><code>values=est</code></p>
+<p><code>values=gubergren</code></p>
 <ul>
 <li>The values specified.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    state=ipsum</code></p>
+<p><code>...    billing-id=eos</code></p>
+<ul>
+<li>Output only. The identifier that corresponds to this pretargeting configuration that helps buyers track and attribute their spend across their own arbitrary divisions. If a bid request matches more than one configuration, the buyer chooses which billing_id to attribute each of their bids.</li>
+</ul>
+</li>
+<li><code>display-name=dolor</code><ul>
+<li>The diplay name associated with this configuration. This name must be unique among all the pretargeting configurations a bidder has.</li>
+</ul>
+</li>
+<li><code>excluded-content-label-ids=ea</code><ul>
+<li>The sensitive content category label IDs excluded in this configuration. Bid requests for inventory with any of the specified content label IDs will not be sent. Refer to this file https://storage.googleapis.com/adx-rtb-dictionaries/content-labels.txt for category IDs.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>geo-targeting    excluded-ids=ipsum</code><ul>
+<li>The IDs excluded in a configuration.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>included-ids=invidunt</code></p>
+<ul>
+<li>The IDs included in a configuration.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    included-environments=amet</code></p>
+<ul>
+<li>Environments that are being included. Bid requests will not be sent for a given environment if it is not included. Further restrictions can be applied to included environments to target only a subset of its inventory. An unset value includes all environments.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>included-formats=duo</code><ul>
+<li>Creative formats included by this configuration. Only bid requests eligible for at least one of the specified creative formats will be sent. An unset value will allow all bid requests to be sent, regardless of format.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>included-languages=ipsum</code><ul>
+<li>The languages included in this configuration, represented by their language code. See https://developers.google.com/adwords/api/docs/appendix/languagecodes.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>included-mobile-operating-system-ids=sed</code><ul>
+<li>The mobile operating systems included in this configuration as defined in https://storage.googleapis.com/adx-rtb-dictionaries/mobile-os.csv</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>included-platforms=ut</code><ul>
+<li>The platforms included by this configration. Bid requests for devices with the specified platform types will be sent. An unset value allows all bid requests to be sent, regardless of platform.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>included-user-id-types=gubergren</code><ul>
+<li>User identifier types included in this configuration. At least one of the user identifier types specified in this list must be available for the bid request to be sent.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>interstitial-targeting=rebum.</code><ul>
+<li>The interstitial targeting specified for this configuration. The unset value will allow bid requests to be sent regardless of whether they are for interstitials or not.</li>
+</ul>
+</li>
+<li><code>invalid-geo-ids=est</code><ul>
+<li>Output only. Existing included or excluded geos that are invalid. Previously targeted geos may become invalid due to privacy restrictions.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>maximum-qps=ipsum</code><ul>
+<li>The maximum QPS threshold for this configuration. The bidder should receive no more than this number of bid requests matching this configuration per second across all their bidding endpoints among all trading locations. Further information available at https://developers.google.com/authorized-buyers/rtb/peer-guide</li>
+</ul>
+</li>
+<li><code>minimum-viewability-decile=51</code><ul>
+<li>The targeted minimum viewability decile, ranging in values [0, 10]. A value of 5 means that the configuration will only match adslots for which we predict at least 50% viewability. Values &gt; 10 will be rounded down to 10. An unset value or a value of 0 indicates that bid requests will be sent regardless of viewability.</li>
+</ul>
+</li>
+<li><code>name=est</code><ul>
+<li>Output only. Name of the pretargeting configuration that must follow the pattern <code>bidders/{bidder_account_id}/pretargetingConfigs/{config_id}</code></li>
+</ul>
+</li>
+<li><code>publisher-targeting    targeting-mode=gubergren</code><ul>
+<li>How the items in this list should be targeted.</li>
+</ul>
+</li>
+<li>
+<p><code>values=ea</code></p>
+<ul>
+<li>The values specified.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=dolor</code></p>
 <ul>
 <li>Output only. The state of this pretargeting configuration.</li>
 </ul>
 </li>
-<li><code>user-list-targeting    excluded-ids=ipsum</code><ul>
+<li><code>user-list-targeting    excluded-ids=lorem</code><ul>
 <li>The IDs excluded in a configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>included-ids=est</code></p>
+<p><code>included-ids=eos</code></p>
 <ul>
 <li>The IDs included in a configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..vertical-targeting    excluded-ids=gubergren</code></p>
+<p><code>..vertical-targeting    excluded-ids=labore</code></p>
 <ul>
 <li>The IDs excluded in a configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>included-ids=ea</code></p>
+<p><code>included-ids=sed</code></p>
 <ul>
 <li>The IDs included in a configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..web-targeting    targeting-mode=dolor</code></p>
+<p><code>..web-targeting    targeting-mode=duo</code></p>
 <ul>
 <li>How the items in this list should be targeted.</li>
 </ul>
 </li>
-<li><code>values=lorem</code><ul>
+<li><code>values=sed</code><ul>
 <li>The values specified.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

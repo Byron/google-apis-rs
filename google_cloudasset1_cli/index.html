@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Asset v2.0.4+20210319</title>
+  <title>Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href="." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="assets_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="effective-iam-policies_batch-get/">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -86,6 +108,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="methods_analyze-move/">Analyze Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="methods_batch-get-assets-history/">Batch Get Assets History</a>
                     
                 </li>
@@ -113,6 +140,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="operations_get/">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="saved-queries_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="saved-queries_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="saved-queries_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="saved-queries_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="saved-queries_patch/">Patch</a>
                     
                 </li>
             
@@ -171,8 +229,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/cloudasset1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Asset</em> API at revision <em>20210319</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Asset</em> API at revision <em>20220225</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">cloudasset1 [options]
+        assets
+                list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        effective-iam-policies
+                batch-get &lt;scope&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         feeds
                 create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -182,12 +244,19 @@ capabilities. Errors will be printed to standard error, and cause the program's 
         methods
                 analyze-iam-policy &lt;scope&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 analyze-iam-policy-longrunning &lt;scope&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                analyze-move &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 batch-get-assets-history &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 export-assets &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 search-all-iam-policies &lt;scope&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 search-all-resources &lt;scope&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         operations
                 get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        saved-queries
+                create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   cloudasset1 --help
 
 Configuration:
@@ -243,7 +312,7 @@ output to standard error <em>as-is</em>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="feeds_create/" class="btn btn-neutral float-right" title="Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="assets_list/" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>
@@ -273,7 +342,7 @@ output to standard error <em>as-is</em>.</p>
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="feeds_create/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="assets_list/" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

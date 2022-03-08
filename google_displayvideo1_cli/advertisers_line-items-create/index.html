@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Line Items Create - Display Video v2.0.4+20210325</title>
+  <title>Line Items Create - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -483,12 +493,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -515,12 +555,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -631,6 +686,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -854,6 +914,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       custom-bidding-algorithm-id: string
       max-average-cpm-bid-amount-micros: string
       performance-goal-type: string
+      raise-bid-for-deals: boolean
     performance-goal-auto-bid:
       custom-bidding-algorithm-id: string
       max-average-cpm-bid-amount-micros: string
@@ -869,6 +930,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   creative-ids: [string]
   display-name: string
   entity-status: string
+  exclude-new-exchanges: boolean
   flight:
     date-range:
       end-date:
@@ -907,6 +969,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   partner-revenue-model:
     markup-amount: string
     markup-type: string
+  reservation-type: string
   targeting-expansion:
     exclude-first-party-audience: boolean
     targeting-expansion-level: string
@@ -917,148 +980,156 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    advertiser-id=ea</code><ul>
+<li><code>-r .    advertiser-id=clita</code><ul>
 <li>Output only. The unique ID of the advertiser the line item belongs to.</li>
 </ul>
 </li>
 <li>
-<p><code>bid-strategy.fixed-bid    bid-amount-micros=at</code></p>
+<p><code>bid-strategy.fixed-bid    bid-amount-micros=vero</code></p>
 <ul>
 <li>The fixed bid amount, in micros of the advertiser&#39;s currency. For insertion order entity, bid_amount_micros should be set as 0. For line item entity, bid_amount_micros must be greater than or equal to billable unit of the given currency and smaller than or equal to the upper limit 1000000000. For example, 1500000 represents 1.5 standard units of the currency.</li>
 </ul>
 </li>
 <li>
-<p><code>..maximize-spend-auto-bid    custom-bidding-algorithm-id=erat</code></p>
-<ul>
-<li>The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO</code>.</li>
-</ul>
-</li>
-<li><code>max-average-cpm-bid-amount-micros=clita</code><ul>
-<li>The maximum average CPM that may be bid, in micros of the advertiser&#39;s currency. Must be greater than or equal to a billable unit of the given currency. For example, 1500000 represents 1.5 standard units of the currency.</li>
-</ul>
-</li>
-<li>
-<p><code>performance-goal-type=vero</code></p>
-<ul>
-<li>Required. The type of the performance goal that the bidding strategy tries to minimize while spending the full budget. <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM</code> is not supported for this strategy.</li>
-</ul>
-</li>
-<li>
-<p><code>..performance-goal-auto-bid    custom-bidding-algorithm-id=invidunt</code></p>
+<p><code>..maximize-spend-auto-bid    custom-bidding-algorithm-id=invidunt</code></p>
 <ul>
 <li>The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO</code>.</li>
 </ul>
 </li>
 <li><code>max-average-cpm-bid-amount-micros=nonumy</code><ul>
+<li>The maximum average CPM that may be bid, in micros of the advertiser&#39;s currency. Must be greater than or equal to a billable unit of the given currency. For example, 1500000 represents 1.5 standard units of the currency.</li>
+</ul>
+</li>
+<li><code>performance-goal-type=erat</code><ul>
+<li>Required. The type of the performance goal that the bidding strategy tries to minimize while spending the full budget. <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM</code> is not supported for this strategy.</li>
+</ul>
+</li>
+<li>
+<p><code>raise-bid-for-deals=true</code></p>
+<ul>
+<li>Controls whether the strategy takes deal floor prices into account.</li>
+</ul>
+</li>
+<li>
+<p><code>..performance-goal-auto-bid    custom-bidding-algorithm-id=voluptua.</code></p>
+<ul>
+<li>The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO</code>.</li>
+</ul>
+</li>
+<li><code>max-average-cpm-bid-amount-micros=eos</code><ul>
 <li>The maximum average CPM that may be bid, in micros of the advertiser&#39;s currency. Must be greater than or equal to a billable unit of the given currency. Not applicable when performance_goal_type is set to <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM</code>. For example, 1500000 represents 1.5 standard units of the currency.</li>
 </ul>
 </li>
-<li><code>performance-goal-amount-micros=erat</code><ul>
+<li><code>performance-goal-amount-micros=duo</code><ul>
 <li>Required. The performance goal the bidding strategy will attempt to meet or beat, in micros of the advertiser&#39;s currency or in micro of the ROAS (Return On Advertising Spend) value which is also based on advertiser&#39;s currency. Must be greater than or equal to a billable unit of the given currency and smaller or equal to upper bounds. Each performance_goal_type has its upper bound: * when performance_goal_type is <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CPA</code>, upper bound is 10000.00 USD. * when performance_goal_type is <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CPC</code>, upper bound is 1000.00 USD. * when performance_goal_type is <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM</code>, upper bound is 1000.00 USD. * when performance_goal_type is <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO</code>, upper bound is 1000.00 and lower bound is 0.01. Example: If set to <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM</code>, the bid price will be based on the probability that each available impression will be viewable. For example, if viewable CPM target is $2 and an impression is 40% likely to be viewable, the bid price will be $0.80 CPM (40% of $2). For example, 1500000 represents 1.5 standard units of the currency or ROAS value.</li>
 </ul>
 </li>
 <li>
-<p><code>performance-goal-type=erat</code></p>
+<p><code>performance-goal-type=elitr</code></p>
 <ul>
 <li>Required. The type of the performance goal that the bidding strategy will try to meet or beat. For line item level usage, the value must be one of: * <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CPA</code> * <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CPC</code> * <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM</code> * <code>BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...budget    budget-allocation-type=dolores</code></p>
+<p><code>...budget    budget-allocation-type=consetetur</code></p>
 <ul>
 <li>Required. The type of the budget allocation. <code>LINE_ITEM_BUDGET_ALLOCATION_TYPE_AUTOMATIC</code> is only applicable when automatic budget allocation is enabled for the parent insertion order.</li>
 </ul>
 </li>
-<li><code>budget-unit=ipsum</code><ul>
+<li><code>budget-unit=et</code><ul>
 <li>Output only. The budget unit specifies whether the budget is currency based or impression based. This value is inherited from the parent insertion order.</li>
 </ul>
 </li>
 <li>
-<p><code>max-amount=voluptua.</code></p>
+<p><code>max-amount=clita</code></p>
 <ul>
 <li>The maximum budget amount the line item will spend. Must be greater than 0. When budget_allocation_type is: * <code>LINE_ITEM_BUDGET_ALLOCATION_TYPE_AUTOMATIC</code>, this field is immutable and is set by the system. * <code>LINE_ITEM_BUDGET_ALLOCATION_TYPE_FIXED</code>, if budget_unit is: - <code>BUDGET_UNIT_CURRENCY</code>, this field represents maximum budget amount to spend, in micros of the advertiser&#39;s currency. For example, 1500000 represents 1.5 standard units of the currency. - <code>BUDGET_UNIT_IMPRESSIONS</code>, this field represents the maximum number of impressions to serve. * <code>LINE_ITEM_BUDGET_ALLOCATION_TYPE_UNLIMITED</code>, this field is not applicable and will be ignored by the system.</li>
 </ul>
 </li>
 <li>
-<p><code>..    campaign-id=eos</code></p>
+<p><code>..    campaign-id=sit</code></p>
 <ul>
 <li>Output only. The unique ID of the campaign that the line item belongs to.</li>
 </ul>
 </li>
 <li>
-<p><code>conversion-counting    post-view-count-percentage-millis=-70</code></p>
+<p><code>conversion-counting    post-view-count-percentage-millis=-59</code></p>
 <ul>
 <li>The percentage of post-view conversions to count, in millis (1/1000 of a percent). Must be between 0 and 100000 inclusive. For example, to track 50% of the post-click conversions, set a value of 50000.</li>
 </ul>
 </li>
 <li>
-<p><code>..    creative-ids=elitr</code></p>
+<p><code>..    creative-ids=erat</code></p>
 <ul>
 <li>The IDs of the creatives associated with the line item.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>display-name=consetetur</code><ul>
+<li><code>display-name=diam</code><ul>
 <li>Required. The display name of the line item. Must be UTF-8 encoded with a maximum size of 240 bytes.</li>
 </ul>
 </li>
-<li><code>entity-status=et</code><ul>
+<li><code>entity-status=nonumy</code><ul>
 <li>Required. Controls whether or not the line item can spend its budget and bid on inventory. * For CreateLineItem method, only <code>ENTITY_STATUS_DRAFT</code> is allowed. To activate a line item, use UpdateLineItem method and update the status to <code>ENTITY_STATUS_ACTIVE</code> after creation. * A line item cannot be changed back to <code>ENTITY_STATUS_DRAFT</code> status from any other status. * If the line item&#39;s parent insertion order is not active, the line item can&#39;t spend its budget even if its own status is <code>ENTITY_STATUS_ACTIVE</code>.</li>
 </ul>
 </li>
-<li><code>flight.date-range.end-date    day=87</code><ul>
+<li><code>exclude-new-exchanges=false</code><ul>
+<li>Whether to exclude new exchanges from automatically being targeted by the line item. This field is false by default.</li>
+</ul>
+</li>
+<li><code>flight.date-range.end-date    day=9</code><ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=100</code><ul>
+<li><code>month=9</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=53</code></p>
+<p><code>year=8</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>..start-date    day=42</code></p>
+<p><code>..start-date    day=83</code></p>
 <ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
-<li><code>month=70</code><ul>
+<li><code>month=84</code><ul>
 <li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>year=59</code></p>
+<p><code>year=17</code></p>
 <ul>
 <li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
 </ul>
 </li>
 <li>
-<p><code>...    flight-date-type=nonumy</code></p>
+<p><code>...    flight-date-type=ipsum</code></p>
 <ul>
 <li>Required. The type of the line item&#39;s flight dates.</li>
 </ul>
 </li>
 <li>
-<p><code>trigger-id=lorem</code></p>
+<p><code>trigger-id=ea</code></p>
 <ul>
 <li>The ID of the manual trigger associated with the line item. * Required when flight_date_type is <code>LINE_ITEM_FLIGHT_DATE_TYPE_TRIGGER</code>. Must not be set otherwise. * When set, the line item&#39;s flight dates are inherited from its parent insertion order. * Active line items will spend when the selected trigger is activated within the parent insertion order&#39;s flight dates.</li>
 </ul>
 </li>
 <li>
-<p><code>..frequency-cap    max-impressions=24</code></p>
+<p><code>..frequency-cap    max-impressions=74</code></p>
 <ul>
-<li>The maximum number of times a user may be shown with the same ad during this period. Must be greater than 0. Required when unlimited is <code>false</code>.</li>
+<li>The maximum number of times a user may be shown the same ad during this period. Must be greater than 0. Required when unlimited is <code>false</code> and max_views is not set.</li>
 </ul>
 </li>
-<li><code>time-unit=diam</code><ul>
+<li><code>time-unit=sit</code><ul>
 <li>The time unit in which the frequency cap will be applied. Required when unlimited is <code>false</code>.</li>
 </ul>
 </li>
-<li><code>time-unit-count=9</code><ul>
+<li><code>time-unit-count=3</code><ul>
 <li>The number of time_unit the frequency cap will last. Required when unlimited is <code>false</code>. The following restrictions apply based on the value of time_unit: * <code>TIME_UNIT_LIFETIME</code> - this field is output only and will default to 1 * <code>TIME_UNIT_MONTHS</code> - must be between 1 and 2 * <code>TIME_UNIT_WEEKS</code> - must be between 1 and 4 * <code>TIME_UNIT_DAYS</code> - must be between 1 and 6 * <code>TIME_UNIT_HOURS</code> - must be between 1 and 23 * <code>TIME_UNIT_MINUTES</code> - must be between 1 and 59</li>
 </ul>
 </li>
@@ -1069,61 +1140,61 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    insertion-order-id=et</code></p>
+<p><code>..    insertion-order-id=stet</code></p>
 <ul>
 <li>Required. Immutable. The unique ID of the insertion order that the line item belongs to.</li>
 </ul>
 </li>
-<li><code>integration-details    details=ea</code><ul>
+<li><code>integration-details    details=duo</code><ul>
 <li>Additional details of the entry in string format. Must be UTF-8 encoded with a length of no more than 1000 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>integration-code=dolore</code></p>
+<p><code>integration-code=elitr</code></p>
 <ul>
 <li>An external identifier to be associated with the entry. The integration code will show up together with the entry in many places in the system, for example, reporting. Must be UTF-8 encoded with a length of no more than 500 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>..    inventory-source-ids=ipsum</code></p>
+<p><code>..    inventory-source-ids=aliquyam</code></p>
 <ul>
 <li>The IDs of the private inventory sources assigned to the line item.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>line-item-id=ea</code><ul>
+<li><code>line-item-id=erat</code><ul>
 <li>Output only. The unique ID of the line item. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>line-item-type=at</code><ul>
+<li><code>line-item-type=ut</code><ul>
 <li>Required. Immutable. The type of the line item.</li>
 </ul>
 </li>
-<li><code>mobile-app    app-id=sit</code><ul>
+<li><code>mobile-app    app-id=et</code><ul>
 <li>Required. The ID of the app provided by the platform store. Android apps are identified by the bundle ID used by Android&#39;s Play store, such as <code>com.google.android.gm</code>. iOS apps are identified by a nine-digit app ID used by Apple&#39;s App store, such as <code>422689480</code>.</li>
 </ul>
 </li>
-<li><code>display-name=sit</code><ul>
+<li><code>display-name=lorem</code><ul>
 <li>Output only. The app name.</li>
 </ul>
 </li>
-<li><code>platform=lorem</code><ul>
+<li><code>platform=rebum.</code><ul>
 <li>Output only. The app platform.</li>
 </ul>
 </li>
 <li>
-<p><code>publisher=stet</code></p>
+<p><code>publisher=et</code></p>
 <ul>
 <li>Output only. The app publisher.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=duo</code></p>
+<p><code>..    name=sed</code></p>
 <ul>
 <li>Output only. The resource name of the line item.</li>
 </ul>
 </li>
-<li><code>pacing    daily-max-impressions=elitr</code><ul>
+<li><code>pacing    daily-max-impressions=stet</code><ul>
 <li>Maximum number of impressions to serve every day. Applicable when the budget is impression based. Must be greater than 0.</li>
 </ul>
 </li>
@@ -1131,47 +1202,51 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Maximum currency amount to spend every day in micros of advertiser&#39;s currency. Applicable when the budget is currency based. Must be greater than 0. For example, for 1.5 standard unit of the currency, set this field to 1500000. The value assigned will be rounded to whole billable units for the relevant currency by the following rules: any positive value less than a single billable unit will be rounded up to one billable unit and any value larger than a single billable unit will be rounded down to the nearest billable value. For example, if the currency&#39;s billable unit is 0.01, and this field is set to 10257770, it will round down to 10250000, a value of 10.25. If set to 505, it will round up to 10000, a value of 0.01.</li>
 </ul>
 </li>
-<li><code>pacing-period=erat</code><ul>
+<li><code>pacing-period=kasd</code><ul>
 <li>Required. The time period in which the pacing budget will be spent. When automatic budget allocation is enabled at the insertion order via auto_budget_allocation, this field is output only and defaults to <code>PACING_PERIOD_FLIGHT</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>pacing-type=ut</code></p>
+<p><code>pacing-type=lorem</code></p>
 <ul>
 <li>Required. The type of pacing that defines how the budget amount will be spent across the pacing_period.</li>
 </ul>
 </li>
 <li>
-<p><code>..partner-revenue-model    markup-amount=et</code></p>
+<p><code>..partner-revenue-model    markup-amount=sit</code></p>
 <ul>
 <li>Required. The markup amount of the partner revenue model. Must be greater than or equal to 0. * When the markup_type is set to be <code>PARTNER_REVENUE_MODEL_MARKUP_TYPE_CPM</code>, this field represents the CPM markup in micros of advertiser&#39;s currency. For example, 1500000 represents 1.5 standard units of the currency. * When the markup_type is set to be <code>PARTNER_REVENUE_MODEL_MARKUP_TYPE_MEDIA_COST_MARKUP</code>, this field represents the media cost percent markup in millis. For example, 100 represents 0.1% (decimal 0.001). * When the markup_type is set to be <code>PARTNER_REVENUE_MODEL_MARKUP_TYPE_TOTAL_MEDIA_COST_MARKUP</code>, this field represents the total media cost percent markup in millis. For example, 100 represents 0.1% (decimal 0.001).</li>
 </ul>
 </li>
 <li>
-<p><code>markup-type=lorem</code></p>
+<p><code>markup-type=kasd</code></p>
 <ul>
 <li>Required. The markup type of the partner revenue model.</li>
 </ul>
 </li>
 <li>
-<p><code>..targeting-expansion    exclude-first-party-audience=true</code></p>
+<p><code>..    reservation-type=tempor</code></p>
 <ul>
+<li>Output only. The reservation type of the line item.</li>
+</ul>
+</li>
+<li><code>targeting-expansion    exclude-first-party-audience=true</code><ul>
 <li>Required. Whether to exclude first party audiences from targeting. Similar audiences of the excluded first party lists will not be excluded. Only applicable when a first-party audience is positively targeted (directly or included in a combined audience), otherwise this selection will be ignored.</li>
 </ul>
 </li>
 <li>
-<p><code>targeting-expansion-level=et</code></p>
+<p><code>targeting-expansion-level=amet</code></p>
 <ul>
 <li>Required. Magnitude of expansion for applicable targeting under this line item.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-time=sed</code></p>
+<p><code>..    update-time=sit</code></p>
 <ul>
 <li>Output only. The timestamp when the line item was last updated. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>warning-messages=stet</code><ul>
+<li><code>warning-messages=rebum.</code><ul>
 <li>Output only. The warning messages generated by the line item. These warnings do not block saving the line item, but some may block the line item from running.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

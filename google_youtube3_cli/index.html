@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YouTube v2.0.4+20210330</title>
+  <title>YouTube v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> YouTube v2.0.4+20210330</a>
+        <a href="." class="icon icon-home"> YouTube v3.0.0+20220303</a>
         
       </div>
 
@@ -157,11 +157,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="comment-threads_list/">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="comment-threads_update/">Update</a>
                     
                 </li>
             
@@ -590,6 +585,17 @@
         
 
     
+        
+        <span>Youtube</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="youtube_v3-update-comment-threads/">V3 Update Comment Threads</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -642,7 +648,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>YouTube</em> API at revision <em>20210330</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>YouTube</em> API at revision <em>20220303</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">youtube3 [options]
         abuse-reports
                 insert (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -667,7 +673,6 @@ capabilities. Errors will be printed to standard error, and cause the program's 
         comment-threads
                 insert (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list &lt;part&gt;... [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                update (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         comments
                 delete &lt;id&gt; [-p &lt;v&gt;]...
                 insert (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -748,6 +753,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
         watermarks
                 set &lt;channel-id&gt; (-r &lt;kv&gt;)... (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]...
                 unset &lt;channel-id&gt; [-p &lt;v&gt;]...
+        youtube
+                v3-update-comment-threads (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   youtube3 --help
 
 Configuration:

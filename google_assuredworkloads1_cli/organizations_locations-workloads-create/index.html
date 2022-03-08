@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Workloads Create - Assuredworkloads v2.0.4+20210325</title>
+  <title>Locations Workloads Create - Assuredworkloads v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Assuredworkloads v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Assuredworkloads v3.0.0+20220224</a>
         
       </div>
 
@@ -160,20 +160,25 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   compliance-regime: string
   create-time: string
   display-name: string
+  enable-sovereign-controls: boolean
   etag: string
+  kaj-enrollment-state: string
   kms-settings:
     next-rotation-time: string
     rotation-period: string
   labels: { string: string }
   name: string
   provisioned-resources-parent: string
+  saa-enrollment-response:
+    setup-errors: [string]
+    setup-status: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    billing-account=et</code><ul>
-<li>Required. Input only. The billing account used for the resources which are direct children of workload. This billing account is initially associated with the resources created as part of Workload creation. After the initial creation of these resources, the customer can change the assigned billing account. The resource name has the form <code>billingAccounts/{billing_account_id}</code>. For example, <code>billingAccounts/012345-567890-ABCDEF</code>.</li>
+<li>Optional. The billing account used for the resources which are direct children of workload. This billing account is initially associated with the resources created as part of Workload creation. After the initial creation of these resources, the customer can change the assigned billing account. The resource name has the form <code>billingAccounts/{billing_account_id}</code>. For example, <code>billingAccounts/012345-567890-ABCDEF</code>.</li>
 </ul>
 </li>
 <li><code>compliance-regime=magna</code><ul>
@@ -188,33 +193,50 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. The user-assigned display name of the Workload. When present it must be between 4 to 30 characters. Allowed characters are: lowercase and uppercase letters, numbers, hyphen, and spaces. Example: My Workload</li>
 </ul>
 </li>
-<li><code>etag=voluptua.</code><ul>
+<li><code>enable-sovereign-controls=false</code><ul>
+<li>Optional. Indicates the sovereignty status of the given workload. Currently meant to be used by Europe/Canada customers.</li>
+</ul>
+</li>
+<li><code>etag=amet.</code><ul>
 <li>Optional. ETag of the workload, it is calculated on the basis of the Workload contents. It will be used in Update &amp; Delete operations.</li>
 </ul>
 </li>
-<li><code>kms-settings    next-rotation-time=at</code><ul>
+<li><code>kaj-enrollment-state=takimata</code><ul>
+<li>Output only. Represents the KAJ enrollment state of the given workload.</li>
+</ul>
+</li>
+<li><code>kms-settings    next-rotation-time=amet.</code><ul>
 <li>Required. Input only. Immutable. The time at which the Key Management Service will automatically create a new version of the crypto key and mark it as the primary.</li>
 </ul>
 </li>
 <li>
-<p><code>rotation-period=sanctus</code></p>
+<p><code>rotation-period=duo</code></p>
 <ul>
 <li>Required. Input only. Immutable. [next_rotation_time] will be advanced by this period when the Key Management Service automatically rotates a key. Must be at least 24 hours and at most 876,000 hours.</li>
 </ul>
 </li>
 <li>
-<p><code>..    labels=key=sed</code></p>
+<p><code>..    labels=key=ipsum</code></p>
 <ul>
 <li>Optional. Labels applied to the workload.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=amet.</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>Optional. The resource name of the workload. Format: organizations/{organization}/locations/{location}/workloads/{workload} Read-only.</li>
 </ul>
 </li>
-<li><code>provisioned-resources-parent=takimata</code><ul>
-<li>Input only. The parent resource for the resources managed by this Assured Workload. May be either an organization or a folder. Must be the same or a child of the Workload parent. If not specified all resources are created under the Workload parent. Formats: folders/{folder_id} organizations/{organization_id}</li>
+<li><code>provisioned-resources-parent=lorem</code><ul>
+<li>Input only. The parent resource for the resources managed by this Assured Workload. May be either empty or a folder resource which is a child of the Workload parent. If not specified all resources are created under the parent organization. Format: folders/{folder_id}</li>
+</ul>
+</li>
+<li><code>saa-enrollment-response    setup-errors=gubergren</code><ul>
+<li>Indicates SAA enrollment setup error if any.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>setup-status=eos</code><ul>
+<li>Indicates SAA enrollment status of a given workload.</li>
 </ul>
 </li>
 </ul>

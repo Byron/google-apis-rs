@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloudchannel v2.0.4+20210326</title>
+  <title>Cloudchannel v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloudchannel v2.0.4+20210326</a>
+        <a href="." class="icon icon-home"> Cloudchannel v3.0.0+20220303</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="accounts_channel-partner-links-customers-get/">Channel Partner Links Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_channel-partner-links-customers-import/">Channel Partner Links Customers Import</a>
                     
                 </li>
             
@@ -145,6 +150,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="accounts_customers-entitlements-lookup-offer/">Customers Entitlements Lookup Offer</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="accounts_customers-entitlements-start-paid-service/">Customers Entitlements Start Paid Service</a>
                     
                 </li>
@@ -156,6 +166,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="accounts_customers-get/">Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_customers-import/">Customers Import</a>
                     
                 </li>
             
@@ -321,13 +336,14 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/cloudchannel1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloudchannel</em> API at revision <em>20210326</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloudchannel</em> API at revision <em>20220303</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">cloudchannel1 [options]
         accounts
                 channel-partner-links-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channel-partner-links-customers-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channel-partner-links-customers-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channel-partner-links-customers-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                channel-partner-links-customers-import &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channel-partner-links-customers-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channel-partner-links-customers-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channel-partner-links-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -344,9 +360,11 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 customers-entitlements-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-entitlements-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-entitlements-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                customers-entitlements-lookup-offer &lt;entitlement&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-entitlements-start-paid-service &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-entitlements-suspend &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                customers-import &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-list-purchasable-offers &lt;customer&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 customers-list-purchasable-skus &lt;customer&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

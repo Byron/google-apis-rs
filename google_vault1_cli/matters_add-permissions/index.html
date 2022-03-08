@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Add Permissions - Vault v2.0.4+20210316</title>
+  <title>Add Permissions - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -300,23 +300,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    cc-me=true</code><ul>
-<li>Only relevant if send_emails is true. True to CC requestor in the email message. False to not CC requestor.</li>
+<li>Only relevant if <strong>sendEmails</strong> is <strong>true</strong>. To CC the requestor in the email message, set to <strong>true</strong>. To not CC requestor, set to <strong>false</strong>.</li>
 </ul>
 </li>
 <li><code>matter-permission    account-id=voluptua.</code><ul>
-<li>The account ID, as provided by Admin SDK.</li>
+<li>The account ID, as provided by the <a href="https://developers.google.com/admin-sdk/">Admin SDK</a>.</li>
 </ul>
 </li>
 <li>
 <p><code>role=at</code></p>
 <ul>
-<li>The user&#39;s role in this matter.</li>
+<li>The user&#39;s role for the matter.</li>
 </ul>
 </li>
 <li>
 <p><code>..    send-emails=false</code></p>
 <ul>
-<li>True to send notification email to the added account. False to not send notification email.</li>
+<li>To send a notification email to the added account, set to <strong>true</strong>. To not send a notification email, set to <strong>false</strong>.</li>
 </ul>
 </li>
 </ul>

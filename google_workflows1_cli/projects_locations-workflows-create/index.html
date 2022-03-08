@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Workflows Create - Workflows v2.0.4+20210318</title>
+  <title>Locations Workflows Create - Workflows v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Workflows v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Workflows v3.0.0+20220223</a>
         
       </div>
 
@@ -212,7 +212,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>service-account=sanctus</code><ul>
-<li>Name of the service account associated with the latest workflow version. This service account represents the identity of the workflow and determines what permissions the workflow has. Format: projects/{project}/serviceAccounts/{account} Using <code>-</code> as a wildcard for the <code>{project}</code> will infer the project from the account. The <code>{account}</code> value can be the <code>email</code> address or the <code>unique_id</code> of the service account. If not provided, workflow will use the project&#39;s default service account. Modifying this field for an existing workflow results in a new workflow revision.</li>
+<li>The service account associated with the latest workflow version. This service account represents the identity of the workflow and determines what permissions the workflow has. Format: projects/{project}/serviceAccounts/{account} or {account} Using <code>-</code> as a wildcard for the <code>{project}</code> or not providing one at all will infer the project from the account. The <code>{account}</code> value can be the <code>email</code> address or the <code>unique_id</code> of the service account. If not provided, workflow will use the project&#39;s default service account. Modifying this field for an existing workflow results in a new workflow revision.</li>
 </ul>
 </li>
 <li><code>source-contents=sed</code><ul>

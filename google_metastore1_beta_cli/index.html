@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dataproc Metastore v2.0.4+20210325</title>
+  <title>Dataproc Metastore v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Dataproc Metastore v2.0.4+20210325</a>
+        <a href="." class="icon icon-home"> Dataproc Metastore v3.0.0+20220222</a>
         
       </div>
 
@@ -85,12 +85,57 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-backups-get-iam-policy/">Locations Services Backups Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-services-backups-list/">Locations Services Backups List</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-backups-set-iam-policy/">Locations Services Backups Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-backups-test-iam-permissions/">Locations Services Backups Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-services-create/">Locations Services Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-databases-get-iam-policy/">Locations Services Databases Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-databases-set-iam-policy/">Locations Services Databases Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-databases-tables-get-iam-policy/">Locations Services Databases Tables Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-databases-tables-set-iam-policy/">Locations Services Databases Tables Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-databases-tables-test-iam-permissions/">Locations Services Databases Tables Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-databases-test-iam-permissions/">Locations Services Databases Test Iam Permissions</a>
                     
                 </li>
             
@@ -141,6 +186,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-services-patch/">Locations Services Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-remove-iam-policy/">Locations Services Remove Iam Policy</a>
                     
                 </li>
             
@@ -214,7 +264,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/metastore1_beta-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Dataproc Metastore</em> API at revision <em>20210325</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Dataproc Metastore</em> API at revision <em>20220222</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">metastore1-beta [options]
         projects
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -225,8 +275,17 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-services-backups-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-backups-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-backups-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-backups-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-backups-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-backups-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-backups-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-databases-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-databases-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-databases-tables-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-databases-tables-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-databases-tables-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-databases-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-export-metadata &lt;service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -237,6 +296,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-services-metadata-imports-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-metadata-imports-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-remove-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-restore &lt;service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-services-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Returnrefundlineitem - Shopping Content v2.0.4+20210325</title>
+  <title>Returnrefundlineitem - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -663,19 +663,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .amount-pretax    currency=sed</code><ul>
-<li>The currency of the price.</li>
-</ul>
-</li>
-<li>
-<p><code>value=kasd</code></p>
-<ul>
-<li>The price represented as a number.</li>
-</ul>
-</li>
-<li>
-<p><code>..amount-tax    currency=lorem</code></p>
-<ul>
+<li><code>-r .amount-pretax    currency=lorem</code><ul>
 <li>The currency of the price.</li>
 </ul>
 </li>
@@ -686,28 +674,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    line-item-id=nonumy</code></p>
+<p><code>..amount-tax    currency=nonumy</code></p>
+<ul>
+<li>The currency of the price.</li>
+</ul>
+</li>
+<li>
+<p><code>value=rebum.</code></p>
+<ul>
+<li>The price represented as a number.</li>
+</ul>
+</li>
+<li>
+<p><code>..    line-item-id=tempor</code></p>
 <ul>
 <li>The ID of the line item to return. Either lineItemId or productId is required.</li>
 </ul>
 </li>
-<li><code>operation-id=rebum.</code><ul>
+<li><code>operation-id=dolore</code><ul>
 <li>The ID of the operation. Unique across all operations for a given order.</li>
 </ul>
 </li>
-<li><code>product-id=tempor</code><ul>
+<li><code>product-id=eos</code><ul>
 <li>The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.</li>
 </ul>
 </li>
-<li><code>quantity=67</code><ul>
+<li><code>quantity=49</code><ul>
 <li>The quantity to return and refund. Quantity is required.</li>
 </ul>
 </li>
-<li><code>reason=eos</code><ul>
+<li><code>reason=dolore</code><ul>
 <li>The reason for the return. Acceptable values are: - &#34;<code>customerDiscretionaryReturn</code>&#34; - &#34;<code>customerInitiatedMerchantCancel</code>&#34; - &#34;<code>deliveredTooLate</code>&#34; - &#34;<code>expiredItem</code>&#34; - &#34;<code>invalidCoupon</code>&#34; - &#34;<code>malformedShippingAddress</code>&#34; - &#34;<code>other</code>&#34; - &#34;<code>productArrivedDamaged</code>&#34; - &#34;<code>productNotAsDescribed</code>&#34; - &#34;<code>qualityNotAsExpected</code>&#34; - &#34;<code>undeliverableShippingAddress</code>&#34; - &#34;<code>unsupportedPoBoxAddress</code>&#34; - &#34;<code>wrongProductShipped</code>&#34; </li>
 </ul>
 </li>
-<li><code>reason-text=amet.</code><ul>
+<li><code>reason-text=amet</code><ul>
 <li>The explanation of the reason.</li>
 </ul>
 </li>

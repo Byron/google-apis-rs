@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Stop - storage v2.0.4+20210330</title>
+  <title>Stop - storage v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> storage v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> storage v3.0.0+20220228</a>
         
       </div>
 
@@ -429,23 +429,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    address=ea</code><ul>
+<li><code>-r .    address=erat</code><ul>
 <li>The address where notifications are delivered for this channel.</li>
 </ul>
 </li>
-<li><code>expiration=stet</code><ul>
+<li><code>expiration=accusam</code><ul>
 <li>Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.</li>
 </ul>
 </li>
-<li><code>id=dolores</code><ul>
+<li><code>id=sea</code><ul>
 <li>A UUID or similar unique string that identifies this channel.</li>
 </ul>
 </li>
-<li><code>kind=eos</code><ul>
+<li><code>kind=takimata</code><ul>
 <li>Identifies this as a notification channel used to watch for changes to a resource, which is &#34;api#channel&#34;.</li>
 </ul>
 </li>
-<li><code>params=key=et</code><ul>
+<li><code>params=key=lorem</code><ul>
 <li>Additional parameters controlling delivery channel behavior. Optional.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
@@ -454,19 +454,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A Boolean value to indicate whether payload is wanted. Optional.</li>
 </ul>
 </li>
-<li><code>resource-id=at</code><ul>
+<li><code>resource-id=dolor</code><ul>
 <li>An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.</li>
 </ul>
 </li>
-<li><code>resource-uri=dolore</code><ul>
+<li><code>resource-uri=et</code><ul>
 <li>A version-specific identifier for the watched resource.</li>
 </ul>
 </li>
-<li><code>token=eirmod</code><ul>
+<li><code>token=sit</code><ul>
 <li>An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.</li>
 </ul>
 </li>
-<li><code>type=lorem</code><ul>
+<li><code>type=erat</code><ul>
 <li>The type of delivery mechanism used for this channel.</li>
 </ul>
 </li>
@@ -516,6 +516,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p><strong>-p quota-user=string</strong></p>
 <ul>
 <li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;, &#34;resumable&#34;).</li>
 </ul>
 </li>
 <li>

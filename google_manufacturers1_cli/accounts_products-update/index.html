@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Products Update - Manufacturer Center v2.0.4+20210325</title>
+  <title>Products Update - Manufacturer Center v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Manufacturer Center v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Manufacturer Center v3.0.0+20220303</a>
         
       </div>
 
@@ -177,7 +177,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   scent: string
   size: string
   size-system: string
-  size-type: string
+  size-type: [string]
   suggested-retail-price:
     amount: string
     currency: string
@@ -235,7 +235,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>excluded-destination=takimata</code><ul>
-<li>A list of excluded destinations.</li>
+<li>A list of excluded destinations such as &#34;ClientExport&#34;, &#34;ClientShoppingCatalog&#34; or &#34;PartnerShoppingCatalog&#34;. For more information, see https://support.google.com/manufacturers/answer/7443550</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
@@ -273,7 +273,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    included-destination=dolor</code></p>
 <ul>
-<li>A list of included destinations.</li>
+<li>A list of included destinations such as &#34;ClientExport&#34;, &#34;ClientShoppingCatalog&#34; or &#34;PartnerShoppingCatalog&#34;. For more information, see https://support.google.com/manufacturers/answer/7443550</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
@@ -338,6 +338,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 <li><code>size-type=gubergren</code><ul>
 <li>The size type of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#sizetype.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li><code>suggested-retail-price    amount=ea</code><ul>
@@ -353,7 +354,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    target-client-id=lorem</code></p>
 <ul>
-<li>The target client id. Should only be used in the accounts of the data partners.</li>
+<li>The target client id. Should only be used in the accounts of the data partners. For more information, see https://support.google.com/manufacturers/answer/10857344</li>
 </ul>
 </li>
 <li><code>theme=eos</code><ul>

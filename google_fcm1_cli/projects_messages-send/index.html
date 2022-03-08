@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Messages Send - Firebase Cloud Messaging v2.0.4+20210329</title>
+  <title>Messages Send - Firebase Cloud Messaging v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firebase Cloud Messaging v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Firebase Cloud Messaging v3.0.0+20220228</a>
         
       </div>
 
@@ -108,7 +108,11 @@
             <div class="section">
               <p>Send a message to specified target (a registration token, topic or condition).</p>
 <h1 id="scopes">Scopes</h1>
-<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/firebase.messaging</em></li>
+</ul>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
 You can set the scope for this method like this: <code>fcm1 --scope &lt;scope&gt; projects messages-send ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
@@ -379,7 +383,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    headers=key=sed</code></p>
 <ul>
-<li>HTTP request headers defined in Apple Push Notification Service. Refer to <a href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns">APNs request headers</a> for supported headers, e.g. &#34;apns-priority&#34;: &#34;10&#34;.</li>
+<li>HTTP request headers defined in Apple Push Notification Service. Refer to <a href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns">APNs request headers</a> for supported headers such as <code>apns-expiration</code> and <code>apns-priority</code>.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
@@ -390,7 +394,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>data=key=et</code><ul>
-<li>Input only. Arbitrary key/value payload. The key should not be a reserved word (&#34;from&#34;, &#34;message_type&#34;, or any word starting with &#34;google&#34; or &#34;gcm&#34;).</li>
+<li>Input only. Arbitrary key/value payload, which must be UTF-8 encoded. The key should not be a reserved word (&#34;from&#34;, &#34;message_type&#34;, or any word starting with &#34;google&#34; or &#34;gcm&#34;). When sending payloads containing only data fields to iOS devices, only normal priority (<code>&amp;#34;apns-priority&amp;#34;: &amp;#34;5&amp;#34;</code>) is allowed in <a href="..//docs/reference/fcm/rest/v1/projects.messages#apnsconfig"><code>ApnsConfig</code></a>.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>

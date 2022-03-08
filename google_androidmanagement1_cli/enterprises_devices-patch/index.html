@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Devices Patch - Android Management v2.0.4+20210322</title>
+  <title>Devices Patch - Android Management v3.0.0+20220302</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Management v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Android Management v3.0.0+20220302</a>
         
       </div>
 
@@ -294,6 +294,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     cpu-shutdown-temperatures: [number]
     cpu-throttling-temperatures: [number]
     device-baseband-version: string
+    enterprise-specific-id: string
     gpu-shutdown-temperatures: [number]
     gpu-throttling-temperatures: [number]
     hardware: string
@@ -396,7 +397,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>verify-apps-enabled=true</code></p>
 <ul>
-<li>Whether Verify Apps (Google Play Protect (https://support.google.com/googleplay/answer/2812853)) is enabled on the device.</li>
+<li>Whether Google Play Protect verification (https://support.google.com/accounts/answer/2812853) is enforced on the device.</li>
 </ul>
 </li>
 <li>
@@ -454,12 +455,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Baseband version. For example, MDM9625_104662.22.05.34p.</li>
 </ul>
 </li>
-<li><code>gpu-shutdown-temperatures=0.6383502522516505</code><ul>
+<li><code>enterprise-specific-id=duo</code><ul>
+<li>Output only. ID that uniquely identifies a personally-owned device in a particular organization. On the same physical device when enrolled with the same organization, this ID persists across setups and even factory resets. This ID is available on personally-owned devices with a work profile on devices running Android 12 and above.</li>
+</ul>
+</li>
+<li><code>gpu-shutdown-temperatures=0.5254434270373415</code><ul>
 <li>GPU shutdown temperature thresholds in Celsius for each GPU on the device.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>gpu-throttling-temperatures=0.9694857568940014</code><ul>
+<li><code>gpu-throttling-temperatures=0.6186732200516616</code><ul>
 <li>GPU throttling temperature thresholds in Celsius for each GPU on the device.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

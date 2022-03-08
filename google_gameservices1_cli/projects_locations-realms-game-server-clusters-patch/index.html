@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Realms Game Server Clusters Patch - Game Services v2.0.4+20210312</title>
+  <title>Locations Realms Game Server Clusters Patch - Game Services v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Game Services v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Game Services v3.0.0+20220223</a>
         
       </div>
 
@@ -292,7 +292,7 @@ You can set the scope for this method like this: <code>gameservices1 --scope &lt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The resource name of the game server cluster, in the following form: <code>projects/{project}/locations/{location}/realms/{realm}/gameServerClusters/{cluster}</code>. For example, <code>projects/my-project/locations/{location}/realms/zanzibar/gameServerClusters/my-onprem-cluster</code>.</li>
+<li>Required. The resource name of the game server cluster, in the following form: <code>projects/{project}/locations/{locationId}/realms/{realmId}/gameServerClusters/{gameServerClusterId}</code>. For example, <code>projects/my-project/locations/global/realms/zanzibar/gameServerClusters/my-gke-cluster</code>.</li>
 </ul>
 </li>
 </ul>
@@ -301,6 +301,13 @@ You can set the scope for this method like this: <code>gameservices1 --scope &lt
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>GameServerCluster:
+  cluster-state:
+    agones-version-installed: string
+    agones-version-targeted: string
+    installation-state: string
+    kubernetes-version-installed: string
+    provider: string
+    version-installed-error-message: string
   connection-info:
     gke-cluster-reference:
       cluster: string
@@ -316,42 +323,68 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li>
-<p><code>-r .connection-info.gke-cluster-reference    cluster=et</code></p>
-<ul>
-<li>The full or partial name of a GKE cluster, using one of the following forms: * <code>projects/{project}/locations/{location}/clusters/{cluster}</code> * <code>locations/{location}/clusters/{cluster}</code> * <code>{cluster}</code> If project and location are not specified, the project and location of the GameServerCluster resource are used to generate the full name of the GKE cluster.</li>
+<li><code>-r .cluster-state    agones-version-installed=dolore</code><ul>
+<li>Output only. The version of Agones currently installed in the registered Kubernetes cluster.</li>
+</ul>
+</li>
+<li><code>agones-version-targeted=et</code><ul>
+<li>Output only. The version of Agones that is targeted to be installed in the cluster.</li>
+</ul>
+</li>
+<li><code>installation-state=voluptua.</code><ul>
+<li>Output only. The state for the installed versions of Agones/Kubernetes.</li>
+</ul>
+</li>
+<li><code>kubernetes-version-installed=amet.</code><ul>
+<li>Output only. The version of Kubernetes that is currently used in the registered Kubernetes cluster (as detected by the Cloud Game Servers service).</li>
+</ul>
+</li>
+<li><code>provider=consetetur</code><ul>
+<li>Output only. The cloud provider type reported by the first node&#39;s <code>providerID</code> in the list of nodes on the Kubernetes endpoint. On Kubernetes platforms that support zero-node clusters (like GKE-on-GCP), the provider type will be empty.</li>
 </ul>
 </li>
 <li>
-<p><code>..    namespace=vero</code></p>
+<p><code>version-installed-error-message=diam</code></p>
+<ul>
+<li>Output only. The detailed error message for the installed versions of Agones/Kubernetes.</li>
+</ul>
+</li>
+<li>
+<p><code>..connection-info.gke-cluster-reference    cluster=dolor</code></p>
+<ul>
+<li>The full or partial name of a GKE cluster, using one of the following forms: * <code>projects/{project}/locations/{locationId}/clusters/{cluster}</code> * <code>locations/{locationId}/clusters/{cluster}</code> * <code>{cluster}</code> If project and location are not specified, the project and location of the GameServerCluster resource are used to generate the full name of the GKE cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>..    namespace=et</code></p>
 <ul>
 <li>Namespace designated on the game server cluster where the Agones game server instances will be created. Existence of the namespace will be validated during creation.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=erat</code></p>
+<p><code>..    create-time=et</code></p>
 <ul>
 <li>Output only. The creation time.</li>
 </ul>
 </li>
-<li><code>description=sed</code><ul>
+<li><code>description=sadipscing</code><ul>
 <li>Human readable description of the cluster.</li>
 </ul>
 </li>
-<li><code>etag=duo</code><ul>
-<li>ETag of the resource.</li>
+<li><code>etag=stet</code><ul>
+<li>Used to perform consistent read-modify-write updates. If not set, a blind &#34;overwrite&#34; update happens.</li>
 </ul>
 </li>
-<li><code>labels=key=dolore</code><ul>
+<li><code>labels=key=dolor</code><ul>
 <li>The labels associated with this game server cluster. Each label is a key-value pair.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
-<li>Required. The resource name of the game server cluster, in the following form: <code>projects/{project}/locations/{location}/realms/{realm}/gameServerClusters/{cluster}</code>. For example, <code>projects/my-project/locations/{location}/realms/zanzibar/gameServerClusters/my-onprem-cluster</code>.</li>
+<li><code>name=duo</code><ul>
+<li>Required. The resource name of the game server cluster, in the following form: <code>projects/{project}/locations/{locationId}/realms/{realmId}/gameServerClusters/{gameServerClusterId}</code>. For example, <code>projects/my-project/locations/global/realms/zanzibar/gameServerClusters/my-gke-cluster</code>.</li>
 </ul>
 </li>
-<li><code>update-time=voluptua.</code><ul>
+<li><code>update-time=vero</code><ul>
 <li>Output only. The last-modified time.</li>
 </ul>
 </li>
@@ -381,7 +414,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>Required. Mask of fields to update. At least one path must be supplied in this field. For the <code>FieldMask</code> definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask</li>
+<li>Required. The update mask to apply to the resource. At least one path must be supplied in this field. For more information, see the <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"><code>FieldMask</code> definition</a>.</li>
 </ul>
 </li>
 </ul>

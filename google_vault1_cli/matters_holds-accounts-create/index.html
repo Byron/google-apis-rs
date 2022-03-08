@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Holds Accounts Create - Vault v2.0.4+20210316</title>
+  <title>Holds Accounts Create - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -272,7 +272,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Adds a HeldAccount to a hold. Accounts can only be added to a hold that has no held_org_unit set. Attempting to add an account to an OU-based hold will result in an error.</p>
+              <p>Adds an account to a hold. Accounts can be added only to a hold that does not have an organizational unit set. If you try to add an account to an organizational unit-based hold, an error is returned.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/ediscovery</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/ediscovery</em>.
@@ -304,11 +304,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    account-id=et</code><ul>
-<li>The account&#39;s ID as provided by the Admin SDK.</li>
+<li>The account ID, as provided by the <a href="https://developers.google.com/admin-sdk/">Admin SDK</a>.</li>
 </ul>
 </li>
 <li><code>email=erat</code><ul>
-<li>The primary email address of the account. If used as an input, this takes precedence over account ID.</li>
+<li>The primary email address of the account. If used as an input, this takes precedence over <strong>accountId</strong>.</li>
 </ul>
 </li>
 <li><code>first-name=consetetur</code><ul>

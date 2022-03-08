@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Holds Update - Vault v2.0.4+20210316</title>
+  <title>Holds Update - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -272,7 +272,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Updates the OU and/or query parameters of a hold. You cannot add accounts to a hold that covers an OU, nor can you add OUs to a hold that covers individual accounts. Accounts listed in the hold will be ignored.</p>
+              <p>Updates the scope (organizational unit or accounts) and query parameters of a hold. You cannot add accounts to a hold that covers an organizational unit, nor can you add organizational units to a hold that covers individual accounts. If you try, the unsupported values are ignored.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/ediscovery</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/ediscovery</em>.
@@ -322,7 +322,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    corpus=sanctus</code><ul>
-<li>The corpus to be searched.</li>
+<li>The service to be searched.</li>
 </ul>
 </li>
 <li><code>hold-id=lorem</code><ul>
@@ -334,69 +334,69 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>org-unit    hold-time=sed</code><ul>
-<li>When the org unit was put on hold. This property is immutable.</li>
+<li>When the organizational unit was put on hold. This property is immutable.</li>
 </ul>
 </li>
 <li>
 <p><code>org-unit-id=diam</code></p>
 <ul>
-<li>The org unit&#39;s immutable ID as provided by the Admin SDK.</li>
+<li>The organizational unit&#39;s immutable ID as provided by the <a href="https://developers.google.com/admin-sdk/">Admin SDK</a>.</li>
 </ul>
 </li>
 <li>
 <p><code>..query.drive-query    include-shared-drive-files=true</code></p>
 <ul>
-<li>If true, include files in shared drives in the hold.</li>
+<li>To include files in shared drives in the hold, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>include-team-drive-files=true</code></p>
 <ul>
-<li>If true, include files in Team Drives in the hold.</li>
+<li>To include files in Team Drives in the hold, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>..groups-query    end-time=sed</code></p>
 <ul>
-<li>The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The end time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li><code>start-time=no</code><ul>
-<li>The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The start time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
 <p><code>terms=et</code></p>
 <ul>
-<li>The search terms for the hold.</li>
+<li>The <a href="https://support.google.com/vault/answer/2474474">search operators</a> used to refine the messages covered by the hold.</li>
 </ul>
 </li>
 <li>
 <p><code>..hangouts-chat-query    include-rooms=false</code></p>
 <ul>
-<li>If true, include rooms the user has participated in.</li>
+<li>To include messages in Chat spaces the user was a member of, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>..mail-query    end-time=sed</code></p>
 <ul>
-<li>The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The end time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li><code>start-time=no</code><ul>
-<li>The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The start time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
 <p><code>terms=nonumy</code></p>
 <ul>
-<li>The search terms for the hold.</li>
+<li>The <a href="https://support.google.com/vault/answer/2474474">search operators</a> used to refine the messages covered by the hold.</li>
 </ul>
 </li>
 <li>
 <p><code>..voice-query    covered-data=at</code></p>
 <ul>
-<li>Data covered by this rule. Should be non-empty. Order does not matter and duplicates will be ignored.</li>
+<li>A list of data types covered by the hold. Should be non-empty. Order does not matter and duplicates are ignored.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

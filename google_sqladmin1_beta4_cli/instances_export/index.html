@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Export - SQL Admin v2.0.4+20210321</title>
+  <title>Export - SQL Admin v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SQL Admin v2.0.4+20210321</a>
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
         
       </div>
 
@@ -61,6 +61,22 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
                     
                 </li>
             
@@ -407,6 +423,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>InstancesExportRequest:
   export-context:
     csv-export-options:
+      escape-character: string
+      fields-terminated-by: string
+      lines-terminated-by: string
+      quote-character: string
       select-query: string
     databases: [string]
     file-type: string
@@ -423,25 +443,41 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
+<li><code>-r .export-context.csv-export-options    escape-character=accusam</code><ul>
+<li>Specifies the character that should appear before a data character that needs to be escaped.</li>
+</ul>
+</li>
+<li><code>fields-terminated-by=takimata</code><ul>
+<li>Specifies the character that separates columns within each row (line) of the file.</li>
+</ul>
+</li>
+<li><code>lines-terminated-by=consetetur</code><ul>
+<li>This is used to separate lines. If a line does not contain all fields, the rest of the columns are set to their default values.</li>
+</ul>
+</li>
+<li><code>quote-character=voluptua.</code><ul>
+<li>Specifies the quoting character to be used when a data value is quoted.</li>
+</ul>
+</li>
 <li>
-<p><code>-r .export-context.csv-export-options    select-query=invidunt</code></p>
+<p><code>select-query=et</code></p>
 <ul>
 <li>The select query used to extract the data.</li>
 </ul>
 </li>
 <li>
-<p><code>..    databases=stet</code></p>
+<p><code>..    databases=erat</code></p>
 <ul>
-<li>Databases to be exported. <em>MySQL instances:</em> If <em>fileType</em> is <em>SQL</em> and no database is specified, all databases are exported, except for the <em>mysql</em> system database. If <em>fileType</em> is <em>CSV</em>, you can specify one database, either by using this property or by using the <em>csvExportOptions.selectQuery</em> property, which takes precedence over this property. <em>PostgreSQL instances:</em> You must specify one database to be exported. If <em>fileType</em> is <em>CSV</em>, this database must match the one specified in the <em>csvExportOptions.selectQuery</em> property. <em>SQL Server instances:</em> You must specify one database to be exported, and the <em>fileType</em> must be <em>BAK</em>.</li>
+<li>Databases to be exported. <code>MySQL instances:</code> If <code>fileType</code> is <code>SQL</code> and no database is specified, all databases are exported, except for the <code>mysql</code> system database. If <code>fileType</code> is <code>CSV</code>, you can specify one database, either by using this property or by using the <code>csvExportOptions.selectQuery</code> property, which takes precedence over this property. <code>PostgreSQL instances:</code> You must specify one database to be exported. If <code>fileType</code> is <code>CSV</code>, this database must match the one specified in the <code>csvExportOptions.selectQuery</code> property. <code>SQL Server instances:</code> You must specify one database to be exported, and the <code>fileType</code> must be <code>BAK</code>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>file-type=vero</code><ul>
-<li>The file type for the specified uri. <em>SQL</em>: The file contains SQL statements. <em>CSV</em>: The file contains CSV data. <em>BAK</em>: The file contains backup data for a SQL Server instance.</li>
+<li><code>file-type=consetetur</code><ul>
+<li>The file type for the specified uri.</li>
 </ul>
 </li>
-<li><code>kind=elitr</code><ul>
-<li>This is always <em>sql#exportContext</em>.</li>
+<li><code>kind=amet.</code><ul>
+<li>This is always <code>sql#exportContext</code>.</li>
 </ul>
 </li>
 <li><code>offload=true</code><ul>
@@ -449,28 +485,28 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>sql-export-options.mysql-export-options    master-data=1</code></p>
+<p><code>sql-export-options.mysql-export-options    master-data=27</code></p>
 <ul>
-<li>Option to include SQL statement required to set up replication. If set to <em>1</em>, the dump file includes a CHANGE MASTER TO statement with the binary log coordinates, and --set-gtid-purged is set to ON. If set to <em>2</em>, the CHANGE MASTER TO statement is written as a SQL comment and has no effect. If set to any value other than <em>1</em>, --set-gtid-purged is set to OFF.</li>
+<li>Option to include SQL statement required to set up replication. If set to <code>1</code>, the dump file includes a CHANGE MASTER TO statement with the binary log coordinates, and --set-gtid-purged is set to ON. If set to <code>2</code>, the CHANGE MASTER TO statement is written as a SQL comment and has no effect. If set to any value other than <code>1</code>, --set-gtid-purged is set to OFF.</li>
 </ul>
 </li>
 <li>
-<p><code>..    schema-only=true</code></p>
+<p><code>..    schema-only=false</code></p>
 <ul>
 <li>Export only schemas.</li>
 </ul>
 </li>
 <li>
-<p><code>tables=consetetur</code></p>
+<p><code>tables=dolore</code></p>
 <ul>
 <li>Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database. For PostgreSQL instances, you can specify only one table.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    uri=voluptua.</code></p>
+<p><code>..    uri=dolore</code></p>
 <ul>
-<li>The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form <em>gs://bucketName/fileName</em>. If the file already exists, the request succeeds, but the operation fails. If <em>fileType</em> is <em>SQL</em> and the filename ends with .gz, the contents are compressed.</li>
+<li>The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form <code>gs://bucketName/fileName</code>. If the file already exists, the request succeeds, but the operation fails. If <code>fileType</code> is <code>SQL</code> and the filename ends with .gz, the contents are compressed.</li>
 </ul>
 </li>
 </ul>

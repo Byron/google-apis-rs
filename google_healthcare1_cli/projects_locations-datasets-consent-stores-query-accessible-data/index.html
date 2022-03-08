@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Consent Stores Query Accessible Data - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Consent Stores Query Accessible Data - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -446,6 +446,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir--resource-validate">Locations Datasets Fhir Stores Fhir  Resource Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-fhir-capabilities">Locations Datasets Fhir Stores Fhir Capabilities</a>
                     
                 </li>
@@ -556,12 +561,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-export">Locations Datasets Hl7 V2 Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get">Locations Datasets Hl7 V2 Stores Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-hl7-v2-stores-get-iam-policy">Locations Datasets Hl7 V2 Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-import">Locations Datasets Hl7 V2 Stores Import</a>
                     
                 </li>
             
@@ -660,6 +675,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-nlp-analyze-entities">Locations Services Nlp Analyze Entities</a>
+                    
+                </li>
+            
         
 
     
@@ -696,7 +716,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Queries all data_ids that are consented for a specified use in the given consent store and writes them to a specified destination. The returned Operation includes a progress counter for the number of User data mappings processed. Errors are logged to Cloud Logging (see <a href="https://cloud.google.com/healthcare/docs/how-tos/logging">Viewing error logs in Cloud Logging</a>). For example, the following sample log entry shows a <code>failed to evaluate consent policy</code> error that occurred during a QueryAccessibleData call to consent store <code>projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}</code>. <code>json jsonPayload: { @type: &amp;#34;type.googleapis.com/google.cloud.healthcare.logging.QueryAccessibleDataLogEntry&amp;#34; error: { code: 9 message: &amp;#34;failed to evaluate consent policy&amp;#34; } resourceName: &amp;#34;projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}&amp;#34; } logName: &amp;#34;projects/{project_id}/logs/healthcare.googleapis.com%2Fquery_accessible_data&amp;#34; operation: { id: &amp;#34;projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/operations/{operation_id}&amp;#34; producer: &amp;#34;healthcare.googleapis.com/QueryAccessibleData&amp;#34; } receiveTimestamp: &amp;#34;TIMESTAMP&amp;#34; resource: { labels: { consent_store_id: &amp;#34;{consent_store_id}&amp;#34; dataset_id: &amp;#34;{dataset_id}&amp;#34; location: &amp;#34;{location_id}&amp;#34; project_id: &amp;#34;{project_id}&amp;#34; } type: &amp;#34;healthcare_consent_store&amp;#34; } severity: &amp;#34;ERROR&amp;#34; timestamp: &amp;#34;TIMESTAMP&amp;#34;</code></p>
+              <p>Queries all data_ids that are consented for a specified use in the given consent store and writes them to a specified destination. The returned Operation includes a progress counter for the number of User data mappings processed. If the request is successful, a detailed response is returned of type QueryAccessibleDataResponse, contained in the response field when the operation finishes. The metadata field type is OperationMetadata. Errors are logged to Cloud Logging (see <a href="https://cloud.google.com/healthcare/docs/how-tos/logging">Viewing error logs in Cloud Logging</a>). For example, the following sample log entry shows a <code>failed to evaluate consent policy</code> error that occurred during a QueryAccessibleData call to consent store <code>projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}</code>. <code>json jsonPayload: { @type: &amp;#34;type.googleapis.com/google.cloud.healthcare.logging.QueryAccessibleDataLogEntry&amp;#34; error: { code: 9 message: &amp;#34;failed to evaluate consent policy&amp;#34; } resourceName: &amp;#34;projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}&amp;#34; } logName: &amp;#34;projects/{project_id}/logs/healthcare.googleapis.com%2Fquery_accessible_data&amp;#34; operation: { id: &amp;#34;projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/operations/{operation_id}&amp;#34; producer: &amp;#34;healthcare.googleapis.com/QueryAccessibleData&amp;#34; } receiveTimestamp: &amp;#34;TIMESTAMP&amp;#34; resource: { labels: { consent_store_id: &amp;#34;{consent_store_id}&amp;#34; dataset_id: &amp;#34;{dataset_id}&amp;#34; location: &amp;#34;{location_id}&amp;#34; project_id: &amp;#34;{project_id}&amp;#34; } type: &amp;#34;healthcare_consent_store&amp;#34; } severity: &amp;#34;ERROR&amp;#34; timestamp: &amp;#34;TIMESTAMP&amp;#34;</code></p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search - Cloud Resource Manager v2.0.4+20210328</title>
+  <title>Search - Cloud Resource Manager v3.0.0+20220306</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Resource Manager v2.0.4+20210328</a>
+        <a href=".." class="icon icon-home"> Cloud Resource Manager v3.0.0+20220306</a>
         
       </div>
 
@@ -421,7 +421,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>Optional. The maximum number of folders to return in the response. If unspecified, server picks an appropriate default.</li>
+<li>Optional. The maximum number of folders to return in the response. The server can return fewer folders than requested. If unspecified, server picks an appropriate default.</li>
 </ul>
 </li>
 <li>
@@ -433,7 +433,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p query=string</strong></p>
 <ul>
-<li>Optional. Search criteria used to select the folders to return. If no search criteria is specified then all accessible folders will be returned. Query expressions can be used to restrict results based upon displayName, state and parent, where the operators <code>=</code> (<code>:</code>) <code>NOT</code>, <code>AND</code> and <code>OR</code> can be used along with the suffix wildcard symbol <code>*</code>. The <code>displayName</code> field in a query expression should use escaped quotes for values that include whitespace to prevent unexpected behavior. | Field | Description | |-------------------------|----------------------------------------| | displayName | Filters by displayName. | | parent | Filters by parent (for example: folders/123). | | state, lifecycleState | Filters by state. | Some example queries are: * Query <code>displayName=Test*</code> returns Folder resources whose display name starts with &#34;Test&#34;. * Query <code>state=ACTIVE</code> returns Folder resources with <code>state</code> set to <code>ACTIVE</code>. * Query <code>parent=folders/123</code> returns Folder resources that have <code>folders/123</code> as a parent resource. * Query <code>parent=folders/123 AND state=ACTIVE</code> returns active Folder resources that have <code>folders/123</code> as a parent resource. * Query <code>displayName=\\&amp;#34;Test String\\&amp;#34;</code> returns Folder resources with display names that include both &#34;Test&#34; and &#34;String&#34;.</li>
+<li>Optional. Search criteria used to select the folders to return. If no search criteria is specified then all accessible folders will be returned. Query expressions can be used to restrict results based upon displayName, state and parent, where the operators <code>=</code> (<code>:</code>) <code>NOT</code>, <code>AND</code> and <code>OR</code> can be used along with the suffix wildcard symbol <code>*</code>. The <code>displayName</code> field in a query expression should use escaped quotes for values that include whitespace to prevent unexpected behavior. <code>| Field | Description | |-------------------------|----------------------------------------| | displayName | Filters by displayName. | | parent | Filters by parent (for example: folders/123). | | state, lifecycleState | Filters by state. |</code> Some example queries are: * Query <code>displayName=Test*</code> returns Folder resources whose display name starts with &#34;Test&#34;. * Query <code>state=ACTIVE</code> returns Folder resources with <code>state</code> set to <code>ACTIVE</code>. * Query <code>parent=folders/123</code> returns Folder resources that have <code>folders/123</code> as a parent resource. * Query <code>parent=folders/123 AND state=ACTIVE</code> returns active Folder resources that have <code>folders/123</code> as a parent resource. * Query <code>displayName=\\&amp;#34;Test String\\&amp;#34;</code> returns Folder resources with display names that include both &#34;Test&#34; and &#34;String&#34;.</li>
 </ul>
 </li>
 </ul>

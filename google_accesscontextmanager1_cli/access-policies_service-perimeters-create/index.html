@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Service Perimeters Create - Access Context Manager v2.0.4+20210319</title>
+  <title>Service Perimeters Create - Access Context Manager v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Access Context Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Access Context Manager v3.0.0+20220301</a>
         
       </div>
 
@@ -75,6 +75,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_access-levels-test-iam-permissions">Access Levels Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../access-policies_create">Create</a>
                     
                 </li>
@@ -86,6 +91,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_get-iam-policy">Get Iam Policy</a>
                     
                 </li>
             
@@ -152,6 +162,21 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_service-perimeters-replace-all">Service Perimeters Replace All</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_service-perimeters-test-iam-permissions">Service Perimeters Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_test-iam-permissions">Test Iam Permissions</a>
                     
                 </li>
             
@@ -248,7 +273,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Create a Service Perimeter. The longrunning operation from this RPC will have a successful status once the Service Perimeter has propagated to long-lasting storage. Service Perimeters containing errors will result in an error response for the first error encountered.</p>
+              <p>Creates a service perimeter. The long-running operation from this RPC has a successful status after the service perimeter propagates to long-lasting storage. If a service perimeter contains errors, an error response is returned for the first error encountered.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -289,34 +314,34 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    description=gubergren</code><ul>
+<li><code>-r .    description=ipsum</code><ul>
 <li>Description of the <code>ServicePerimeter</code> and its use. Does not affect behavior.</li>
 </ul>
 </li>
-<li><code>name=rebum.</code><ul>
-<li>Required. Resource name for the ServicePerimeter. The <code>short_name</code> component must begin with a letter and only include alphanumeric and &#39;_&#39;. Format: <code>accessPolicies/{policy_id}/servicePerimeters/{short_name}</code></li>
+<li><code>name=est</code><ul>
+<li>Required. Resource name for the ServicePerimeter. The <code>short_name</code> component must begin with a letter and only include alphanumeric and &#39;_&#39;. Format: <code>accessPolicies/{access_policy}/servicePerimeters/{service_perimeter}</code></li>
 </ul>
 </li>
-<li><code>perimeter-type=est</code><ul>
+<li><code>perimeter-type=gubergren</code><ul>
 <li>Perimeter type indicator. A single project is allowed to be a member of single regular perimeter, but multiple service perimeter bridges. A project cannot be a included in a perimeter bridge without being included in regular perimeter. For perimeter bridges, the restricted service list as well as access level lists must be empty.</li>
 </ul>
 </li>
-<li><code>spec    access-levels=ipsum</code><ul>
+<li><code>spec    access-levels=ea</code><ul>
 <li>A list of <code>AccessLevel</code> resource names that allow resources within the <code>ServicePerimeter</code> to be accessed from the internet. <code>AccessLevels</code> listed must be in the same policy as this <code>ServicePerimeter</code>. Referencing a nonexistent <code>AccessLevel</code> is a syntax error. If no <code>AccessLevel</code> names are listed, resources within the perimeter can only be accessed via Google Cloud calls with request origins within the perimeter. Example: <code>&amp;#34;accessPolicies/MY_POLICY/accessLevels/MY_LEVEL&amp;#34;</code>. For Service Perimeter Bridge, must be empty.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>resources=ipsum</code><ul>
+<li><code>resources=dolor</code><ul>
 <li>A list of Google Cloud resources that are inside of the service perimeter. Currently only projects are allowed. Format: <code>projects/{project_number}</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>restricted-services=est</code><ul>
+<li><code>restricted-services=lorem</code><ul>
 <li>Google Cloud services that are subject to the Service Perimeter restrictions. For example, if <code>storage.googleapis.com</code> is specified, access to the storage buckets inside the perimeter must meet the perimeter&#39;s access restrictions.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>vpc-accessible-services    allowed-services=gubergren</code><ul>
+<li><code>vpc-accessible-services    allowed-services=eos</code><ul>
 <li>The list of APIs usable within the Service Perimeter. Must be empty unless &#39;enable_restriction&#39; is True. You can specify a list of individual services, as well as include the &#39;RESTRICTED-SERVICES&#39; value, which automatically includes all of the services protected by the perimeter.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -328,35 +353,35 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...status    access-levels=lorem</code></p>
+<p><code>...status    access-levels=sed</code></p>
 <ul>
 <li>A list of <code>AccessLevel</code> resource names that allow resources within the <code>ServicePerimeter</code> to be accessed from the internet. <code>AccessLevels</code> listed must be in the same policy as this <code>ServicePerimeter</code>. Referencing a nonexistent <code>AccessLevel</code> is a syntax error. If no <code>AccessLevel</code> names are listed, resources within the perimeter can only be accessed via Google Cloud calls with request origins within the perimeter. Example: <code>&amp;#34;accessPolicies/MY_POLICY/accessLevels/MY_LEVEL&amp;#34;</code>. For Service Perimeter Bridge, must be empty.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>resources=eos</code><ul>
+<li><code>resources=duo</code><ul>
 <li>A list of Google Cloud resources that are inside of the service perimeter. Currently only projects are allowed. Format: <code>projects/{project_number}</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>restricted-services=labore</code><ul>
+<li><code>restricted-services=sed</code><ul>
 <li>Google Cloud services that are subject to the Service Perimeter restrictions. For example, if <code>storage.googleapis.com</code> is specified, access to the storage buckets inside the perimeter must meet the perimeter&#39;s access restrictions.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>vpc-accessible-services    allowed-services=sed</code><ul>
+<li><code>vpc-accessible-services    allowed-services=no</code><ul>
 <li>The list of APIs usable within the Service Perimeter. Must be empty unless &#39;enable_restriction&#39; is True. You can specify a list of individual services, as well as include the &#39;RESTRICTED-SERVICES&#39; value, which automatically includes all of the services protected by the perimeter.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>enable-restriction=false</code></p>
+<p><code>enable-restriction=true</code></p>
 <ul>
 <li>Whether to restrict API calls within the Service Perimeter to the list of APIs specified in &#39;allowed_services&#39;.</li>
 </ul>
 </li>
 <li>
-<p><code>...    title=sed</code></p>
+<p><code>...    title=et</code></p>
 <ul>
 <li>Human readable title. Must be unique within the Policy.</li>
 </ul>

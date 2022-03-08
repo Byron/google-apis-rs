@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>storagetransfer v2.0.4+20210316</title>
+  <title>storagetransfer v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> storagetransfer v2.0.4+20210316</a>
+        <a href="." class="icon icon-home"> storagetransfer v3.0.0+20220223</a>
         
       </div>
 
@@ -46,6 +46,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="google-service-accounts_get/">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_agent-pools-create/">Agent Pools Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_agent-pools-delete/">Agent Pools Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_agent-pools-get/">Agent Pools Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_agent-pools-list/">Agent Pools List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_agent-pools-patch/">Agent Pools Patch</a>
                     
                 </li>
             
@@ -166,10 +197,16 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storagetransfer1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>storagetransfer</em> API at revision <em>20210316</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>storagetransfer</em> API at revision <em>20220223</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">storagetransfer1 [options]
         google-service-accounts
                 get &lt;project-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        projects
+                agent-pools-create &lt;project-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                agent-pools-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                agent-pools-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                agent-pools-list &lt;project-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                agent-pools-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         transfer-jobs
                 create (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 get &lt;job-name&gt; &lt;project-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

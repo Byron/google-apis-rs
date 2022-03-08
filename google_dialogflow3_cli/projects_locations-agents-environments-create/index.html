@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Agents Environments Create - Dialogflow v2.0.4+20210329</title>
+  <title>Locations Agents Environments Create - Dialogflow v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dialogflow v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Dialogflow v3.0.0+20220228</a>
         
       </div>
 
@@ -43,6 +43,16 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-get">Locations Agents Changelogs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-list">Locations Agents Changelogs List</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-create">Locations Agents Create</a>
@@ -79,6 +89,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-continuous-test-results-list">Locations Agents Environments Continuous Test Results List</a>
+                    
+                </li>
+            
                 <li class="toctree-l1 current">
                     <a class="current" href=".">Locations Agents Environments Create</a>
                     
@@ -107,6 +122,21 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-delete">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deploy-flow">Locations Agents Environments Deploy Flow</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-get">Locations Agents Environments Deployments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-list">Locations Agents Environments Deployments List</a>
                     
                 </li>
             
@@ -166,6 +196,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-run-continuous-test">Locations Agents Environments Run Continuous Test</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-sessions-detect-intent">Locations Agents Environments Sessions Detect Intent</a>
                     
                 </li>
@@ -221,12 +256,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-export">Locations Agents Flows Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get">Locations Agents Flows Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get-validation-result">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-import">Locations Agents Flows Import</a>
                     
                 </li>
             
@@ -297,6 +342,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-validate">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-versions-compare-versions">Locations Agents Flows Versions Compare Versions</a>
                     
                 </li>
             
@@ -511,6 +561,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
                     
                 </li>
@@ -601,7 +661,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates an Environment in the specified Agent.</p>
+              <p>Creates an Environment in the specified Agent. This method is a <a href="https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation">long-running operation</a>. The returned <code>Operation</code> type has the following method-specific fields: - <code>metadata</code>: An empty <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct">Struct message</a> - <code>response</code>: Environment</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -625,25 +685,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   description: string
   display-name: string
   name: string
+  test-cases-config:
+    enable-continuous-run: boolean
+    enable-predeployment-run: boolean
+    test-cases: [string]
   update-time: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    description=ea</code><ul>
+<li><code>-r .    description=eos</code><ul>
 <li>The human-readable description of the environment. The maximum length is 500 characters. If exceeded, the request is rejected.</li>
 </ul>
 </li>
-<li><code>display-name=dolor</code><ul>
+<li><code>display-name=labore</code><ul>
 <li>Required. The human-readable name of the environment (unique in an agent). Limit of 64 characters.</li>
 </ul>
 </li>
-<li><code>name=lorem</code><ul>
+<li><code>name=sed</code><ul>
 <li>The name of the environment. Format: <code>projects//locations//agents//environments/</code>.</li>
 </ul>
 </li>
-<li><code>update-time=eos</code><ul>
+<li><code>test-cases-config    enable-continuous-run=false</code><ul>
+<li>Whether to run test cases in TestCasesConfig.test_cases periodically. Default false. If set to true, run once a day.</li>
+</ul>
+</li>
+<li><code>enable-predeployment-run=false</code><ul>
+<li>Whether to run test cases in TestCasesConfig.test_cases before deploying a flow version to the environment. Default false.</li>
+</ul>
+</li>
+<li>
+<p><code>test-cases=no</code></p>
+<ul>
+<li>A list of test case names to run. They should be under the same agent. Format of each test case name: <code>projects//locations/ /agents//testCases/</code></li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-time=stet</code></p>
+<ul>
 <li>Output only. Update time of this environment.</li>
 </ul>
 </li>
@@ -747,7 +828,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         <a href="../projects_locations-agents-environments-delete" class="btn btn-neutral float-right" title="Locations Agents Environments Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-agents-entity-types-patch" class="btn btn-neutral" title="Locations Agents Entity Types Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-agents-environments-continuous-test-results-list" class="btn btn-neutral" title="Locations Agents Environments Continuous Test Results List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -775,7 +856,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-agents-entity-types-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-agents-environments-continuous-test-results-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-agents-environments-delete" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

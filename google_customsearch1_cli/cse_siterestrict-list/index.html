@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Siterestrict List - CustomSearch API v2.0.4+20210330</title>
+  <title>Siterestrict List - CustomSearch API v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> CustomSearch API v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> CustomSearch API v3.0.0+20220305</a>
         
       </div>
 
@@ -123,13 +123,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p c2coff=string</strong></p>
 <ul>
-<li>Enables or disables <a href="https://developers.google.com/custom-search/docs/xml_results#chineseSearch">Simplified and Traditional Chinese Search</a>. The default value for this parameter is 0 (zero), meaning that the feature is enabled. Supported values are: * <code>1</code>: Disabled * <code>0</code>: Enabled (default)</li>
+<li>Enables or disables <a href="https://developers.google.com/custom-search/docs/json_api_reference#chineseSearch">Simplified and Traditional Chinese Search</a>. The default value for this parameter is 0 (zero), meaning that the feature is enabled. Supported values are: * <code>1</code>: Disabled * <code>0</code>: Enabled (default)</li>
 </ul>
 </li>
 <li>
 <p><strong>-p cr=string</strong></p>
 <ul>
-<li>Restricts search results to documents originating in a particular country. You may use <a href="https://developers.google.com/custom-search/docs/xml_results_appendices#booleanOperators">Boolean operators</a> in the cr parameter&#39;s value. Google Search determines the country of a document by analyzing: * the top-level domain (TLD) of the document&#39;s URL * the geographic location of the Web server&#39;s IP address See the <a href="https://developers.google.com/custom-search/docs/xml_results_appendices#countryCollections">Country Parameter Values</a> page for a list of valid values for this parameter.</li>
+<li>Restricts search results to documents originating in a particular country. You may use <a href="https://developers.google.com/custom-search/docs/json_api_reference#booleanOperators">Boolean operators</a> in the cr parameter&#39;s value. Google Search determines the country of a document by analyzing: * the top-level domain (TLD) of the document&#39;s URL * the geographic location of the Web server&#39;s IP address See the <a href="https://developers.google.com/custom-search/docs/json_api_reference#countryCollections">Country Parameter Values</a> page for a list of valid values for this parameter.</li>
 </ul>
 </li>
 <li>
@@ -165,13 +165,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Controls turning on or off the duplicate content filter. * See <a href="https://developers.google.com/custom-search/docs/xml_results#automaticFiltering">Automatic Filtering</a> for more information about Google&#39;s search results filters. Note that host crowding filtering applies only to multi-site searches. * By default, Google applies filtering to all search results to improve the quality of those results. Acceptable values are: * <code>0</code>: Turns off duplicate content filter. * <code>1</code>: Turns on duplicate content filter.</li>
+<li>Controls turning on or off the duplicate content filter. * See <a href="https://developers.google.com/custom-search/docs/json_api_reference#automaticFiltering">Automatic Filtering</a> for more information about Google&#39;s search results filters. Note that host crowding filtering applies only to multi-site searches. * By default, Google applies filtering to all search results to improve the quality of those results. Acceptable values are: * <code>0</code>: Turns off duplicate content filter. * <code>1</code>: Turns on duplicate content filter.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p gl=string</strong></p>
 <ul>
-<li>Geolocation of end user. * The <code>gl</code> parameter value is a two-letter country code. The <code>gl</code> parameter boosts search results whose country of origin matches the parameter value. See the <a href="https://developers.google.com/custom-search/docs/xml_results_appendices#countryCodes">Country Codes</a> page for a list of valid values. * Specifying a <code>gl</code> parameter value should lead to more relevant results. This is particularly true for international customers and, even more specifically, for customers in English- speaking countries other than the United States.</li>
+<li>Geolocation of end user. * The <code>gl</code> parameter value is a two-letter country code. The <code>gl</code> parameter boosts search results whose country of origin matches the parameter value. See the <a href="https://developers.google.com/custom-search/docs/json_api_reference#countryCodes">Country Codes</a> page for a list of valid values. * Specifying a <code>gl</code> parameter value should lead to more relevant results. This is particularly true for international customers and, even more specifically, for customers in English- speaking countries other than the United States.</li>
 </ul>
 </li>
 <li>
@@ -189,7 +189,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p hl=string</strong></p>
 <ul>
-<li>Sets the user interface language. * Explicitly setting this parameter improves the performance and the quality of your search results. * See the <a href="https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages">Interface Languages</a> section of <a href="https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing">Internationalizing Queries and Results Presentation</a> for more information, and (Supported Interface Languages)[https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages] for a list of supported languages.</li>
+<li>Sets the user interface language. * Explicitly setting this parameter improves the performance and the quality of your search results. * See the <a href="https://developers.google.com/custom-search/docs/json_api_reference#wsInterfaceLanguages">Interface Languages</a> section of <a href="https://developers.google.com/custom-search/docs/json_api_reference#wsInternationalizing">Internationalizing Queries and Results Presentation</a> for more information, and <a href="https://developers.google.com/custom-search/docs/json_api_reference#interfaceLanguages">Supported Interface Languages</a> for a list of supported languages.</li>
 </ul>
 </li>
 <li>

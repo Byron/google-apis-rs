@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Rewrite - storage v2.0.4+20210330</title>
+  <title>Rewrite - storage v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> storage v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> storage v3.0.0+20220228</a>
         
       </div>
 
@@ -480,35 +480,35 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    bucket=accusam</code><ul>
+<li><code>-r .    bucket=invidunt</code><ul>
 <li>The name of the bucket containing this object.</li>
 </ul>
 </li>
-<li><code>cache-control=ut</code><ul>
+<li><code>cache-control=sea</code><ul>
 <li>Cache-Control directive for the object data. If omitted, and the object is accessible to all anonymous users, the default will be public, max-age=3600.</li>
 </ul>
 </li>
-<li><code>component-count=23</code><ul>
+<li><code>component-count=81</code><ul>
 <li>Number of underlying components that make up this object. Components are accumulated by compose operations.</li>
 </ul>
 </li>
-<li><code>content-disposition=consetetur</code><ul>
+<li><code>content-disposition=sea</code><ul>
 <li>Content-Disposition of the object data.</li>
 </ul>
 </li>
-<li><code>content-encoding=dolor</code><ul>
+<li><code>content-encoding=stet</code><ul>
 <li>Content-Encoding of the object data.</li>
 </ul>
 </li>
-<li><code>content-language=amet</code><ul>
+<li><code>content-language=sadipscing</code><ul>
 <li>Content-Language of the object data.</li>
 </ul>
 </li>
-<li><code>content-type=et</code><ul>
+<li><code>content-type=no</code><ul>
 <li>Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.</li>
 </ul>
 </li>
-<li><code>crc32c=aliquyam</code><ul>
+<li><code>crc32c=tempor</code><ul>
 <li>CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order. For more information about using the CRC32c checksum, see Hashes and ETags: Best Practices.</li>
 </ul>
 </li>
@@ -516,18 +516,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A timestamp in RFC 3339 format specified by the user for an object.</li>
 </ul>
 </li>
-<li><code>customer-encryption    encryption-algorithm=gubergren</code><ul>
+<li><code>customer-encryption    encryption-algorithm=sea</code><ul>
 <li>The encryption algorithm.</li>
 </ul>
 </li>
 <li>
-<p><code>key-sha256=invidunt</code></p>
+<p><code>key-sha256=sit</code></p>
 <ul>
 <li>SHA256 hash value of the encryption key.</li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=sea</code></p>
+<p><code>..    etag=amet.</code></p>
 <ul>
 <li>HTTP 1.1 Entity tag for the object.</li>
 </ul>
@@ -536,88 +536,88 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether an object is under event-based hold. Event-based hold is a way to retain objects until an event occurs, which is signified by the hold&#39;s release (i.e. this value is set to false). After being released (set to false), such objects will be subject to bucket-level retention (if any). One sample use case of this flag is for banks to hold loan documents for at least 3 years after loan is paid in full. Here, bucket-level retention is 3 years and the event is the loan being paid in full. In this example, these objects will be held intact for any number of years until the event has occurred (event-based hold on the object is released) and then 3 more years after that. That means retention duration of the objects begins from the moment event-based hold transitioned from true to false.</li>
 </ul>
 </li>
-<li><code>generation=stet</code><ul>
+<li><code>generation=at</code><ul>
 <li>The content generation of this object. Used for object versioning.</li>
 </ul>
 </li>
-<li><code>id=sadipscing</code><ul>
+<li><code>id=vero</code><ul>
 <li>The ID of the object, including the bucket name, object name, and generation number.</li>
 </ul>
 </li>
-<li><code>kind=no</code><ul>
+<li><code>kind=takimata</code><ul>
 <li>The kind of item this is. For objects, this is always storage#object.</li>
 </ul>
 </li>
-<li><code>kms-key-name=tempor</code><ul>
+<li><code>kms-key-name=gubergren</code><ul>
 <li>Not currently supported. Specifying the parameter causes the request to fail with status code 400 - Bad Request.</li>
 </ul>
 </li>
-<li><code>md5-hash=ipsum</code><ul>
+<li><code>md5-hash=et</code><ul>
 <li>MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see Hashes and ETags: Best Practices.</li>
 </ul>
 </li>
-<li><code>media-link=sea</code><ul>
+<li><code>media-link=invidunt</code><ul>
 <li>Media download link.</li>
 </ul>
 </li>
-<li><code>metadata=key=sit</code><ul>
+<li><code>metadata=key=magna</code><ul>
 <li>User-provided metadata, in key/value pairs.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>metageneration=amet.</code><ul>
+<li><code>metageneration=sit</code><ul>
 <li>The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.</li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>The name of the object. Required if not specified by URL parameter.</li>
 </ul>
 </li>
-<li><code>owner    entity=at</code><ul>
+<li><code>owner    entity=elitr</code><ul>
 <li>The entity, in the form user-userId.</li>
 </ul>
 </li>
 <li>
-<p><code>entity-id=vero</code></p>
+<p><code>entity-id=ipsum</code></p>
 <ul>
 <li>The ID for the entity.</li>
 </ul>
 </li>
 <li>
-<p><code>..    retention-expiration-time=takimata</code></p>
+<p><code>..    retention-expiration-time=kasd</code></p>
 <ul>
 <li>A server-determined value that specifies the earliest time that the object&#39;s retention period expires. This value is in RFC 3339 format. Note 1: This field is not provided for objects with an active event-based hold, since retention expiration is unknown until the hold is removed. Note 2: This value can be provided even when temporary hold is set (so that the user can reason about policy without having to first unset the temporary hold).</li>
 </ul>
 </li>
-<li><code>self-link=gubergren</code><ul>
+<li><code>self-link=dolore</code><ul>
 <li>The link to this object.</li>
 </ul>
 </li>
-<li><code>size=et</code><ul>
+<li><code>size=lorem</code><ul>
 <li>Content-Length of the data in bytes.</li>
 </ul>
 </li>
-<li><code>storage-class=invidunt</code><ul>
+<li><code>storage-class=amet</code><ul>
 <li>Storage class of the object.</li>
 </ul>
 </li>
-<li><code>temporary-hold=false</code><ul>
+<li><code>temporary-hold=true</code><ul>
 <li>Whether an object is under temporary hold. While this flag is set to true, the object is protected against deletion and overwrites. A common use case of this flag is regulatory investigations where objects need to be retained while the investigation is ongoing. Note that unlike event-based hold, temporary hold does not impact retention expiration time of an object.</li>
 </ul>
 </li>
-<li><code>time-created=gubergren</code><ul>
+<li><code>time-created=lorem</code><ul>
 <li>The creation time of the object in RFC 3339 format.</li>
 </ul>
 </li>
-<li><code>time-deleted=elitr</code><ul>
+<li><code>time-deleted=dolores</code><ul>
 <li>The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.</li>
 </ul>
 </li>
-<li><code>time-storage-class-updated=ipsum</code><ul>
+<li><code>time-storage-class-updated=consetetur</code><ul>
 <li>The time at which the object&#39;s storage class was last changed. When the object is initially created, it will be set to timeCreated.</li>
 </ul>
 </li>
-<li><code>updated=kasd</code><ul>
+<li><code>updated=stet</code><ul>
 <li>The modification time of the object metadata in RFC 3339 format.</li>
 </ul>
 </li>
@@ -780,6 +780,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p><strong>-p quota-user=string</strong></p>
 <ul>
 <li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;, &#34;resumable&#34;).</li>
 </ul>
 </li>
 <li>

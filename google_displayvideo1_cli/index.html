@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Display Video v2.0.4+20210325</title>
+  <title>Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href="." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="advertisers_insertion-orders-targeting-types-assigned-targeting-options-list/">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="advertisers_invoices-list/">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="advertisers_invoices-lookup-invoice-currency/">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -462,12 +472,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="custom-bidding-algorithms_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="custom-bidding-algorithms_get/">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="custom-bidding-algorithms_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="custom-bidding-algorithms_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="custom-bidding-algorithms_scripts-create/">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="custom-bidding-algorithms_scripts-get/">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="custom-bidding-algorithms_scripts-list/">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="custom-bidding-algorithms_upload-script/">Upload Script</a>
                     
                 </li>
             
@@ -494,12 +534,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="first-and-third-party-audiences_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="first-and-third-party-audiences_edit-customer-match-members/">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="first-and-third-party-audiences_get/">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="first-and-third-party-audiences_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="first-and-third-party-audiences_patch/">Patch</a>
                     
                 </li>
             
@@ -610,6 +665,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="media_download/">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="media_upload/">Upload</a>
                     
                 </li>
             
@@ -827,7 +887,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/displayvideo1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Display Video</em> API at revision <em>20210325</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Display Video</em> API at revision <em>20220303</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">displayvideo1 [options]
         advertisers
                 assets-upload &lt;advertiser-id&gt; (-r &lt;kv&gt;)... (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -867,6 +927,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 insertion-orders-patch &lt;advertiser-id&gt; &lt;insertion-order-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 insertion-orders-targeting-types-assigned-targeting-options-get &lt;advertiser-id&gt; &lt;insertion-order-id&gt; &lt;targeting-type&gt; &lt;assigned-targeting-option-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 insertion-orders-targeting-types-assigned-targeting-options-list &lt;advertiser-id&gt; &lt;insertion-order-id&gt; &lt;targeting-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                invoices-list &lt;advertiser-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                invoices-lookup-invoice-currency &lt;advertiser-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 line-items-bulk-edit-line-item-assigned-targeting-options &lt;advertiser-id&gt; &lt;line-item-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 line-items-bulk-list-line-item-assigned-targeting-options &lt;advertiser-id&gt; &lt;line-item-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 line-items-create &lt;advertiser-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -913,14 +975,23 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 get &lt;combined-audience-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
         custom-bidding-algorithms
+                create (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 get &lt;custom-bidding-algorithm-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;custom-bidding-algorithm-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                scripts-create &lt;custom-bidding-algorithm-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                scripts-get &lt;custom-bidding-algorithm-id&gt; &lt;custom-bidding-script-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                scripts-list &lt;custom-bidding-algorithm-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                upload-script &lt;custom-bidding-algorithm-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         custom-lists
                 get &lt;custom-list-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
         first-and-third-party-audiences
+                create (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                edit-customer-match-members &lt;first-and-third-party-audience-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 get &lt;first-and-third-party-audience-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;first-and-third-party-audience-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         floodlight-groups
                 get &lt;floodlight-group-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 patch &lt;floodlight-group-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -942,6 +1013,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
         media
                 download &lt;resource-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                upload &lt;resource-name&gt; (-r &lt;kv&gt;)... (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
         partners
                 bulk-edit-partner-assigned-targeting-options &lt;partner-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 channels-create &lt;partner-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

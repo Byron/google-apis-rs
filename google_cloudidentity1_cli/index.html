@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Identity v2.0.4+20210310</title>
+  <title>Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href="." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -151,6 +151,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="groups_get-security-settings/">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="groups_list/">List</a>
                     
                 </li>
@@ -220,6 +225,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="groups_update-security-settings/">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -275,7 +285,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/cloudidentity1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Identity</em> API at revision <em>20210310</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Identity</em> API at revision <em>20220301</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">cloudidentity1 [options]
         devices
                 cancel-wipe &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -299,6 +309,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 create (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-security-settings &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 lookup [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 memberships-check-transitive-membership &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -313,6 +324,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 memberships-search-transitive-memberships &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 search [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-security-settings &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   cloudidentity1 --help
 
 Configuration:

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dns v2.0.4+20210319</title>
+  <title>Dns v3.0.0+20220217</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Dns v2.0.4+20210319</a>
+        <a href="." class="icon icon-home"> Dns v3.0.0+20220217</a>
         
       </div>
 
@@ -174,26 +174,6 @@
                     
                 </li>
             
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_managed-zones-rrsets-create/">Managed Zones Rrsets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_managed-zones-rrsets-delete/">Managed Zones Rrsets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_managed-zones-rrsets-get/">Managed Zones Rrsets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_managed-zones-rrsets-patch/">Managed Zones Rrsets Patch</a>
-                    
-                </li>
-            
         
 
     
@@ -201,7 +181,99 @@
         <span>Resource Record Sets</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="resource-record-sets_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-record-sets_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-record-sets_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="resource-record-sets_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-record-sets_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Response Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policies_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policies_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policies_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Response Policy Rules</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policy-rules_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policy-rules_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policy-rules_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policy-rules_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policy-rules_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="response-policy-rules_update/">Update</a>
                     
                 </li>
             
@@ -260,7 +332,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dns1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Dns</em> API at revision <em>20210319</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Dns</em> API at revision <em>20220217</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">dns1 [options]
         changes
                 create &lt;project&gt; &lt;managed-zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -288,12 +360,26 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 update &lt;project&gt; &lt;policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         projects
                 get &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                managed-zones-rrsets-create &lt;project&gt; &lt;managed-zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                managed-zones-rrsets-delete &lt;project&gt; &lt;managed-zone&gt; &lt;name&gt; &lt;type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                managed-zones-rrsets-get &lt;project&gt; &lt;managed-zone&gt; &lt;name&gt; &lt;type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                managed-zones-rrsets-patch &lt;project&gt; &lt;managed-zone&gt; &lt;name&gt; &lt;type&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         resource-record-sets
+                create &lt;project&gt; &lt;managed-zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;managed-zone&gt; &lt;name&gt; &lt;type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;managed-zone&gt; &lt;name&gt; &lt;type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list &lt;project&gt; &lt;managed-zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;managed-zone&gt; &lt;name&gt; &lt;type&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        response-policies
+                create &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;response-policy&gt; [-p &lt;v&gt;]...
+                get &lt;project&gt; &lt;response-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;response-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;response-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        response-policy-rules
+                create &lt;project&gt; &lt;response-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;response-policy&gt; &lt;response-policy-rule&gt; [-p &lt;v&gt;]...
+                get &lt;project&gt; &lt;response-policy&gt; &lt;response-policy-rule&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;response-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;response-policy&gt; &lt;response-policy-rule&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;response-policy&gt; &lt;response-policy-rule&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   dns1 --help
 
 Configuration:

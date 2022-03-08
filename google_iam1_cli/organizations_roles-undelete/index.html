@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Roles Undelete - Iam v2.0.4+20210325</title>
+  <title>Roles Undelete - Iam v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Iam v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Iam v3.0.0+20220224</a>
         
       </div>
 
@@ -51,6 +51,27 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../iam-policies_query-auditable-services">Query Auditable Services</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-operations-get">Workforce Pools Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-providers-operations-get">Workforce Pools Providers Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-subjects-operations-get">Workforce Pools Subjects Operations Get</a>
                     
                 </li>
             
@@ -174,6 +195,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workload-identity-pools-providers-keys-operations-get">Locations Workload Identity Pools Providers Keys Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-workload-identity-pools-providers-list">Locations Workload Identity Pools Providers List</a>
                     
                 </li>
@@ -265,6 +291,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_service-accounts-keys-delete">Service Accounts Keys Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-disable">Service Accounts Keys Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-enable">Service Accounts Keys Enable</a>
                     
                 </li>
             
@@ -388,7 +424,7 @@ You can set the scope for this method like this: <code>iam1 --scope &lt;scope&gt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The <code>name</code> parameter&#39;s value depends on the target resource for the request, namely <a href="..//iam/reference/rest/v1/projects.roles"><code>projects</code></a> or <a href="..//iam/reference/rest/v1/organizations.roles"><code>organizations</code></a>. Each resource type&#39;s <code>name</code> value format is described below: * <a href="..//iam/reference/rest/v1/projects.roles/undelete"><code>projects.roles.undelete()</code></a>: <code>projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}</code>. This method undeletes only <a href="..//iam/docs/understanding-custom-roles">custom roles</a> that have been created at the project level. Example request URL: <code>https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}</code> * <a href="..//iam/reference/rest/v1/organizations.roles/undelete"><code>organizations.roles.undelete()</code></a>: <code>organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}</code>. This method undeletes only <a href="..//iam/docs/understanding-custom-roles">custom roles</a> that have been created at the organization level. Example request URL: <code>https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}</code> Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.</li>
+<li>The <code>name</code> parameter&#39;s value depends on the target resource for the request, namely <a href="https://cloud.google.com/iam/reference/rest/v1/projects.roles"><code>projects</code></a> or <a href="https://cloud.google.com/iam/reference/rest/v1/organizations.roles"><code>organizations</code></a>. Each resource type&#39;s <code>name</code> value format is described below: * <a href="https://cloud.google.com/iam/reference/rest/v1/projects.roles/undelete"><code>projects.roles.undelete()</code></a>: <code>projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}</code>. This method undeletes only <a href="https://cloud.google.com/iam/docs/understanding-custom-roles">custom roles</a> that have been created at the project level. Example request URL: <code>https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}</code> * <a href="https://cloud.google.com/iam/reference/rest/v1/organizations.roles/undelete"><code>organizations.roles.undelete()</code></a>: <code>organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}</code>. This method undeletes only <a href="https://cloud.google.com/iam/docs/understanding-custom-roles">custom roles</a> that have been created at the organization level. Example request URL: <code>https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}</code> Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.</li>
 </ul>
 </li>
 </ul>

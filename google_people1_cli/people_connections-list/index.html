@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Connections List - People Service v2.0.4+20210330</title>
+  <title>Connections List - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -231,7 +231,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Provides a list of the authenticated user&#39;s contacts. The request returns a 400 error if <code>personFields</code> is not specified. The request returns a 410 error if <code>sync_token</code> is specified and is expired. Sync tokens expire after 7 days to prevent data drift between clients and the server. To handle a sync token expired error, a request should be sent without <code>sync_token</code> to get all contacts.</p>
+              <p>Provides a list of the authenticated user&#39;s contacts. Sync tokens expire 7 days after the full sync. A request with an expired sync token will result in a 410 error. In the case of such an error clients should make a full sync request without a <code>sync_token</code>. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the <code>sync_token</code> is specified, resources deleted since the last sync will be returned as a person with <code>PersonMetadata.deleted</code> set to true. When the <code>page_token</code> or <code>sync_token</code> is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at <a href="..//people/v1/contacts#list_the_users_contacts_that_have_changed">List the user&#39;s contacts that have changed</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -272,7 +272,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-token=string</strong></p>
 <ul>
-<li>Optional. A page token, received from a previous <code>ListConnections</code> call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to <code>ListConnections</code> must match the call that provided the page token.</li>
+<li>Optional. A page token, received from a previous response <code>next_page_token</code>. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to <code>people.connections.list</code> must match the first call that provided the page token.</li>
 </ul>
 </li>
 <li>
@@ -290,7 +290,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p request-sync-token=boolean</strong></p>
 <ul>
-<li>Optional. Whether the response should include <code>next_sync_token</code> on the last page, which can be used to get all changes since the last request. For subsequent sync requests use the <code>sync_token</code> param instead. Initial full sync requests that specify <code>request_sync_token</code> and do not specify <code>sync_token</code> have an additional rate limit per user. Each client should generally only be doing a full sync once every few days per user and so should not hit this limit.</li>
+<li>Optional. Whether the response should return <code>next_sync_token</code> on the last page of results. It can be used to get incremental changes since the last request by setting it on the request <code>sync_token</code>. More details about sync behavior at <code>people.connections.list</code>.</li>
 </ul>
 </li>
 <li>
@@ -308,7 +308,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p sync-token=string</strong></p>
 <ul>
-<li>Optional. A sync token, received from a previous <code>ListConnections</code> call. Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to <code>ListConnections</code> except <code>page_size</code> and <code>page_token</code> must match the initial call that provided the sync token. Sync tokens expire after seven days, after which a full sync request without a <code>sync_token</code> should be made.</li>
+<li>Optional. A sync token, received from a previous response <code>next_sync_token</code> Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to <code>people.connections.list</code> must match the first call that provided the sync token. More details about sync behavior at <code>people.connections.list</code>.</li>
 </ul>
 </li>
 </ul>

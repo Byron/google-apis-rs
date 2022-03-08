@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Data Sources Get - BigQuery Data Transfer v2.0.4+20210324</title>
+  <title>Locations Data Sources Get - BigQuery Data Transfer v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Data Transfer v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Data Transfer v3.0.0+20220225</a>
         
       </div>
 
@@ -56,6 +56,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_data-sources-list">Data Sources List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_enroll-data-sources">Enroll Data Sources</a>
                     
                 </li>
             
@@ -87,6 +92,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-data-sources-list">Locations Data Sources List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-enroll-data-sources">Locations Enroll Data Sources</a>
                     
                 </li>
             
@@ -246,16 +256,15 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Retrieves a supported data source and returns its settings, which can be used for UI rendering.</p>
+              <p>Retrieves a supported data source and returns its settings.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
 <li><em>https://www.googleapis.com/auth/bigquery</em></li>
-<li><em>https://www.googleapis.com/auth/bigquery.readonly</em></li>
 <li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
 <li><em>https://www.googleapis.com/auth/cloud-platform.read-only</em></li>
 </ul>
-<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/bigquery.readonly</em>.
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/bigquery</em>.
 You can set the scope for this method like this: <code>bigquerydatatransfer1 --scope &lt;scope&gt; projects locations-data-sources-get ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>

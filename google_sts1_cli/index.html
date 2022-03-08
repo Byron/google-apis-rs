@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Security Token v2.0.4+20210326</title>
+  <title>Cloud Security Token v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Security Token v2.0.4+20210326</a>
+        <a href="." class="icon icon-home"> Cloud Security Token v3.0.0+20220227</a>
         
       </div>
 
@@ -43,6 +43,11 @@
     
         
         <span>Methods</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="methods_introspect/">Introspect</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="methods_token/">Token</a>
@@ -104,9 +109,10 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/sts1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Security Token</em> API at revision <em>20210326</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Security Token</em> API at revision <em>20220227</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">sts1 [options]
         methods
+                introspect (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 token (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   sts1 --help
 
@@ -159,7 +165,7 @@ output to standard error <em>as-is</em>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="methods_token/" class="btn btn-neutral float-right" title="Token"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="methods_introspect/" class="btn btn-neutral float-right" title="Introspect"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>
@@ -189,7 +195,7 @@ output to standard error <em>as-is</em>.</p>
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="methods_token/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="methods_introspect/" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

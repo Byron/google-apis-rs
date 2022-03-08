@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Profiles Create - Cloud Profiler v2.0.4+20210326</title>
+  <title>Profiles Create - Cloud Profiler v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Profiler v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Cloud Profiler v3.0.0+20220228</a>
         
       </div>
 
@@ -116,7 +116,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>CreateProfile creates a new profile resource in the online mode. The server ensures that the new profiles are created at a constant rate per deployment, so the creation request may hang for some time until the next profile session is available. The request may fail with ABORTED error if the creation is not available within ~1m, the response will indicate the duration of the backoff the client should take before attempting creating a profile again. The backoff duration is returned in google.rpc.RetryInfo extension on the response status. To a gRPC client, the extension will be return as a binary-serialized proto in the trailing metadata item named &#34;google.rpc.retryinfo-bin&#34;.</p>
+              <p>CreateProfile creates a new profile resource in the online mode. The server ensures that the new profiles are created at a constant rate per deployment, so the creation request may hang for some time until the next profile session is available. The request may fail with ABORTED error if the creation is not available within ~1m, the response will indicate the duration of the backoff the client should take before attempting creating a profile again. The backoff duration is returned in google.rpc.RetryInfo extension on the response status. To a gRPC client, the extension will be return as a binary-serialized proto in the trailing metadata item named &#34;google.rpc.retryinfo-bin&#34;. </p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -160,13 +160,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>target=no</code></p>
 <ul>
-<li>Target is the service name used to group related deployments: * Service name for GAE Flex / Standard. * Cluster and container name for GKE. * User-specified string for direct GCE profiling (e.g. Java). * Job name for Dataflow. Validation regex: <code>^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$</code>.</li>
+<li>Target is the service name used to group related deployments: * Service name for App Engine Flex / Standard. * Cluster and container name for GKE. * User-specified string for direct Compute Engine profiling (e.g. Java). * Job name for Dataflow. Validation regex: <code>^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$</code>.</li>
 </ul>
 </li>
 <li>
 <p><code>..    profile-type=ipsum</code></p>
 <ul>
-<li>One or more profile types that the agent is capable of providing.</li>
+<li>Required. One or more profile types that the agent is capable of providing.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

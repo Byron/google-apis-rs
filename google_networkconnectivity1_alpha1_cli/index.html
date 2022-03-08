@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>networkconnectivity v2.0.4+20210324</title>
+  <title>networkconnectivity v3.0.0+20220210</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> networkconnectivity v2.0.4+20210324</a>
+        <a href="." class="icon icon-home"> networkconnectivity v3.0.0+20220210</a>
         
       </div>
 
@@ -130,21 +130,6 @@
                 </li>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-policy-based-routes-get-iam-policy/">Locations Policy Based Routes Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-policy-based-routes-set-iam-policy/">Locations Policy Based Routes Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-policy-based-routes-test-iam-permissions/">Locations Policy Based Routes Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-spokes-create/">Locations Spokes Create</a>
                     
                 </li>
@@ -231,7 +216,7 @@ DO NOT EDIT !
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
 <p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
 <p>Everything else about the <em>networkconnectivity</em> API can be found at the
-<a href="https://cloud.google.com/network-connectivity/docs">official documentation site</a>.</p>
+<a href="https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest">official documentation site</a>.</p>
 <h1 id="installation-and-source-code">Installation and Source Code</h1>
 <p>Install the command-line interface with cargo using:</p>
 <pre><code class="bash">cargo install google-networkconnectivity1_alpha1-cli
@@ -239,7 +224,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/networkconnectivity1_alpha1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>networkconnectivity</em> API at revision <em>20210324</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>networkconnectivity</em> API at revision <em>20220210</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">networkconnectivity1-alpha1 [options]
         projects
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -259,9 +244,6 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-operations-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                locations-policy-based-routes-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                locations-policy-based-routes-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                locations-policy-based-routes-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-spokes-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-spokes-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-spokes-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]

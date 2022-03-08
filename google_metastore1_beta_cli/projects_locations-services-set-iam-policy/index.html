@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Services Set Iam Policy - Dataproc Metastore v2.0.4+20210325</title>
+  <title>Locations Services Set Iam Policy - Dataproc Metastore v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc Metastore v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Dataproc Metastore v3.0.0+20220222</a>
         
       </div>
 
@@ -85,12 +85,57 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-get-iam-policy">Locations Services Backups Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-backups-list">Locations Services Backups List</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-set-iam-policy">Locations Services Backups Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-test-iam-permissions">Locations Services Backups Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-create">Locations Services Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-get-iam-policy">Locations Services Databases Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-set-iam-policy">Locations Services Databases Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-get-iam-policy">Locations Services Databases Tables Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-set-iam-policy">Locations Services Databases Tables Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-test-iam-permissions">Locations Services Databases Tables Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-test-iam-permissions">Locations Services Databases Test Iam Permissions</a>
                     
                 </li>
             
@@ -141,6 +186,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-patch">Locations Services Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-remove-iam-policy">Locations Services Remove Iam Policy</a>
                     
                 </li>
             
@@ -242,18 +292,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .policy    etag=amet.</code><ul>
+<li><code>-r .policy    etag=et</code><ul>
 <li>etag is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the etag in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An etag is returned in the response to getIamPolicy, and systems are expected to put that etag in the request to setIamPolicy to ensure that their change will be applied to the same version of the policy.Important: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.</li>
 </ul>
 </li>
 <li>
-<p><code>version=84</code></p>
+<p><code>version=8</code></p>
 <ul>
 <li>Specifies the format of the policy.Valid values are 0, 1, and 3. Requests that specify an invalid value are rejected.Any operation that affects conditional role bindings must specify version 3. This requirement applies to the following operations: Getting a policy that includes a conditional role binding Adding a conditional role binding to a policy Changing a conditional role binding in a policy Removing any role binding, with or without a condition, from a policy that includes conditionsImportant: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset.To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-mask=sadipscing</code></p>
+<p><code>..    update-mask=no</code></p>
 <ul>
 <li>OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only the fields in the mask will be modified. If no mask is provided, the following default mask is used:paths: &#34;bindings, etag&#34;</li>
 </ul>

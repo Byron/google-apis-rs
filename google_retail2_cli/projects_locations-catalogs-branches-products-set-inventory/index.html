@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Catalogs Branches Products Set Inventory - Cloud Retail v3.0.0+20220224</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Retail v3.0.0+20220224</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-operations-get">Locations Catalogs Branches Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-add-fulfillment-places">Locations Catalogs Branches Products Add Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-create">Locations Catalogs Branches Products Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-delete">Locations Catalogs Branches Products Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-get">Locations Catalogs Branches Products Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-import">Locations Catalogs Branches Products Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-list">Locations Catalogs Branches Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-patch">Locations Catalogs Branches Products Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Catalogs Branches Products Set Inventory</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-complete-query">Locations Catalogs Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-completion-data-import">Locations Catalogs Completion Data Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-get-default-branch">Locations Catalogs Get Default Branch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-list">Locations Catalogs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-operations-get">Locations Catalogs Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-operations-list">Locations Catalogs Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-patch">Locations Catalogs Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-placements-predict">Locations Catalogs Placements Predict</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-placements-search">Locations Catalogs Placements Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-set-default-branch">Locations Catalogs Set Default Branch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-collect">Locations Catalogs User Events Collect</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-import">Locations Catalogs User Events Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-purge">Locations Catalogs User Events Purge</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-rejoin">Locations Catalogs User Events Rejoin</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-write">Locations Catalogs User Events Write</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Catalogs Branches Products Set Inventory</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates inventory information for a Product while respecting the last update timestamps of each inventory field. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, updates are not immediately manifested in the Product queried by GetProduct or ListProducts. When inventory is updated with CreateProduct and UpdateProduct, the specified inventory field value(s) will overwrite any existing value(s) while ignoring the last update time for this field. Furthermore, the last update time for the specified inventory fields will be overwritten to the time of the CreateProduct or UpdateProduct request. If no inventory fields are set in CreateProductRequest.product, then any pre-existing inventory information for this product will be used. If no inventory fields are set in SetInventoryRequest.set_mask, then any existing inventory information will be preserved. Pre-existing inventory information can only be updated with SetInventory, AddFulfillmentPlaces, and RemoveFulfillmentPlaces. This feature is only available for users who have Retail Search enabled. Please submit a form <a href="https://cloud.google.com/contact">here</a> to contact cloud sales if you are interested in using Retail Search.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>retail2 --scope &lt;scope&gt; projects locations-catalogs-branches-products-set-inventory ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Immutable. Full resource name of the product, such as <code>projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/product_id</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudRetailV2SetInventoryRequest:
+  allow-missing: boolean
+  inventory:
+    audience:
+      age-groups: [string]
+      genders: [string]
+    availability: string
+    available-quantity: integer
+    available-time: string
+    brands: [string]
+    categories: [string]
+    collection-member-ids: [string]
+    color-info:
+      color-families: [string]
+      colors: [string]
+    conditions: [string]
+    description: string
+    expire-time: string
+    gtin: string
+    id: string
+    language-code: string
+    materials: [string]
+    name: string
+    patterns: [string]
+    price-info:
+      cost: number
+      currency-code: string
+      original-price: number
+      price: number
+      price-effective-time: string
+      price-expire-time: string
+      price-range:
+        original-price:
+          exclusive-maximum: number
+          exclusive-minimum: number
+          maximum: number
+          minimum: number
+        price:
+          exclusive-maximum: number
+          exclusive-minimum: number
+          maximum: number
+          minimum: number
+    primary-product-id: string
+    publish-time: string
+    rating:
+      average-rating: number
+      rating-count: integer
+      rating-histogram: [integer]
+    retrievable-fields: string
+    sizes: [string]
+    tags: [string]
+    title: string
+    ttl: string
+    type: string
+    uri: string
+  set-mask: string
+  set-time: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    allow-missing=false</code><ul>
+<li>If set to true, and the Product with name Product.name is not found, the inventory update will still be processed and retained for at most 1 day until the Product is created. If set to false, a NOT_FOUND error is returned if the Product is not found.</li>
+</ul>
+</li>
+<li><code>inventory.audience    age-groups=amet</code><ul>
+<li>The age groups of the audience. Strongly encouraged to use the standard values: &#34;newborn&#34; (up to 3 months old), &#34;infant&#34; (3–12 months old), &#34;toddler&#34; (1–5 years old), &#34;kids&#34; (5–13 years old), &#34;adult&#34; (typically teens or older). At most 5 values are allowed. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324463">age_group</a>. Schema.org property <a href="https://schema.org/suggestedMinAge">Product.audience.suggestedMinAge</a> and <a href="https://schema.org/suggestedMaxAge">Product.audience.suggestedMaxAge</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>genders=est</code></p>
+<ul>
+<li>The genders of the audience. Strongly encouraged to use the standard values: &#34;male&#34;, &#34;female&#34;, &#34;unisex&#34;. At most 5 values are allowed. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324479">gender</a>. Schema.org property <a href="https://schema.org/suggestedGender">Product.audience.suggestedGender</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    availability=et</code></p>
+<ul>
+<li>The online availability of the Product. Default to Availability.IN_STOCK. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324448">availability</a>. Schema.org property <a href="https://schema.org/availability">Offer.availability</a>.</li>
+</ul>
+</li>
+<li><code>available-quantity=91</code><ul>
+<li>The available quantity of the item.</li>
+</ul>
+</li>
+<li><code>available-time=consetetur</code><ul>
+<li>The timestamp when this Product becomes available for SearchService.Search.</li>
+</ul>
+</li>
+<li><code>brands=consetetur</code><ul>
+<li>The brands of the product. A maximum of 30 brands are allowed. Each brand must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324351">brand</a>. Schema.org property <a href="https://schema.org/brand">Product.brand</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>categories=stet</code><ul>
+<li>Product categories. This field is repeated for supporting one product belonging to several parallel categories. Strongly recommended using the full path for better search / recommendation quality. To represent full path of category, use &#39;&gt;&#39; sign to separate different hierarchies. If &#39;&gt;&#39; is part of the category name, please replace it with other character(s). For example, if a shoes product belongs to both [&#34;Shoes &amp; Accessories&#34; -&gt; &#34;Shoes&#34;] and [&#34;Sports &amp; Fitness&#34; -&gt; &#34;Athletic Clothing&#34; -&gt; &#34;Shoes&#34;], it could be represented as: &#34;categories&#34;: [ &#34;Shoes &amp; Accessories &gt; Shoes&#34;, &#34;Sports &amp; Fitness &gt; Athletic Clothing &gt; Shoes&#34; ] Must be set for Type.PRIMARY Product otherwise an INVALID_ARGUMENT error is returned. At most 250 values are allowed per Product. Empty values are not allowed. Each value must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property google_product_category. Schema.org property [Product.category] (https://schema.org/category). [mc_google_product_category]: https://support.google.com/merchants/answer/6324436</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>collection-member-ids=est</code><ul>
+<li>The id of the collection members when type is Type.COLLECTION. Non-existent product ids are allowed. The type of the members must be either Type.PRIMARY or Type.VARIANT otherwise and INVALID_ARGUMENT error is thrown. Should not set it for other types. A maximum of 1000 values are allowed. Otherwise, an INVALID_ARGUMENT error is return.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>color-info    color-families=aliquyam</code><ul>
+<li>The standard color families. Strongly recommended to use the following standard color groups: &#34;Red&#34;, &#34;Pink&#34;, &#34;Orange&#34;, &#34;Yellow&#34;, &#34;Purple&#34;, &#34;Green&#34;, &#34;Cyan&#34;, &#34;Blue&#34;, &#34;Brown&#34;, &#34;White&#34;, &#34;Gray&#34;, &#34;Black&#34; and &#34;Mixed&#34;. Normally it is expected to have only 1 color family. May consider using single &#34;Mixed&#34; instead of multiple values. A maximum of 5 values are allowed. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324487">color</a>. Schema.org property <a href="https://schema.org/color">Product.color</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>colors=elitr</code></p>
+<ul>
+<li>The color display names, which may be different from standard color family names, such as the color aliases used in the website frontend. Normally it is expected to have only 1 color. May consider using single &#34;Mixed&#34; instead of multiple values. A maximum of 25 colors are allowed. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324487">color</a>. Schema.org property <a href="https://schema.org/color">Product.color</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    conditions=duo</code></p>
+<ul>
+<li>The condition of the product. Strongly encouraged to use the standard values: &#34;new&#34;, &#34;refurbished&#34;, &#34;used&#34;. A maximum of 1 value is allowed per Product. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324469">condition</a>. Schema.org property <a href="https://schema.org/itemCondition">Offer.itemCondition</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>description=diam</code><ul>
+<li>Product description. This field must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324468">description</a>. Schema.org property <a href="https://schema.org/description">Product.description</a>.</li>
+</ul>
+</li>
+<li><code>expire-time=est</code><ul>
+<li>The timestamp when this product becomes unavailable for SearchService.Search. If it is set, the Product is not available for SearchService.Search after expire_time. However, the product can still be retrieved by ProductService.GetProduct and ProductService.ListProducts. expire_time must be later than available_time and publish_time, otherwise an INVALID_ARGUMENT error is thrown. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324499">expiration_date</a>.</li>
+</ul>
+</li>
+<li><code>gtin=sit</code><ul>
+<li>The Global Trade Item Number (GTIN) of the product. This field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. This field must be a Unigram. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324461">gtin</a>. Schema.org property <a href="https://schema.org/isbn">Product.isbn</a>, <a href="https://schema.org/gtin8">Product.gtin8</a>, <a href="https://schema.org/gtin12">Product.gtin12</a>, <a href="https://schema.org/gtin13">Product.gtin13</a>, or <a href="https://schema.org/gtin14">Product.gtin14</a>. If the value is not a valid GTIN, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li><code>id=sed</code><ul>
+<li>Immutable. Product identifier, which is the final component of name. For example, this field is &#34;id_1&#34;, if name is <code>projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/id_1</code>. This field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324405">id</a>. Schema.org property <a href="https://schema.org/sku">Product.sku</a>.</li>
+</ul>
+</li>
+<li><code>language-code=eos</code><ul>
+<li>Language of the title/description and other string attributes. Use language tags defined by <a href="https://www.rfc-editor.org/rfc/bcp/bcp47.txt">BCP 47</a>. For product prediction, this field is ignored and the model automatically detects the text language. The Product can include text in different languages, but duplicating Products to provide text in multiple languages can result in degraded model performance. For product search this field is in use. It defaults to &#34;en-US&#34; if unset.</li>
+</ul>
+</li>
+<li><code>materials=lorem</code><ul>
+<li>The material of the product. For example, &#34;leather&#34;, &#34;wooden&#34;. A maximum of 20 values are allowed. Each value must be a UTF-8 encoded string with a length limit of 200 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324410">material</a>. Schema.org property <a href="https://schema.org/material">Product.material</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>name=ea</code><ul>
+<li>Immutable. Full resource name of the product, such as <code>projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/product_id</code>.</li>
+</ul>
+</li>
+<li><code>patterns=stet</code><ul>
+<li>The pattern or graphic print of the product. For example, &#34;striped&#34;, &#34;polka dot&#34;, &#34;paisley&#34;. A maximum of 20 values are allowed per Product. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324483">pattern</a>. Schema.org property <a href="https://schema.org/pattern">Product.pattern</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>price-info    cost=0.6437440335822143</code><ul>
+<li>The costs associated with the sale of a particular product. Used for gross profit reporting. * Profit = price - cost Google Merchant Center property <a href="https://support.google.com/merchants/answer/9017895">cost_of_goods_sold</a>.</li>
+</ul>
+</li>
+<li><code>currency-code=et</code><ul>
+<li>The 3-letter currency code defined in <a href="https://www.iso.org/iso-4217-currency-codes.html">ISO 4217</a>. If this field is an unrecognizable currency code, an INVALID_ARGUMENT error is returned. The Product.Type.VARIANT Products with the same Product.primary_product_id must share the same currency_code. Otherwise, a FAILED_PRECONDITION error is returned.</li>
+</ul>
+</li>
+<li><code>original-price=0.7173775897454667</code><ul>
+<li>Price of the product without any discount. If zero, by default set to be the price.</li>
+</ul>
+</li>
+<li><code>price=0.19152174246409814</code><ul>
+<li>Price of the product. Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324371">price</a>. Schema.org property <a href="https://schema.org/price">Offer.price</a>.</li>
+</ul>
+</li>
+<li><code>price-effective-time=eirmod</code><ul>
+<li>The timestamp when the price starts to be effective. This can be set as a future timestamp, and the price is only used for search after price_effective_time. If so, the original_price must be set and original_price is used before price_effective_time. Do not set if price is always effective because it will cause additional latency during search.</li>
+</ul>
+</li>
+<li><code>price-expire-time=lorem</code><ul>
+<li>The timestamp when the price stops to be effective. The price is used for search before price_expire_time. If this field is set, the original_price must be set and original_price is used after price_expire_time. Do not set if price is always effective because it will cause additional latency during search.</li>
+</ul>
+</li>
+<li><code>price-range.original-price    exclusive-maximum=0.6131721394478933</code><ul>
+<li>Exclusive upper bound.</li>
+</ul>
+</li>
+<li><code>exclusive-minimum=0.5528213400607493</code><ul>
+<li>Exclusive lower bound.</li>
+</ul>
+</li>
+<li><code>maximum=0.15972633079770038</code><ul>
+<li>Inclusive upper bound.</li>
+</ul>
+</li>
+<li>
+<p><code>minimum=0.711397230560734</code></p>
+<ul>
+<li>Inclusive lower bound.</li>
+</ul>
+</li>
+<li>
+<p><code>..price    exclusive-maximum=0.8426777223777091</code></p>
+<ul>
+<li>Exclusive upper bound.</li>
+</ul>
+</li>
+<li><code>exclusive-minimum=0.3929504724172228</code><ul>
+<li>Exclusive lower bound.</li>
+</ul>
+</li>
+<li><code>maximum=0.1945321992186927</code><ul>
+<li>Inclusive upper bound.</li>
+</ul>
+</li>
+<li>
+<p><code>minimum=0.7627297711199902</code></p>
+<ul>
+<li>Inclusive lower bound.</li>
+</ul>
+</li>
+<li>
+<p><code>....    primary-product-id=et</code></p>
+<ul>
+<li>Variant group identifier. Must be an id, with the same parent branch with this product. Otherwise, an error is thrown. For Type.PRIMARY Products, this field can only be empty or set to the same value as id. For VARIANT Products, this field cannot be empty. A maximum of 2,000 products are allowed to share the same Type.PRIMARY Product. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324507">item_group_id</a>. Schema.org property <a href="https://schema.org/inProductGroupWithID">Product.inProductGroupWithID</a>.</li>
+</ul>
+</li>
+<li><code>publish-time=sit</code><ul>
+<li>The timestamp when the product is published by the retailer for the first time, which indicates the freshness of the products. Note that this field is different from available_time, given it purely describes product freshness regardless of when it is available on search and recommendation.</li>
+</ul>
+</li>
+<li><code>rating    average-rating=0.9343576145104524</code><ul>
+<li>The average rating of the Product. The rating is scaled at 1-5. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li><code>rating-count=91</code><ul>
+<li>The total number of ratings. This value is independent of the value of rating_histogram. This value must be nonnegative. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li>
+<p><code>rating-histogram=60</code></p>
+<ul>
+<li>List of rating counts per rating value (index = rating - 1). The list is empty if there is no rating. If the list is non-empty, its size is always 5. Otherwise, an INVALID_ARGUMENT error is returned. For example, [41, 14, 13, 47, 303]. It means that the Product got 41 ratings with 1 star, 14 ratings with 2 star, and so on.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    retrievable-fields=et</code></p>
+<ul>
+<li>Indicates which fields in the Products are returned in SearchResponse. Supported fields for all types: * audience * availability * brands * color_info * conditions * gtin * materials * name * patterns * price_info * rating * sizes * title * uri Supported fields only for Type.PRIMARY and Type.COLLECTION: * categories * description * images Supported fields only for Type.VARIANT: * Only the first image in images To mark attributes as retrievable, include paths of the form &#34;attributes.key&#34; where &#34;key&#34; is the key of a custom attribute, as specified in attributes. For Type.PRIMARY and Type.COLLECTION, the following fields are always returned in SearchResponse by default: * name For Type.VARIANT, the following fields are always returned in by default: * name * color_info Maximum number of paths is 30. Otherwise, an INVALID_ARGUMENT error is returned. Note: Returning more fields in SearchResponse may increase response payload size and serving latency.</li>
+</ul>
+</li>
+<li><code>sizes=gubergren</code><ul>
+<li>The size of the product. To represent different size systems or size types, consider using this format: [[[size_system:]size_type:]size_value]. For example, in &#34;US:MENS:M&#34;, &#34;US&#34; represents size system; &#34;MENS&#34; represents size type; &#34;M&#34; represents size value. In &#34;GIRLS:27&#34;, size system is empty; &#34;GIRLS&#34; represents size type; &#34;27&#34; represents size value. In &#34;32 inches&#34;, both size system and size type are empty, while size value is &#34;32 inches&#34;. A maximum of 20 values are allowed per Product. Each value must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324492">size</a>, <a href="https://support.google.com/merchants/answer/6324497">size_type</a>, and <a href="https://support.google.com/merchants/answer/6324502">size_system</a>. Schema.org property <a href="https://schema.org/size">Product.size</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>tags=justo</code><ul>
+<li>Custom tags associated with the product. At most 250 values are allowed per Product. This value must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. This tag can be used for filtering recommendation results by passing the tag as part of the PredictRequest.filter. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324473">custom_label_0–4</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>title=sea</code><ul>
+<li>Required. Product title. This field must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324415">title</a>. Schema.org property <a href="https://schema.org/name">Product.name</a>.</li>
+</ul>
+</li>
+<li><code>ttl=consetetur</code><ul>
+<li>Input only. The TTL (time to live) of the product. If it is set, it must be a non-negative value, and expire_time is set as current timestamp plus ttl. The derived expire_time is returned in the output and ttl is left blank when retrieving the Product. If it is set, the product is not available for SearchService.Search after current timestamp plus ttl. However, the product can still be retrieved by ProductService.GetProduct and ProductService.ListProducts.</li>
+</ul>
+</li>
+<li><code>type=sit</code><ul>
+<li>Immutable. The type of the product. Default to Catalog.product_level_config.ingestion_product_type if unset.</li>
+</ul>
+</li>
+<li>
+<p><code>uri=aliquyam</code></p>
+<ul>
+<li>Canonical URL directly linking to the product detail page. It is strongly recommended to provide a valid uri for the product, otherwise the service performance could be significantly degraded. This field must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property <a href="https://support.google.com/merchants/answer/6324416">link</a>. Schema.org property <a href="https://schema.org/url">Offer.url</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    set-mask=eos</code></p>
+<ul>
+<li>Indicates which inventory fields in the provided Product to update. At least one field must be provided. If an unsupported or unknown field is provided, an INVALID_ARGUMENT error is returned and the entire update will be ignored.</li>
+</ul>
+</li>
+<li><code>set-time=at</code><ul>
+<li>The time when the request is issued, used to prevent out-of-order updates on inventory fields with the last update time recorded. If not provided, the internal system time will be used.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-catalogs-complete-query" class="btn btn-neutral float-right" title="Locations Catalogs Complete Query"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-catalogs-branches-products-remove-fulfillment-places" class="btn btn-neutral" title="Locations Catalogs Branches Products Remove Fulfillment Places"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-catalogs-branches-products-remove-fulfillment-places" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-catalogs-complete-query" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

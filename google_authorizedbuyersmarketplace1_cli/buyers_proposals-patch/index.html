@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Proposals Patch - Authorized Buyers Marketplace v3.0.0+20220307</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Authorized Buyers Marketplace v3.0.0+20220307</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Bidders</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../bidders_finalized-deals-list">Finalized Deals List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Buyers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_auction-packages-get">Auction Packages Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_auction-packages-list">Auction Packages List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_auction-packages-subscribe">Auction Packages Subscribe</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_auction-packages-subscribe-clients">Auction Packages Subscribe Clients</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_auction-packages-unsubscribe">Auction Packages Unsubscribe</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_auction-packages-unsubscribe-clients">Auction Packages Unsubscribe Clients</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-activate">Clients Activate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-create">Clients Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-deactivate">Clients Deactivate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-get">Clients Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-list">Clients List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-patch">Clients Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-users-activate">Clients Users Activate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-users-create">Clients Users Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-users-deactivate">Clients Users Deactivate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-users-delete">Clients Users Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-users-get">Clients Users Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_clients-users-list">Clients Users List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_finalized-deals-add-creative">Finalized Deals Add Creative</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_finalized-deals-get">Finalized Deals Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_finalized-deals-list">Finalized Deals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_finalized-deals-pause">Finalized Deals Pause</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_finalized-deals-resume">Finalized Deals Resume</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_finalized-deals-set-ready-to-serve">Finalized Deals Set Ready To Serve</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-accept">Proposals Accept</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-add-note">Proposals Add Note</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-cancel-negotiation">Proposals Cancel Negotiation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-deals-batch-update">Proposals Deals Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-deals-get">Proposals Deals Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-deals-list">Proposals Deals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-deals-patch">Proposals Deals Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-get">Proposals Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-list">Proposals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Proposals Patch</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_proposals-send-rfp">Proposals Send Rfp</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_publisher-profiles-get">Publisher Profiles Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../buyers_publisher-profiles-list">Publisher Profiles List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Proposals Patch</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/authorizedbuyersmarketplace1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates the proposal at the given revision number. If the revision number in the request is behind the latest from the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as &#39;Immutable&#39; or &#39;Output only&#39; yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is not allowed and will result in an error.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/authorized-buyers-marketplace</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/authorized-buyers-marketplace</em>.
+You can set the scope for this method like this: <code>authorizedbuyersmarketplace1 --scope &lt;scope&gt; buyers proposals-patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Immutable. The name of the proposal serving as a unique identifier. Format: buyers/{accountId}/proposals/{proposalId}</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Proposal:
+  billed-buyer: string
+  buyer: string
+  buyer-private-data:
+    reference-id: string
+  client: string
+  deal-type: string
+  display-name: string
+  is-renegotiating: boolean
+  last-updater-or-commentor-role: string
+  name: string
+  originator-role: string
+  pausing-consented: boolean
+  proposal-revision: string
+  publisher-profile: string
+  state: string
+  terms-and-conditions: string
+  update-time: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    billed-buyer=dolore</code><ul>
+<li>Output only. When the client field is populated, this field refers to the buyer who creates and manages the client buyer and gets billed on behalf of the client buyer; when the buyer field is populated, this field is the same value as buyer. Format : <code>buyers/{buyerAccountId}</code></li>
+</ul>
+</li>
+<li><code>buyer=dolore</code><ul>
+<li>Output only. Refers to a buyer in The Realtime-bidding API. Format: <code>buyers/{buyerAccountId}</code></li>
+</ul>
+</li>
+<li>
+<p><code>buyer-private-data    reference-id=dolore</code></p>
+<ul>
+<li>A buyer specified reference ID. This can be queried in the list operations (max-length: 1024 unicode code units).</li>
+</ul>
+</li>
+<li>
+<p><code>..    client=voluptua.</code></p>
+<ul>
+<li>Output only. Refers to a Client. Format: <code>buyers/{buyerAccountId}/clients/{clientAccountid}</code></li>
+</ul>
+</li>
+<li><code>deal-type=amet.</code><ul>
+<li>Output only. Type of deal the proposal contains.</li>
+</ul>
+</li>
+<li><code>display-name=ea</code><ul>
+<li>Output only. The descriptive name for the proposal. Maximum length of 255 unicode characters is allowed. Control characters are not allowed. Buyers cannot update this field. Note: Not to be confused with name, which is a unique identifier of the proposal.</li>
+</ul>
+</li>
+<li><code>is-renegotiating=false</code><ul>
+<li>Output only. True if the proposal was previously finalized and is now being renegotiated.</li>
+</ul>
+</li>
+<li><code>last-updater-or-commentor-role=lorem</code><ul>
+<li>Output only. The role of the last user that either updated the proposal or left a comment.</li>
+</ul>
+</li>
+<li><code>name=invidunt</code><ul>
+<li>Immutable. The name of the proposal serving as a unique identifier. Format: buyers/{accountId}/proposals/{proposalId}</li>
+</ul>
+</li>
+<li><code>originator-role=no</code><ul>
+<li>Output only. Indicates whether the buyer/seller created the proposal.</li>
+</ul>
+</li>
+<li><code>pausing-consented=true</code><ul>
+<li>Whether pausing is allowed for the proposal. This is a negotiable term between buyers and publishers.</li>
+</ul>
+</li>
+<li><code>proposal-revision=sit</code><ul>
+<li>Output only. The revision number for the proposal. Each update to the proposal or deal causes the proposal revision number to auto-increment. The buyer keeps track of the last revision number they know of and pass it in when making an update. If the head revision number on the server has since incremented, then an ABORTED error is returned during the update operation to let the buyer know that a subsequent update was made.</li>
+</ul>
+</li>
+<li><code>publisher-profile=et</code><ul>
+<li>Immutable. Reference to the seller on the proposal. Format: <code>buyers/{buyerAccountId}/publisherProfiles/{publisherProfileId}</code> Note: This field may be set only when creating the resource. Modifying this field while updating the resource will result in an error.</li>
+</ul>
+</li>
+<li><code>state=tempor</code><ul>
+<li>Output only. Indicates the state of the proposal.</li>
+</ul>
+</li>
+<li><code>terms-and-conditions=aliquyam</code><ul>
+<li>Output only. The terms and conditions associated with this proposal. Accepting a proposal implies acceptance of this field. This is created by the seller, the buyer can only view it.</li>
+</ul>
+</li>
+<li><code>update-time=ipsum</code><ul>
+<li>Output only. The time when the proposal was last revised.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p update-mask=string</strong><ul>
+<li>List of fields to be updated. If empty or unspecified, the service will update all fields populated in the update request excluding the output only fields and primitive fields with default value. Note that explicit field mask is required in order to reset a primitive field back to its default value, e.g. false for boolean fields, 0 for integer fields. A special field mask consisting of a single path &#34;*&#34; can be used to indicate full replacement(the equivalent of PUT method), updatable fields unset or unspecified in the input will be cleared or set to default value. Output only fields will be ignored regardless of the value of updateMask.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../buyers_proposals-send-rfp" class="btn btn-neutral float-right" title="Proposals Send Rfp"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../buyers_proposals-list" class="btn btn-neutral" title="Proposals List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../buyers_proposals-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../buyers_proposals-send-rfp" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

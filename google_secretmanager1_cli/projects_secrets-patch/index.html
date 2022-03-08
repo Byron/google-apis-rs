@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Secrets Patch - Secret Manager v2.0.4+20210319</title>
+  <title>Secrets Patch - Secret Manager v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Secret Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Secret Manager v3.0.0+20220226</a>
         
       </div>
 
@@ -207,6 +207,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>Secret:
   create-time: string
+  etag: string
   expire-time: string
   labels: { string: string }
   name: string
@@ -223,43 +224,47 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=takimata</code><ul>
+<li><code>-r .    create-time=duo</code><ul>
 <li>Output only. The time at which the Secret was created.</li>
 </ul>
 </li>
-<li><code>expire-time=amet.</code><ul>
+<li><code>etag=ipsum</code><ul>
+<li>Optional. Etag of the currently stored Secret.</li>
+</ul>
+</li>
+<li><code>expire-time=gubergren</code><ul>
 <li>Optional. Timestamp in UTC when the Secret is scheduled to expire. This is always provided on output, regardless of what was sent on input.</li>
 </ul>
 </li>
-<li><code>labels=key=duo</code><ul>
+<li><code>labels=key=lorem</code><ul>
 <li>The labels assigned to this Secret. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: <code>\p{Ll}\p{Lo}{0,62}</code> Label values must be between 0 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: <code>[\p{Ll}\p{Lo}\p{N}_-]{0,63}</code> No more than 64 labels can be assigned to a given resource.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>Output only. The resource name of the Secret in the format <code>projects/*/secrets/*</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>replication.automatic.customer-managed-encryption    kms-key-name=gubergren</code></p>
+<p><code>replication.automatic.customer-managed-encryption    kms-key-name=eos</code></p>
 <ul>
 <li>Required. The resource name of the Cloud KMS CryptoKey used to encrypt secret payloads. For secrets using the UserManaged replication policy type, Cloud KMS CryptoKeys must reside in the same location as the replica location. For secrets using the Automatic replication policy type, Cloud KMS CryptoKeys must reside in <code>global</code>. The expected format is <code>projects/*/locations/*/keyRings/*/cryptoKeys/*</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>....rotation    next-rotation-time=lorem</code></p>
+<p><code>....rotation    next-rotation-time=dolor</code></p>
 <ul>
-<li>Optional. Timestamp in UTC at which the Secret is scheduled to rotate. next_rotation_time MUST be set if rotation_period is set.</li>
+<li>Optional. Timestamp in UTC at which the Secret is scheduled to rotate. Cannot be set to less than 300s (5 min) in the future and at most 3153600000s (100 years). next_rotation_time MUST be set if rotation_period is set.</li>
 </ul>
 </li>
 <li>
-<p><code>rotation-period=gubergren</code></p>
+<p><code>rotation-period=ea</code></p>
 <ul>
 <li>Input only. The Duration between rotation notifications. Must be in seconds and at least 3600s (1h) and at most 3153600000s (100 years). If rotation_period is set, next_rotation_time must be set. next_rotation_time will be advanced by this period when the service automatically sends rotation notifications.</li>
 </ul>
 </li>
 <li>
-<p><code>..    ttl=eos</code></p>
+<p><code>..    ttl=ipsum</code></p>
 <ul>
 <li>Input only. The TTL for the Secret.</li>
 </ul>

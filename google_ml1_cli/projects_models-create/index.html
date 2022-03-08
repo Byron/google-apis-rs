@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Models Create - Cloud Machine Learning Engine v2.0.4+20210317</title>
+  <title>Models Create - Cloud Machine Learning Engine v3.0.0+20220212</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Machine Learning Engine v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Machine Learning Engine v3.0.0+20220212</a>
         
       </div>
 
@@ -405,82 +405,82 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .default-version.accelerator-config    count=sadipscing</code><ul>
+<li><code>-r .default-version.accelerator-config    count=rebum.</code><ul>
 <li>The number of accelerators to attach to each machine running the job.</li>
 </ul>
 </li>
 <li>
-<p><code>type=ut</code></p>
+<p><code>type=at</code></p>
 <ul>
 <li>The type of accelerator to use.</li>
 </ul>
 </li>
 <li>
-<p><code>..auto-scaling    max-nodes=85</code></p>
+<p><code>..auto-scaling    max-nodes=13</code></p>
 <ul>
 <li>The maximum number of nodes to scale this model under load. The actual value will depend on resource quota and availability.</li>
 </ul>
 </li>
 <li>
-<p><code>min-nodes=31</code></p>
+<p><code>min-nodes=87</code></p>
 <ul>
 <li>Optional. The minimum number of nodes to allocate for this model. These nodes are always up, starting from the time the model is deployed. Therefore, the cost of operating this model will be at least <code>rate</code> * <code>min_nodes</code> * number of hours since last billing cycle, where <code>rate</code> is the cost per node-hour as documented in the <a href="..//ml-engine/docs/pricing">pricing guide</a>, even if no predictions are performed. There is additional cost for each prediction performed. Unlike manual scaling, if the load gets too heavy for the nodes that are up, the service will automatically add nodes to handle the increased load as well as scale back as traffic drops, always maintaining at least <code>min_nodes</code>. You will be charged for the time in which additional nodes are used. If <code>min_nodes</code> is not specified and AutoScaling is used with a <a href="..//ml-engine/docs/machine-types-online-prediction">legacy (MLS1) machine type</a>, <code>min_nodes</code> defaults to 0, in which case, when traffic to a model stops (and after a cool-down period), nodes will be shut down and no charges will be incurred until traffic to the model resumes. If <code>min_nodes</code> is not specified and AutoScaling is used with a <a href="..//ml-engine/docs/machine-types-online-prediction">Compute Engine (N1) machine type</a>, <code>min_nodes</code> defaults to 1. <code>min_nodes</code> must be at least 1 for use with a Compute Engine machine type. You can set <code>min_nodes</code> when creating the model version, and you can also update <code>min_nodes</code> for an existing version: update_body.json: { &#39;autoScaling&#39;: { &#39;minNodes&#39;: 5 } } HTTP request: PATCH https://ml.googleapis.com/v1/{name=projects/<em>/models/</em>/versions/*}?update_mask=autoScaling.minNodes -d @./update_body.json </li>
 </ul>
 </li>
 <li>
-<p><code>..container    args=kasd</code></p>
+<p><code>..container    args=stet</code></p>
 <ul>
 <li>Immutable. Specifies arguments for the command that runs when the container starts. This overrides the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>CMD</code></a>. Specify this field as an array of executable and arguments, similar to a Docker <code>CMD</code>&#39;s &#34;default parameters&#34; form. If you don&#39;t specify this field but do specify the command field, then the command from the <code>command</code> field runs without any additional arguments. See the <a href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes">Kubernetes documentation about how the <code>command</code> and <code>args</code> fields interact with a container&#39;s <code>ENTRYPOINT</code> and <code>CMD</code></a>. If you don&#39;t specify this field and don&#39;t specify the <code>commmand</code> field, then the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>ENTRYPOINT</code></a> and <code>CMD</code> determine what runs based on their default behavior. See the <a href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact">Docker documentation about how <code>CMD</code> and <code>ENTRYPOINT</code> interact</a>. In this field, you can reference <a href="..//ai-platform/prediction/docs/custom-container-requirements#aip-variables">environment variables set by AI Platform Prediction</a> and environment variables set in the env field. You cannot reference environment variables set in the Docker image. In order for environment variables to be expanded, reference them by using the following syntax: $( VARIABLE_NAME) Note that this differs from Bash variable expansion, which does not use parentheses. If a variable cannot be resolved, the reference in the input string is used unchanged. To avoid variable expansion, you can escape this syntax with <code>$$</code>; for example: $$(VARIABLE_NAME) This field corresponds to the <code>args</code> field of the <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#container-v1-core">Kubernetes Containers v1 core API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>command=sadipscing</code><ul>
+<li><code>command=aliquyam</code><ul>
 <li>Immutable. Specifies the command that runs when the container starts. This overrides the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#entrypoint"><code>ENTRYPOINT</code></a>. Specify this field as an array of executable and arguments, similar to a Docker <code>ENTRYPOINT</code>&#39;s &#34;exec&#34; form, not its &#34;shell&#34; form. If you do not specify this field, then the container&#39;s <code>ENTRYPOINT</code> runs, in conjunction with the args field or the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>CMD</code></a>, if either exists. If this field is not specified and the container does not have an <code>ENTRYPOINT</code>, then refer to the <a href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact">Docker documentation about how <code>CMD</code> and <code>ENTRYPOINT</code> interact</a>. If you specify this field, then you can also specify the <code>args</code> field to provide additional arguments for this command. However, if you specify this field, then the container&#39;s <code>CMD</code> is ignored. See the <a href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes">Kubernetes documentation about how the <code>command</code> and <code>args</code> fields interact with a container&#39;s <code>ENTRYPOINT</code> and <code>CMD</code></a>. In this field, you can reference <a href="..//ai-platform/prediction/docs/custom-container-requirements#aip-variables">environment variables set by AI Platform Prediction</a> and environment variables set in the env field. You cannot reference environment variables set in the Docker image. In order for environment variables to be expanded, reference them by using the following syntax: $( VARIABLE_NAME) Note that this differs from Bash variable expansion, which does not use parentheses. If a variable cannot be resolved, the reference in the input string is used unchanged. To avoid variable expansion, you can escape this syntax with <code>$$</code>; for example: $$(VARIABLE_NAME) This field corresponds to the <code>command</code> field of the <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#container-v1-core">Kubernetes Containers v1 core API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>image=tempor</code></p>
+<p><code>image=ut</code></p>
 <ul>
 <li>URI of the Docker image to be used as the custom container for serving predictions. This URI must identify <a href="..//artifact-registry/docs/overview">an image in Artifact Registry</a> and begin with the hostname <code>{REGION}-docker.pkg.dev</code>, where <code>{REGION}</code> is replaced by the region that matches AI Platform Prediction <a href="..//ai-platform/prediction/docs/regional-endpoints">regional endpoint</a> that you are using. For example, if you are using the <code>us-central1-ml.googleapis.com</code> endpoint, then this URI must begin with <code>us-central1-docker.pkg.dev</code>. To use a custom container, the <a href="..//ai-platform/prediction/docs/custom-service-account#default">AI Platform Google-managed service account</a> must have permission to pull (read) the Docker image at this URI. The AI Platform Google-managed service account has the following format: <code>service-{PROJECT_NUMBER}@cloud-ml.google.com.iam.gserviceaccount.com</code> {PROJECT_NUMBER} is replaced by your Google Cloud project number. By default, this service account has necessary permissions to pull an Artifact Registry image in the same Google Cloud project where you are using AI Platform Prediction. In this case, no configuration is necessary. If you want to use an image from a different Google Cloud project, learn how to <a href="..//artifact-registry/docs/access-control#grant-repo">grant the Artifact Registry Reader (roles/artifactregistry.reader) role for a repository</a> to your projet&#39;s AI Platform Google-managed service account. To learn about the requirements for the Docker image itself, read <a href="..//ai-platform/prediction/docs/custom-container-requirements">Custom container requirements</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=sea</code></p>
+<p><code>..    create-time=sit</code></p>
 <ul>
 <li>Output only. The time the version was created.</li>
 </ul>
 </li>
-<li><code>deployment-uri=et</code><ul>
+<li><code>deployment-uri=vero</code><ul>
 <li>The Cloud Storage URI of a directory containing trained model artifacts to be used to create the model version. See the <a href="..//ai-platform/prediction/docs/deploying-models">guide to deploying models</a> for more information. The total number of files under this directory must not exceed 1000. During projects.models.versions.create, AI Platform Prediction copies all files from the specified directory to a location managed by the service. From then on, AI Platform Prediction uses these copies of the model artifacts to serve predictions, not the original files in Cloud Storage, so this location is useful only as a historical record. If you specify container, then this field is optional. Otherwise, it is required. Learn <a href="..//ai-platform/prediction/docs/custom-container-requirements#artifacts">how to use this field with a custom container</a>.</li>
 </ul>
 </li>
-<li><code>description=lorem</code><ul>
+<li><code>description=rebum.</code><ul>
 <li>Optional. The description specified for the version when it was created.</li>
 </ul>
 </li>
-<li><code>error-message=magna</code><ul>
+<li><code>error-message=dolores</code><ul>
 <li>Output only. The details of a failure or a cancellation.</li>
 </ul>
 </li>
-<li><code>etag=takimata</code><ul>
+<li><code>etag=consetetur</code><ul>
 <li><code>etag</code> is used for optimistic concurrency control as a way to help prevent simultaneous updates of a model from overwriting each other. It is strongly suggested that systems make use of the <code>etag</code> in the read-modify-write cycle to perform model updates in order to avoid race conditions: An <code>etag</code> is returned in the response to <code>GetVersion</code>, and systems are expected to put that etag in the request to <code>UpdateVersion</code> to ensure that their change will be applied to the model as intended.</li>
 </ul>
 </li>
 <li>
-<p><code>explanation-config.integrated-gradients-attribution    num-integral-steps=35</code></p>
+<p><code>explanation-config.integrated-gradients-attribution    num-integral-steps=82</code></p>
 <ul>
 <li>Number of steps for approximating the path integral. A good value to start is 50 and gradually increase until the sum to diff property is met within the desired error range.</li>
 </ul>
 </li>
 <li>
-<p><code>..sampled-shapley-attribution    num-paths=74</code></p>
+<p><code>..sampled-shapley-attribution    num-paths=71</code></p>
 <ul>
 <li>The number of feature permutations to consider when approximating the Shapley values.</li>
 </ul>
 </li>
 <li>
-<p><code>..xrai-attribution    num-integral-steps=13</code></p>
+<p><code>..xrai-attribution    num-integral-steps=63</code></p>
 <ul>
 <li>Number of steps for approximating the path integral. A good value to start is 50 and gradually increase until the sum to diff property is met within the desired error range.</li>
 </ul>
@@ -495,81 +495,81 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. If true, this version will be used to handle prediction requests that do not specify a version. You can change the default version by calling projects.methods.versions.setDefault.</li>
 </ul>
 </li>
-<li><code>labels=key=ut</code><ul>
+<li><code>labels=key=aliquyam</code><ul>
 <li>Optional. One or more labels that you can add, to organize your model versions. Each label is a key-value pair, where both the key and the value are arbitrary strings that you supply. For more information, see the documentation on using labels.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>last-migration-model-id=sit</code><ul>
+<li><code>last-migration-model-id=magna</code><ul>
 <li>Output only. The <a href="https://cloud.google.com/ai-platform-unified/docs/reference/rest/v1beta1/projects.locations.models">AI Platform (Unified) <code>Model</code></a> ID for the last <a href="https://cloud.google.com/ai-platform-unified/docs/start/migrating-to-ai-platform-unified">model migration</a>.</li>
 </ul>
 </li>
-<li><code>last-migration-time=vero</code><ul>
+<li><code>last-migration-time=diam</code><ul>
 <li>Output only. The last time this version was successfully <a href="https://cloud.google.com/ai-platform-unified/docs/start/migrating-to-ai-platform-unified">migrated to AI Platform (Unified)</a>.</li>
 </ul>
 </li>
-<li><code>last-use-time=rebum.</code><ul>
+<li><code>last-use-time=nonumy</code><ul>
 <li>Output only. The time the version was last used for prediction.</li>
 </ul>
 </li>
-<li><code>machine-type=dolores</code><ul>
+<li><code>machine-type=et</code><ul>
 <li>Optional. The type of machine on which to serve the model. Currently only applies to online prediction service. To learn about valid values for this field, read <a href="..//ai-platform/prediction/docs/machine-types-online-prediction">Choosing a machine type for online prediction</a>. If this field is not specified and you are using a <a href="..//ai-platform/prediction/docs/regional-endpoints">regional endpoint</a>, then the machine type defaults to <code>n1-standard-2</code>. If this field is not specified and you are using the global endpoint (<code>ml.googleapis.com</code>), then the machine type defaults to <code>mls1-c1-m2</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>manual-scaling    nodes=5</code></p>
+<p><code>manual-scaling    nodes=93</code></p>
 <ul>
 <li>The number of nodes to allocate for this model. These nodes are always up, starting from the time the model is deployed, so the cost of operating this model will be proportional to <code>nodes</code> * number of hours since last billing cycle plus the cost for each prediction performed.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=dolores</code></p>
+<p><code>..    name=accusam</code></p>
 <ul>
 <li>Required. The name specified for the version when it was created. The version name must be unique within the model it is created in.</li>
 </ul>
 </li>
-<li><code>package-uris=sed</code><ul>
+<li><code>package-uris=tempor</code><ul>
 <li>Optional. Cloud Storage paths (<code>gs://…</code>) of packages for <a href="..//ml-engine/docs/tensorflow/custom-prediction-routines">custom prediction routines</a> or <a href="..//ml-engine/docs/scikit/exporting-for-prediction#custom-pipeline-code">scikit-learn pipelines with custom code</a>. For a custom prediction routine, one of these packages must contain your Predictor class (see <a href="#Version.FIELDS.prediction_class"><code>predictionClass</code></a>). Additionally, include any dependencies used by your Predictor or scikit-learn pipeline uses that are not already included in your selected <a href="..//ml-engine/docs/tensorflow/runtime-version-list">runtime version</a>. If you specify this field, you must also set <a href="#Version.FIELDS.runtime_version"><code>runtimeVersion</code></a> to 1.4 or greater.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>prediction-class=invidunt</code><ul>
+<li><code>prediction-class=sed</code><ul>
 <li>Optional. The fully qualified name (module_name.class_name) of a class that implements the Predictor interface described in this reference field. The module containing this class should be included in a package provided to the <a href="#Version.FIELDS.package_uris"><code>packageUris</code> field</a>. Specify this field if and only if you are deploying a <a href="..//ml-engine/docs/tensorflow/custom-prediction-routines">custom prediction routine (beta)</a>. If you specify this field, you must set <a href="#Version.FIELDS.runtime_version"><code>runtimeVersion</code></a> to 1.4 or greater and you must set <code>machineType</code> to a <a href="..//ml-engine/docs/machine-types-online-prediction">legacy (MLS1) machine type</a>. The following code sample provides the Predictor interface: class Predictor(object): &#34;&#34;&#34;Interface for constructing custom predictors.&#34;&#34;&#34; def predict(self, instances, <strong>kwargs): &#34;&#34;&#34;Performs custom prediction. Instances are the decoded values from the request. They have already been deserialized from JSON. Args: instances: A list of prediction input instances. </strong>kwargs: A dictionary of keyword args provided as additional fields on the predict request body. Returns: A list of outputs containing the prediction results. This list must be JSON serializable. &#34;&#34;&#34; raise NotImplementedError() @classmethod def from_path(cls, model_dir): &#34;&#34;&#34;Creates an instance of Predictor using the given path. Loading of the predictor should be done in this method. Args: model_dir: The local directory that contains the exported model file along with any additional files uploaded when creating the version resource. Returns: An instance implementing this Predictor class. &#34;&#34;&#34; raise NotImplementedError() Learn more about <a href="..//ml-engine/docs/tensorflow/custom-prediction-routines">the Predictor interface and custom prediction routines</a>.</li>
 </ul>
 </li>
-<li><code>python-version=clita</code><ul>
+<li><code>python-version=est</code><ul>
 <li>Required. The version of Python used in prediction. The following Python versions are available: * Python &#39;3.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or later. * Python &#39;3.5&#39; is available when <code>runtime_version</code> is set to a version from &#39;1.4&#39; to &#39;1.14&#39;. * Python &#39;2.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or earlier. Read more about the Python versions available for <a href="..//ml-engine/docs/runtime-version-list">each runtime version</a>.</li>
 </ul>
 </li>
-<li><code>request-logging-config    bigquery-table-name=dolor</code><ul>
+<li><code>request-logging-config    bigquery-table-name=takimata</code><ul>
 <li>Required. Fully qualified BigQuery table name in the following format: &#34; project_id.dataset_name.table_name&#34; The specified table must already exist, and the &#34;Cloud ML Service Agent&#34; for your project must have permission to write to it. The table must have the following <a href="..//bigquery/docs/schemas">schema</a>: Field nameType Mode model STRING REQUIRED model_version STRING REQUIRED time TIMESTAMP REQUIRED raw_data STRING REQUIRED raw_prediction STRING NULLABLE groundtruth STRING NULLABLE </li>
 </ul>
 </li>
 <li>
-<p><code>sampling-percentage=0.14868339261511765</code></p>
+<p><code>sampling-percentage=0.02085600923949349</code></p>
 <ul>
 <li>Percentage of requests to be logged, expressed as a fraction from 0 to 1. For example, if you want to log 10% of requests, enter <code>0.1</code>. The sampling window is the lifetime of the model version. Defaults to 0.</li>
 </ul>
 </li>
 <li>
-<p><code>..routes    health=diam</code></p>
+<p><code>..routes    health=at</code></p>
 <ul>
 <li>HTTP path on the container to send health checkss to. AI Platform Prediction intermittently sends GET requests to this path on the container&#39;s IP address and port to check that the container is healthy. Read more about <a href="..//ai-platform/prediction/docs/custom-container-requirements#checks">health checks</a>. For example, if you set this field to <code>/bar</code>, then AI Platform Prediction intermittently sends a GET request to the <code>/bar</code> path on the port of your container specified by the first value of Version.container.ports. If you don&#39;t specify this field, it defaults to the following value: /v1/models/ MODEL/versions/VERSION The placeholders in this value are replaced as follows: * MODEL: The name of the parent Model. This does not include the &#34;projects/PROJECT_ID/models/&#34; prefix that the API returns in output; it is the bare model name, as provided to projects.models.create. * VERSION: The name of the model version. This does not include the &#34;projects/PROJECT_ID /models/MODEL/versions/&#34; prefix that the API returns in output; it is the bare version name, as provided to projects.models.versions.create.</li>
 </ul>
 </li>
 <li>
-<p><code>predict=nonumy</code></p>
+<p><code>predict=erat</code></p>
 <ul>
 <li>HTTP path on the container to send prediction requests to. AI Platform Prediction forwards requests sent using projects.predict to this path on the container&#39;s IP address and port. AI Platform Prediction then returns the container&#39;s response in the API response. For example, if you set this field to <code>/foo</code>, then when AI Platform Prediction receives a prediction request, it forwards the request body in a POST request to the <code>/foo</code> path on the port of your container specified by the first value of Version.container.ports. If you don&#39;t specify this field, it defaults to the following value: /v1/models/MODEL/versions/VERSION:predict The placeholders in this value are replaced as follows: * MODEL: The name of the parent Model. This does not include the &#34;projects/PROJECT_ID/models/&#34; prefix that the API returns in output; it is the bare model name, as provided to projects.models.create. * VERSION: The name of the model version. This does not include the &#34;projects/PROJECT_ID/models/MODEL/versions/&#34; prefix that the API returns in output; it is the bare version name, as provided to projects.models.versions.create.</li>
 </ul>
 </li>
 <li>
-<p><code>..    runtime-version=et</code></p>
+<p><code>..    runtime-version=justo</code></p>
 <ul>
 <li>Required. The AI Platform runtime version to use for this deployment. For more information, see the <a href="..//ml-engine/docs/runtime-version-list">runtime version list</a> and <a href="..//ml-engine/docs/versioning">how to manage runtime versions</a>.</li>
 </ul>
 </li>
-<li><code>service-account=sanctus</code><ul>
+<li><code>service-account=ipsum</code><ul>
 <li>Optional. Specifies the service account for resource access control. If you specify this field, then you must also specify either the <code>containerSpec</code> or the <code>predictionClass</code> field. Learn more about <a href="..//ai-platform/prediction/docs/custom-service-account">using a custom service account</a>.</li>
 </ul>
 </li>
@@ -580,33 +580,33 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    description=tempor</code></p>
+<p><code>..    description=dolores</code></p>
 <ul>
 <li>Optional. The description specified for the model when it was created.</li>
 </ul>
 </li>
-<li><code>etag=sed</code><ul>
+<li><code>etag=consetetur</code><ul>
 <li><code>etag</code> is used for optimistic concurrency control as a way to help prevent simultaneous updates of a model from overwriting each other. It is strongly suggested that systems make use of the <code>etag</code> in the read-modify-write cycle to perform model updates in order to avoid race conditions: An <code>etag</code> is returned in the response to <code>GetModel</code>, and systems are expected to put that etag in the request to <code>UpdateModel</code> to ensure that their change will be applied to the model as intended.</li>
 </ul>
 </li>
-<li><code>labels=key=est</code><ul>
+<li><code>labels=key=no</code><ul>
 <li>Optional. One or more labels that you can add, to organize your models. Each label is a key-value pair, where both the key and the value are arbitrary strings that you supply. For more information, see the documentation on using labels.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=takimata</code><ul>
+<li><code>name=justo</code><ul>
 <li>Required. The name specified for the model when it was created. The model name must be unique within the project it is created in.</li>
 </ul>
 </li>
-<li><code>online-prediction-console-logging=false</code><ul>
+<li><code>online-prediction-console-logging=true</code><ul>
 <li>Optional. If true, online prediction nodes send <code>stderr</code> and <code>stdout</code> streams to Cloud Logging. These can be more verbose than the standard access logs (see <code>onlinePredictionLogging</code>) and can incur higher cost. However, they are helpful for debugging. Note that <a href="..//stackdriver/pricing">logs may incur a cost</a>, especially if your project receives prediction requests at a high QPS. Estimate your costs before enabling this option. Default is false.</li>
 </ul>
 </li>
-<li><code>online-prediction-logging=false</code><ul>
+<li><code>online-prediction-logging=true</code><ul>
 <li>Optional. If true, online prediction access logs are sent to Cloud Logging. These logs are like standard server access logs, containing information like timestamp and latency for each request. Note that <a href="..//stackdriver/pricing">logs may incur a cost</a>, especially if your project receives prediction requests at a high queries per second rate (QPS). Estimate your costs before enabling this option. Default is false.</li>
 </ul>
 </li>
-<li><code>regions=at</code><ul>
+<li><code>regions=sea</code><ul>
 <li>Optional. The list of regions where the model is going to be deployed. Only one region per model is supported. Defaults to &#39;us-central1&#39; if nothing is set. See the available regions for AI Platform services. Note: * No matter where a model is deployed, it can always be accessed by users from anywhere, both for online and batch prediction. * The region for a batch prediction job is set by the region field when submitting the batch prediction job and does not take its value from this field.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

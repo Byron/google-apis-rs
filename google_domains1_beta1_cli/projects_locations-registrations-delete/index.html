@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Registrations Delete - Cloud Domains v2.0.4+20210216</title>
+  <title>Locations Registrations Delete - Cloud Domains v3.0.0+20220128</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Domains v2.0.4+20210216</a>
+        <a href=".." class="icon icon-home"> Cloud Domains v3.0.0+20220128</a>
         
       </div>
 
@@ -146,6 +146,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-retrieve-transfer-parameters">Locations Registrations Retrieve Transfer Parameters</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-registrations-search-domains">Locations Registrations Search Domains</a>
                     
                 </li>
@@ -157,6 +162,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-registrations-test-iam-permissions">Locations Registrations Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-transfer">Locations Registrations Transfer</a>
                     
                 </li>
             
@@ -196,7 +206,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Deletes a <code>Registration</code> resource. This method only works on resources in one of the following states: * <code>state</code> is <code>EXPORTED</code> with <code>expire_time</code> in the past * <code>state</code> is <code>REGISTRATION_FAILED</code></p>
+              <p>Deletes a <code>Registration</code> resource. This method works on any <code>Registration</code> resource using <a href="..//domains/pricing#billing-models">Subscription or Commitment billing</a>, provided that the resource was created at least 1 day in the past. For <code>Registration</code> resources using <a href="..//domains/pricing#billing-models">Monthly billing</a>, this method works if: * <code>state</code> is <code>EXPORTED</code> with <code>expire_time</code> in the past * <code>state</code> is <code>REGISTRATION_FAILED</code> * <code>state</code> is <code>TRANSFER_FAILED</code> When an active registration is successfully deleted, you can continue to use the domain in <a href="https://domains.google/">Google Domains</a> until it expires. The calling user becomes the domain&#39;s sole owner in Google Domains, and permissions for the domain are subsequently managed there. The domain does not renew automatically unless the new owner sets up billing in Google Domains.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.

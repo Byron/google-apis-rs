@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Proposals Create - AdExchangeBuyerII v2.0.4+20210331</title>
+  <title>Proposals Create - AdExchangeBuyerII v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> AdExchangeBuyerII v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> AdExchangeBuyerII v3.0.0+20220307</a>
         
       </div>
 
@@ -141,6 +141,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_finalized-proposals-list">Finalized Proposals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_finalized-proposals-pause">Finalized Proposals Pause</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_finalized-proposals-resume">Finalized Proposals Resume</a>
                     
                 </li>
             
@@ -460,30 +470,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .billed-buyer    account-id=consetetur</code></p>
+<p><code>-r .billed-buyer    account-id=aliquyam</code></p>
 <ul>
 <li>Authorized Buyers account ID of the buyer.</li>
 </ul>
 </li>
 <li>
-<p><code>..buyer    account-id=stet</code></p>
+<p><code>..buyer    account-id=elitr</code></p>
 <ul>
 <li>Authorized Buyers account ID of the buyer.</li>
 </ul>
 </li>
 <li>
-<p><code>..buyer-private-data    reference-id=est</code></p>
+<p><code>..buyer-private-data    reference-id=duo</code></p>
 <ul>
 <li>A buyer or seller specified reference ID. This can be queried in the list operations (max-length: 1024 unicode code units).</li>
 </ul>
 </li>
 <li>
-<p><code>..    display-name=aliquyam</code></p>
+<p><code>..    display-name=diam</code></p>
 <ul>
 <li>The name for the proposal.</li>
 </ul>
 </li>
-<li><code>is-renegotiating=false</code><ul>
+<li><code>is-renegotiating=true</code><ul>
 <li>Output only. True if the proposal is being renegotiated.</li>
 </ul>
 </li>
@@ -491,42 +501,42 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. True, if the buyside inventory setup is complete for this proposal.</li>
 </ul>
 </li>
-<li><code>last-updater-or-commentor-role=est</code><ul>
+<li><code>last-updater-or-commentor-role=sed</code><ul>
 <li>Output only. The role of the last user that either updated the proposal or left a comment.</li>
 </ul>
 </li>
-<li><code>originator-role=sit</code><ul>
+<li><code>originator-role=eos</code><ul>
 <li>Output only. Indicates whether the buyer/seller created the proposal.</li>
 </ul>
 </li>
-<li><code>private-auction-id=sed</code><ul>
+<li><code>private-auction-id=lorem</code><ul>
 <li>Output only. Private auction ID if this proposal is a private auction proposal.</li>
 </ul>
 </li>
-<li><code>proposal-id=eos</code><ul>
+<li><code>proposal-id=ea</code><ul>
 <li>Output only. The unique ID of the proposal.</li>
 </ul>
 </li>
-<li><code>proposal-revision=lorem</code><ul>
+<li><code>proposal-revision=stet</code><ul>
 <li>Output only. The revision number for the proposal. Each update to the proposal or the deal causes the proposal revision number to auto-increment. The buyer keeps track of the last revision number they know of and pass it in when making an update. If the head revision number on the server has since incremented, then an ABORTED error is returned during the update operation to let the buyer know that a subsequent update was made.</li>
 </ul>
 </li>
-<li><code>proposal-state=ea</code><ul>
+<li><code>proposal-state=dolores</code><ul>
 <li>Output only. The current state of the proposal.</li>
 </ul>
 </li>
-<li><code>seller    account-id=stet</code><ul>
+<li><code>seller    account-id=eos</code><ul>
 <li>The unique ID for the seller. The seller fills in this field. The seller account ID is then available to buyer in the product.</li>
 </ul>
 </li>
 <li>
-<p><code>sub-account-id=dolores</code></p>
+<p><code>sub-account-id=et</code></p>
 <ul>
-<li>Optional sub-account ID for the seller.</li>
+<li>Output only. Ad manager network code for the seller.</li>
 </ul>
 </li>
 <li>
-<p><code>..    terms-and-conditions=eos</code></p>
+<p><code>..    terms-and-conditions=sea</code></p>
 <ul>
 <li>Output only. The terms and conditions set by the publisher for this proposal.</li>
 </ul>

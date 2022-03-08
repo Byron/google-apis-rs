@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Services Create - Dataproc Metastore v2.0.4+20210325</title>
+  <title>Locations Services Create - Dataproc Metastore v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc Metastore v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Dataproc Metastore v3.0.0+20220222</a>
         
       </div>
 
@@ -85,7 +85,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-get-iam-policy">Locations Services Backups Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-backups-list">Locations Services Backups List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-set-iam-policy">Locations Services Backups Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-backups-test-iam-permissions">Locations Services Backups Test Iam Permissions</a>
                     
                 </li>
             
@@ -115,6 +130,36 @@
                             
                         
                         </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-get-iam-policy">Locations Services Databases Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-set-iam-policy">Locations Services Databases Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-get-iam-policy">Locations Services Databases Tables Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-set-iam-policy">Locations Services Databases Tables Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-tables-test-iam-permissions">Locations Services Databases Tables Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-databases-test-iam-permissions">Locations Services Databases Test Iam Permissions</a>
                     
                 </li>
             
@@ -165,6 +210,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-services-patch">Locations Services Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-services-remove-iam-policy">Locations Services Remove Iam Policy</a>
                     
                 </li>
             
@@ -238,9 +288,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>Service:
   artifact-gcs-uri: string
   create-time: string
+  database-type: string
+  encryption-config:
+    kms-key: string
   endpoint-uri: string
   hive-metastore-config:
     config-overrides: { string: string }
+    endpoint-protocol: string
     kerberos-config:
       keytab:
         cloud-secret: string
@@ -268,72 +322,88 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    artifact-gcs-uri=rebum.</code><ul>
+<li><code>-r .    artifact-gcs-uri=dolor</code><ul>
 <li>Output only. A Cloud Storage URI (starting with gs://) that specifies where artifacts related to the metastore service are stored.</li>
 </ul>
 </li>
-<li><code>create-time=est</code><ul>
+<li><code>create-time=lorem</code><ul>
 <li>Output only. The time when the metastore service was created.</li>
 </ul>
 </li>
-<li><code>endpoint-uri=ipsum</code><ul>
-<li>Output only. The URI of the endpoint used to access the metastore service.</li>
-</ul>
-</li>
-<li><code>hive-metastore-config    config-overrides=key=ipsum</code><ul>
-<li>A mapping of Hive metastore configuration key-value pairs to apply to the Hive metastore (configured in hive-site.xml). The mappings override system defaults (some keys cannot be overridden).</li>
-<li>the value will be associated with the given <code>key</code></li>
+<li><code>database-type=eos</code><ul>
+<li>Immutable. The database type that the Metastore service stores its data.</li>
 </ul>
 </li>
 <li>
-<p><code>kerberos-config.keytab    cloud-secret=est</code></p>
+<p><code>encryption-config    kms-key=labore</code></p>
+<ul>
+<li>The fully qualified customer provided Cloud KMS key name to use for customer data encryption, in the following form:projects/{project_number}/locations/{location_id}/keyRings/{key_ring_id}/cryptoKeys/{crypto_key_id}.</li>
+</ul>
+</li>
+<li>
+<p><code>..    endpoint-uri=sed</code></p>
+<ul>
+<li>Output only. The URI of the endpoint used to access the metastore service.</li>
+</ul>
+</li>
+<li><code>hive-metastore-config    config-overrides=key=duo</code><ul>
+<li>A mapping of Hive metastore configuration key-value pairs to apply to the Hive metastore (configured in hive-site.xml). The mappings override system defaults (some keys cannot be overridden). These overrides are also applied to auxiliary versions and can be further customized in the auxiliary version&#39;s AuxiliaryVersionConfig.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>endpoint-protocol=sed</code><ul>
+<li>The protocol to use for the metastore service endpoint. If unspecified, defaults to THRIFT.</li>
+</ul>
+</li>
+<li>
+<p><code>kerberos-config.keytab    cloud-secret=no</code></p>
 <ul>
 <li>The relative resource name of a Secret Manager secret version, in the following form:projects/{project_number}/secrets/{secret_id}/versions/{version_id}.</li>
 </ul>
 </li>
 <li>
-<p><code>..    krb5-config-gcs-uri=gubergren</code></p>
+<p><code>..    krb5-config-gcs-uri=stet</code></p>
 <ul>
 <li>A Cloud Storage URI that specifies the path to a krb5.conf file. It is of the form gs://{bucket_name}/path/to/krb5.conf, although the file does not need to be named krb5.conf explicitly.</li>
 </ul>
 </li>
 <li>
-<p><code>principal=ea</code></p>
+<p><code>principal=kasd</code></p>
 <ul>
 <li>A Kerberos principal that exists in the both the keytab the KDC to authenticate as. A typical principal is of the form primary/instance@REALM, but there is no exact format.</li>
 </ul>
 </li>
 <li>
-<p><code>..    version=dolor</code></p>
+<p><code>..    version=et</code></p>
 <ul>
 <li>Immutable. The Hive metastore schema version.</li>
 </ul>
 </li>
 <li>
-<p><code>..    labels=key=lorem</code></p>
+<p><code>..    labels=key=sed</code></p>
 <ul>
 <li>User-defined labels for the metastore service.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>maintenance-window    day-of-week=eos</code><ul>
+<li><code>maintenance-window    day-of-week=et</code><ul>
 <li>The day of week, when the window starts.</li>
 </ul>
 </li>
 <li>
-<p><code>hour-of-day=15</code></p>
+<p><code>hour-of-day=33</code></p>
 <ul>
 <li>The hour of day (0-23) when the window starts.</li>
 </ul>
 </li>
 <li>
-<p><code>..metadata-integration.data-catalog-config    enabled=true</code></p>
+<p><code>..metadata-integration.data-catalog-config    enabled=false</code></p>
 <ul>
 <li>Defines whether the metastore metadata should be synced to Data Catalog. The default value is to disable syncing metastore metadata to Data Catalog.</li>
 </ul>
 </li>
 <li>
-<p><code>...    name=duo</code></p>
+<p><code>...    name=erat</code></p>
 <ul>
 <li>Immutable. The relative resource name of the metastore service, of the form:projects/{project_number}/locations/{location_id}/services/{service_id}.</li>
 </ul>
@@ -342,31 +412,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Immutable. The relative resource name of the VPC network on which the instance can be accessed. It is specified in the following form:projects/{project_number}/global/networks/{network_id}.</li>
 </ul>
 </li>
-<li><code>port=40</code><ul>
+<li><code>port=81</code><ul>
 <li>The TCP port at which the metastore service is reached. Default: 9083.</li>
 </ul>
 </li>
-<li><code>release-channel=stet</code><ul>
+<li><code>release-channel=dolore</code><ul>
 <li>Immutable. The release channel of the service. If unspecified, defaults to STABLE.</li>
 </ul>
 </li>
-<li><code>state=kasd</code><ul>
+<li><code>state=et</code><ul>
 <li>Output only. The current state of the metastore service.</li>
 </ul>
 </li>
-<li><code>state-message=et</code><ul>
+<li><code>state-message=voluptua.</code><ul>
 <li>Output only. Additional information about the current state of the metastore service, if available.</li>
 </ul>
 </li>
-<li><code>tier=sed</code><ul>
+<li><code>tier=amet.</code><ul>
 <li>The tier of the service.</li>
 </ul>
 </li>
-<li><code>uid=et</code><ul>
+<li><code>uid=consetetur</code><ul>
 <li>Output only. The globally unique resource identifier of the metastore service.</li>
 </ul>
 </li>
-<li><code>update-time=et</code><ul>
+<li><code>update-time=diam</code><ul>
 <li>Output only. The time when the metastore service was last updated.</li>
 </ul>
 </li>
@@ -485,10 +555,10 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-services-delete" class="btn btn-neutral float-right" title="Locations Services Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-services-databases-get-iam-policy" class="btn btn-neutral float-right" title="Locations Services Databases Get Iam Policy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../projects_locations-services-backups-list" class="btn btn-neutral" title="Locations Services Backups List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-services-backups-test-iam-permissions" class="btn btn-neutral" title="Locations Services Backups Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -516,8 +586,8 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../projects_locations-services-backups-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-services-delete" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../projects_locations-services-backups-test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-services-databases-get-iam-policy" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

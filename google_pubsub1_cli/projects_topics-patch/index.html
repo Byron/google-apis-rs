@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Topics Patch - Pubsub v2.0.4+20210322</title>
+  <title>Topics Patch - Pubsub v3.0.0+20220221</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pubsub v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Pubsub v3.0.0+20220221</a>
         
       </div>
 
@@ -335,6 +335,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   topic:
     kms-key-name: string
     labels: { string: string }
+    message-retention-duration: string
     message-storage-policy:
       allowed-persistence-regions: [string]
     name: string
@@ -348,44 +349,48 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .topic    kms-key-name=voluptua.</code><ul>
+<li><code>-r .topic    kms-key-name=at</code><ul>
 <li>The resource name of the Cloud KMS CryptoKey to be used to protect access to messages published on this topic. The expected format is <code>projects/*/locations/*/keyRings/*/cryptoKeys/*</code>.</li>
 </ul>
 </li>
-<li><code>labels=key=dolore</code><ul>
+<li><code>labels=key=sed</code><ul>
 <li>See [Creating and managing labels] (https://cloud.google.com/pubsub/docs/labels).</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
+<li><code>message-retention-duration=sit</code><ul>
+<li>Indicates the minimum duration to retain a message after it is published to the topic. If this field is set, messages published to the topic in the last <code>message_retention_duration</code> are always available to subscribers. For instance, it allows any attached subscription to <a href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">seek to a timestamp</a> that is up to <code>message_retention_duration</code> in the past. If this field is not set, message retention is controlled by settings on individual subscriptions. Cannot be more than 31 days or less than 10 minutes.</li>
+</ul>
+</li>
 <li>
-<p><code>message-storage-policy    allowed-persistence-regions=dolore</code></p>
+<p><code>message-storage-policy    allowed-persistence-regions=et</code></p>
 <ul>
 <li>A list of IDs of GCP regions where messages that are published to the topic may be persisted in storage. Messages published by publishers running in non-allowed GCP regions (or running outside of GCP altogether) will be routed for storage in one of the allowed regions. An empty list means that no regions are allowed, and is not a valid configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=dolore</code></p>
+<p><code>..    name=tempor</code></p>
 <ul>
 <li>Required. The name of the topic. It must have the format <code>&amp;#34;projects/{project}/topics/{topic}&amp;#34;</code>. <code>{topic}</code> must start with a letter, and contain only letters (<code>[A-Za-z]</code>), numbers (<code>[0-9]</code>), dashes (<code>-</code>), underscores (<code>_</code>), periods (<code>.</code>), tildes (<code>~</code>), plus (<code>+</code>) or percent signs (<code>%</code>). It must be between 3 and 255 characters in length, and it must not start with <code>&amp;#34;goog&amp;#34;</code>.</li>
 </ul>
 </li>
-<li><code>satisfies-pzs=false</code><ul>
+<li><code>satisfies-pzs=true</code><ul>
 <li>Reserved for future use. This field is set only in responses from the server; it is ignored if it is set in any requests.</li>
 </ul>
 </li>
-<li><code>schema-settings    encoding=amet.</code><ul>
+<li><code>schema-settings    encoding=est</code><ul>
 <li>The encoding of messages validated against <code>schema</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>schema=ea</code></p>
+<p><code>schema=sed</code></p>
 <ul>
 <li>Required. The name of the schema that messages published should be validated against. Format is <code>projects/{project}/schemas/{schema}</code>. The value of this field will be <code>_deleted-schema_</code> if the schema has been deleted.</li>
 </ul>
 </li>
 <li>
-<p><code>...    update-mask=sadipscing</code></p>
+<p><code>...    update-mask=diam</code></p>
 <ul>
 <li>Required. Indicates which fields in the provided topic to update. Must be specified and non-empty. Note that if <code>update_mask</code> contains &#34;message_storage_policy&#34; but the <code>message_storage_policy</code> is not set in the <code>topic</code> provided above, then the updated value is determined by the policy configured at the project or organization level.</li>
 </ul>

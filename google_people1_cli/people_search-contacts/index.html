@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search Contacts - People Service v2.0.4+20210330</title>
+  <title>Search Contacts - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -228,7 +228,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Provides a list of contacts in the authenticated user&#39;s grouped contacts that matches the search query. The query matches on a contact&#39;s <code>names</code>, <code>nickNames</code>, <code>emailAddresses</code>, <code>phoneNumbers</code>, and <code>organizations</code> fields that are from the CONTACT&#34; source.</p>
+              <p>Provides a list of contacts in the authenticated user&#39;s grouped contacts that matches the search query. The query matches on a contact&#39;s <code>names</code>, <code>nickNames</code>, <code>emailAddresses</code>, <code>phoneNumbers</code>, and <code>organizations</code> fields that are from the CONTACT source. <strong>IMPORTANT</strong>: Before searching, clients should send a warmup request with an empty query to update the cache. See https://developers.google.com/people/v1/contacts#search_the_users_contacts</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -256,7 +256,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>Optional. The number of results to return.</li>
+<li>Optional. The number of results to return. Defaults to 10 if field is not set, or set to 0. Values greater than 30 will be capped to 30.</li>
 </ul>
 </li>
 <li>
@@ -269,6 +269,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p><strong>-p read-mask=string</strong></p>
 <ul>
 <li>Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined</li>
+</ul>
+</li>
+<li>
+<p><strong>-p sources=string</strong></p>
+<ul>
+<li>Optional. A mask of what source types to return. Defaults to READ_SOURCE_TYPE_CONTACT if not set.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - bigquery v2.0.4+20210327</title>
+  <title>Update - bigquery v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> bigquery v2.0.4+20210327</a>
+        <a href=".." class="icon icon-home"> bigquery v3.0.0+20220222</a>
         
       </div>
 
@@ -382,70 +382,75 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     project-id: string
     routine-id: string
   routine-type: string
+  strict-mode: boolean
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    creation-time=ipsum</code><ul>
+<li><code>-r .    creation-time=kasd</code><ul>
 <li>Output only. The time when this routine was created, in milliseconds since the epoch.</li>
 </ul>
 </li>
-<li><code>definition-body=stet</code><ul>
+<li><code>definition-body=amet</code><ul>
 <li>Required. The body of the routine. For functions, this is the expression in the AS clause. If language=SQL, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: <code>CREATE FUNCTION JoinLines(x string, y string) as (concat(x, &amp;#34;\n&amp;#34;, y))</code> The definition_body is <code>concat(x, &amp;#34;\n&amp;#34;, y)</code> (\n is not replaced with linebreak). If language=JAVASCRIPT, it is the evaluated string in the AS clause. For example, for the function created with the following statement: <code>CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS &amp;#39;return &amp;#34;\n&amp;#34;;\n&amp;#39;</code> The definition_body is <code>return &amp;#34;\n&amp;#34;;\n</code> Note that both \n are replaced with linebreaks.</li>
 </ul>
 </li>
-<li><code>description=gubergren</code><ul>
-<li>Optional. [Experimental] The description of the routine if defined.</li>
+<li><code>description=lorem</code><ul>
+<li>Optional. The description of the routine, if defined.</li>
 </ul>
 </li>
-<li><code>determinism-level=ipsum</code><ul>
-<li>Optional. [Experimental] The determinism level of the JavaScript UDF if defined.</li>
+<li><code>determinism-level=justo</code><ul>
+<li>Optional. The determinism level of the JavaScript UDF, if defined.</li>
 </ul>
 </li>
-<li><code>etag=no</code><ul>
+<li><code>etag=invidunt</code><ul>
 <li>Output only. A hash of this resource.</li>
 </ul>
 </li>
-<li><code>imported-libraries=sit</code><ul>
+<li><code>imported-libraries=sed</code><ul>
 <li>Optional. If language = &#34;JAVASCRIPT&#34;, this field stores the path of the imported JAVASCRIPT libraries.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>language=kasd</code><ul>
+<li><code>language=nonumy</code><ul>
 <li>Optional. Defaults to &#34;SQL&#34;.</li>
 </ul>
 </li>
-<li><code>last-modified-time=amet</code><ul>
+<li><code>last-modified-time=sea</code><ul>
 <li>Output only. The time when this routine was last modified, in milliseconds since the epoch.</li>
 </ul>
 </li>
 <li>
-<p><code>return-type    type-kind=lorem</code></p>
+<p><code>return-type    type-kind=ipsum</code></p>
 <ul>
 <li>Required. The top level type of this field. Can be any standard SQL data type (e.g., &#34;INT64&#34;, &#34;DATE&#34;, &#34;ARRAY&#34;).</li>
 </ul>
 </li>
 <li>
-<p><code>..routine-reference    dataset-id=justo</code></p>
+<p><code>..routine-reference    dataset-id=kasd</code></p>
 <ul>
 <li>[Required] The ID of the dataset containing this routine.</li>
 </ul>
 </li>
-<li><code>project-id=invidunt</code><ul>
+<li><code>project-id=justo</code><ul>
 <li>[Required] The ID of the project containing this routine.</li>
 </ul>
 </li>
 <li>
-<p><code>routine-id=sed</code></p>
+<p><code>routine-id=ea</code></p>
 <ul>
 <li>[Required] The ID of the routine. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>..    routine-type=nonumy</code></p>
+<p><code>..    routine-type=at</code></p>
 <ul>
 <li>Required. The type of routine.</li>
+</ul>
+</li>
+<li><code>strict-mode=false</code><ul>
+<li>Optional. Can be set for procedures only. If true (default), the definition body will be validated in the creation and the updates of the procedure. For procedures with an argument of ANY TYPE, the definition body validtion is not supported at creation/update time, and thus this field must be set to false explicitly.</li>
 </ul>
 </li>
 </ul>

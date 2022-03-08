@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Catalogs Placements Search - Cloud Retail v3.0.0+20220224</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Retail v3.0.0+20220224</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-operations-get">Locations Catalogs Branches Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-add-fulfillment-places">Locations Catalogs Branches Products Add Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-create">Locations Catalogs Branches Products Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-delete">Locations Catalogs Branches Products Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-get">Locations Catalogs Branches Products Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-import">Locations Catalogs Branches Products Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-list">Locations Catalogs Branches Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-patch">Locations Catalogs Branches Products Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-set-inventory">Locations Catalogs Branches Products Set Inventory</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-complete-query">Locations Catalogs Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-completion-data-import">Locations Catalogs Completion Data Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-get-default-branch">Locations Catalogs Get Default Branch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-list">Locations Catalogs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-operations-get">Locations Catalogs Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-operations-list">Locations Catalogs Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-patch">Locations Catalogs Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-placements-predict">Locations Catalogs Placements Predict</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Catalogs Placements Search</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-set-default-branch">Locations Catalogs Set Default Branch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-collect">Locations Catalogs User Events Collect</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-import">Locations Catalogs User Events Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-purge">Locations Catalogs User Events Purge</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-rejoin">Locations Catalogs User Events Rejoin</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-user-events-write">Locations Catalogs User Events Write</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Catalogs Placements Search</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Performs a search. This feature is only available for users who have Retail Search enabled. Please submit a form <a href="https://cloud.google.com/contact">here</a> to contact cloud sales if you are interested in using Retail Search.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>retail2 --scope &lt;scope&gt; projects locations-catalogs-placements-search ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;placement&gt;</strong> <em>(string)</em><ul>
+<li>Required. The resource name of the search engine placement, such as <code>projects/*/locations/global/catalogs/default_catalog/placements/default_search</code>. This field is used to identify the serving configuration name and the set of models that will be used to make the search.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudRetailV2SearchRequest:
+  boost-spec:
+    skip-boost-spec-validation: boolean
+  branch: string
+  canonical-filter: string
+  dynamic-facet-spec:
+    mode: string
+  filter: string
+  offset: integer
+  order-by: string
+  page-categories: [string]
+  page-size: integer
+  page-token: string
+  personalization-spec:
+    mode: string
+  query: string
+  query-expansion-spec:
+    condition: string
+    pin-unexpanded-results: boolean
+  search-mode: string
+  user-info:
+    direct-user-request: boolean
+    ip-address: string
+    user-agent: string
+    user-id: string
+  variant-rollup-keys: [string]
+  visitor-id: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li>
+<p><code>-r .boost-spec    skip-boost-spec-validation=true</code></p>
+<ul>
+<li>Whether to skip boostspec validation. If this field is set to true, invalid BoostSpec.condition_boost_specs will be ignored and valid BoostSpec.condition_boost_specs will still be applied.</li>
+</ul>
+</li>
+<li>
+<p><code>..    branch=sadipscing</code></p>
+<ul>
+<li>The branch resource name, such as <code>projects/*/locations/global/catalogs/default_catalog/branches/0</code>. Use &#34;default_branch&#34; as the branch ID or leave this field empty, to search products under the default branch.</li>
+</ul>
+</li>
+<li><code>canonical-filter=tempor</code><ul>
+<li>The filter applied to every search request when quality improvement such as query expansion is needed. For example, if a query does not have enough results, an expanded query with SearchRequest.canonical_filter will be returned as a supplement of the original query. This field is strongly recommended to achieve high search quality. See SearchRequest.filter for more details about filter syntax.</li>
+</ul>
+</li>
+<li>
+<p><code>dynamic-facet-spec    mode=sea</code></p>
+<ul>
+<li>Mode of the DynamicFacet feature. Defaults to Mode.DISABLED if it&#39;s unset.</li>
+</ul>
+</li>
+<li>
+<p><code>..    filter=et</code></p>
+<ul>
+<li>The filter syntax consists of an expression language for constructing a predicate from one or more fields of the products being filtered. Filter expression is case-sensitive. See more details at this <a href="https://cloud.google.com/retail/docs/filter-and-order#filter">user guide</a>. If this field is unrecognizable, an INVALID_ARGUMENT is returned.</li>
+</ul>
+</li>
+<li><code>offset=45</code><ul>
+<li>A 0-indexed integer that specifies the current offset (that is, starting result location, amongst the Products deemed by the API as relevant) in search results. This field is only considered if page_token is unset. If this field is negative, an INVALID_ARGUMENT is returned.</li>
+</ul>
+</li>
+<li><code>order-by=magna</code><ul>
+<li>The order in which products are returned. Products can be ordered by a field in an Product object. Leave it unset if ordered by relevance. OrderBy expression is case-sensitive. See more details at this <a href="https://cloud.google.com/retail/docs/filter-and-order#order">user guide</a>. If this field is unrecognizable, an INVALID_ARGUMENT is returned.</li>
+</ul>
+</li>
+<li><code>page-categories=takimata</code><ul>
+<li>The categories associated with a category page. Required for category navigation queries to achieve good search quality. The format should be the same as UserEvent.page_categories; To represent full path of category, use &#39;&gt;&#39; sign to separate different hierarchies. If &#39;&gt;&#39; is part of the category name, please replace it with other character(s). Category pages include special pages such as sales or promotions. For instance, a special sale page may have the category hierarchy: &#34;pageCategories&#34; : [&#34;Sales &gt; 2017 Black Friday Deals&#34;].</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>page-size=35</code><ul>
+<li>Maximum number of Products to return. If unspecified, defaults to a reasonable value. The maximum allowed value is 120. Values above 120 will be coerced to 120. If this field is negative, an INVALID_ARGUMENT is returned.</li>
+</ul>
+</li>
+<li><code>page-token=at</code><ul>
+<li>A page token SearchResponse.next_page_token, received from a previous SearchService.Search call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to SearchService.Search must match the call that provided the page token. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li>
+<p><code>personalization-spec    mode=invidunt</code></p>
+<ul>
+<li>Defaults to Mode.AUTO.</li>
+</ul>
+</li>
+<li>
+<p><code>..    query=clita</code></p>
+<ul>
+<li>Raw search query.</li>
+</ul>
+</li>
+<li><code>query-expansion-spec    condition=stet</code><ul>
+<li>The condition under which query expansion should occur. Default to Condition.DISABLED.</li>
+</ul>
+</li>
+<li>
+<p><code>pin-unexpanded-results=false</code></p>
+<ul>
+<li>Whether to pin unexpanded results. If this field is set to true, unexpanded products are always at the top of the search results, followed by the expanded results.</li>
+</ul>
+</li>
+<li>
+<p><code>..    search-mode=ut</code></p>
+<ul>
+<li>The search mode of the search request. If not specified, a single search request triggers both product search and faceted search.</li>
+</ul>
+</li>
+<li><code>user-info    direct-user-request=false</code><ul>
+<li>True if the request is made directly from the end user, in which case the ip_address and user_agent can be populated from the HTTP request. This flag should be set only if the API request is made directly from the end user such as a mobile app (and not if a gateway or a server is processing and pushing the user events). This should not be set when using the JavaScript tag in UserEventService.CollectUserEvent.</li>
+</ul>
+</li>
+<li><code>ip-address=dolores</code><ul>
+<li>The end user&#39;s IP address. Required for getting SearchResponse.sponsored_results. This field is used to extract location information for personalization. This field must be either an IPv4 address (e.g. &#34;104.133.9.80&#34;) or an IPv6 address (e.g. &#34;2001:0db8:85a3:0000:0000:8a2e:0370:7334&#34;). Otherwise, an INVALID_ARGUMENT error is returned. This should not be set when using the JavaScript tag in UserEventService.CollectUserEvent or if direct_user_request is set.</li>
+</ul>
+</li>
+<li><code>user-agent=sed</code><ul>
+<li>User agent as included in the HTTP header. Required for getting SearchResponse.sponsored_results. The field must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. This should not be set when using the client side event reporting with GTM or JavaScript tag in UserEventService.CollectUserEvent or if direct_user_request is set.</li>
+</ul>
+</li>
+<li>
+<p><code>user-id=invidunt</code></p>
+<ul>
+<li>Highly recommended for logged-in users. Unique identifier for logged-in user, such as a user name. The field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li>
+<p><code>..    variant-rollup-keys=clita</code></p>
+<ul>
+<li>The keys to fetch and rollup the matching variant Products attributes, FulfillmentInfo or LocalInventorys attributes. The attributes from all the matching variant Products or LocalInventorys are merged and de-duplicated. Notice that rollup attributes will lead to extra query latency. Maximum number of keys is 30. For FulfillmentInfo, a fulfillment type and a fulfillment ID must be provided in the format of &#34;fulfillmentType.fulfillmentId&#34;. E.g., in &#34;pickupInStore.store123&#34;, &#34;pickupInStore&#34; is fulfillment type and &#34;store123&#34; is the store ID. Supported keys are: * colorFamilies * price * originalPrice * discount * variantId * inventory(place_id,price) * inventory(place_id,original_price) * inventory(place_id,attributes.key), where key is any key in the Product.inventories.attributes map. * attributes.key, where key is any key in the Product.attributes map. * pickupInStore.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;pickup-in-store&#34;. * shipToStore.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;ship-to-store&#34;. * sameDayDelivery.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;same-day-delivery&#34;. * nextDayDelivery.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;next-day-delivery&#34;. * customFulfillment1.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;custom-type-1&#34;. * customFulfillment2.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;custom-type-2&#34;. * customFulfillment3.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;custom-type-3&#34;. * customFulfillment4.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;custom-type-4&#34;. * customFulfillment5.id, where id is any FulfillmentInfo.place_ids for FulfillmentInfo.type &#34;custom-type-5&#34;. If this field is set to an invalid value other than these, an INVALID_ARGUMENT error is returned.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>visitor-id=dolor</code><ul>
+<li>Required. A unique identifier for tracking visitors. For example, this could be implemented with an HTTP cookie, which should be able to uniquely identify a visitor on a single device. This unique identifier should not change if the visitor logs in or out of the website. This should be the same identifier as UserEvent.visitor_id. The field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-catalogs-set-default-branch" class="btn btn-neutral float-right" title="Locations Catalogs Set Default Branch"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-catalogs-placements-predict" class="btn btn-neutral" title="Locations Catalogs Placements Predict"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-catalogs-placements-predict" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-catalogs-set-default-branch" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

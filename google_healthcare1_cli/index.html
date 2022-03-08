@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Healthcare v2.0.4+20210317</title>
+  <title>Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href="." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -425,6 +425,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-datasets-fhir-stores-fhir--resource-validate/">Locations Datasets Fhir Stores Fhir  Resource Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-datasets-fhir-stores-fhir-capabilities/">Locations Datasets Fhir Stores Fhir Capabilities</a>
                     
                 </li>
@@ -535,12 +540,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-datasets-hl7-v2-stores-export/">Locations Datasets Hl7 V2 Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-datasets-hl7-v2-stores-get/">Locations Datasets Hl7 V2 Stores Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-datasets-hl7-v2-stores-get-iam-policy/">Locations Datasets Hl7 V2 Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-datasets-hl7-v2-stores-import/">Locations Datasets Hl7 V2 Stores Import</a>
                     
                 </li>
             
@@ -639,6 +654,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-services-nlp-analyze-entities/">Locations Services Nlp Analyze Entities</a>
+                    
+                </li>
+            
         
 
     
@@ -694,7 +714,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/healthcare1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Healthcare</em> API at revision <em>20210317</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Healthcare</em> API at revision <em>20220223</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">healthcare1 [options]
         projects
                 locations-datasets-consent-stores-attribute-definitions-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -773,6 +793,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-datasets-fhir-stores-export &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-fhir-stores-fhir--patient-everything &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-fhir-stores-fhir--resource-purge &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-datasets-fhir-stores-fhir--resource-validate &lt;parent&gt; &lt;type&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-fhir-stores-fhir-capabilities &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-fhir-stores-fhir-create &lt;parent&gt; &lt;type&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-fhir-stores-fhir-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -795,8 +816,10 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-datasets-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-datasets-hl7-v2-stores-export &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-datasets-hl7-v2-stores-import &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-messages-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-datasets-hl7-v2-stores-messages-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -816,6 +839,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-datasets-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-services-nlp-analyze-entities &lt;nlp-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   healthcare1 --help
 
 Configuration:

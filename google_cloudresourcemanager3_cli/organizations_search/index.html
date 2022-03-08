@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search - Cloud Resource Manager v2.0.4+20210328</title>
+  <title>Search - Cloud Resource Manager v3.0.0+20220306</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Resource Manager v2.0.4+20210328</a>
+        <a href=".." class="icon icon-home"> Cloud Resource Manager v3.0.0+20220306</a>
         
       </div>
 
@@ -421,7 +421,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>Optional. The maximum number of organizations to return in the response. If unspecified, server picks an appropriate default.</li>
+<li>Optional. The maximum number of organizations to return in the response. The server can return fewer organizations than requested. If unspecified, server picks an appropriate default.</li>
 </ul>
 </li>
 <li>
@@ -433,7 +433,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p query=string</strong></p>
 <ul>
-<li>Optional. An optional query string used to filter the Organizations to return in the response. Query rules are case-insensitive. | Field | Description | |------------------|--------------------------------------------| | directoryCustomerId, owner.directoryCustomerId | Filters by directory customer id. | | domain | Filters by domain. | Organizations may be queried by <code>directoryCustomerId</code> or by <code>domain</code>, where the domain is a G Suite domain, for example: * Query <code>directorycustomerid:123456789</code> returns Organization resources with <code>owner.directory_customer_id</code> equal to <code>123456789</code>. * Query <code>domain:google.com</code> returns Organization resources corresponding to the domain <code>google.com</code>.</li>
+<li>Optional. An optional query string used to filter the Organizations to return in the response. Query rules are case-insensitive. <code>| Field | Description | |------------------|--------------------------------------------| | directoryCustomerId, owner.directoryCustomerId | Filters by directory customer id. | | domain | Filters by domain. |</code> Organizations may be queried by <code>directoryCustomerId</code> or by <code>domain</code>, where the domain is a G Suite domain, for example: * Query <code>directorycustomerid:123456789</code> returns Organization resources with <code>owner.directory_customer_id</code> equal to <code>123456789</code>. * Query <code>domain:google.com</code> returns Organization resources corresponding to the domain <code>google.com</code>.</li>
 </ul>
 </li>
 </ul>

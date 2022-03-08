@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Batch Delete Contacts - People Service v2.0.4+20210330</title>
+  <title>Batch Delete Contacts - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -230,7 +230,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Delete a batch of contacts. Any non-contact data will not be deleted. Limited to 10 parallel requests per user.</p>
+              <p>Delete a batch of contacts. Any non-contact data will not be deleted. Mutate requests for the same user should be sent sequentially to avoid increased latency and failures.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/contacts</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/contacts</em>.

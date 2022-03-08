@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - Dns v2.0.4+20210319</title>
+  <title>Create - Dns v3.0.0+20220217</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dns v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Dns v3.0.0+20220217</a>
         
       </div>
 
@@ -198,26 +198,6 @@
                     
                 </li>
             
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_managed-zones-rrsets-create">Managed Zones Rrsets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_managed-zones-rrsets-delete">Managed Zones Rrsets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_managed-zones-rrsets-get">Managed Zones Rrsets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_managed-zones-rrsets-patch">Managed Zones Rrsets Patch</a>
-                    
-                </li>
-            
         
 
     
@@ -225,7 +205,99 @@
         <span>Resource Record Sets</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../resource-record-sets_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-record-sets_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-record-sets_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../resource-record-sets_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-record-sets_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Response Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policies_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policies_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policies_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Response Policy Rules</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policy-rules_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policy-rules_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policy-rules_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policy-rules_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policy-rules_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../response-policy-rules_update">Update</a>
                     
                 </li>
             
@@ -286,6 +358,9 @@ You can set the scope for this method like this: <code>dns1 --scope &lt;scope&gt
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>ManagedZone:
+  cloud-logging-config:
+    enable-logging: boolean
+    kind: string
   creation-time: string
   description: string
   dns-name: string
@@ -323,7 +398,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    creation-time=sed</code><ul>
+<li><code>-r .cloud-logging-config    enable-logging=false</code><ul>
+<li>If set, enable query logging for this ManagedZone. False by default, making logging opt-in.</li>
+</ul>
+</li>
+<li>
+<p><code>kind=amet.</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    creation-time=takimata</code></p>
+<ul>
 <li>The time that this resource was created on the server. This is in RFC3339 text format. Output only.</li>
 </ul>
 </li>
@@ -331,20 +418,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A mutable string of at most 1024 characters associated with this resource for the user&#39;s convenience. Has no effect on the managed zone&#39;s function.</li>
 </ul>
 </li>
-<li><code>dns-name=takimata</code><ul>
+<li><code>dns-name=duo</code><ul>
 <li>The DNS name of this managed zone, for instance &#34;example.com.&#34;.</li>
 </ul>
 </li>
-<li><code>dnssec-config    kind=amet.</code><ul>
+<li><code>dnssec-config    kind=ipsum</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>non-existence=duo</code><ul>
+<li><code>non-existence=gubergren</code><ul>
 <li>Specifies the mechanism for authenticated denial-of-existence responses. Can only be changed while the state is OFF.</li>
 </ul>
 </li>
 <li>
-<p><code>state=ipsum</code></p>
+<p><code>state=lorem</code></p>
 <ul>
 <li>Specifies whether DNSSEC is enabled, and what mode it is in.</li>
 </ul>
@@ -356,85 +443,85 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    id=lorem</code></p>
+<p><code>..    id=eos</code></p>
 <ul>
 <li>Unique identifier for the resource; defined by the server (output only)</li>
 </ul>
 </li>
-<li><code>kind=gubergren</code><ul>
+<li><code>kind=dolor</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>labels=key=eos</code><ul>
+<li><code>labels=key=ea</code><ul>
 <li>User labels.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=dolor</code><ul>
+<li><code>name=ipsum</code><ul>
 <li>User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.</li>
 </ul>
 </li>
-<li><code>name-server-set=ea</code><ul>
+<li><code>name-server-set=invidunt</code><ul>
 <li>Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users leave this field unset. If you need to use this field, contact your account team.</li>
 </ul>
 </li>
-<li><code>name-servers=ipsum</code><ul>
+<li><code>name-servers=amet</code><ul>
 <li>Delegate your managed_zone to these virtual name servers; defined by the server (output only)</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>peering-config    kind=invidunt</code><ul>
+<li><code>peering-config    kind=duo</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>target-network    deactivate-time=amet</code><ul>
+<li><code>target-network    deactivate-time=ipsum</code><ul>
 <li>The time at which the zone was deactivated, in RFC 3339 date-time format. An empty string indicates that the peering connection is active. The producer network can deactivate a zone. The zone is automatically deactivated if the producer network that the zone targeted is deleted. Output only.</li>
 </ul>
 </li>
-<li><code>kind=duo</code><ul>
+<li><code>kind=sed</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>network-url=ipsum</code></p>
+<p><code>network-url=ut</code></p>
 <ul>
 <li>The fully qualified URL of the VPC network to forward queries to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}</li>
 </ul>
 </li>
 <li>
-<p><code>...private-visibility-config    kind=sed</code></p>
+<p><code>...private-visibility-config    kind=gubergren</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..reverse-lookup-config    kind=ut</code></p>
+<p><code>..reverse-lookup-config    kind=rebum.</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..service-directory-config    kind=gubergren</code></p>
+<p><code>..service-directory-config    kind=est</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>namespace    deletion-time=rebum.</code><ul>
+<li><code>namespace    deletion-time=ipsum</code><ul>
 <li>The time that the namespace backing this zone was deleted; an empty string if it still exists. This is in RFC3339 text format. Output only.</li>
 </ul>
 </li>
-<li><code>kind=est</code><ul>
+<li><code>kind=ipsum</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>namespace-url=ipsum</code></p>
+<p><code>namespace-url=est</code></p>
 <ul>
 <li>The fully qualified URL of the namespace associated with the zone. Format must be https://servicedirectory.googleapis.com/v1/projects/{project}/locations/{location}/namespaces/{namespace}</li>
 </ul>
 </li>
 <li>
-<p><code>...    visibility=ipsum</code></p>
+<p><code>...    visibility=gubergren</code></p>
 <ul>
 <li>The zone&#39;s visibility: public zones are exposed to the Internet, while private zones are visible only to Virtual Private Cloud resources.</li>
 </ul>

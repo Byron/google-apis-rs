@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Analyze Iam Policy Longrunning - Cloud Asset v2.0.4+20210319</title>
+  <title>Analyze Iam Policy Longrunning - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -107,6 +129,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../methods_batch-get-assets-history">Batch Get Assets History</a>
                     
                 </li>
@@ -134,6 +161,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
                     
                 </li>
             
@@ -173,7 +231,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Analyzes IAM policies asynchronously to answer which identities have what accesses on which resources, and writes the analysis results to a Google Cloud Storage or a BigQuery destination. For Cloud Storage destination, the output format is the JSON format that represents a AnalyzeIamPolicyResponse. This method implements the google.longrunning.Operation, which allows you to track the operation status. We recommend intervals of at least 2 seconds with exponential backoff retry to poll the operation result. The metadata contains the request to help callers to map responses to requests.</p>
+              <p>Analyzes IAM policies asynchronously to answer which identities have what accesses on which resources, and writes the analysis results to a Google Cloud Storage or a BigQuery destination. For Cloud Storage destination, the output format is the JSON format that represents a AnalyzeIamPolicyResponse. This method implements the google.longrunning.Operation, which allows you to track the operation status. We recommend intervals of at least 2 seconds with exponential backoff retry to poll the operation result. The metadata contains the metadata for the long-running operation.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -194,6 +252,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     access-selector:
       permissions: [string]
       roles: [string]
+    condition-context:
+      access-time: string
     identity-selector:
       identity: string
     options:
@@ -214,93 +274,106 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       write-disposition: string
     gcs-destination:
       uri: string
+  saved-analysis-query: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .analysis-query.access-selector    permissions=invidunt</code><ul>
+<li><code>-r .analysis-query.access-selector    permissions=duo</code><ul>
 <li>Optional. The permissions to appear in result.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>roles=amet</code></p>
+<p><code>roles=ipsum</code></p>
 <ul>
 <li>Optional. The roles to appear in result.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..identity-selector    identity=duo</code></p>
+<p><code>..condition-context    access-time=sed</code></p>
 <ul>
-<li>Required. The identity appear in the form of members in <a href="https://cloud.google.com/iam/reference/rest/v1/Binding">IAM policy binding</a>. The examples of supported forms are: &#34;user:mike@example.com&#34;, &#34;group:admins@example.com&#34;, &#34;domain:google.com&#34;, &#34;serviceAccount:my-project-id@appspot.gserviceaccount.com&#34;. Notice that wildcard characters (such as * and ?) are not supported. You must give a specific identity.</li>
+<li>The hypothetical access timestamp to evaluate IAM conditions. Note that this value must not be earlier than the current time; otherwise, an INVALID_ARGUMENT error will be returned.</li>
+</ul>
+</li>
+<li>
+<p><code>..identity-selector    identity=ut</code></p>
+<ul>
+<li>Required. The identity appear in the form of principals in <a href="https://cloud.google.com/iam/reference/rest/v1/Binding">IAM policy binding</a>. The examples of supported forms are: &#34;user:mike@example.com&#34;, &#34;group:admins@example.com&#34;, &#34;domain:google.com&#34;, &#34;serviceAccount:my-project-id@appspot.gserviceaccount.com&#34;. Notice that wildcard characters (such as * and ?) are not supported. You must give a specific identity.</li>
 </ul>
 </li>
 <li>
 <p><code>..options    analyze-service-account-impersonation=true</code></p>
 <ul>
-<li>Optional. If true, the response will include access analysis from identities to resources via service account impersonation. This is a very expensive operation, because many derived queries will be executed. We highly recommend you use AssetService.AnalyzeIamPolicyLongrunning rpc instead. For example, if the request analyzes for which resources user A has permission P, and there&#39;s an IAM policy states user A has iam.serviceAccounts.getAccessToken permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to a GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Another example, if the request analyzes for who has permission P to a GCP folder F, and there&#39;s an IAM policy states user A has iam.serviceAccounts.actAs permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to the GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Default is false.</li>
+<li>Optional. If true, the response will include access analysis from identities to resources via service account impersonation. This is a very expensive operation, because many derived queries will be executed. We highly recommend you use AssetService.AnalyzeIamPolicyLongrunning rpc instead. For example, if the request analyzes for which resources user A has permission P, and there&#39;s an IAM policy states user A has iam.serviceAccounts.getAccessToken permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to a GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Another example, if the request analyzes for who has permission P to a GCP folder F, and there&#39;s an IAM policy states user A has iam.serviceAccounts.actAs permission to a service account SA, and there&#39;s another IAM policy states service account SA has permission P to the GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Only the following permissions are considered in this analysis: * <code>iam.serviceAccounts.actAs</code> * <code>iam.serviceAccounts.signBlob</code> * <code>iam.serviceAccounts.signJwt</code> * <code>iam.serviceAccounts.getAccessToken</code> * <code>iam.serviceAccounts.getOpenIdToken</code> * <code>iam.serviceAccounts.implicitDelegation</code> Default is false.</li>
 </ul>
 </li>
-<li><code>expand-groups=false</code><ul>
-<li>Optional. If true, the identities section of the result will expand any Google groups appearing in an IAM policy binding. If IamPolicyAnalysisQuery.identity_selector is specified, the identity in the result will be determined by the selector, and this flag is not allowed to set. Default is false.</li>
+<li><code>expand-groups=true</code><ul>
+<li>Optional. If true, the identities section of the result will expand any Google groups appearing in an IAM policy binding. If IamPolicyAnalysisQuery.identity_selector is specified, the identity in the result will be determined by the selector, and this flag is not allowed to set. If true, the default max expansion per group is 1000 for AssetService.AnalyzeIamPolicy][]. Default is false.</li>
 </ul>
 </li>
 <li><code>expand-resources=true</code><ul>
-<li>Optional. If true and IamPolicyAnalysisQuery.resource_selector is not specified, the resource section of the result will expand any resource attached to an IAM policy to include resources lower in the resource hierarchy. For example, if the request analyzes for which resources user A has permission P, and the results include an IAM policy with P on a GCP folder, the results will also include resources in that folder with permission P. If true and IamPolicyAnalysisQuery.resource_selector is specified, the resource section of the result will expand the specified resource to include resources lower in the resource hierarchy. Only project or lower resources are supported. Folder and organization resource cannot be used together with this option. For example, if the request analyzes for which users have permission P on a GCP project with this option enabled, the results will include all users who have permission P on that project or any lower resource. Default is false.</li>
+<li>Optional. If true and IamPolicyAnalysisQuery.resource_selector is not specified, the resource section of the result will expand any resource attached to an IAM policy to include resources lower in the resource hierarchy. For example, if the request analyzes for which resources user A has permission P, and the results include an IAM policy with P on a GCP folder, the results will also include resources in that folder with permission P. If true and IamPolicyAnalysisQuery.resource_selector is specified, the resource section of the result will expand the specified resource to include resources lower in the resource hierarchy. Only project or lower resources are supported. Folder and organization resource cannot be used together with this option. For example, if the request analyzes for which users have permission P on a GCP project with this option enabled, the results will include all users who have permission P on that project or any lower resource. If true, the default max expansion per resource is 1000 for AssetService.AnalyzeIamPolicy][] and 100000 for AssetService.AnalyzeIamPolicyLongrunning][]. Default is false.</li>
 </ul>
 </li>
 <li><code>expand-roles=true</code><ul>
 <li>Optional. If true, the access section of result will expand any roles appearing in IAM policy bindings to include their permissions. If IamPolicyAnalysisQuery.access_selector is specified, the access section of the result will be determined by the selector, and this flag is not allowed to set. Default is false.</li>
 </ul>
 </li>
-<li><code>output-group-edges=true</code><ul>
-<li>Optional. If true, the result will output group identity edges, starting from the binding&#39;s group members, to any expanded identities. Default is false.</li>
+<li><code>output-group-edges=false</code><ul>
+<li>Optional. If true, the result will output the relevant membership relationships between groups and other groups, and between groups and principals. Default is false.</li>
 </ul>
 </li>
 <li>
 <p><code>output-resource-edges=true</code></p>
 <ul>
-<li>Optional. If true, the result will output resource edges, starting from the policy attached resource, to any expanded resources. Default is false.</li>
+<li>Optional. If true, the result will output the relevant parent/child relationships between resources. Default is false.</li>
 </ul>
 </li>
 <li>
-<p><code>..resource-selector    full-resource-name=ea</code></p>
+<p><code>..resource-selector    full-resource-name=eos</code></p>
 <ul>
 <li>Required. The [full resource name] (https://cloud.google.com/asset-inventory/docs/resource-name-format) of a resource of <a href="https://cloud.google.com/asset-inventory/docs/supported-asset-types#analyzable_asset_types">supported resource types</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    scope=dolor</code></p>
+<p><code>..    scope=labore</code></p>
 <ul>
 <li>Required. The relative name of the root asset. Only resources and IAM policies within the scope will be analyzed. This can only be an organization number (such as &#34;organizations/123&#34;), a folder number (such as &#34;folders/123&#34;), a project ID (such as &#34;projects/my-project-id&#34;), or a project number (such as &#34;projects/12345&#34;). To know how to get organization id, visit <a href="https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id">here </a>. To know how to get folder or project id, visit <a href="https://cloud.google.com/resource-manager/docs/creating-managing-folders#viewing_or_listing_folders_and_projects">here </a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..output-config.bigquery-destination    dataset=lorem</code></p>
+<p><code>..output-config.bigquery-destination    dataset=sed</code></p>
 <ul>
 <li>Required. The BigQuery dataset in format &#34;projects/projectId/datasets/datasetId&#34;, to which the analysis results should be exported. If this dataset does not exist, the export call will return an INVALID_ARGUMENT error.</li>
 </ul>
 </li>
-<li><code>partition-key=eos</code><ul>
+<li><code>partition-key=duo</code><ul>
 <li>The partition key for BigQuery partitioned table.</li>
 </ul>
 </li>
-<li><code>table-prefix=labore</code><ul>
+<li><code>table-prefix=sed</code><ul>
 <li>Required. The prefix of the BigQuery tables to which the analysis results will be written. Tables will be created based on this table_prefix if not exist: * _analysis table will contain export operation&#39;s metadata. * _analysis_result will contain all the IamPolicyAnalysisResult. When [partition_key] is specified, both tables will be partitioned based on the [partition_key].</li>
 </ul>
 </li>
 <li>
-<p><code>write-disposition=sed</code></p>
+<p><code>write-disposition=no</code></p>
 <ul>
 <li>Optional. Specifies the action that occurs if the destination table or partition already exists. The following values are supported: * WRITE_TRUNCATE: If the table or partition already exists, BigQuery overwrites the entire table or all the partitions data. * WRITE_APPEND: If the table or partition already exists, BigQuery appends the data to the table or the latest partition. * WRITE_EMPTY: If the table already exists and contains data, an error is returned. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Details are at https://cloud.google.com/bigquery/docs/loading-data-local#appending_to_or_overwriting_a_table_using_a_local_file.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-destination    uri=duo</code></p>
+<p><code>..gcs-destination    uri=stet</code></p>
 <ul>
 <li>Required. The uri of the Cloud Storage object. It&#39;s the same uri that is used by gsutil. Example: &#34;gs://bucket_name/object_name&#34;. See <a href="https://cloud.google.com/storage/docs/viewing-editing-metadata">Viewing and Editing Object Metadata</a> for more information. If the specified Cloud Storage object already exists and there is no <a href="https://cloud.google.com/storage/docs/object-holds">hold</a>, it will be overwritten with the analysis result.</li>
+</ul>
+</li>
+<li>
+<p><code>...    saved-analysis-query=kasd</code></p>
+<ul>
+<li>Optional. The name of a saved query, which must be in the format of: * projects/project_number/savedQueries/saved_query_id * folders/folder_number/savedQueries/saved_query_id * organizations/organization_number/savedQueries/saved_query_id If both <code>analysis_query</code> and <code>saved_analysis_query</code> are provided, they will be merged together with the <code>saved_analysis_query</code> as base and the <code>analysis_query</code> as overrides. For more details of the merge behavior, please refer to the <a href="https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message#Message.MergeFrom.details">MergeFrom</a> doc. Note that you cannot override primitive fields with default value, such as 0 or empty string, etc., because we use proto3, which doesn&#39;t support field presence yet.</li>
 </ul>
 </li>
 </ul>
@@ -400,7 +473,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../methods_batch-get-assets-history" class="btn btn-neutral float-right" title="Batch Get Assets History"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../methods_analyze-move" class="btn btn-neutral float-right" title="Analyze Move"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../methods_analyze-iam-policy" class="btn btn-neutral" title="Analyze Iam Policy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -432,7 +505,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../methods_analyze-iam-policy" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../methods_batch-get-assets-history" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../methods_analyze-move" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

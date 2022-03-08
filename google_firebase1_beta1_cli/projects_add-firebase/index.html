@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Add Firebase - Firebase Management v2.0.4+20210329</title>
+  <title>Add Firebase - Firebase Management v3.0.0+20220304</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firebase Management v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Firebase Management v3.0.0+20220304</a>
         
       </div>
 
@@ -290,8 +290,6 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>AddFirebaseRequest:
   location-id: string
-  region-code: string
-  time-zone: string
 
 </code></pre>
 
@@ -299,14 +297,6 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <ul>
 <li><code>-r .    location-id=et</code><ul>
 <li>Deprecated. Instead, to set a Project&#39;s default GCP resource location, call <a href="../../projects.defaultLocation/finalize"><code>FinalizeDefaultLocation</code></a> after you add Firebase resources to the GCP <code>Project</code>. The ID of the Project&#39;s default GCP resource location. The location must be one of the available <a href="https://firebase.google.com/docs/projects/locations">GCP resource locations</a>.</li>
-</ul>
-</li>
-<li><code>region-code=magna</code><ul>
-<li>Deprecated. Instead, to link a Project with a Google Analytics account, call <a href="../../../v1beta1/projects/addGoogleAnalytics"><code>AddGoogleAnalytics</code></a> after you add Firebase resources to the GCP <code>Project</code>. The region code (CLDR) that the account will use for Google Analytics data For example: US, GB, or DE In Java, use <code>com.google.i18n.identifiers.RegionCode</code>.</li>
-</ul>
-</li>
-<li><code>time-zone=no</code><ul>
-<li>Deprecated. Instead, to link a Project with a Google Analytics account, call <a href="../../../v1beta1/projects/addGoogleAnalytics"><code>AddGoogleAnalytics</code></a> after you add Firebase resources to the GCP <code>Project</code>. The time zone that the account will use for Google Analytics data. For example: America/Los_Angeles or Africa/Abidjan</li>
 </ul>
 </li>
 </ul>

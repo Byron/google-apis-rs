@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Metric Descriptors List - Monitoring v2.0.4+20210322</title>
+  <title>Metric Descriptors List - Monitoring v3.0.0+20220218</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
         
       </div>
 
@@ -231,6 +231,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_time-series-list">Time Series List</a>
                     
                 </li>
@@ -368,7 +373,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists metric descriptors that match a filter. This method does not require a Workspace.</p>
+              <p>Lists metric descriptors that match a filter.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -382,7 +387,7 @@ You can set the scope for this method like this: <code>monitoring3 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] </li>
+<li>Required. The project (https://cloud.google.com/monitoring/api/v3#project_name) on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] </li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Memberships Lookup - Cloud Identity v2.0.4+20210310</title>
+  <title>Memberships Lookup - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -151,6 +151,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../groups_list">List</a>
                     
                 </li>
@@ -239,6 +244,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -288,7 +298,7 @@ You can set the scope for this method like this: <code>cloudidentity1 --scope &l
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The parent <code>Group</code> resource under which to lookup the <code>Membership</code> name. Must be of the form <code>groups/{group_id}</code>.</li>
+<li>Required. The parent <code>Group</code> resource under which to lookup the <code>Membership</code> name. Must be of the form <code>groups/{group}</code>.</li>
 </ul>
 </li>
 </ul>
@@ -317,7 +327,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p member-key-namespace=string</strong></p>
 <ul>
-<li>The namespace in which the entity exists. If not specified, the <code>EntityKey</code> represents a Google-managed entity such as a Google user or a Google Group. If specified, the <code>EntityKey</code> represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of `identitysources/{identity_source_id}.</li>
+<li>The namespace in which the entity exists. If not specified, the <code>EntityKey</code> represents a Google-managed entity such as a Google user or a Google Group. If specified, the <code>EntityKey</code> represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of <code>identitysources/{identity_source}</code>.</li>
 </ul>
 </li>
 </ul>

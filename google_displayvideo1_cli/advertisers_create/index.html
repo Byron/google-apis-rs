@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - Display Video v2.0.4+20210325</title>
+  <title>Create - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -244,6 +244,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -480,12 +490,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -512,12 +552,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -628,6 +683,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -869,6 +929,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     integration-code: string
   name: string
   partner-id: string
+  prisma-enabled: boolean
   serving-config:
     exempt-tv-from-viewability-targeting: boolean
   update-time: string
@@ -881,20 +942,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. Immutable. Account ID of the CM360 Floodlight configuration linked with the DV360 advertiser.</li>
 </ul>
 </li>
-<li><code>cm-floodlight-config-id=vero</code><ul>
+<li><code>cm-floodlight-config-id=elitr</code><ul>
 <li>Required. Immutable. ID of the CM360 Floodlight configuration linked with the DV360 advertiser.</li>
 </ul>
 </li>
-<li><code>cm-floodlight-linking-authorized=false</code><ul>
+<li><code>cm-floodlight-linking-authorized=true</code><ul>
 <li>Required. Immutable. By setting this field to <code>true</code>, you, on behalf of your company, authorize the sharing of information from the given Floodlight configuration to this Display &amp; Video 360 advertiser.</li>
 </ul>
 </li>
-<li><code>cm-syncable-site-ids=stet</code><ul>
+<li><code>cm-syncable-site-ids=ipsum</code><ul>
 <li>A list of CM360 sites whose placements will be synced to DV360 as creatives. If absent or empty in CreateAdvertiser method, the system will automatically create a CM360 site. Removing sites from this list may cause DV360 creatives synced from CM360 to be deleted. At least one site must be specified.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>dv360-to-cm-cost-reporting-enabled=false</code><ul>
+<li><code>dv360-to-cm-cost-reporting-enabled=true</code><ul>
 <li>Whether or not to report DV360 cost to CM360.</li>
 </ul>
 </li>
@@ -905,26 +966,26 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..third-party-only-config    pixel-order-id-reporting-enabled=true</code></p>
+<p><code>..third-party-only-config    pixel-order-id-reporting-enabled=false</code></p>
 <ul>
 <li>Whether or not order ID reporting for pixels is enabled. This value cannot be changed once set to <code>true</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...    advertiser-id=ipsum</code></p>
+<p><code>...    advertiser-id=erat</code></p>
 <ul>
 <li>Output only. The unique ID of the advertiser. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>creative-config    dynamic-creative-enabled=true</code><ul>
+<li><code>creative-config    dynamic-creative-enabled=false</code><ul>
 <li>Whether or not the advertiser is enabled for dynamic creatives.</li>
 </ul>
 </li>
-<li><code>ias-client-id=consetetur</code><ul>
+<li><code>ias-client-id=amet.</code><ul>
 <li>An ID for configuring campaign monitoring provided by Integral Ad Service (IAS). The DV360 system will append an IAS &#34;Campaign Monitor&#34; tag containing this ID to the creative tag.</li>
 </ul>
 </li>
-<li><code>oba-compliance-disabled=false</code><ul>
+<li><code>oba-compliance-disabled=true</code><ul>
 <li>Whether or not to use DV360&#39;s Online Behavioral Advertising (OBA) compliance. Warning: Changing OBA settings may cause the audit status of your creatives to be reset by some ad exchanges, making them ineligible to serve until they are re-approved.</li>
 </ul>
 </li>
@@ -935,75 +996,79 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..data-access-config.sdf-config    override-partner-sdf-config=true</code></p>
+<p><code>..data-access-config.sdf-config    override-partner-sdf-config=false</code></p>
 <ul>
 <li>Whether or not this advertiser overrides the SDF configuration of its parent partner. By default, an advertiser inherits the SDF configuration from the parent partner. To override the partner configuration, set this field to <code>true</code> and provide the new configuration in sdfConfig.</li>
 </ul>
 </li>
-<li><code>sdf-config    admin-email=et</code><ul>
+<li><code>sdf-config    admin-email=dolore</code><ul>
 <li>An administrator email address to which the SDF processing status reports will be sent.</li>
 </ul>
 </li>
 <li>
-<p><code>version=accusam</code></p>
+<p><code>version=dolore</code></p>
 <ul>
 <li>Required. The version of SDF being used.</li>
 </ul>
 </li>
 <li>
-<p><code>....    display-name=voluptua.</code></p>
+<p><code>....    display-name=dolore</code></p>
 <ul>
 <li>Required. The display name of the advertiser. Must be UTF-8 encoded with a maximum size of 240 bytes.</li>
 </ul>
 </li>
-<li><code>entity-status=dolore</code><ul>
-<li>Required. Controls whether or not insertion orders and line items of the advertiser can spend their budgets and bid on inventory. * Accepted values are <code>ENTITY_STATUS_ACTIVE</code> and <code>ENTITY_STATUS_SCHEDULED_FOR_DELETION</code>. * If set to <code>ENTITY_STATUS_SCHEDULED_FOR_DELETION</code>, the advertiser will be deleted 30 days from when it was first scheduled for deletion.</li>
+<li><code>entity-status=voluptua.</code><ul>
+<li>Required. Controls whether or not insertion orders and line items of the advertiser can spend their budgets and bid on inventory. * Accepted values are <code>ENTITY_STATUS_ACTIVE</code>, <code>ENTITY_STATUS_PAUSED</code> and <code>ENTITY_STATUS_SCHEDULED_FOR_DELETION</code>. * If set to <code>ENTITY_STATUS_SCHEDULED_FOR_DELETION</code>, the advertiser will be deleted 30 days from when it was first scheduled for deletion.</li>
 </ul>
 </li>
-<li><code>general-config    currency-code=dolore</code><ul>
+<li><code>general-config    currency-code=amet.</code><ul>
 <li>Required. Immutable. Advertiser&#39;s currency in ISO 4217 format. Accepted codes and the currencies they represent are: Currency Code : Currency Name * <code>ARS</code> : Argentine Peso * <code>AUD</code> : Australian Dollar * <code>BRL</code> : Brazilian Real * <code>CAD</code> : Canadian Dollar * <code>CHF</code> : Swiss Franc * <code>CLP</code> : Chilean Peso * <code>CNY</code> : Chinese Yuan * <code>COP</code> : Colombian Peso * <code>CZK</code> : Czech Koruna * <code>DKK</code> : Danish Krone * <code>EGP</code> : Egyption Pound * <code>EUR</code> : Euro * <code>GBP</code> : British Pound * <code>HKD</code> : Hong Kong Dollar * <code>HUF</code> : Hungarian Forint * <code>IDR</code> : Indonesian Rupiah * <code>ILS</code> : Israeli Shekel * <code>INR</code> : Indian Rupee * <code>JPY</code> : Japanese Yen * <code>KRW</code> : South Korean Won * <code>MXN</code> : Mexican Pesos * <code>MYR</code> : Malaysian Ringgit * <code>NGN</code> : Nigerian Naira * <code>NOK</code> : Norwegian Krone * <code>NZD</code> : New Zealand Dollar * <code>PEN</code> : Peruvian Nuevo Sol * <code>PLN</code> : Polish Zloty * <code>RON</code> : New Romanian Leu * <code>RUB</code> : Russian Ruble * <code>SEK</code> : Swedish Krona * <code>TRY</code> : Turkish Lira * <code>TWD</code> : New Taiwan Dollar * <code>USD</code> : US Dollar * <code>ZAR</code> : South African Rand</li>
 </ul>
 </li>
-<li><code>domain-url=dolore</code><ul>
+<li><code>domain-url=ea</code><ul>
 <li>Required. The domain URL of the advertiser&#39;s primary website. The system will send this information to publishers that require website URL to associate a campaign with an advertiser. Provide a URL with no path or query string, beginning with <code>http:</code> or <code>https:</code>. For example, http://www.example.com</li>
 </ul>
 </li>
 <li>
-<p><code>time-zone=voluptua.</code></p>
+<p><code>time-zone=sadipscing</code></p>
 <ul>
 <li>Output only. The standard TZ database name of the advertiser&#39;s time zone. For example, <code>America/New_York</code>. See more at: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones For CM360 hybrid advertisers, the time zone is the same as that of the associated CM360 account; for third-party only advertisers, the time zone is the same as that of the parent partner.</li>
 </ul>
 </li>
 <li>
-<p><code>..integration-details    details=amet.</code></p>
+<p><code>..integration-details    details=lorem</code></p>
 <ul>
 <li>Additional details of the entry in string format. Must be UTF-8 encoded with a length of no more than 1000 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>integration-code=ea</code></p>
+<p><code>integration-code=invidunt</code></p>
 <ul>
 <li>An external identifier to be associated with the entry. The integration code will show up together with the entry in many places in the system, for example, reporting. Must be UTF-8 encoded with a length of no more than 500 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=sadipscing</code></p>
+<p><code>..    name=no</code></p>
 <ul>
 <li>Output only. The resource name of the advertiser.</li>
 </ul>
 </li>
-<li><code>partner-id=lorem</code><ul>
+<li><code>partner-id=est</code><ul>
 <li>Required. Immutable. The unique ID of the partner that the advertiser belongs to.</li>
 </ul>
 </li>
+<li><code>prisma-enabled=true</code><ul>
+<li>Whether integration with Mediaocean (Prisma) is enabled. By enabling this, you agree to the following: On behalf of my company, I authorize Mediaocean (Prisma) to send budget segment plans to Google, and I authorize Google to send corresponding reporting and invoices from DV360 to Mediaocean for the purposes of budget planning, billing, and reconciliation for this advertiser.</li>
+</ul>
+</li>
 <li>
-<p><code>serving-config    exempt-tv-from-viewability-targeting=true</code></p>
+<p><code>serving-config    exempt-tv-from-viewability-targeting=false</code></p>
 <ul>
 <li>Whether or not connected TV devices are exempt from viewability targeting for all video line items under the advertiser.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-time=no</code></p>
+<p><code>..    update-time=et</code></p>
 <ul>
 <li>Output only. The timestamp when the advertiser was last updated. Assigned by the system.</li>
 </ul>

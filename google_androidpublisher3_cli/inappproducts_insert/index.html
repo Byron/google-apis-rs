@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - Android Publisher v2.0.4+20210401</title>
+  <title>Insert - Android Publisher v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Publisher v2.0.4+20210401</a>
+        <a href=".." class="icon icon-home"> Android Publisher v3.0.0+20220307</a>
         
       </div>
 
@@ -71,6 +71,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../edits_commit">Commit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../edits_countryavailability-get">Countryavailability Get</a>
                     
                 </li>
             
@@ -223,6 +228,43 @@
 
     
         
+        <span>Generatedapks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../generatedapks_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../generatedapks_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Grants</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../grants_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../grants_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../grants_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
         <span>Inappproducts</span>
             
                 <li class="toctree-l1 ">
@@ -292,6 +334,17 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../internalappsharingartifacts_uploadbundle">Uploadbundle</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Monetization</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../monetization_convert-region-prices">Convert Region Prices</a>
                     
                 </li>
             
@@ -407,6 +460,32 @@
         
 
     
+        
+        <span>Users</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -462,58 +541,78 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     currency: string
     price-micros: string
   grace-period: string
+  managed-product-taxes-and-compliance-settings:
+    eea-withdrawal-right-type: string
   package-name: string
   purchase-type: string
   sku: string
   status: string
   subscription-period: string
+  subscription-taxes-and-compliance-settings:
+    eea-withdrawal-right-type: string
   trial-period: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    default-language=stet</code><ul>
+<li><code>-r .    default-language=vero</code><ul>
 <li>Default language of the localized data, as defined by BCP-47. e.g. &#34;en-US&#34;.</li>
 </ul>
 </li>
-<li><code>default-price    currency=kasd</code><ul>
+<li><code>default-price    currency=erat</code><ul>
 <li>3 letter Currency code, as defined by ISO 4217. See java/com/google/common/money/CurrencyCode.java</li>
 </ul>
 </li>
 <li>
-<p><code>price-micros=et</code></p>
+<p><code>price-micros=sed</code></p>
 <ul>
 <li>Price in 1/million of the currency base unit, represented as a string.</li>
 </ul>
 </li>
 <li>
-<p><code>..    grace-period=sed</code></p>
+<p><code>..    grace-period=duo</code></p>
 <ul>
 <li>Grace period of the subscription, specified in ISO 8601 format. Allows developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values are P0D (zero days), P3D (three days), P7D (seven days), P14D (14 days), and P30D (30 days).</li>
 </ul>
 </li>
-<li><code>package-name=et</code><ul>
+<li>
+<p><code>managed-product-taxes-and-compliance-settings    eea-withdrawal-right-type=dolore</code></p>
+<ul>
+<li>Digital content or service classification for products distributed to users in the European Economic Area (EEA). The withdrawal regime under EEA consumer laws depends on this classification. Refer to the <a href="https://support.google.com/googleplay/android-developer/answer/10463498">Help Center article</a> for more information.</li>
+</ul>
+</li>
+<li>
+<p><code>..    package-name=et</code></p>
+<ul>
 <li>Package name of the parent app.</li>
 </ul>
 </li>
-<li><code>purchase-type=et</code><ul>
+<li><code>purchase-type=voluptua.</code><ul>
 <li>The type of the product, e.g. a recurring subscription.</li>
 </ul>
 </li>
-<li><code>sku=vero</code><ul>
+<li><code>sku=amet.</code><ul>
 <li>Stock-keeping-unit (SKU) of the product, unique within an app.</li>
 </ul>
 </li>
-<li><code>status=erat</code><ul>
+<li><code>status=consetetur</code><ul>
 <li>The status of the product, e.g. whether it&#39;s active.</li>
 </ul>
 </li>
-<li><code>subscription-period=sed</code><ul>
+<li><code>subscription-period=diam</code><ul>
 <li>Subscription period, specified in ISO 8601 format. Acceptable values are P1W (one week), P1M (one month), P3M (three months), P6M (six months), and P1Y (one year).</li>
 </ul>
 </li>
-<li><code>trial-period=duo</code><ul>
+<li>
+<p><code>subscription-taxes-and-compliance-settings    eea-withdrawal-right-type=dolor</code></p>
+<ul>
+<li>Digital content or service classification for products distributed to users in the European Economic Area (EEA). The withdrawal regime under EEA consumer laws depends on this classification. Refer to the <a href="https://support.google.com/googleplay/android-developer/answer/10463498">Help Center article</a> for more information.</li>
+</ul>
+</li>
+<li>
+<p><code>..    trial-period=et</code></p>
+<ul>
 <li>Trial period, specified in ISO 8601 format. Acceptable values are anything between P7D (seven days) and P999D (999 days).</li>
 </ul>
 </li>

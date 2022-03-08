@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Customers List - Cloudchannel v2.0.4+20210326</title>
+  <title>Customers List - Cloudchannel v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloudchannel v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Cloudchannel v3.0.0+20220303</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_channel-partner-links-customers-get">Channel Partner Links Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_channel-partner-links-customers-import">Channel Partner Links Customers Import</a>
                     
                 </li>
             
@@ -145,6 +150,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-entitlements-lookup-offer">Customers Entitlements Lookup Offer</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-entitlements-start-paid-service">Customers Entitlements Start Paid Service</a>
                     
                 </li>
@@ -156,6 +166,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-get">Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-import">Customers Import</a>
                     
                 </li>
             
@@ -350,6 +365,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li>Optional. Filters applied to the [CloudChannelService.ListCustomers] results. See https://cloud.google.com/channel/docs/concepts/google-cloud/filter-customers for more information.</li>
+</ul>
+</li>
+<li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
 <li>Optional. The maximum number of customers to return. The service may return fewer than this value. If unspecified, returns at most 10 customers. The maximum value is 50.</li>
@@ -442,7 +463,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         <a href="../accounts_customers-list-purchasable-offers" class="btn btn-neutral float-right" title="Customers List Purchasable Offers"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../accounts_customers-get" class="btn btn-neutral" title="Customers Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../accounts_customers-import" class="btn btn-neutral" title="Customers Import"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -470,7 +491,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../accounts_customers-get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../accounts_customers-import" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../accounts_customers-list-purchasable-offers" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

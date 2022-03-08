@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Services Nlp Analyze Entities - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Services Nlp Analyze Entities - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -475,6 +475,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-configure-search">Locations Datasets Fhir Stores Configure Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-create">Locations Datasets Fhir Stores Create</a>
                     
                 </li>
@@ -831,7 +836,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Analyze heathcare entity in a document. Its response includes the recognized entity mentions and the relationships between them. AnalyzeEntities uses context aware models to detect entities.</p>
+              <p>Analyze heathcare entity in a document. Its response includes the recognized entity mentions and the relationships between them. AnalyzeEntities uses context aware models to detect entities. This method can only analyze documents written in English.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -849,13 +854,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>AnalyzeEntitiesRequest:
   document-content: string
+  licensed-vocabularies: [string]
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    document-content=eos</code><ul>
+<li><code>-r .    document-content=et</code><ul>
 <li>document_content is a document to be annotated.</li>
+</ul>
+</li>
+<li><code>licensed-vocabularies=lorem</code><ul>
+<li>A list of licensed vocabularies to use in the request, in addition to the default unlicensed vocabularies.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 </ul>

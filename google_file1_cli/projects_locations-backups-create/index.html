@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Backups Create - Cloud Filestore v2.0.4+20210323</title>
+  <title>Locations Backups Create - Cloud Filestore v3.0.0+20220214</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Filestore v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Cloud Filestore v3.0.0+20220214</a>
         
       </div>
 
@@ -129,6 +129,31 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-create">Locations Instances Snapshots Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-delete">Locations Instances Snapshots Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-get">Locations Instances Snapshots Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-list">Locations Instances Snapshots List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-patch">Locations Instances Snapshots Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-list">Locations List</a>
                     
                 </li>
@@ -197,7 +222,7 @@ You can set the scope for this method like this: <code>file1 --scope &lt;scope&g
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The backup&#39;s project and location, in the format projects/{project_number}/locations/{location}. In Cloud Filestore, backup locations map to GCP regions, for example <strong>us-west1</strong>.</li>
+<li>Required. The backup&#39;s project and location, in the format <code>projects/{project_number}/locations/{location}</code>. In Cloud Filestore, backup locations map to GCP regions, for example <strong>us-west1</strong>.</li>
 </ul>
 </li>
 </ul>
@@ -212,6 +237,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   download-bytes: string
   labels: { string: string }
   name: string
+  satisfies-pzs: boolean
   source-file-share: string
   source-instance: string
   source-instance-tier: string
@@ -244,26 +270,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>name=at</code><ul>
-<li>Output only. The resource name of the backup, in the format projects/{project_number}/locations/{location_id}/backups/{backup_id}.</li>
+<li>Output only. The resource name of the backup, in the format <code>projects/{project_number}/locations/{location_id}/backups/{backup_id}</code>.</li>
 </ul>
 </li>
-<li><code>source-file-share=sanctus</code><ul>
+<li><code>satisfies-pzs=false</code><ul>
+<li>Output only. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>source-file-share=amet.</code><ul>
 <li>Name of the file share in the source Cloud Filestore instance that the backup is created from.</li>
 </ul>
 </li>
-<li><code>source-instance=sed</code><ul>
-<li>The resource name of the source Cloud Filestore instance, in the format projects/{project_number}/locations/{location_id}/instances/{instance_id}, used to create this backup.</li>
+<li><code>source-instance=takimata</code><ul>
+<li>The resource name of the source Cloud Filestore instance, in the format <code>projects/{project_number}/locations/{location_id}/instances/{instance_id}</code>, used to create this backup.</li>
 </ul>
 </li>
 <li><code>source-instance-tier=amet.</code><ul>
 <li>Output only. The service tier of the source Cloud Filestore instance that this backup is created from.</li>
 </ul>
 </li>
-<li><code>state=takimata</code><ul>
+<li><code>state=duo</code><ul>
 <li>Output only. The backup state.</li>
 </ul>
 </li>
-<li><code>storage-bytes=amet.</code><ul>
+<li><code>storage-bytes=ipsum</code><ul>
 <li>Output only. The size of the storage used by the backup. As backups share storage, this number is expected to change with backup creation/deletion.</li>
 </ul>
 </li>

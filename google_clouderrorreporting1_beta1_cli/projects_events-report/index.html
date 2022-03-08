@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Events Report - Clouderrorreporting v2.0.4+20210323</title>
+  <title>Events Report - Clouderrorreporting v3.0.0+20220302</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Clouderrorreporting v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Clouderrorreporting v3.0.0+20220302</a>
         
       </div>
 
@@ -131,7 +131,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Report an individual error event and record the event to a log. This endpoint accepts <strong>either</strong> an OAuth token, <strong>or</strong> an <a href="https://support.google.com/cloud/answer/6158862">API key</a> for authentication. To use an API key, append it to the URL as the value of a <code>key</code> parameter. For example: <code>POST https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456</code> <strong>Note:</strong> <a href="..//error-reporting">Error Reporting</a> is a global service built on Cloud Logging and doesn&#39;t analyze logs stored in regional log buckets or logs routed to other Google Cloud projects. For more information, see <a href="..//error-reporting/docs/regionalization">Using Error Reporting with regionalized logs</a>.</p>
+              <p>Report an individual error event and record the event to a log. This endpoint accepts <strong>either</strong> an OAuth token, <strong>or</strong> an <a href="https://support.google.com/cloud/answer/6158862">API key</a> for authentication. To use an API key, append it to the URL as the value of a <code>key</code> parameter. For example: <code>POST https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456</code> <strong>Note:</strong> [Error Reporting] (https://cloud.google.com/error-reporting) is a global service built on Cloud Logging and doesn&#39;t analyze logs stored in regional log buckets or logs routed to other Google Cloud projects. For more information, see [Using Error Reporting with regionalized logs] (https://cloud.google.com/error-reporting/docs/regionalization).</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -223,7 +223,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    event-time=amet.</code></p>
 <ul>
-<li>Optional. Time when the event occurred. If not provided, the time when the event was received by the Error Reporting system will be used.</li>
+<li>Optional. Time when the event occurred. If not provided, the time when the event was received by the Error Reporting system is used. If provided, the time must not exceed the <a href="https://cloud.google.com/logging/quotas#logs_retention_periods">logs retention period</a> in the past, or be more than 24 hours in the future. If an invalid time is provided, then an error is returned.</li>
 </ul>
 </li>
 <li><code>message=duo</code><ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Createchargeinvoice - Shopping Content v2.0.4+20210325</title>
+  <title>Createchargeinvoice - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -683,23 +683,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    invoice-id=dolores</code><ul>
+<li><code>-r .    invoice-id=et</code><ul>
 <li>[required] The ID of the invoice.</li>
 </ul>
 </li>
-<li><code>invoice-summary.customer-balance.pretax    currency=dolores</code><ul>
-<li>The currency of the price.</li>
-</ul>
-</li>
-<li>
-<p><code>value=et</code></p>
-<ul>
-<li>The price represented as a number.</li>
-</ul>
-</li>
-<li>
-<p><code>..tax    currency=sed</code></p>
-<ul>
+<li><code>invoice-summary.customer-balance.pretax    currency=sed</code><ul>
 <li>The currency of the price.</li>
 </ul>
 </li>
@@ -710,7 +698,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...google-balance.pretax    currency=et</code></p>
+<p><code>..tax    currency=et</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -722,7 +710,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..tax    currency=sed</code></p>
+<p><code>...google-balance.pretax    currency=sed</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -734,7 +722,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...merchant-balance.pretax    currency=nonumy</code></p>
+<p><code>..tax    currency=nonumy</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -746,7 +734,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..tax    currency=sadipscing</code></p>
+<p><code>...merchant-balance.pretax    currency=sadipscing</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -758,7 +746,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...product-total.pretax    currency=dolores</code></p>
+<p><code>..tax    currency=dolores</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -770,7 +758,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..tax    currency=erat</code></p>
+<p><code>...product-total.pretax    currency=erat</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -782,12 +770,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>....    operation-id=amet</code></p>
+<p><code>..tax    currency=amet</code></p>
+<ul>
+<li>The currency of the price.</li>
+</ul>
+</li>
+<li>
+<p><code>value=est</code></p>
+<ul>
+<li>The price represented as a number.</li>
+</ul>
+</li>
+<li>
+<p><code>....    operation-id=et</code></p>
 <ul>
 <li>[required] The ID of the operation, unique across all operations for a given order.</li>
 </ul>
 </li>
-<li><code>shipment-group-id=est</code><ul>
+<li><code>shipment-group-id=sea</code><ul>
 <li>[required] ID of the shipment group. It is assigned by the merchant in the <code>shipLineItems</code> method and is used to group multiple line items that have the same kind of shipping charges.</li>
 </ul>
 </li>

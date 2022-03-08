@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - bigquery v2.0.4+20210327</title>
+  <title>Insert - bigquery v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> bigquery v2.0.4+20210327</a>
+        <a href=".." class="icon icon-home"> bigquery v3.0.0+20220222</a>
         
       </div>
 
@@ -363,6 +363,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   dataset-reference:
     dataset-id: string
     project-id: string
+  default-collation: string
   default-encryption-configuration:
     kms-key-name: string
   default-partition-expiration-ms: string
@@ -371,6 +372,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   etag: string
   friendly-name: string
   id: string
+  is-case-insensitive: boolean
   kind: string
   labels: { string: string }
   last-modified-time: string
@@ -397,51 +399,61 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..default-encryption-configuration    kms-key-name=ipsum</code></p>
+<p><code>..    default-collation=ipsum</code></p>
+<ul>
+<li>[Output-only] The default collation of the dataset.</li>
+</ul>
+</li>
+<li>
+<p><code>default-encryption-configuration    kms-key-name=voluptua.</code></p>
 <ul>
 <li>[Optional] Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.</li>
 </ul>
 </li>
 <li>
-<p><code>..    default-partition-expiration-ms=voluptua.</code></p>
+<p><code>..    default-partition-expiration-ms=at</code></p>
 <ul>
 <li>[Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.</li>
 </ul>
 </li>
-<li><code>default-table-expiration-ms=at</code><ul>
+<li><code>default-table-expiration-ms=sanctus</code><ul>
 <li>[Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table&#39;s expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.</li>
 </ul>
 </li>
-<li><code>description=sanctus</code><ul>
+<li><code>description=sed</code><ul>
 <li>[Optional] A user-friendly description of the dataset.</li>
 </ul>
 </li>
-<li><code>etag=sed</code><ul>
+<li><code>etag=amet.</code><ul>
 <li>[Output-only] A hash of the resource.</li>
 </ul>
 </li>
-<li><code>friendly-name=amet.</code><ul>
+<li><code>friendly-name=takimata</code><ul>
 <li>[Optional] A descriptive name for the dataset.</li>
 </ul>
 </li>
-<li><code>id=takimata</code><ul>
+<li><code>id=amet.</code><ul>
 <li>[Output-only] The fully-qualified unique name of the dataset in the format projectId:datasetId. The dataset name without the project name is given in the datasetId field. When creating a new dataset, leave this field blank, and instead specify the datasetId field.</li>
 </ul>
 </li>
-<li><code>kind=amet.</code><ul>
+<li><code>is-case-insensitive=true</code><ul>
+<li>[Optional] Indicates if table names are case insensitive in the dataset.</li>
+</ul>
+</li>
+<li><code>kind=gubergren</code><ul>
 <li>[Output-only] The resource type.</li>
 </ul>
 </li>
-<li><code>labels=key=duo</code><ul>
+<li><code>labels=key=lorem</code><ul>
 <li>The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>last-modified-time=ipsum</code><ul>
+<li><code>last-modified-time=gubergren</code><ul>
 <li>[Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.</li>
 </ul>
 </li>
-<li><code>location=gubergren</code><ul>
+<li><code>location=eos</code><ul>
 <li>The geographic location where the dataset should reside. The default value is US. See details at https://cloud.google.com/bigquery/docs/locations.</li>
 </ul>
 </li>
@@ -449,7 +461,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>[Output-only] Reserved for future use.</li>
 </ul>
 </li>
-<li><code>self-link=gubergren</code><ul>
+<li><code>self-link=invidunt</code><ul>
 <li>[Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.</li>
 </ul>
 </li>

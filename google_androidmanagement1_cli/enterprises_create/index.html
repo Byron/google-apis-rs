@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - Android Management v2.0.4+20210322</title>
+  <title>Create - Android Management v3.0.0+20220302</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Android Management v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Android Management v3.0.0+20220302</a>
         
       </div>
 
@@ -376,13 +376,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p agreement-accepted=boolean</strong></p>
 <ul>
-<li>This feature is not generally available yet. Whether the managed Google Play Agreement is presented and agreed.</li>
+<li>Whether the enterprise admin has seen and agreed to the managed Google Play Agreement (https://www.android.com/enterprise/terms/). Always set this to true when creating an EMM-managed enterprise. Do not create the enterprise until the admin has viewed and accepted the agreement.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p enterprise-token=string</strong></p>
 <ul>
-<li>The enterprise token appended to the callback URL.</li>
+<li>The enterprise token appended to the callback URL. Only set this when creating a customer-managed enterprise.</li>
 </ul>
 </li>
 <li>
@@ -394,7 +394,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p signup-url-name=string</strong></p>
 <ul>
-<li>The name of the SignupUrl used to sign up for the enterprise.</li>
+<li>The name of the SignupUrl used to sign up for the enterprise. Only set this when creating a customer-managed enterprise.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tag Manager v2.0.4+20210330</title>
+  <title>Tag Manager v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Tag Manager v2.0.4+20210330</a>
+        <a href="." class="icon icon-home"> Tag Manager v3.0.0+20220301</a>
         
       </div>
 
@@ -161,6 +161,36 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="accounts_containers-workspaces-built-in-variables-revert/">Containers Workspaces Built In Variables Revert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_containers-workspaces-clients-create/">Containers Workspaces Clients Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_containers-workspaces-clients-delete/">Containers Workspaces Clients Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_containers-workspaces-clients-get/">Containers Workspaces Clients Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_containers-workspaces-clients-list/">Containers Workspaces Clients List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_containers-workspaces-clients-revert/">Containers Workspaces Clients Revert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_containers-workspaces-clients-update/">Containers Workspaces Clients Update</a>
                     
                 </li>
             
@@ -499,7 +529,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/tagmanager2-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Tag Manager</em> API at revision <em>20210330</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Tag Manager</em> API at revision <em>20220301</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">tagmanager2 [options]
         accounts
                 containers-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -526,6 +556,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 containers-workspaces-built-in-variables-delete &lt;path&gt; [-p &lt;v&gt;]...
                 containers-workspaces-built-in-variables-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 containers-workspaces-built-in-variables-revert &lt;path&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                containers-workspaces-clients-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                containers-workspaces-clients-delete &lt;path&gt; [-p &lt;v&gt;]...
+                containers-workspaces-clients-get &lt;path&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                containers-workspaces-clients-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                containers-workspaces-clients-revert &lt;path&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                containers-workspaces-clients-update &lt;path&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 containers-workspaces-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 containers-workspaces-create-version &lt;path&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 containers-workspaces-delete &lt;path&gt; [-p &lt;v&gt;]...

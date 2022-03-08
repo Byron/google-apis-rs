@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Line Items List - Display Video v2.0.4+20210325</title>
+  <title>Line Items List - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -481,12 +491,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -513,12 +553,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -629,6 +684,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -858,7 +918,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Allows filtering by line item properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by <code>AND</code> or <code>OR</code> logical operators. A sequence of restrictions implicitly uses <code>AND</code>. * A restriction has the form of <code>{field} {operator} {value}</code>. * The operator used on <code>flight.dateRange.endDate</code> must be LESS THAN (&lt;). * The operator used on <code>updateTime</code> must be <code>GREATER THAN OR EQUAL TO (&amp;gt;=)</code> or <code>LESS THAN OR EQUAL TO (&amp;lt;=)</code>. * The operator used on <code>warningMessages</code> must be <code>HAS (:)</code>. * The operators used on all other fields must be <code>EQUALS (=)</code>. * Supported fields: - <code>campaignId</code> - <code>displayName</code> - <code>insertionOrderId</code> - <code>entityStatus</code> - <code>lineItemId</code> - <code>lineItemType</code> - <code>flight.dateRange.endDate</code> (input formatted as YYYY-MM-DD) - <code>warningMessages</code> - <code>flight.triggerId</code> - <code>updateTime</code> (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) * The operator can be <code>NO LESS THAN (&amp;gt;=)</code> or <code>NO GREATER THAN (&amp;lt;=)</code>. - <code>updateTime</code> (format of ISO 8601) Examples: * All line items under an insertion order: <code>insertionOrderId=&amp;#34;1234&amp;#34;</code> * All <code>ENTITY_STATUS_ACTIVE</code> or <code>ENTITY_STATUS_PAUSED</code> and <code>LINE_ITEM_TYPE_DISPLAY_DEFAULT</code> line items under an advertiser: <code>(entityStatus=&amp;#34;ENTITY_STATUS_ACTIVE&amp;#34; OR entityStatus=&amp;#34;ENTITY_STATUS_PAUSED&amp;#34;) AND lineItemType=&amp;#34;LINE_ITEM_TYPE_DISPLAY_DEFAULT&amp;#34;</code> * All line items whose flight dates end before March 28, 2019: <code>flight.dateRange.endDate&amp;lt;&amp;#34;2019-03-28&amp;#34;</code> * All line items that have <code>NO_VALID_CREATIVE</code> in <code>warningMessages</code>: <code>warningMessages:&amp;#34;NO_VALID_CREATIVE&amp;#34;</code> * All line items with an update time less than or equal to <code>2020-11-04T18:54:47Z (format of ISO 8601)</code>: <code>updateTime&amp;lt;=&amp;#34;2020-11-04T18:54:47Z&amp;#34;</code> * All line items with an update time greater than or equal to <code>2020-11-04T18:54:47Z (format of ISO 8601)</code>: <code>updateTime&amp;gt;=&amp;#34;2020-11-04T18:54:47Z&amp;#34;</code> The length of this field should be no more than 500 characters.</li>
+<li>Allows filtering by line item properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by <code>AND</code> or <code>OR</code> logical operators. A sequence of restrictions implicitly uses <code>AND</code>. * A restriction has the form of <code>{field} {operator} {value}</code>. * The operator used on <code>flight.dateRange.endDate</code> must be LESS THAN (&lt;). * The operator used on <code>updateTime</code> must be <code>GREATER THAN OR EQUAL TO (&amp;gt;=)</code> or <code>LESS THAN OR EQUAL TO (&amp;lt;=)</code>. * The operator used on <code>warningMessages</code> must be <code>HAS (:)</code>. * The operators used on all other fields must be <code>EQUALS (=)</code>. * Supported properties: - <code>campaignId</code> - <code>displayName</code> - <code>insertionOrderId</code> - <code>entityStatus</code> - <code>lineItemId</code> - <code>lineItemType</code> - <code>flight.dateRange.endDate</code> (input formatted as YYYY-MM-DD) - <code>warningMessages</code> - <code>flight.triggerId</code> - <code>updateTime</code> (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) - <code>targetedChannelId</code> - <code>targetedNegativeKeywordListId</code> Examples: * All line items under an insertion order: <code>insertionOrderId=&amp;#34;1234&amp;#34;</code> * All <code>ENTITY_STATUS_ACTIVE</code> or <code>ENTITY_STATUS_PAUSED</code> and <code>LINE_ITEM_TYPE_DISPLAY_DEFAULT</code> line items under an advertiser: <code>(entityStatus=&amp;#34;ENTITY_STATUS_ACTIVE&amp;#34; OR entityStatus=&amp;#34;ENTITY_STATUS_PAUSED&amp;#34;) AND lineItemType=&amp;#34;LINE_ITEM_TYPE_DISPLAY_DEFAULT&amp;#34;</code> * All line items whose flight dates end before March 28, 2019: <code>flight.dateRange.endDate&amp;lt;&amp;#34;2019-03-28&amp;#34;</code> * All line items that have <code>NO_VALID_CREATIVE</code> in <code>warningMessages</code>: <code>warningMessages:&amp;#34;NO_VALID_CREATIVE&amp;#34;</code> * All line items with an update time less than or equal to <code>2020-11-04T18:54:47Z (format of ISO 8601)</code>: <code>updateTime&amp;lt;=&amp;#34;2020-11-04T18:54:47Z&amp;#34;</code> * All line items with an update time greater than or equal to <code>2020-11-04T18:54:47Z (format of ISO 8601)</code>: <code>updateTime&amp;gt;=&amp;#34;2020-11-04T18:54:47Z&amp;#34;</code> * All line items that are using both the specified channel and specified negative keyword list in their targeting: <code>targetedNegativeKeywordListId=789 AND targetedChannelId=12345</code> The length of this field should be no more than 500 characters.</li>
 </ul>
 </li>
 <li>

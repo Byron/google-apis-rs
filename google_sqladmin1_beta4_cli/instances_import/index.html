@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Import - SQL Admin v2.0.4+20210321</title>
+  <title>Import - SQL Admin v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SQL Admin v2.0.4+20210321</a>
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
         
       </div>
 
@@ -61,6 +61,22 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
                     
                 </li>
             
@@ -413,6 +429,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         pvk-path: string
     csv-import-options:
       columns: [string]
+      escape-character: string
+      fields-terminated-by: string
+      lines-terminated-by: string
+      quote-character: string
       table: string
     database: string
     file-type: string
@@ -424,53 +444,69 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .import-context.bak-import-options.encryption-options    cert-path=consetetur</code><ul>
-<li>Path to the Certificate (.cer) in Cloud Storage, in the form <em>gs://bucketName/fileName</em>. The instance must have write permissions to the bucket and read access to the file.</li>
+<li><code>-r .import-context.bak-import-options.encryption-options    cert-path=amet.</code><ul>
+<li>Path to the Certificate (.cer) in Cloud Storage, in the form <code>gs://bucketName/fileName</code>. The instance must have write permissions to the bucket and read access to the file.</li>
 </ul>
 </li>
-<li><code>pvk-password=amet.</code><ul>
+<li><code>pvk-password=ea</code><ul>
 <li>Password that encrypts the private key</li>
 </ul>
 </li>
 <li>
-<p><code>pvk-path=sed</code></p>
+<p><code>pvk-path=sadipscing</code></p>
 <ul>
-<li>Path to the Certificate Private Key (.pvk) in Cloud Storage, in the form <em>gs://bucketName/fileName</em>. The instance must have write permissions to the bucket and read access to the file.</li>
+<li>Path to the Certificate Private Key (.pvk) in Cloud Storage, in the form <code>gs://bucketName/fileName</code>. The instance must have write permissions to the bucket and read access to the file.</li>
 </ul>
 </li>
 <li>
-<p><code>...csv-import-options    columns=takimata</code></p>
+<p><code>...csv-import-options    columns=lorem</code></p>
 <ul>
 <li>The columns to which CSV data is imported. If not specified, all columns of the database table are loaded with CSV data.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
+<li><code>escape-character=invidunt</code><ul>
+<li>Specifies the character that should appear before a data character that needs to be escaped.</li>
+</ul>
+</li>
+<li><code>fields-terminated-by=no</code><ul>
+<li>Specifies the character that separates columns within each row (line) of the file.</li>
+</ul>
+</li>
+<li><code>lines-terminated-by=est</code><ul>
+<li>This is used to separate lines. If a line does not contain all fields, the rest of the columns are set to their default values.</li>
+</ul>
+</li>
+<li><code>quote-character=at</code><ul>
+<li>Specifies the quoting character to be used when a data value is quoted.</li>
+</ul>
+</li>
 <li>
-<p><code>table=dolores</code></p>
+<p><code>table=sed</code></p>
 <ul>
 <li>The table to which CSV data is imported.</li>
 </ul>
 </li>
 <li>
-<p><code>..    database=gubergren</code></p>
+<p><code>..    database=sit</code></p>
 <ul>
-<li>The target database for the import. If <em>fileType</em> is <em>SQL</em>, this field is required only if the import file does not specify a database, and is overridden by any database specification in the import file. If <em>fileType</em> is <em>CSV</em>, one database must be specified.</li>
+<li>The target database for the import. If <code>fileType</code> is <code>SQL</code>, this field is required only if the import file does not specify a database, and is overridden by any database specification in the import file. If <code>fileType</code> is <code>CSV</code>, one database must be specified.</li>
 </ul>
 </li>
 <li><code>file-type=et</code><ul>
-<li>The file type for the specified uri. <em>SQL</em>: The file contains SQL statements. <em>CSV</em>: The file contains CSV data.</li>
+<li>The file type for the specified uri. * <code>SQL</code>: The file contains SQL statements. * <code>CSV</code>: The file contains CSV data. * <code>BAK</code>: The file contains backup data for a SQL Server instance.</li>
 </ul>
 </li>
-<li><code>import-user=accusam</code><ul>
+<li><code>import-user=tempor</code><ul>
 <li>The PostgreSQL user for this import operation. PostgreSQL instances only.</li>
 </ul>
 </li>
-<li><code>kind=voluptua.</code><ul>
-<li>This is always <em>sql#importContext</em>.</li>
+<li><code>kind=aliquyam</code><ul>
+<li>This is always <code>sql#importContext</code>.</li>
 </ul>
 </li>
-<li><code>uri=dolore</code><ul>
-<li>Path to the import file in Cloud Storage, in the form <em>gs://bucketName/fileName</em>. Compressed gzip files (.gz) are supported when <em>fileType</em> is <em>SQL</em>. The instance must have write permissions to the bucket and read access to the file.</li>
+<li><code>uri=ipsum</code><ul>
+<li>Path to the import file in Cloud Storage, in the form <code>gs://bucketName/fileName</code>. Compressed gzip files (.gz) are supported when <code>fileType</code> is <code>SQL</code>. The instance must have write permissions to the bucket and read access to the file.</li>
 </ul>
 </li>
 </ul>

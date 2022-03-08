@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Holds Create - Vault v2.0.4+20210316</title>
+  <title>Holds Create - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -272,7 +272,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates a hold in the given matter.</p>
+              <p>Creates a hold in the specified matter.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/ediscovery</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/ediscovery</em>.
@@ -318,7 +318,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    corpus=gubergren</code><ul>
-<li>The corpus to be searched.</li>
+<li>The service to be searched.</li>
 </ul>
 </li>
 <li><code>hold-id=et</code><ul>
@@ -330,69 +330,69 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>org-unit    hold-time=voluptua.</code><ul>
-<li>When the org unit was put on hold. This property is immutable.</li>
+<li>When the organizational unit was put on hold. This property is immutable.</li>
 </ul>
 </li>
 <li>
 <p><code>org-unit-id=dolore</code></p>
 <ul>
-<li>The org unit&#39;s immutable ID as provided by the Admin SDK.</li>
+<li>The organizational unit&#39;s immutable ID as provided by the <a href="https://developers.google.com/admin-sdk/">Admin SDK</a>.</li>
 </ul>
 </li>
 <li>
 <p><code>..query.drive-query    include-shared-drive-files=false</code></p>
 <ul>
-<li>If true, include files in shared drives in the hold.</li>
+<li>To include files in shared drives in the hold, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>include-team-drive-files=false</code></p>
 <ul>
-<li>If true, include files in Team Drives in the hold.</li>
+<li>To include files in Team Drives in the hold, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>..groups-query    end-time=lorem</code></p>
 <ul>
-<li>The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The end time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li><code>start-time=invidunt</code><ul>
-<li>The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The start time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
 <p><code>terms=no</code></p>
 <ul>
-<li>The search terms for the hold.</li>
+<li>The <a href="https://support.google.com/vault/answer/2474474">search operators</a> used to refine the messages covered by the hold.</li>
 </ul>
 </li>
 <li>
 <p><code>..hangouts-chat-query    include-rooms=true</code></p>
 <ul>
-<li>If true, include rooms the user has participated in.</li>
+<li>To include messages in Chat spaces the user was a member of, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
 <p><code>..mail-query    end-time=sit</code></p>
 <ul>
-<li>The end time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The end time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li><code>start-time=et</code><ul>
-<li>The start time range for the search query. These timestamps are in GMT and rounded down to the start of the given date.</li>
+<li>The start time for the query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
 <p><code>terms=tempor</code></p>
 <ul>
-<li>The search terms for the hold.</li>
+<li>The <a href="https://support.google.com/vault/answer/2474474">search operators</a> used to refine the messages covered by the hold.</li>
 </ul>
 </li>
 <li>
 <p><code>..voice-query    covered-data=aliquyam</code></p>
 <ul>
-<li>Data covered by this rule. Should be non-empty. Order does not matter and duplicates will be ignored.</li>
+<li>A list of data types covered by the hold. Should be non-empty. Order does not matter and duplicates are ignored.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

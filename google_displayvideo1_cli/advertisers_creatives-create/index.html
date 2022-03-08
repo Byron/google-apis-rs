@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Creatives Create - Display Video v2.0.4+20210325</title>
+  <title>Creatives Create - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -247,6 +247,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -483,12 +493,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -515,12 +555,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -631,6 +686,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -915,77 +975,77 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    advertiser-id=est</code><ul>
+<li><code>-r .    advertiser-id=tempor</code><ul>
 <li>Output only. The unique ID of the advertiser the creative belongs to.</li>
 </ul>
 </li>
-<li><code>appended-tag=at</code><ul>
+<li><code>appended-tag=aliquyam</code><ul>
 <li>Third-party HTML tracking tag to be appended to the creative tag.</li>
 </ul>
 </li>
-<li><code>cm-placement-id=sed</code><ul>
+<li><code>cm-placement-id=ipsum</code><ul>
 <li>Output only. The unique ID of the Campaign Manager 360 placement associated with the creative. This field is only applicable for creatives that are synced from Campaign Manager.</li>
 </ul>
 </li>
-<li><code>cm-tracking-ad    cm-ad-id=sit</code><ul>
+<li><code>cm-tracking-ad    cm-ad-id=et</code><ul>
 <li>The ad ID of the campaign manager 360 tracking Ad.</li>
 </ul>
 </li>
-<li><code>cm-creative-id=et</code><ul>
+<li><code>cm-creative-id=sanctus</code><ul>
 <li>The creative ID of the campaign manager 360 tracking Ad.</li>
 </ul>
 </li>
 <li>
-<p><code>cm-placement-id=tempor</code></p>
+<p><code>cm-placement-id=lorem</code></p>
 <ul>
 <li>The placement ID of the campaign manager 360 tracking Ad.</li>
 </ul>
 </li>
 <li>
-<p><code>..    companion-creative-ids=aliquyam</code></p>
+<p><code>..    companion-creative-ids=est</code></p>
 <ul>
 <li>The IDs of companion creatives for a video creative. You can assign existing display creatives (with image or HTML5 assets) to serve surrounding the publisher&#39;s video player. Companions display around the video player while the video is playing and remain after the video has completed. Creatives contain additional dimensions can not be companion creatives. This field is only supported for following creative_type: * <code>CREATIVE_TYPE_AUDIO</code> * <code>CREATIVE_TYPE_VIDEO</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>create-time=ipsum</code><ul>
+<li><code>create-time=sed</code><ul>
 <li>Output only. The timestamp when the creative was created. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>creative-attributes=et</code><ul>
+<li><code>creative-attributes=diam</code><ul>
 <li>Output only. A list of attributes of the creative that is generated by the system.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>creative-id=sanctus</code><ul>
+<li><code>creative-id=dolores</code><ul>
 <li>Output only. The unique ID of the creative. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>creative-type=lorem</code><ul>
+<li><code>creative-type=dolores</code><ul>
 <li>Required. Immutable. The type of the creative.</li>
 </ul>
 </li>
-<li><code>dimensions    height-pixels=94</code><ul>
+<li><code>dimensions    height-pixels=33</code><ul>
 <li>The height in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>width-pixels=71</code></p>
+<p><code>width-pixels=8</code></p>
 <ul>
 <li>The width in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    display-name=diam</code></p>
+<p><code>..    display-name=no</code></p>
 <ul>
 <li>Required. The display name of the creative. Must be UTF-8 encoded with a maximum size of 240 bytes.</li>
 </ul>
 </li>
-<li><code>dynamic=true</code><ul>
+<li><code>dynamic=false</code><ul>
 <li>Output only. Indicates whether the creative is dynamic.</li>
 </ul>
 </li>
-<li><code>entity-status=et</code><ul>
+<li><code>entity-status=elitr</code><ul>
 <li>Required. Controls whether or not the creative can serve. Accepted values are: * <code>ENTITY_STATUS_ACTIVE</code> * <code>ENTITY_STATUS_ARCHIVED</code> * <code>ENTITY_STATUS_PAUSED</code></li>
 </ul>
 </li>
@@ -997,7 +1057,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional. Specifies the expanding direction of the creative. Required and only valid for third-party expandable creatives. Third-party expandable creatives are creatives with following hosting source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_EXPANDABLE</code></li>
 </ul>
 </li>
-<li><code>hosting-source=et</code><ul>
+<li><code>hosting-source=nonumy</code><ul>
 <li>Required. Indicates where the creative is hosted.</li>
 </ul>
 </li>
@@ -1005,104 +1065,104 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. Indicates the third-party VAST tag creative requires HTML5 Video support. Output only and only valid for third-party VAST tag creatives. Third-party VAST tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_VIDEO</code></li>
 </ul>
 </li>
-<li><code>ias-campaign-monitoring=false</code><ul>
+<li><code>ias-campaign-monitoring=true</code><ul>
 <li>Indicates whether Integral Ad Science (IAS) campaign monitoring is enabled. To enable this for the creative, make sure the Advertiser.creative_config.ias_client_id has been set to your IAS client ID.</li>
 </ul>
 </li>
-<li><code>integration-code=no</code><ul>
+<li><code>integration-code=aliquyam</code><ul>
 <li>ID information used to link this creative to an external system. Must be UTF-8 encoded with a length of no more than 10,000 characters.</li>
 </ul>
 </li>
-<li><code>js-tracker-url=nonumy</code><ul>
+<li><code>js-tracker-url=dolores</code><ul>
 <li>JavaScript measurement URL from supported third-party verification providers (ComScore, DoubleVerify, IAS, Moat). HTML script tags are not supported. This field is only supported in following creative_type: * <code>CREATIVE_TYPE_NATIVE</code> * <code>CREATIVE_TYPE_NATIVE_SITE_SQUARE</code> * <code>CREATIVE_TYPE_NATIVE_APP_INSTALL</code> * <code>CREATIVE_TYPE_NATIVE_APP_INSTALL_SQUARE</code> * <code>CREATIVE_TYPE_NATIVE_VIDEO</code></li>
 </ul>
 </li>
-<li><code>line-item-ids=at</code><ul>
+<li><code>line-item-ids=sadipscing</code><ul>
 <li>Output only. The IDs of the line items this creative is associated with. To associate a creative to a line item, use LineItem.creative_ids instead.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>media-duration=sadipscing</code><ul>
+<li><code>media-duration=erat</code><ul>
 <li>Output only. Media duration of the creative. Applicable when creative_type is one of: * <code>CREATIVE_TYPE_VIDEO</code> * <code>CREATIVE_TYPE_AUDIO</code> * <code>CREATIVE_TYPE_NATIVE_VIDEO</code> * <code>CREATIVE_TYPE_PUBLISHER_HOSTED</code></li>
 </ul>
 </li>
-<li><code>mp3-audio=true</code><ul>
+<li><code>mp3-audio=false</code><ul>
 <li>Output only. Indicates the third-party audio creative supports MP3. Output only and only valid for third-party audio creatives. Third-party audio creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_AUDIO</code></li>
 </ul>
 </li>
-<li><code>name=sadipscing</code><ul>
+<li><code>name=amet</code><ul>
 <li>Output only. The resource name of the creative.</li>
 </ul>
 </li>
-<li><code>notes=erat</code><ul>
+<li><code>notes=est</code><ul>
 <li>User notes for this creative. Must be UTF-8 encoded with a length of no more than 20,000 characters.</li>
 </ul>
 </li>
-<li><code>oba-icon    click-tracking-url=aliquyam</code><ul>
+<li><code>oba-icon    click-tracking-url=et</code><ul>
 <li>Required. The click tracking URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com</li>
 </ul>
 </li>
-<li><code>dimensions    height-pixels=54</code><ul>
+<li><code>dimensions    height-pixels=91</code><ul>
 <li>The height in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>width-pixels=44</code></p>
+<p><code>width-pixels=5</code></p>
 <ul>
 <li>The width in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    landing-page-url=et</code></p>
+<p><code>..    landing-page-url=consetetur</code></p>
 <ul>
 <li>Required. The landing page URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com</li>
 </ul>
 </li>
-<li><code>position=sea</code><ul>
+<li><code>position=stet</code><ul>
 <li>The position of the OBA icon on the creative.</li>
 </ul>
 </li>
-<li><code>program=consetetur</code><ul>
+<li><code>program=est</code><ul>
 <li>The program of the OBA icon. For example: “AdChoices”.</li>
 </ul>
 </li>
-<li><code>resource-mime-type=consetetur</code><ul>
+<li><code>resource-mime-type=aliquyam</code><ul>
 <li>The MIME type of the OBA icon resource.</li>
 </ul>
 </li>
-<li><code>resource-url=stet</code><ul>
+<li><code>resource-url=elitr</code><ul>
 <li>The URL of the OBA icon resource.</li>
 </ul>
 </li>
 <li>
-<p><code>view-tracking-url=est</code></p>
+<p><code>view-tracking-url=duo</code></p>
 <ul>
 <li>Required. The view tracking URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com</li>
 </ul>
 </li>
 <li>
-<p><code>..    ogg-audio=false</code></p>
+<p><code>..    ogg-audio=true</code></p>
 <ul>
 <li>Output only. Indicates the third-party audio creative supports OGG. Output only and only valid for third-party audio creatives. Third-party audio creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_AUDIO</code></li>
 </ul>
 </li>
-<li><code>progress-offset    percentage=elitr</code><ul>
+<li><code>progress-offset    percentage=est</code><ul>
 <li>The offset in percentage of the audio or video duration.</li>
 </ul>
 </li>
 <li>
-<p><code>seconds=duo</code></p>
+<p><code>seconds=sit</code></p>
 <ul>
 <li>The offset in seconds from the start of the audio or video.</li>
 </ul>
 </li>
 <li>
-<p><code>..    require-html5=true</code></p>
+<p><code>..    require-html5=false</code></p>
 <ul>
 <li>Optional. Indicates that the creative relies on HTML5 to render properly. Optional and only valid for third-party tag creatives. Third-party tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_STANDARD</code> * <code>CREATIVE_TYPE_EXPANDABLE</code></li>
 </ul>
 </li>
-<li><code>require-mraid=true</code><ul>
+<li><code>require-mraid=false</code><ul>
 <li>Optional. Indicates that the creative requires MRAID (Mobile Rich Media Ad Interface Definitions system). Set this if the creative relies on mobile gestures for interactivity, such as swiping or tapping. Optional and only valid for third-party tag creatives. Third-party tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_STANDARD</code> * <code>CREATIVE_TYPE_EXPANDABLE</code></li>
 </ul>
 </li>
@@ -1110,64 +1170,64 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional. Indicates that the creative will wait for a return ping for attribution. Only valid when using a Campaign Manager 360 tracking ad with a third-party ad server parameter and the ${DC_DBM_TOKEN} macro. Optional and only valid for third-party tag creatives or third-party VAST tag creatives. Third-party tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_STANDARD</code> * <code>CREATIVE_TYPE_EXPANDABLE</code> Third-party VAST tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_AUDIO</code> * <code>CREATIVE_TYPE_VIDEO</code></li>
 </ul>
 </li>
-<li><code>review-status    approval-status=sed</code><ul>
+<li><code>review-status    approval-status=ea</code><ul>
 <li>Represents the basic approval needed for a creative to begin serving. Summary of creative_and_landing_page_review_status and content_and_policy_review_status.</li>
 </ul>
 </li>
-<li><code>content-and-policy-review-status=eos</code><ul>
+<li><code>content-and-policy-review-status=stet</code><ul>
 <li>Content and policy review status for the creative.</li>
 </ul>
 </li>
 <li>
-<p><code>creative-and-landing-page-review-status=lorem</code></p>
+<p><code>creative-and-landing-page-review-status=dolores</code></p>
 <ul>
 <li>Creative and landing page review status for the creative.</li>
 </ul>
 </li>
 <li>
-<p><code>..skip-offset    percentage=ea</code></p>
+<p><code>..skip-offset    percentage=eos</code></p>
 <ul>
 <li>The offset in percentage of the audio or video duration.</li>
 </ul>
 </li>
 <li>
-<p><code>seconds=stet</code></p>
+<p><code>seconds=et</code></p>
 <ul>
 <li>The offset in seconds from the start of the audio or video.</li>
 </ul>
 </li>
 <li>
-<p><code>..    skippable=true</code></p>
+<p><code>..    skippable=false</code></p>
 <ul>
 <li>Whether the user can choose to skip a video creative. This field is only supported for the following creative_type: * <code>CREATIVE_TYPE_VIDEO</code></li>
 </ul>
 </li>
-<li><code>third-party-tag=sea</code><ul>
+<li><code>third-party-tag=at</code><ul>
 <li>Optional. The original third-party tag used for the creative. Required and only valid for third-party tag creatives. Third-party tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_STANDARD</code> * <code>CREATIVE_TYPE_EXPANDABLE</code></li>
 </ul>
 </li>
-<li><code>tracker-urls=et</code><ul>
+<li><code>tracker-urls=dolore</code><ul>
 <li>Tracking URLs for analytics providers or third-party ad technology vendors. The URLs must start with https (except on inventory that doesn&#39;t require SSL compliance). If using macros in your URL, use only macros supported by Display &amp; Video 360. Standard URLs only, no IMG or SCRIPT tags. This field is only supported in following creative_type: * <code>CREATIVE_TYPE_NATIVE</code> * <code>CREATIVE_TYPE_NATIVE_SITE_SQUARE</code> * <code>CREATIVE_TYPE_NATIVE_APP_INSTALL</code> * <code>CREATIVE_TYPE_NATIVE_APP_INSTALL_SQUARE</code> * <code>CREATIVE_TYPE_NATIVE_VIDEO</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>universal-ad-id    id=at</code><ul>
+<li><code>universal-ad-id    id=eirmod</code><ul>
 <li>The unique creative identifier.</li>
 </ul>
 </li>
 <li>
-<p><code>registry=dolore</code></p>
+<p><code>registry=lorem</code></p>
 <ul>
 <li>The registry provides unique creative identifiers.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-time=eirmod</code></p>
+<p><code>..    update-time=accusam</code></p>
 <ul>
 <li>Output only. The timestamp when the creative was last updated. Assigned by the system.</li>
 </ul>
 </li>
-<li><code>vast-tag-url=lorem</code><ul>
+<li><code>vast-tag-url=amet</code><ul>
 <li>Optional. The URL of the VAST tag for a third-party VAST tag creative. Required and only valid for third-party VAST tag creatives. Third-party VAST tag creatives are creatives with following hosting_source: * <code>HOSTING_SOURCE_THIRD_PARTY</code> combined with following creative_type: * <code>CREATIVE_TYPE_AUDIO</code> * <code>CREATIVE_TYPE_VIDEO</code></li>
 </ul>
 </li>

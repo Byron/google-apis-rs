@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Demote Master - SQL Admin v2.0.4+20210321</title>
+  <title>Demote Master - SQL Admin v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SQL Admin v2.0.4+20210321</a>
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
         
       </div>
 
@@ -61,6 +61,22 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
                     
                 </li>
             
@@ -421,54 +437,59 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         kind: string
         password: string
         username: string
+    skip-replication-setup: boolean
     verify-gtid-consistency: boolean
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .demote-master-context    kind=diam</code><ul>
-<li>This is always <em>sql#demoteMasterContext</em>.</li>
+<li><code>-r .demote-master-context    kind=stet</code><ul>
+<li>This is always <code>sql#demoteMasterContext</code>.</li>
 </ul>
 </li>
 <li><code>master-instance-name=dolor</code><ul>
 <li>The name of the instance which will act as on-premises primary instance in the replication setup.</li>
 </ul>
 </li>
-<li><code>replica-configuration    kind=et</code><ul>
-<li>This is always <em>sql#demoteMasterConfiguration</em>.</li>
+<li><code>replica-configuration    kind=duo</code><ul>
+<li>This is always <code>sql#demoteMasterConfiguration</code>.</li>
 </ul>
 </li>
-<li><code>mysql-replica-configuration    ca-certificate=et</code><ul>
+<li><code>mysql-replica-configuration    ca-certificate=vero</code><ul>
 <li>PEM representation of the trusted CA&#39;s x509 certificate.</li>
 </ul>
 </li>
-<li><code>client-certificate=sadipscing</code><ul>
+<li><code>client-certificate=vero</code><ul>
 <li>PEM representation of the replica&#39;s x509 certificate.</li>
 </ul>
 </li>
-<li><code>client-key=stet</code><ul>
+<li><code>client-key=invidunt</code><ul>
 <li>PEM representation of the replica&#39;s private key. The corresponsing public key is encoded in the client&#39;s certificate. The format of the replica&#39;s private key can be either PKCS #1 or PKCS #8.</li>
 </ul>
 </li>
-<li><code>kind=dolor</code><ul>
-<li>This is always <em>sql#demoteMasterMysqlReplicaConfiguration</em>.</li>
+<li><code>kind=stet</code><ul>
+<li>This is always <code>sql#demoteMasterMysqlReplicaConfiguration</code>.</li>
 </ul>
 </li>
-<li><code>password=duo</code><ul>
+<li><code>password=vero</code><ul>
 <li>The password for the replication connection.</li>
 </ul>
 </li>
 <li>
-<p><code>username=vero</code></p>
+<p><code>username=elitr</code></p>
 <ul>
 <li>The username for the replication connection.</li>
 </ul>
 </li>
 <li>
-<p><code>...    verify-gtid-consistency=false</code></p>
+<p><code>...    skip-replication-setup=true</code></p>
 <ul>
-<li>Verify GTID consistency for demote operation. Default value: <em>True</em>. Second Generation instances only. Setting this flag to false enables you to bypass GTID consistency check between on-premises primary instance and Cloud SQL instance during the demotion operation but also exposes you to the risk of future replication failures. Change the value only if you know the reason for the GTID divergence and are confident that doing so will not cause any replication issues.</li>
+<li>Flag to skip replication setup on the instance.</li>
+</ul>
+</li>
+<li><code>verify-gtid-consistency=false</code><ul>
+<li>Verify the GTID consistency for demote operation. Default value: <code>True</code>. Setting this flag to <code>false</code> enables you to bypass the GTID consistency check between on-premises primary instance and Cloud SQL instance during the demotion operation but also exposes you to the risk of future replication failures. Change the value only if you know the reason for the GTID divergence and are confident that doing so will not cause any replication issues.</li>
 </ul>
 </li>
 </ul>

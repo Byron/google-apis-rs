@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Secrets Versions Enable - Secret Manager v2.0.4+20210319</title>
+  <title>Secrets Versions Enable - Secret Manager v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Secret Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Secret Manager v3.0.0+20220226</a>
         
       </div>
 
@@ -203,10 +203,17 @@ You can set the scope for this method like this: <code>secretmanager1 --scope &l
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>EnableSecretVersionRequest:
+  etag: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    etag=gubergren</code><ul>
+<li>Optional. Etag of the SecretVersion. The request succeeds if it matches the etag of the currently stored secret version object. If the etag is omitted, the request succeeds.</li>
+</ul>
+</li>
+</ul>
 <h3 id="about-cursors">About Cursors</h3>
 <p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
 <ul>

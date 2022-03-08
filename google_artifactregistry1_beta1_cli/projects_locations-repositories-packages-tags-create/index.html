@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Repositories Packages Tags Create - Artifact Registry v2.0.4+20210324</title>
+  <title>Locations Repositories Packages Tags Create - Artifact Registry v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Artifact Registry v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> Artifact Registry v3.0.0+20220225</a>
         
       </div>
 
@@ -56,11 +56,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
                     
                 </li>
             
@@ -254,11 +249,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    name=sed</code><ul>
-<li>The name of the tag, for example: &#34;projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/tag1&#34;.</li>
+<li>The name of the tag, for example: &#34;projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/tag1&#34;. If the package part contains slashes, the slashes are escaped. The tag part can only have characters in [a-zA-Z0-9-._~:@], anything else must be URL encoded.</li>
 </ul>
 </li>
 <li><code>version=amet.</code><ul>
-<li>The name of the version the tag refers to, for example: &#34;projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/sha256:5243811&#34;</li>
+<li>The name of the version the tag refers to, for example: &#34;projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/sha256:5243811&#34; If the package or version ID parts contain slashes, the slashes are escaped.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Holds List - Vault v2.0.4+20210316</title>
+  <title>Holds List - Vault v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
         
       </div>
 
@@ -270,7 +270,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists holds within a matter. An empty page token in ListHoldsResponse denotes no more holds to list.</p>
+              <p>Lists the holds in a matter.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -305,7 +305,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>The number of holds to return in the response, between 0 and 100 inclusive. Leaving this empty, or as 0, is the same as page_size = 100.</li>
+<li>The number of holds to return in the response, between 0 and 100 inclusive. Leaving this empty, or as 0, is the same as <strong>page_size</strong> = 100.</li>
 </ul>
 </li>
 <li>
@@ -317,7 +317,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p view=string</strong></p>
 <ul>
-<li>Specifies which parts of the Hold to return.</li>
+<li>The amount of detail to return for a hold.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Service Accounts Set Iam Policy - Iam v2.0.4+20210325</title>
+  <title>Service Accounts Set Iam Policy - Iam v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Iam v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Iam v3.0.0+20220224</a>
         
       </div>
 
@@ -51,6 +51,27 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../iam-policies_query-auditable-services">Query Auditable Services</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-operations-get">Workforce Pools Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-providers-operations-get">Workforce Pools Providers Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-subjects-operations-get">Workforce Pools Subjects Operations Get</a>
                     
                 </li>
             
@@ -153,6 +174,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workload-identity-pools-providers-keys-operations-get">Locations Workload Identity Pools Providers Keys Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-workload-identity-pools-providers-list">Locations Workload Identity Pools Providers List</a>
                     
                 </li>
@@ -244,6 +270,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_service-accounts-keys-delete">Service Accounts Keys Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-disable">Service Accounts Keys Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-enable">Service Accounts Keys Enable</a>
                     
                 </li>
             
@@ -380,7 +416,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Sets the IAM policy that is attached to a ServiceAccount. Use this method to grant or revoke access to the service account. For example, you could grant a member the ability to impersonate the service account. This method does not enable the service account to access other resources. To grant roles to a service account on a resource, follow these steps: 1. Call the resource&#39;s <code>getIamPolicy</code> method to get its current IAM policy. 2. Edit the policy so that it binds the service account to an IAM role for the resource. 3. Call the resource&#39;s <code>setIamPolicy</code> method to update its IAM policy. For detailed instructions, see <a href="https://cloud.google.com/iam/help/service-accounts/granting-access-to-service-accounts">Granting roles to a service account for specific resources</a>.</p>
+              <p>Sets the IAM policy that is attached to a ServiceAccount. Use this method to grant or revoke access to the service account. For example, you could grant a principal the ability to impersonate the service account. This method does not enable the service account to access other resources. To grant roles to a service account on a resource, follow these steps: 1. Call the resource&#39;s <code>getIamPolicy</code> method to get its current IAM policy. 2. Edit the policy so that it binds the service account to an IAM role for the resource. 3. Call the resource&#39;s <code>setIamPolicy</code> method to update its IAM policy. For detailed instructions, see <a href="https://cloud.google.com/iam/help/service-accounts/granting-access-to-service-accounts">Manage access to project, folders, and organizations</a> or <a href="https://cloud.google.com/iam/help/access/manage-other-resources">Manage access to other resources</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.

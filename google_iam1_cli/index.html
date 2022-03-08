@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Iam v2.0.4+20210325</title>
+  <title>Iam v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Iam v2.0.4+20210325</a>
+        <a href="." class="icon icon-home"> Iam v3.0.0+20220224</a>
         
       </div>
 
@@ -51,6 +51,27 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="iam-policies_query-auditable-services/">Query Auditable Services</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="locations_workforce-pools-operations-get/">Workforce Pools Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="locations_workforce-pools-providers-operations-get/">Workforce Pools Providers Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="locations_workforce-pools-subjects-operations-get/">Workforce Pools Subjects Operations Get</a>
                     
                 </li>
             
@@ -153,6 +174,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-workload-identity-pools-providers-keys-operations-get/">Locations Workload Identity Pools Providers Keys Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-workload-identity-pools-providers-list/">Locations Workload Identity Pools Providers List</a>
                     
                 </li>
@@ -244,6 +270,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_service-accounts-keys-delete/">Service Accounts Keys Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_service-accounts-keys-disable/">Service Accounts Keys Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_service-accounts-keys-enable/">Service Accounts Keys Enable</a>
                     
                 </li>
             
@@ -378,11 +414,15 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iam1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Iam</em> API at revision <em>20210325</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Iam</em> API at revision <em>20220224</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">iam1 [options]
         iam-policies
                 lint-policy (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 query-auditable-services (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        locations
+                workforce-pools-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                workforce-pools-providers-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                workforce-pools-subjects-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         organizations
                 roles-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 roles-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -402,6 +442,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-workload-identity-pools-providers-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workload-identity-pools-providers-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workload-identity-pools-providers-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-workload-identity-pools-providers-keys-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workload-identity-pools-providers-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workload-identity-pools-providers-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-workload-identity-pools-providers-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -421,6 +462,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 service-accounts-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-accounts-keys-create &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-accounts-keys-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                service-accounts-keys-disable &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                service-accounts-keys-enable &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-accounts-keys-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-accounts-keys-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 service-accounts-keys-upload &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

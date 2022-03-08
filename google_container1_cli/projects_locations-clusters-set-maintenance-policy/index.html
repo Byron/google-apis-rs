@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Clusters Set Maintenance Policy - Container v2.0.4+20210314</title>
+  <title>Locations Clusters Set Maintenance Policy - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -424,7 +424,7 @@ You can set the scope for this method like this: <code>container1 --scope &lt;sc
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The name (project, location, cluster id) of the cluster to set maintenance policy. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
+<li>The name (project, location, cluster name) of the cluster to set maintenance policy. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
 </ul>
 </li>
 </ul>
@@ -444,6 +444,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         recurrence: string
         window:
           end-time: string
+          maintenance-exclusion-options:
+            scope: string
           start-time: string
   name: string
   project-id: string
@@ -453,51 +455,57 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    cluster-id=at</code><ul>
+<li><code>-r .    cluster-id=amet</code><ul>
 <li>Required. The name of the cluster to update.</li>
 </ul>
 </li>
-<li><code>maintenance-policy    resource-version=erat</code><ul>
+<li><code>maintenance-policy    resource-version=sit</code><ul>
 <li>A hash identifying the version of this policy, so that updates to fields of the policy won&#39;t accidentally undo intermediate changes (and so that users of the API unaware of some fields won&#39;t accidentally remove other fields). Make a <code>get()</code> request to the cluster to get the current resource version and include it with requests to set the policy.</li>
 </ul>
 </li>
-<li><code>window.daily-maintenance-window    duration=clita</code><ul>
+<li><code>window.daily-maintenance-window    duration=rebum.</code><ul>
 <li>[Output only] Duration of the time window, automatically chosen to be smallest possible in the given scenario. Duration will be in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format &#34;PTnHnMnS&#34;.</li>
 </ul>
 </li>
 <li>
-<p><code>start-time=vero</code></p>
+<p><code>start-time=sea</code></p>
 <ul>
 <li>Time within the maintenance window to start the maintenance operations. Time format should be in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format &#34;HH:MM&#34;, where HH : [00-23] and MM : [00-59] GMT.</li>
 </ul>
 </li>
 <li>
-<p><code>..recurring-window    recurrence=invidunt</code></p>
+<p><code>..recurring-window    recurrence=ipsum</code></p>
 <ul>
 <li>An RRULE (https://tools.ietf.org/html/rfc5545#section-3.8.5.3) for how this window reccurs. They go on for the span of time between the start and end time. For example, to have something repeat every weekday, you&#39;d use: <code>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code> To repeat some window daily (equivalent to the DailyMaintenanceWindow): <code>FREQ=DAILY</code> For the first weekend of every month: <code>FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU</code> This specifies how frequently the window starts. Eg, if you wanted to have a 9-5 UTC-4 window every weekday, you&#39;d use something like: <code>start time = 2019-01-01T09:00:00-0400 end time = 2019-01-01T17:00:00-0400 recurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code> Windows can span multiple days. Eg, to make the window encompass every weekend from midnight Saturday till the last minute of Sunday UTC: <code>start time = 2019-01-05T00:00:00Z end time = 2019-01-07T23:59:00Z recurrence = FREQ=WEEKLY;BYDAY=SA</code> Note the start and end time&#39;s specific dates are largely arbitrary except to specify duration of the window and when it first starts. The FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.</li>
 </ul>
 </li>
-<li><code>window    end-time=nonumy</code><ul>
+<li><code>window    end-time=ipsum</code><ul>
 <li>The time that the window ends. The end time should take place after the start time.</li>
 </ul>
 </li>
 <li>
-<p><code>start-time=erat</code></p>
+<p><code>maintenance-exclusion-options    scope=et</code></p>
+<ul>
+<li>Scope specifies the upgrade scope which upgrades are blocked by the exclusion.</li>
+</ul>
+</li>
+<li>
+<p><code>..    start-time=elitr</code></p>
 <ul>
 <li>The time that the window first starts.</li>
 </ul>
 </li>
 <li>
-<p><code>.....    name=erat</code></p>
+<p><code>.....    name=eirmod</code></p>
 <ul>
-<li>The name (project, location, cluster id) of the cluster to set maintenance policy. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
+<li>The name (project, location, cluster name) of the cluster to set maintenance policy. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
 </ul>
 </li>
-<li><code>project-id=dolores</code><ul>
+<li><code>project-id=dolor</code><ul>
 <li>Required. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>.</li>
 </ul>
 </li>
-<li><code>zone=ipsum</code><ul>
+<li><code>zone=sadipscing</code><ul>
 <li>Required. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides.</li>
 </ul>
 </li>

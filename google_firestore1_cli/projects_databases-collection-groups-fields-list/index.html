@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Databases Collection Groups Fields List - Firestore v2.0.4+20210317</title>
+  <title>Databases Collection Groups Fields List - Firestore v3.0.0+20220221</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firestore v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Firestore v3.0.0+20220221</a>
         
       </div>
 
@@ -179,7 +179,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_databases-get">Databases Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_databases-import-documents">Databases Import Documents</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_databases-list">Databases List</a>
                     
                 </li>
             
@@ -200,6 +210,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_databases-operations-list">Databases Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_databases-patch">Databases Patch</a>
                     
                 </li>
             
@@ -249,7 +264,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists the field configuration and metadata for this database. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with the filter set to <code>indexConfig.usesAncestorConfig:false</code>.</p>
+              <p>Lists the field configuration and metadata for this database. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with the filter set to <code>indexConfig.usesAncestorConfig:false</code> .</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -284,7 +299,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>The filter to apply to list results. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with the filter set to <code>indexConfig.usesAncestorConfig:false</code>.</li>
+<li>The filter to apply to list results. Currently, FirestoreAdmin.ListFields only supports listing fields that have been explicitly overridden. To issue this query, call FirestoreAdmin.ListFields with a filter that includes <code>indexConfig.usesAncestorConfig:false</code> .</li>
 </ul>
 </li>
 <li>

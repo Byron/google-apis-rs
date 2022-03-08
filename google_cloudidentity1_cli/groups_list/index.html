@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Cloud Identity v2.0.4+20210310</title>
+  <title>List - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -150,6 +150,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
                 <li class="toctree-l1 current">
                     <a class="current" href=".">List</a>
                     
@@ -236,6 +241,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -272,7 +282,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Lists the <code>Group</code>s under a customer or namespace.</p>
+              <p>Lists the <code>Group</code> resources under a customer or namespace.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -313,7 +323,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p parent=string</strong></p>
 <ul>
-<li>Required. The parent resource under which to list all <code>Group</code>s. Must be of the form <code>identitysources/{identity_source_id}</code> for external- identity-mapped groups or <code>customers/{customer_id}</code> for Google Groups.</li>
+<li>Required. The parent resource under which to list all <code>Group</code> resources. Must be of the form <code>identitysources/{identity_source}</code> for external- identity-mapped groups or <code>customers/{customer}</code> for Google Groups. The <code>customer</code> must begin with &#34;C&#34; (for example, &#39;C046psxkn&#39;).</li>
 </ul>
 </li>
 <li>
@@ -403,7 +413,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         <a href="../groups_lookup" class="btn btn-neutral float-right" title="Lookup"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../groups_get" class="btn btn-neutral" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../groups_get-security-settings" class="btn btn-neutral" title="Get Security Settings"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -431,7 +441,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../groups_get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../groups_get-security-settings" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../groups_lookup" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

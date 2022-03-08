@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - drive v2.0.4+20210322</title>
+  <title>Update - drive v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
         
       </div>
 
@@ -577,6 +577,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   id: string
   kind: string
   name: string
+  pending-owner: boolean
   photo-link: string
   role: string
   self-link: string
@@ -589,12 +590,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    additional-roles=duo</code><ul>
+<li><code>-r .    additional-roles=erat</code><ul>
 <li>Additional roles for this user. Only commenter is currently allowed, though more may be supported in the future.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>auth-key=sea</code><ul>
+<li><code>auth-key=diam</code><ul>
 <li>Deprecated.</li>
 </ul>
 </li>
@@ -602,19 +603,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
 </ul>
 </li>
-<li><code>domain=erat</code><ul>
+<li><code>domain=ipsum</code><ul>
 <li>The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.</li>
 </ul>
 </li>
-<li><code>email-address=eirmod</code><ul>
+<li><code>email-address=et</code><ul>
 <li>The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.</li>
 </ul>
 </li>
-<li><code>etag=no</code><ul>
+<li><code>etag=dolor</code><ul>
 <li>The ETag of the permission.</li>
 </ul>
 </li>
-<li><code>expiration-date=eirmod</code><ul>
+<li><code>expiration-date=amet</code><ul>
 <li>The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  <ul>
 <li>They cannot be set on shared drive items </li>
 <li>They can only be set on user and group permissions </li>
@@ -625,23 +626,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>id=accusam</code><ul>
+<li><code>id=magna</code><ul>
 <li>The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
 </ul>
 </li>
-<li><code>kind=et</code><ul>
+<li><code>kind=gubergren</code><ul>
 <li>This is always drive#permission.</li>
 </ul>
 </li>
-<li><code>name=sit</code><ul>
+<li><code>name=dolor</code><ul>
 <li>The name for this permission.</li>
 </ul>
 </li>
-<li><code>photo-link=lorem</code><ul>
+<li><code>pending-owner=false</code><ul>
+<li>Whether the account associated with this permission is a pending owner. Only populated for user type permissions for files that are not in a shared drive.</li>
+</ul>
+</li>
+<li><code>photo-link=invidunt</code><ul>
 <li>A link to the profile photo, if available.</li>
 </ul>
 </li>
-<li><code>role=et</code><ul>
+<li><code>role=consetetur</code><ul>
 <li>The primary role for this user. While new values may be supported in the future, the following are currently allowed:  <ul>
 <li>owner </li>
 <li>organizer </li>
@@ -652,11 +657,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>self-link=tempor</code><ul>
+<li><code>self-link=duo</code><ul>
 <li>A link back to this permission.</li>
 </ul>
 </li>
-<li><code>type=lorem</code><ul>
+<li><code>type=est</code><ul>
 <li>The account type. Allowed values are:  <ul>
 <li>user </li>
 <li>group </li>
@@ -666,11 +671,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>value=vero</code><ul>
+<li><code>value=erat</code><ul>
 <li>The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
 </ul>
 </li>
-<li><code>view=at</code><ul>
+<li><code>view=duo</code><ul>
 <li>Indicates the view for this permission. Only populated for permissions that belong to a view. published is the only supported value.</li>
 </ul>
 </li>
@@ -724,7 +729,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p transfer-ownership=boolean</strong></p>
 <ul>
-<li>Whether changing a role to &#39;owner&#39; downgrades the current owners to writers. Does nothing if the specified role is not &#39;owner&#39;.</li>
+<li>Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect. File owners can only transfer ownership of files existing on My Drive. Files existing in a shared drive are owned by the organization that owns that shared drive. Ownership transfers are not supported for files and folders in shared drives. Organizers of a shared drive can move items from that shared drive into their My Drive which transfers the ownership to them.</li>
 </ul>
 </li>
 <li>

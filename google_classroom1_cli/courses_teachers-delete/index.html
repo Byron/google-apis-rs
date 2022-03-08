@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Teachers Delete - classroom v2.0.4+20210323</title>
+  <title>Teachers Delete - classroom v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> classroom v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> classroom v3.0.0+20220224</a>
         
       </div>
 
@@ -419,7 +419,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Deletes a teacher of a course. This method returns the following error codes: * <code>PERMISSION_DENIED</code> if the requesting user is not permitted to delete teachers of this course or for access errors. * <code>NOT_FOUND</code> if no teacher of this course has the requested ID or if the course does not exist. * <code>FAILED_PRECONDITION</code> if the requested ID belongs to the primary teacher of this course.</p>
+              <p>Removes the specified teacher from the specified course. This method returns the following error codes: * <code>PERMISSION_DENIED</code> if the requesting user is not permitted to delete teachers of this course or for access errors. * <code>NOT_FOUND</code> if no teacher of this course has the requested ID or if the course does not exist. * <code>FAILED_PRECONDITION</code> if the requested ID belongs to the primary teacher of this course. * <code>FAILED_PRECONDITION</code> if the requested ID belongs to the owner of the course Drive folder. * <code>FAILED_PRECONDITION</code> if the course no longer has an active owner.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/classroom.rosters</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/classroom.rosters</em>.

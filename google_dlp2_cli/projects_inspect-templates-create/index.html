@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Inspect Templates Create - DLP v2.0.4+20210326</title>
+  <title>Inspect Templates Create - DLP v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> DLP v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> DLP v3.0.0+20220227</a>
         
       </div>
 
@@ -675,16 +675,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>inspect-config    content-options=sit</code><ul>
-<li>List of options defining data content to scan. If empty, text, images, and other content will be included.</li>
+<li>Deprecated and unused.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li><code>exclude-info-types=false</code><ul>
-<li>When true, excludes type information of the findings.</li>
+<li>When true, excludes type information of the findings. This is not used for data profiling.</li>
 </ul>
 </li>
 <li><code>include-quote=false</code><ul>
-<li>When true, a contextual quote from the data that triggered a finding is included in the response; see Finding.quote.</li>
+<li>When true, a contextual quote from the data that triggered a finding is included in the response; see Finding.quote. This is not used for data profiling.</li>
 </ul>
 </li>
 <li><code>limits    max-findings-per-item=7</code><ul>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Registrations Register - Cloud Domains v3.0.0+20220128</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Domains v3.0.0+20220128</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-configure-contact-settings">Locations Registrations Configure Contact Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-configure-dns-settings">Locations Registrations Configure Dns Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-configure-management-settings">Locations Registrations Configure Management Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-delete">Locations Registrations Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-export">Locations Registrations Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-get">Locations Registrations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-get-iam-policy">Locations Registrations Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-list">Locations Registrations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-patch">Locations Registrations Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Registrations Register</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-reset-authorization-code">Locations Registrations Reset Authorization Code</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-retrieve-authorization-code">Locations Registrations Retrieve Authorization Code</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-retrieve-register-parameters">Locations Registrations Retrieve Register Parameters</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-retrieve-transfer-parameters">Locations Registrations Retrieve Transfer Parameters</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-search-domains">Locations Registrations Search Domains</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-set-iam-policy">Locations Registrations Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-test-iam-permissions">Locations Registrations Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-registrations-transfer">Locations Registrations Transfer</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Registrations Register</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/domains1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Registers a new domain name and creates a corresponding <code>Registration</code> resource. Call <code>RetrieveRegisterParameters</code> first to check availability of the domain name and determine parameters like price that are needed to build a call to this method. A successful call creates a <code>Registration</code> resource in state <code>REGISTRATION_PENDING</code>, which resolves to <code>ACTIVE</code> within 1-2 minutes, indicating that the domain was successfully registered. If the resource ends up in state <code>REGISTRATION_FAILED</code>, it indicates that the domain was not registered successfully, and you can safely delete the resource and retry registration.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>domains1 --scope &lt;scope&gt; projects locations-registrations-register ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The parent resource of the <code>Registration</code>. Must be in the format <code>projects/*/locations/*</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>RegisterDomainRequest:
+  contact-notices: [string]
+  domain-notices: [string]
+  registration:
+    contact-settings:
+      admin-contact:
+        email: string
+        fax-number: string
+        phone-number: string
+        postal-address:
+          address-lines: [string]
+          administrative-area: string
+          language-code: string
+          locality: string
+          organization: string
+          postal-code: string
+          recipients: [string]
+          region-code: string
+          revision: integer
+          sorting-code: string
+          sublocality: string
+      privacy: string
+      registrant-contact:
+        email: string
+        fax-number: string
+        phone-number: string
+        postal-address:
+          address-lines: [string]
+          administrative-area: string
+          language-code: string
+          locality: string
+          organization: string
+          postal-code: string
+          recipients: [string]
+          region-code: string
+          revision: integer
+          sorting-code: string
+          sublocality: string
+      technical-contact:
+        email: string
+        fax-number: string
+        phone-number: string
+        postal-address:
+          address-lines: [string]
+          administrative-area: string
+          language-code: string
+          locality: string
+          organization: string
+          postal-code: string
+          recipients: [string]
+          region-code: string
+          revision: integer
+          sorting-code: string
+          sublocality: string
+    create-time: string
+    dns-settings:
+      custom-dns:
+        name-servers: [string]
+      google-domains-dns:
+        ds-state: string
+        name-servers: [string]
+    domain-name: string
+    expire-time: string
+    issues: [string]
+    labels: { string: string }
+    management-settings:
+      renewal-method: string
+      transfer-lock-state: string
+    name: string
+    pending-contact-settings:
+      admin-contact:
+        email: string
+        fax-number: string
+        phone-number: string
+        postal-address:
+          address-lines: [string]
+          administrative-area: string
+          language-code: string
+          locality: string
+          organization: string
+          postal-code: string
+          recipients: [string]
+          region-code: string
+          revision: integer
+          sorting-code: string
+          sublocality: string
+      privacy: string
+      registrant-contact:
+        email: string
+        fax-number: string
+        phone-number: string
+        postal-address:
+          address-lines: [string]
+          administrative-area: string
+          language-code: string
+          locality: string
+          organization: string
+          postal-code: string
+          recipients: [string]
+          region-code: string
+          revision: integer
+          sorting-code: string
+          sublocality: string
+      technical-contact:
+        email: string
+        fax-number: string
+        phone-number: string
+        postal-address:
+          address-lines: [string]
+          administrative-area: string
+          language-code: string
+          locality: string
+          organization: string
+          postal-code: string
+          recipients: [string]
+          region-code: string
+          revision: integer
+          sorting-code: string
+          sublocality: string
+    state: string
+    supported-privacy: [string]
+  validate-only: boolean
+  yearly-price:
+    currency-code: string
+    nanos: integer
+    units: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    contact-notices=sea</code><ul>
+<li>The list of contact notices that the caller acknowledges. The notices needed here depend on the values specified in <code>registration.contact_settings</code>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>domain-notices=et</code><ul>
+<li>The list of domain notices that you acknowledge. Call <code>RetrieveRegisterParameters</code> to see the notices that need acknowledgement.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>registration.contact-settings.admin-contact    email=at</code><ul>
+<li>Required. Email address of the contact.</li>
+</ul>
+</li>
+<li><code>fax-number=dolore</code><ul>
+<li>Fax number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>phone-number=eirmod</code><ul>
+<li>Required. Phone number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>postal-address    address-lines=lorem</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=accusam</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=amet</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=erat</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=dolores</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=erat</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=accusam</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=sea</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=42</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=lorem</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=et</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>...    privacy=at</code></p>
+<ul>
+<li>Required. Privacy setting for the contacts associated with the <code>Registration</code>.</li>
+</ul>
+</li>
+<li><code>registrant-contact    email=dolor</code><ul>
+<li>Required. Email address of the contact.</li>
+</ul>
+</li>
+<li><code>fax-number=et</code><ul>
+<li>Fax number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>phone-number=sit</code><ul>
+<li>Required. Phone number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>postal-address    address-lines=erat</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=sea</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=nonumy</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=et</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=gubergren</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=justo</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=sea</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=consetetur</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=3</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=aliquyam</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=eos</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>...technical-contact    email=at</code></p>
+<ul>
+<li>Required. Email address of the contact.</li>
+</ul>
+</li>
+<li><code>fax-number=dolores</code><ul>
+<li>Fax number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>phone-number=consetetur</code><ul>
+<li>Required. Phone number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>postal-address    address-lines=gubergren</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=dolor</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=aliquyam</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=no</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=amet.</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=ipsum</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=lorem</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=accusam</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=39</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=sadipscing</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=at</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>....    create-time=sit</code></p>
+<ul>
+<li>Output only. The creation timestamp of the <code>Registration</code> resource.</li>
+</ul>
+</li>
+<li>
+<p><code>dns-settings.custom-dns    name-servers=duo</code></p>
+<ul>
+<li>Required. A list of name servers that store the DNS zone for this domain. Each name server is a domain name, with Unicode domain names expressed in Punycode format.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..google-domains-dns    ds-state=sit</code></p>
+<ul>
+<li>Required. The state of DS records for this domain. Used to enable or disable automatic DNSSEC.</li>
+</ul>
+</li>
+<li>
+<p><code>name-servers=magna</code></p>
+<ul>
+<li>Output only. A list of name servers that store the DNS zone for this domain. Each name server is a domain name, with Unicode domain names expressed in Punycode format. This field is automatically populated with the name servers assigned to the Google Domains DNS zone.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...    domain-name=et</code></p>
+<ul>
+<li>Required. Immutable. The domain name. Unicode domain names must be expressed in Punycode format.</li>
+</ul>
+</li>
+<li><code>expire-time=rebum.</code><ul>
+<li>Output only. The expiration timestamp of the <code>Registration</code>.</li>
+</ul>
+</li>
+<li><code>issues=dolor</code><ul>
+<li>Output only. The set of issues with the <code>Registration</code> that require attention.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>labels=key=lorem</code><ul>
+<li>Set of labels associated with the <code>Registration</code>.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>management-settings    renewal-method=justo</code><ul>
+<li>Output only. The renewal method for this <code>Registration</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>transfer-lock-state=amet.</code></p>
+<ul>
+<li>Controls whether the domain can be transferred to another registrar.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=no</code></p>
+<ul>
+<li>Output only. Name of the <code>Registration</code> resource, in the format <code>projects/*/locations/*/registrations/</code>.</li>
+</ul>
+</li>
+<li><code>pending-contact-settings.admin-contact    email=nonumy</code><ul>
+<li>Required. Email address of the contact.</li>
+</ul>
+</li>
+<li><code>fax-number=sed</code><ul>
+<li>Fax number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>phone-number=kasd</code><ul>
+<li>Required. Phone number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>postal-address    address-lines=lorem</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=sanctus</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=nonumy</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=rebum.</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=tempor</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=dolore</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=eos</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=amet.</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=17</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=amet</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=ut</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>...    privacy=at</code></p>
+<ul>
+<li>Required. Privacy setting for the contacts associated with the <code>Registration</code>.</li>
+</ul>
+</li>
+<li><code>registrant-contact    email=sit</code><ul>
+<li>Required. Email address of the contact.</li>
+</ul>
+</li>
+<li><code>fax-number=vero</code><ul>
+<li>Fax number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>phone-number=duo</code><ul>
+<li>Required. Phone number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>postal-address    address-lines=sadipscing</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=ut</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=rebum.</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=duo</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=kasd</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=sadipscing</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=tempor</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=sea</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=27</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=lorem</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=magna</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>...technical-contact    email=takimata</code></p>
+<ul>
+<li>Required. Email address of the contact.</li>
+</ul>
+</li>
+<li><code>fax-number=rebum.</code><ul>
+<li>Fax number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>phone-number=at</code><ul>
+<li>Required. Phone number of the contact in international format. For example, <code>&amp;#34;+1-800-555-0123&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>postal-address    address-lines=invidunt</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=clita</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=stet</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=aliquyam</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=ut</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=sit</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=vero</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=rebum.</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=82</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=consetetur</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=dolores</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>....    state=sed</code></p>
+<ul>
+<li>Output only. The state of the <code>Registration</code></li>
+</ul>
+</li>
+<li>
+<p><code>supported-privacy=invidunt</code></p>
+<ul>
+<li>Output only. Set of options for the <code>contact_settings.privacy</code> field that this <code>Registration</code> supports.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    validate-only=true</code></p>
+<ul>
+<li>When true, only validation is performed, without actually registering the domain. Follows: https://cloud.google.com/apis/design/design_patterns#request_validation</li>
+</ul>
+</li>
+<li><code>yearly-price    currency-code=dolor</code><ul>
+<li>The three-letter currency code defined in ISO 4217.</li>
+</ul>
+</li>
+<li><code>nanos=19</code><ul>
+<li>Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive. If <code>units</code> is positive, <code>nanos</code> must be positive or zero. If <code>units</code> is zero, <code>nanos</code> can be positive, zero, or negative. If <code>units</code> is negative, <code>nanos</code> must be negative or zero. For example $-1.75 is represented as <code>units</code>=-1 and <code>nanos</code>=-750,000,000.</li>
+</ul>
+</li>
+<li><code>units=magna</code><ul>
+<li>The whole units of the amount. For example if <code>currencyCode</code> is <code>&amp;#34;USD&amp;#34;</code>, then 1 unit is one US dollar.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-registrations-reset-authorization-code" class="btn btn-neutral float-right" title="Locations Registrations Reset Authorization Code"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-registrations-patch" class="btn btn-neutral" title="Locations Registrations Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-registrations-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-registrations-reset-authorization-code" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

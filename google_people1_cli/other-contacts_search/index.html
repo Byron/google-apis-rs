@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search - People Service v2.0.4+20210330</title>
+  <title>Search - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -228,7 +228,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Provides a list of contacts in the authenticated user&#39;s other contacts that matches the search query. The query matches on a contact&#39;s <code>names</code>, <code>emailAddresses</code>, and <code>phoneNumbers</code> fields that are from the OTHER_CONTACT source.</p>
+              <p>Provides a list of contacts in the authenticated user&#39;s other contacts that matches the search query. The query matches on a contact&#39;s <code>names</code>, <code>emailAddresses</code>, and <code>phoneNumbers</code> fields that are from the OTHER_CONTACT source. <strong>IMPORTANT</strong>: Before searching, clients should send a warmup request with an empty query to update the cache. See https://developers.google.com/people/v1/other-contacts#search_the_users_other_contacts</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/contacts.other.readonly</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/contacts.other.readonly</em>.
@@ -252,7 +252,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>Optional. The number of results to return. Defaults to 10 if field is not set, or set to 0.</li>
+<li>Optional. The number of results to return. Defaults to 10 if field is not set, or set to 0. Values greater than 30 will be capped to 30.</li>
 </ul>
 </li>
 <li>
@@ -264,7 +264,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p read-mask=string</strong></p>
 <ul>
-<li>Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * emailAddresses * names * phoneNumbers</li>
+<li>Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * emailAddresses * metadata * names * phoneNumbers</li>
 </ul>
 </li>
 </ul>

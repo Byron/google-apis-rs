@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Get Supported Languages - Translate v2.0.4+20210312</title>
+  <title>Locations Get Supported Languages - Translate v3.0.0+20220121</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Translate v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Translate v3.0.0+20220121</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_get-supported-languages">Get Supported Languages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batch-translate-document">Locations Batch Translate Document</a>
                     
                 </li>
             
@@ -144,6 +149,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-translate-document">Locations Translate Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-translate-text">Locations Translate Text</a>
                     
                 </li>
@@ -230,7 +240,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p model=string</strong></p>
 <ul>
-<li>Optional. Get supported languages of this model. The format depends on model type: - AutoML Translation models: <code>projects/{project-number-or-id}/locations/{location-id}/models/{model-id}</code> - General (built-in) models: <code>projects/{project-number-or-id}/locations/{location-id}/models/general/nmt</code>, <code>projects/{project-number-or-id}/locations/{location-id}/models/general/base</code> Returns languages supported by the specified model. If missing, we get supported languages of Google general base (PBMT) model.</li>
+<li>Optional. Get supported languages of this model. The format depends on model type: - AutoML Translation models: <code>projects/{project-number-or-id}/locations/{location-id}/models/{model-id}</code> - General (built-in) models: <code>projects/{project-number-or-id}/locations/{location-id}/models/general/nmt</code>, Returns languages supported by the specified model. If missing, we get supported languages of Google general NMT model.</li>
 </ul>
 </li>
 </ul>

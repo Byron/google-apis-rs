@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - Shopping Content v2.0.4+20210325</title>
+  <title>Insert - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -657,6 +657,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       email: string
       phone-number: string
       url: string
+    korean-business-registration-number: string
     phone-number: string
   google-my-business-link:
     gmb-email: string
@@ -715,46 +716,52 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    phone-number=ipsum</code></p>
+<p><code>..    korean-business-registration-number=ipsum</code></p>
+<ul>
+<li>The 10-digit <a href="https://support.google.com/merchants/answer/9037766">Korean business registration number</a> separated with dashes in the format: XXX-XX-XXXXX. This field will only be updated if explicitly set.</li>
+</ul>
+</li>
+<li>
+<p><code>phone-number=gubergren</code></p>
 <ul>
 <li>The phone number of the business.</li>
 </ul>
 </li>
 <li>
-<p><code>..google-my-business-link    gmb-email=gubergren</code></p>
+<p><code>..google-my-business-link    gmb-email=lorem</code></p>
 <ul>
 <li>The GMB email address of which a specific account within a GMB account. A sample account within a GMB account could be a business account with set of locations, managed under the GMB account.</li>
 </ul>
 </li>
 <li>
-<p><code>status=lorem</code></p>
+<p><code>status=gubergren</code></p>
 <ul>
 <li>Status of the link between this Merchant Center account and the GMB account. Acceptable values are: - &#34;<code>active</code>&#34; - &#34;<code>pending</code>&#34; </li>
 </ul>
 </li>
 <li>
-<p><code>..    id=gubergren</code></p>
+<p><code>..    id=eos</code></p>
 <ul>
 <li>Required for update. Merchant Center account ID.</li>
 </ul>
 </li>
-<li><code>kind=eos</code><ul>
+<li><code>kind=dolor</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;<code>content#account</code>&#34;</li>
 </ul>
 </li>
-<li><code>name=dolor</code><ul>
+<li><code>name=ea</code><ul>
 <li>Required. Display name for the account.</li>
 </ul>
 </li>
-<li><code>reviews-url=ea</code><ul>
+<li><code>reviews-url=ipsum</code><ul>
 <li>[DEPRECATED] This field is never returned and will be ignored if provided.</li>
 </ul>
 </li>
-<li><code>seller-id=ipsum</code><ul>
+<li><code>seller-id=invidunt</code><ul>
 <li>Client-specific, locally-unique, internal ID for the child account.</li>
 </ul>
 </li>
-<li><code>website-url=invidunt</code><ul>
+<li><code>website-url=amet</code><ul>
 <li>The merchant&#39;s website.</li>
 </ul>
 </li>

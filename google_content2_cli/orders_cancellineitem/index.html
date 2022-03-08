@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cancellineitem - Shopping Content v2.0.4+20210325</title>
+  <title>Cancellineitem - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -666,19 +666,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .amount    currency=est</code><ul>
-<li>The currency of the price.</li>
-</ul>
-</li>
-<li>
-<p><code>value=sit</code></p>
-<ul>
-<li>The price represented as a number.</li>
-</ul>
-</li>
-<li>
-<p><code>..amount-pretax    currency=sed</code></p>
-<ul>
+<li><code>-r .amount    currency=sed</code><ul>
 <li>The currency of the price.</li>
 </ul>
 </li>
@@ -689,7 +677,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..amount-tax    currency=lorem</code></p>
+<p><code>..amount-pretax    currency=lorem</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -701,28 +689,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    line-item-id=stet</code></p>
+<p><code>..amount-tax    currency=stet</code></p>
+<ul>
+<li>The currency of the price.</li>
+</ul>
+</li>
+<li>
+<p><code>value=dolores</code></p>
+<ul>
+<li>The price represented as a number.</li>
+</ul>
+</li>
+<li>
+<p><code>..    line-item-id=eos</code></p>
 <ul>
 <li>The ID of the line item to cancel. Either lineItemId or productId is required.</li>
 </ul>
 </li>
-<li><code>operation-id=dolores</code><ul>
+<li><code>operation-id=et</code><ul>
 <li>The ID of the operation. Unique across all operations for a given order.</li>
 </ul>
 </li>
-<li><code>product-id=eos</code><ul>
+<li><code>product-id=sea</code><ul>
 <li>The ID of the product to cancel. This is the REST ID used in the products service. Either lineItemId or productId is required.</li>
 </ul>
 </li>
-<li><code>quantity=33</code><ul>
+<li><code>quantity=27</code><ul>
 <li>The quantity to cancel.</li>
 </ul>
 </li>
-<li><code>reason=sea</code><ul>
+<li><code>reason=at</code><ul>
 <li>The reason for the cancellation. Acceptable values are: - &#34;<code>customerInitiatedCancel</code>&#34; - &#34;<code>invalidCoupon</code>&#34; - &#34;<code>malformedShippingAddress</code>&#34; - &#34;<code>noInventory</code>&#34; - &#34;<code>other</code>&#34; - &#34;<code>priceError</code>&#34; - &#34;<code>shippingPriceError</code>&#34; - &#34;<code>taxError</code>&#34; - &#34;<code>undeliverableShippingAddress</code>&#34; - &#34;<code>unsupportedPoBoxAddress</code>&#34; </li>
 </ul>
 </li>
-<li><code>reason-text=et</code><ul>
+<li><code>reason-text=dolore</code><ul>
 <li>The explanation of the reason.</li>
 </ul>
 </li>

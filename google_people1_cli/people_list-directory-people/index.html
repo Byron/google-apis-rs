@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List Directory People - People Service v2.0.4+20210330</title>
+  <title>List Directory People - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -228,7 +228,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Provides a list of domain profiles and domain contacts in the authenticated user&#39;s domain directory.</p>
+              <p>Provides a list of domain profiles and domain contacts in the authenticated user&#39;s domain directory. When the <code>sync_token</code> is specified, resources deleted since the last sync will be returned as a person with <code>PersonMetadata.deleted</code> set to true. When the <code>page_token</code> or <code>sync_token</code> is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at <a href="..//people/v1/directory#list_the_directory_people_that_have_changed">List the directory people that have changed</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/directory.readonly</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/directory.readonly</em>.
@@ -264,7 +264,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-token=string</strong></p>
 <ul>
-<li>Optional. A page token, received from a previous <code>ListDirectoryPeople</code> call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to <code>ListDirectoryPeople</code> must match the call that provided the page token.</li>
+<li>Optional. A page token, received from a previous response <code>next_page_token</code>. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to <code>people.listDirectoryPeople</code> must match the first call that provided the page token.</li>
 </ul>
 </li>
 <li>
@@ -276,7 +276,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p request-sync-token=boolean</strong></p>
 <ul>
-<li>Optional. Whether the response should include <code>next_sync_token</code>, which can be used to get all changes since the last request. For subsequent sync requests use the <code>sync_token</code> param instead.</li>
+<li>Optional. Whether the response should return <code>next_sync_token</code>. It can be used to get incremental changes since the last request by setting it on the request <code>sync_token</code>. More details about sync behavior at <code>people.listDirectoryPeople</code>.</li>
 </ul>
 </li>
 <li>
@@ -288,7 +288,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p sync-token=string</strong></p>
 <ul>
-<li>Optional. A sync token, received from a previous <code>ListDirectoryPeople</code> call. Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to <code>ListDirectoryPeople</code> must match the call that provided the sync token.</li>
+<li>Optional. A sync token, received from a previous response <code>next_sync_token</code> Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to <code>people.listDirectoryPeople</code> must match the first call that provided the sync token. More details about sync behavior at <code>people.listDirectoryPeople</code>.</li>
 </ul>
 </li>
 </ul>

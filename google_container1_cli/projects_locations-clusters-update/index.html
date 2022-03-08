@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Clusters Update - Container v2.0.4+20210314</title>
+  <title>Locations Clusters Update - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -447,6 +447,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         enabled: boolean
       gce-persistent-disk-csi-driver-config:
         enabled: boolean
+      gcp-filestore-csi-driver-config:
+        enabled: boolean
       horizontal-pod-autoscaling:
         disabled: boolean
       http-load-balancing:
@@ -455,6 +457,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         disabled: boolean
       network-policy-config:
         disabled: boolean
+    desired-authenticator-groups-config:
+      enabled: boolean
+      security-group: string
     desired-binary-authorization:
       enabled: boolean
     desired-cluster-autoscaling:
@@ -463,6 +468,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         boot-disk-kms-key: string
         disk-size-gb: integer
         disk-type: string
+        image-type: string
         management:
           auto-repair: boolean
           auto-upgrade: boolean
@@ -478,21 +484,43 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         upgrade-settings:
           max-surge: integer
           max-unavailable: integer
+      autoscaling-profile: string
       enable-node-autoprovisioning: boolean
     desired-database-encryption:
       key-name: string
       state: string
+    desired-datapath-provider: string
     desired-default-snat-status:
       disabled: boolean
+    desired-dns-config:
+      cluster-dns: string
+      cluster-dns-domain: string
+      cluster-dns-scope: string
+    desired-gcfs-config:
+      enabled: boolean
+    desired-identity-service-config:
+      enabled: boolean
     desired-image-type: string
     desired-intra-node-visibility-config:
       enabled: boolean
+    desired-l4ilb-subsetting-config:
+      enabled: boolean
     desired-locations: [string]
+    desired-logging-config:
+      component-config:
+        enable-components: [string]
     desired-logging-service: string
     desired-master-authorized-networks-config:
       enabled: boolean
     desired-master-version: string
+    desired-mesh-certificates:
+      enable-certificates: boolean
+    desired-monitoring-config:
+      component-config:
+        enable-components: [string]
     desired-monitoring-service: string
+    desired-node-pool-auto-config-network-tags:
+      tags: [string]
     desired-node-pool-autoscaling:
       autoprovisioned: boolean
       enabled: boolean
@@ -503,6 +531,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     desired-notification-config:
       pubsub:
         enabled: boolean
+        filter:
+          event-type: [string]
         topic: string
     desired-private-cluster-config:
       enable-private-endpoint: boolean
@@ -522,6 +552,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       consumption-metering-config:
         enabled: boolean
       enable-network-egress-metering: boolean
+    desired-service-external-ips-config:
+      enabled: boolean
     desired-shielded-nodes:
       enabled: boolean
     desired-vertical-pod-autoscaling:
@@ -534,30 +566,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    cluster-id=et</code><ul>
+<li><code>-r .    cluster-id=sea</code><ul>
 <li>Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>name=sed</code><ul>
+<li><code>name=duo</code><ul>
 <li>The name (project, location, cluster) of the cluster to update. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
 </ul>
 </li>
-<li><code>project-id=stet</code><ul>
+<li><code>project-id=sea</code><ul>
 <li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>update.desired-addons-config.cloud-run-config    disabled=false</code><ul>
+<li><code>update.desired-addons-config.cloud-run-config    disabled=true</code><ul>
 <li>Whether Cloud Run addon is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>load-balancer-type=kasd</code></p>
+<p><code>load-balancer-type=sadipscing</code></p>
 <ul>
 <li>Which load balancer type is installed for Cloud Run.</li>
 </ul>
 </li>
 <li>
-<p><code>..config-connector-config    enabled=false</code></p>
+<p><code>..config-connector-config    enabled=true</code></p>
 <ul>
 <li>Whether Cloud Connector is enabled for this cluster.</li>
 </ul>
@@ -572,6 +604,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p><code>..gce-persistent-disk-csi-driver-config    enabled=true</code></p>
 <ul>
 <li>Whether the Compute Engine PD CSI driver is enabled for this cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>..gcp-filestore-csi-driver-config    enabled=false</code></p>
+<ul>
+<li>Whether the GCP Filestore CSI driver is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
@@ -593,13 +631,25 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..network-policy-config    disabled=true</code></p>
+<p><code>..network-policy-config    disabled=false</code></p>
 <ul>
 <li>Whether NetworkPolicy is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>...desired-binary-authorization    enabled=false</code></p>
+<p><code>...desired-authenticator-groups-config    enabled=false</code></p>
+<ul>
+<li>Whether this cluster should return group membership lookups during authentication using a group of security groups.</li>
+</ul>
+</li>
+<li>
+<p><code>security-group=gubergren</code></p>
+<ul>
+<li>The name of the security group-of-groups to be used. Only relevant if enabled = true.</li>
+</ul>
+</li>
+<li>
+<p><code>..desired-binary-authorization    enabled=false</code></p>
 <ul>
 <li>Enable Binary Authorization for this cluster. If enabled, all container images will be validated by Binary Authorization.</li>
 </ul>
@@ -611,52 +661,56 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>autoprovisioning-node-pool-defaults    boot-disk-kms-key=et</code><ul>
+<li><code>autoprovisioning-node-pool-defaults    boot-disk-kms-key=kasd</code><ul>
 <li>The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool. This should be of the form projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]. For more information about protecting resources with Cloud KMS Keys please see: https://cloud.google.com/compute/docs/disks/customer-managed-encryption</li>
 </ul>
 </li>
-<li><code>disk-size-gb=7</code><ul>
+<li><code>disk-size-gb=67</code><ul>
 <li>Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB. If unspecified, the default disk size is 100GB.</li>
 </ul>
 </li>
-<li><code>disk-type=eirmod</code><ul>
+<li><code>disk-type=lorem</code><ul>
 <li>Type of the disk attached to each node (e.g. &#39;pd-standard&#39;, &#39;pd-ssd&#39; or &#39;pd-balanced&#39;) If unspecified, the default disk type is &#39;pd-standard&#39;</li>
 </ul>
 </li>
-<li><code>management    auto-repair=false</code><ul>
+<li><code>image-type=amet</code><ul>
+<li>The image type to use for NAP created node.</li>
+</ul>
+</li>
+<li><code>management    auto-repair=true</code><ul>
 <li>A flag that specifies whether the node auto-repair is enabled for the node pool. If enabled, the nodes in this node pool will be monitored and, if they fail health checks too many times, an automatic repair action will be triggered.</li>
 </ul>
 </li>
-<li><code>auto-upgrade=true</code><ul>
+<li><code>auto-upgrade=false</code><ul>
 <li>A flag that specifies whether node auto-upgrade is enabled for the node pool. If enabled, node auto-upgrade helps keep the nodes in your node pool up to date with the latest release version of Kubernetes.</li>
 </ul>
 </li>
-<li><code>upgrade-options    auto-upgrade-start-time=consetetur</code><ul>
+<li><code>upgrade-options    auto-upgrade-start-time=dolores</code><ul>
 <li>[Output only] This field is set when upgrades are about to commence with the approximate start time for the upgrades, in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
 </ul>
 </li>
 <li>
-<p><code>description=et</code></p>
+<p><code>description=consetetur</code></p>
 <ul>
 <li>[Output only] This field is set when upgrades are about to commence with the description of the upgrade.</li>
 </ul>
 </li>
 <li>
-<p><code>...    min-cpu-platform=sit</code></p>
+<p><code>...    min-cpu-platform=stet</code></p>
 <ul>
-<li>Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a> To unset the min cpu platform field pass &#34;automatic&#34; as field value.</li>
+<li>Deprecated. Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a> This field is deprecated, min_cpu_platform should be specified using cloud.google.com/requested-min-cpu-platform label selector on the pod. To unset the min cpu platform field pass &#34;automatic&#34; as field value.</li>
 </ul>
 </li>
-<li><code>oauth-scopes=lorem</code><ul>
+<li><code>oauth-scopes=accusam</code><ul>
 <li>Scopes that are used by NAP when creating node pools.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>service-account=nonumy</code><ul>
+<li><code>service-account=consetetur</code><ul>
 <li>The Google Cloud Platform Service Account to be used by the node VMs.</li>
 </ul>
 </li>
-<li><code>shielded-instance-config    enable-integrity-monitoring=false</code><ul>
+<li><code>shielded-instance-config    enable-integrity-monitoring=true</code><ul>
 <li>Defines whether the instance has integrity monitoring enabled. Enables monitoring and attestation of the boot integrity of the instance. The attestation is performed against the integrity policy baseline. This baseline is initially derived from the implicitly trusted boot image when the instance is created.</li>
 </ul>
 </li>
@@ -667,43 +721,83 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..upgrade-settings    max-surge=63</code></p>
+<p><code>..upgrade-settings    max-surge=41</code></p>
 <ul>
 <li>The maximum number of nodes that can be created beyond the current size of the node pool during the upgrade process.</li>
 </ul>
 </li>
 <li>
-<p><code>max-unavailable=86</code></p>
+<p><code>max-unavailable=76</code></p>
 <ul>
 <li>The maximum number of nodes that can be simultaneously unavailable during the upgrade process. A node is considered available if its status is Ready.</li>
 </ul>
 </li>
 <li>
-<p><code>...    enable-node-autoprovisioning=false</code></p>
+<p><code>...    autoscaling-profile=dolore</code></p>
+<ul>
+<li>Defines autoscaling behaviour.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-node-autoprovisioning=true</code></p>
 <ul>
 <li>Enables automatic node pool creation and deletion.</li>
 </ul>
 </li>
 <li>
-<p><code>..desired-database-encryption    key-name=at</code></p>
+<p><code>..desired-database-encryption    key-name=sed</code></p>
 <ul>
 <li>Name of CloudKMS key to use for the encryption of secrets in etcd. Ex. projects/my-project/locations/global/keyRings/my-ring/cryptoKeys/my-key</li>
 </ul>
 </li>
 <li>
-<p><code>state=diam</code></p>
+<p><code>state=labore</code></p>
 <ul>
 <li>Denotes the state of etcd encryption.</li>
 </ul>
 </li>
 <li>
-<p><code>..desired-default-snat-status    disabled=true</code></p>
+<p><code>..    desired-datapath-provider=et</code></p>
+<ul>
+<li>The desired datapath provider for the cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>desired-default-snat-status    disabled=false</code></p>
 <ul>
 <li>Disables cluster default sNAT rules.</li>
 </ul>
 </li>
 <li>
-<p><code>..    desired-image-type=at</code></p>
+<p><code>..desired-dns-config    cluster-dns=sed</code></p>
+<ul>
+<li>cluster_dns indicates which in-cluster DNS provider should be used.</li>
+</ul>
+</li>
+<li><code>cluster-dns-domain=at</code><ul>
+<li>cluster_dns_domain is the suffix used for all cluster service records.</li>
+</ul>
+</li>
+<li>
+<p><code>cluster-dns-scope=stet</code></p>
+<ul>
+<li>cluster_dns_scope indicates the scope of access to cluster DNS records.</li>
+</ul>
+</li>
+<li>
+<p><code>..desired-gcfs-config    enabled=true</code></p>
+<ul>
+<li>Whether to use GCFS.</li>
+</ul>
+</li>
+<li>
+<p><code>..desired-identity-service-config    enabled=true</code></p>
+<ul>
+<li>Whether to enable the Identity Service component</li>
+</ul>
+</li>
+<li>
+<p><code>..    desired-image-type=amet</code></p>
 <ul>
 <li>The desired image type for the node pool. NOTE: Set the &#34;desired_node_pool&#34; field as well.</li>
 </ul>
@@ -715,66 +809,112 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    desired-locations=erat</code></p>
+<p><code>..desired-l4ilb-subsetting-config    enabled=false</code></p>
+<ul>
+<li>Enables l4 ILB subsetting for this cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>..    desired-locations=invidunt</code></p>
 <ul>
 <li>The desired list of Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zones</a> in which the cluster&#39;s nodes should be located. This list must always include the cluster&#39;s primary zone. Warning: changing cluster locations will update the locations of all node pools and will result in nodes being added and/or removed.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>desired-logging-service=duo</code><ul>
+<li>
+<p><code>desired-logging-config.component-config    enable-components=et</code></p>
+<ul>
+<li>Select components to collect logs. An empty set would disable all logging.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...    desired-logging-service=et</code></p>
+<ul>
 <li>The logging service the cluster should use to write logs. Currently available options: * <code>logging.googleapis.com/kubernetes</code> - The Cloud Logging service with a Kubernetes-native resource model * <code>logging.googleapis.com</code> - The legacy Cloud Logging service (no longer available as of GKE 1.15). * <code>none</code> - no logs will be exported from the cluster. If left as an empty string,<code>logging.googleapis.com/kubernetes</code> will be used for GKE 1.14+ or <code>logging.googleapis.com</code> for earlier versions.</li>
 </ul>
 </li>
 <li>
-<p><code>desired-master-authorized-networks-config    enabled=false</code></p>
+<p><code>desired-master-authorized-networks-config    enabled=true</code></p>
 <ul>
 <li>Whether or not master authorized networks is enabled.</li>
 </ul>
 </li>
 <li>
-<p><code>..    desired-master-version=sit</code></p>
+<p><code>..    desired-master-version=erat</code></p>
 <ul>
 <li>The Kubernetes version to change the master to. Users may specify either explicit versions offered by Kubernetes Engine or version aliases, which have the following behavior: - &#34;latest&#34;: picks the highest valid Kubernetes version - &#34;1.X&#34;: picks the highest valid patch+gke.N patch in the 1.X version - &#34;1.X.Y&#34;: picks the highest valid gke.N patch in the 1.X.Y version - &#34;1.X.Y-gke.N&#34;: picks an explicit Kubernetes version - &#34;-&#34;: picks the default Kubernetes version</li>
 </ul>
 </li>
-<li><code>desired-monitoring-service=accusam</code><ul>
+<li>
+<p><code>desired-mesh-certificates    enable-certificates=false</code></p>
+<ul>
+<li>enable_certificates controls issuance of workload mTLS certificates. If set, the GKE Workload Identity Certificates controller and node agent will be deployed in the cluster, which can then be configured by creating a WorkloadCertificateConfig Custom Resource. Requires Workload Identity (workload_pool must be non-empty).</li>
+</ul>
+</li>
+<li>
+<p><code>..desired-monitoring-config.component-config    enable-components=vero</code></p>
+<ul>
+<li>Select components to collect metrics. An empty set would disable all monitoring.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...    desired-monitoring-service=ea</code></p>
+<ul>
 <li>The monitoring service the cluster should use to write metrics. Currently available options: * &#34;monitoring.googleapis.com/kubernetes&#34; - The Cloud Monitoring service with a Kubernetes-native resource model * <code>monitoring.googleapis.com</code> - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * <code>none</code> - No metrics will be exported from the cluster. If left as an empty string,<code>monitoring.googleapis.com/kubernetes</code> will be used for GKE 1.14+ or <code>monitoring.googleapis.com</code> for earlier versions.</li>
 </ul>
 </li>
-<li><code>desired-node-pool-autoscaling    autoprovisioned=false</code><ul>
+<li>
+<p><code>desired-node-pool-auto-config-network-tags    tags=et</code></p>
+<ul>
+<li>List of network tags.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..desired-node-pool-autoscaling    autoprovisioned=true</code></p>
+<ul>
 <li>Can this node pool be deleted automatically.</li>
 </ul>
 </li>
-<li><code>enabled=false</code><ul>
+<li><code>enabled=true</code><ul>
 <li>Is autoscaling enabled for this node pool.</li>
 </ul>
 </li>
-<li><code>max-node-count=64</code><ul>
-<li>Maximum number of nodes in the NodePool. Must be &gt;= min_node_count. There has to enough quota to scale up the cluster.</li>
+<li><code>max-node-count=43</code><ul>
+<li>Maximum number of nodes for one location in the NodePool. Must be &gt;= min_node_count. There has to be enough quota to scale up the cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>min-node-count=23</code></p>
+<p><code>min-node-count=8</code></p>
 <ul>
-<li>Minimum number of nodes in the NodePool. Must be &gt;= 1 and &lt;= max_node_count.</li>
+<li>Minimum number of nodes for one location in the NodePool. Must be &gt;= 1 and &lt;= max_node_count.</li>
 </ul>
 </li>
 <li>
-<p><code>..    desired-node-pool-id=consetetur</code></p>
+<p><code>..    desired-node-pool-id=dolor</code></p>
 <ul>
 <li>The node pool to be upgraded. This field is mandatory if &#34;desired_node_version&#34;, &#34;desired_image_family&#34; or &#34;desired_node_pool_autoscaling&#34; is specified and there is more than one node pool on the cluster.</li>
 </ul>
 </li>
-<li><code>desired-node-version=dolor</code><ul>
+<li><code>desired-node-version=et</code><ul>
 <li>The Kubernetes version to change the nodes to (typically an upgrade). Users may specify either explicit versions offered by Kubernetes Engine or version aliases, which have the following behavior: - &#34;latest&#34;: picks the highest valid Kubernetes version - &#34;1.X&#34;: picks the highest valid patch+gke.N patch in the 1.X version - &#34;1.X.Y&#34;: picks the highest valid gke.N patch in the 1.X.Y version - &#34;1.X.Y-gke.N&#34;: picks an explicit Kubernetes version - &#34;-&#34;: picks the Kubernetes master version</li>
 </ul>
 </li>
-<li><code>desired-notification-config.pubsub    enabled=true</code><ul>
+<li><code>desired-notification-config.pubsub    enabled=false</code><ul>
 <li>Enable notifications for Pub/Sub.</li>
 </ul>
 </li>
 <li>
-<p><code>topic=et</code></p>
+<p><code>filter    event-type=erat</code></p>
+<ul>
+<li>Event types to allowlist.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    topic=eos</code></p>
 <ul>
 <li>The desired Pub/Sub topic to which notifications will be sent by GKE. Format is <code>projects/{project}/topics/{topic}</code>.</li>
 </ul>
@@ -785,12 +925,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the master&#39;s internal IP address is used as the cluster endpoint.</li>
 </ul>
 </li>
-<li><code>enable-private-nodes=false</code><ul>
+<li><code>enable-private-nodes=true</code><ul>
 <li>Whether nodes have internal IP addresses only. If enabled, all nodes are given only RFC 1918 private addresses and communicate with the master via private networking.</li>
 </ul>
 </li>
 <li>
-<p><code>master-global-access-config    enabled=true</code></p>
+<p><code>master-global-access-config    enabled=false</code></p>
 <ul>
 <li>Whenever master is accessible globally or not.</li>
 </ul>
@@ -801,48 +941,54 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The IP range in CIDR notation to use for the hosted master network. This range will be used for assigning internal IP addresses to the master or set of masters, as well as the ILB VIP. This range must not overlap with any other ranges in use within the cluster&#39;s network.</li>
 </ul>
 </li>
-<li><code>peering-name=sadipscing</code><ul>
+<li><code>peering-name=rebum.</code><ul>
 <li>Output only. The peering name in the customer VPC used by this cluster.</li>
 </ul>
 </li>
-<li><code>private-endpoint=no</code><ul>
+<li><code>private-endpoint=eirmod</code><ul>
 <li>Output only. The internal IP address of this cluster&#39;s master endpoint.</li>
 </ul>
 </li>
 <li>
-<p><code>public-endpoint=tempor</code></p>
+<p><code>public-endpoint=dolores</code></p>
 <ul>
 <li>Output only. The external IP address of this cluster&#39;s master endpoint.</li>
 </ul>
 </li>
 <li>
-<p><code>..    desired-private-ipv6-google-access=ipsum</code></p>
+<p><code>..    desired-private-ipv6-google-access=aliquyam</code></p>
 <ul>
 <li>The desired state of IPv6 connectivity to Google Services.</li>
 </ul>
 </li>
 <li>
-<p><code>desired-release-channel    channel=sea</code></p>
+<p><code>desired-release-channel    channel=sanctus</code></p>
 <ul>
 <li>channel specifies which release channel the cluster is subscribed to.</li>
 </ul>
 </li>
 <li>
-<p><code>..desired-resource-usage-export-config.bigquery-destination    dataset-id=sit</code></p>
+<p><code>..desired-resource-usage-export-config.bigquery-destination    dataset-id=invidunt</code></p>
 <ul>
 <li>The ID of a BigQuery Dataset.</li>
 </ul>
 </li>
 <li>
-<p><code>..consumption-metering-config    enabled=true</code></p>
+<p><code>..consumption-metering-config    enabled=false</code></p>
 <ul>
 <li>Whether to enable consumption metering for this cluster. If enabled, a second BigQuery table will be created to hold resource consumption records.</li>
 </ul>
 </li>
 <li>
-<p><code>..    enable-network-egress-metering=true</code></p>
+<p><code>..    enable-network-egress-metering=false</code></p>
 <ul>
 <li>Whether to enable network egress metering for this cluster. If enabled, a daemonset will be created in the cluster to meter network egress traffic.</li>
+</ul>
+</li>
+<li>
+<p><code>..desired-service-external-ips-config    enabled=false</code></p>
+<ul>
+<li>Whether Services with ExternalIPs field are allowed or not.</li>
 </ul>
 </li>
 <li>
@@ -858,13 +1004,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..desired-workload-identity-config    workload-pool=magna</code></p>
+<p><code>..desired-workload-identity-config    workload-pool=ea</code></p>
 <ul>
 <li>The workload pool to attach all Kubernetes service accounts to.</li>
 </ul>
 </li>
 <li>
-<p><code>...    zone=sit</code></p>
+<p><code>...    zone=lorem</code></p>
 <ul>
 <li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the name field.</li>
 </ul>

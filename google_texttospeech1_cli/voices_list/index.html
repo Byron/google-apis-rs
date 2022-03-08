@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Texttospeech v2.0.4+20210326</title>
+  <title>List - Texttospeech v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Texttospeech v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Texttospeech v3.0.0+20220228</a>
         
       </div>
 
@@ -134,7 +134,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p language-code=string</strong><ul>
-<li>Optional. Recommended. <a href="https://www.rfc-editor.org/rfc/bcp/bcp47.txt">BCP-47</a> language tag. If not specified, the API will return all supported voices. If specified, the ListVoices call will only return voices that can be used to synthesize this language_code. E.g. when specifying &#34;en-NZ&#34;, you will get supported &#34;en-NZ&#34; voices; when specifying &#34;no&#34;, you will get supported &#34;no-*&#34; (Norwegian) and &#34;nb-*&#34; (Norwegian Bokmal) voices; specifying &#34;zh&#34; will also get supported &#34;cmn-*&#34; voices; specifying &#34;zh-hk&#34; will also get supported &#34;yue-hk&#34; voices.</li>
+<li>Optional. Recommended. <a href="https://www.rfc-editor.org/rfc/bcp/bcp47.txt">BCP-47</a> language tag. If not specified, the API will return all supported voices. If specified, the ListVoices call will only return voices that can be used to synthesize this language_code. For example, if you specify <code>&amp;#34;en-NZ&amp;#34;</code>, all <code>&amp;#34;en-NZ&amp;#34;</code> voices will be returned. If you specify <code>&amp;#34;no&amp;#34;</code>, both <code>&amp;#34;no-\*&amp;#34;</code> (Norwegian) and <code>&amp;#34;nb-\*&amp;#34;</code> (Norwegian Bokmal) voices will be returned.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Subscriptions Modify Ack Deadline - Pubsub v2.0.4+20210322</title>
+  <title>Subscriptions Modify Ack Deadline - Pubsub v3.0.0+20220221</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pubsub v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Pubsub v3.0.0+20220221</a>
         
       </div>
 
@@ -339,11 +339,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    ack-deadline-seconds=77</code><ul>
+<li><code>-r .    ack-deadline-seconds=81</code><ul>
 <li>Required. The new ack deadline with respect to the time this request was sent to the Pub/Sub system. For example, if the value is 10, the new ack deadline will expire 10 seconds after the <code>ModifyAckDeadline</code> call was made. Specifying zero might immediately make the message available for delivery to another subscriber client. This typically results in an increase in the rate of message redeliveries (that is, duplicates). The minimum deadline you can specify is 0 seconds. The maximum deadline you can specify is 600 seconds (10 minutes).</li>
 </ul>
 </li>
-<li><code>ack-ids=sed</code><ul>
+<li><code>ack-ids=dolore</code><ul>
 <li>Required. List of acknowledgment IDs.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

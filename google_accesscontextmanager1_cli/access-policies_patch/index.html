@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Patch - Access Context Manager v2.0.4+20210319</title>
+  <title>Patch - Access Context Manager v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Access Context Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Access Context Manager v3.0.0+20220301</a>
         
       </div>
 
@@ -75,6 +75,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_access-levels-test-iam-permissions">Access Levels Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../access-policies_create">Create</a>
                     
                 </li>
@@ -86,6 +91,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_get-iam-policy">Get Iam Policy</a>
                     
                 </li>
             
@@ -155,6 +165,21 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../access-policies_service-perimeters-replace-all">Service Perimeters Replace All</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_service-perimeters-test-iam-permissions">Service Perimeters Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../access-policies_test-iam-permissions">Test Iam Permissions</a>
                     
                 </li>
             
@@ -251,7 +276,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Update an AccessPolicy. The longrunning Operation from this RPC will have a successful status once the changes to the AccessPolicy have propagated to long-lasting storage. Syntactic and basic semantic errors will be returned in <code>metadata</code> as a BadRequest proto.</p>
+              <p>Updates an access policy. The long-running operation from this RPC has a successful status after the changes to the access policy propagate to long-lasting storage.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -259,7 +284,7 @@ You can set the scope for this method like this: <code>accesscontextmanager1 --s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Output only. Resource name of the <code>AccessPolicy</code>. Format: <code>accessPolicies/{policy_id}</code></li>
+<li>Output only. Resource name of the <code>AccessPolicy</code>. Format: <code>accessPolicies/{access_policy}</code></li>
 </ul>
 </li>
 </ul>
@@ -271,25 +296,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   etag: string
   name: string
   parent: string
+  scopes: [string]
   title: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    etag=amet</code><ul>
+<li><code>-r .    etag=sed</code><ul>
 <li>Output only. An opaque identifier for the current version of the <code>AccessPolicy</code>. This will always be a strongly validated etag, meaning that two Access Polices will be identical if and only if their etags are identical. Clients should not expect this to be in any specific format.</li>
 </ul>
 </li>
-<li><code>name=duo</code><ul>
-<li>Output only. Resource name of the <code>AccessPolicy</code>. Format: <code>accessPolicies/{policy_id}</code></li>
+<li><code>name=ut</code><ul>
+<li>Output only. Resource name of the <code>AccessPolicy</code>. Format: <code>accessPolicies/{access_policy}</code></li>
 </ul>
 </li>
-<li><code>parent=ipsum</code><ul>
+<li><code>parent=gubergren</code><ul>
 <li>Required. The parent of this <code>AccessPolicy</code> in the Cloud Resource Hierarchy. Currently immutable once created. Format: <code>organizations/{organization_id}</code></li>
 </ul>
 </li>
-<li><code>title=sed</code><ul>
+<li><code>scopes=rebum.</code><ul>
+<li>The scopes of a policy define which resources an ACM policy can restrict, and where ACM resources can be referenced. For example, a policy with scopes=[&#34;folders/123&#34;] has the following behavior: - vpcsc perimeters can only restrict projects within folders/123 - access levels can only be referenced by resources within folders/123. If empty, there are no limitations on which resources can be restricted by an ACM policy, and there are no limitations on where ACM resources can be referenced. Only one policy can include a given scope (attempting to create a second policy which includes &#34;folders/123&#34; will result in an error). Currently, scopes cannot be modified after a policy is created. Currently, policies can only have a single scope. Format: list of <code>folders/{folder_number}</code> or <code>projects/{project_number}</code></li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>title=est</code><ul>
 <li>Required. Human readable title. Does not affect behavior.</li>
 </ul>
 </li>

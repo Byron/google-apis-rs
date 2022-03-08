@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Course Work Create - classroom v2.0.4+20210323</title>
+  <title>Course Work Create - classroom v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> classroom v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> classroom v3.0.0+20220224</a>
         
       </div>
 
@@ -462,6 +462,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     minutes: integer
     nanos: integer
     seconds: integer
+  grade-category:
+    default-grade-denominator: integer
+    id: string
+    name: string
+    weight: integer
   id: string
   individual-students-options:
     student-ids: [string]
@@ -559,58 +564,78 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    id=et</code></p>
+<p><code>..grade-category    default-grade-denominator=77</code></p>
+<ul>
+<li>Default value of denominator. Only applicable when grade calculation type is TOTAL_POINTS.</li>
+</ul>
+</li>
+<li><code>id=sed</code><ul>
+<li>ID of the grade category.</li>
+</ul>
+</li>
+<li><code>name=et</code><ul>
+<li>Name of the grade category.</li>
+</ul>
+</li>
+<li>
+<p><code>weight=33</code></p>
+<ul>
+<li>The weight of the category average as part of overall average. A weight of 12.34% is represented as 123400 (100% is 1,000,000). The last two digits should always be zero since we use two decimal precision. Only applicable when grade calculation type is WEIGHTED_CATEGORIES.</li>
+</ul>
+</li>
+<li>
+<p><code>..    id=vero</code></p>
 <ul>
 <li>Classroom-assigned identifier of this course work, unique per course. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>individual-students-options    student-ids=sed</code></p>
+<p><code>individual-students-options    student-ids=erat</code></p>
 <ul>
 <li>Identifiers for the students that have access to the coursework/announcement.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    max-points=0.6034145300452126</code></p>
+<p><code>..    max-points=0.06730027227364666</code></p>
 <ul>
 <li>Maximum grade for this course work. If zero or unspecified, this assignment is considered ungraded. This must be a non-negative integer value.</li>
 </ul>
 </li>
 <li>
-<p><code>multiple-choice-question    choices=vero</code></p>
+<p><code>multiple-choice-question    choices=dolore</code></p>
 <ul>
 <li>Possible choices.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    scheduled-time=erat</code></p>
+<p><code>..    scheduled-time=et</code></p>
 <ul>
 <li>Optional timestamp when this course work is scheduled to be published.</li>
 </ul>
 </li>
-<li><code>state=sed</code><ul>
+<li><code>state=voluptua.</code><ul>
 <li>Status of this course work. If unspecified, the default state is <code>DRAFT</code>.</li>
 </ul>
 </li>
-<li><code>submission-modification-mode=duo</code><ul>
+<li><code>submission-modification-mode=amet.</code><ul>
 <li>Setting to determine when students are allowed to modify submissions. If unspecified, the default value is <code>MODIFIABLE_UNTIL_TURNED_IN</code>.</li>
 </ul>
 </li>
-<li><code>title=dolore</code><ul>
+<li><code>title=consetetur</code><ul>
 <li>Title of this course work. The title must be a valid UTF-8 string containing between 1 and 3000 characters.</li>
 </ul>
 </li>
-<li><code>topic-id=et</code><ul>
+<li><code>topic-id=diam</code><ul>
 <li>Identifier for the topic that this coursework is associated with. Must match an existing topic in the course.</li>
 </ul>
 </li>
-<li><code>update-time=voluptua.</code><ul>
+<li><code>update-time=dolor</code><ul>
 <li>Timestamp of the most recent change to this course work. Read-only.</li>
 </ul>
 </li>
-<li><code>work-type=amet.</code><ul>
+<li><code>work-type=et</code><ul>
 <li>Type of this course work. The type is set when the course work is created and cannot be changed.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Device Users Client States Patch - Cloud Identity v2.0.4+20210310</title>
+  <title>Device Users Client States Patch - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -88,6 +88,9 @@
                     <a class="current" href=".">Device Users Client States Patch</a>
                     
                         <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
                         
                             <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
                             
@@ -172,6 +175,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../groups_list">List</a>
                     
                 </li>
@@ -241,6 +249,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -278,10 +291,14 @@
           <div role="main">
             <div class="section">
               <p>Updates the client state for the device user <strong>Note</strong>: This method is available only to customers who have one of the following SKUs: Enterprise Standard, Enterprise Plus, Enterprise for Education, and Cloud Identity Premium</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-identity.devices</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-identity.devices</em>.
+You can set the scope for this method like this: <code>cloudidentity1 --scope &lt;scope&gt; devices device-users-client-states-patch ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Output only. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the ClientState in format: <code>devices/{device_id}/deviceUsers/{device_user_id}/clientState/{partner_id}</code>, where partner_id corresponds to the partner storing the data. For partners belonging to the &#34;BeyondCorp Alliance&#34;, this is the partner ID specified to you by Google. For all other callers, this is a string of the form: <code>{customer_id}-suffix</code>, where <code>customer_id</code> is your customer ID. The <em>suffix</em> is any string the caller specifies. This string will be displayed verbatim in the administration console. This suffix is used in setting up Custom Access Levels in Context-Aware Access. Your organization&#39;s customer ID can be obtained from the URL: <code>GET https://www.googleapis.com/admin/directory/v1/customers/my_customer</code> The <code>id</code> field in the response contains the customer ID starting with the letter &#39;C&#39;. The customer ID to be used in this API is the string after the letter &#39;C&#39; (not including &#39;C&#39;)</li>
+<li>Output only. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the ClientState in format: <code>devices/{device}/deviceUsers/{device_user}/clientState/{partner}</code>, where partner corresponds to the partner storing the data. For partners belonging to the &#34;BeyondCorp Alliance&#34;, this is the partner ID specified to you by Google. For all other callers, this is a string of the form: <code>{customer}-suffix</code>, where <code>customer</code> is your customer ID. The <em>suffix</em> is any string the caller specifies. This string will be displayed verbatim in the administration console. This suffix is used in setting up Custom Access Levels in Context-Aware Access. Your organization&#39;s customer ID can be obtained from the URL: <code>GET https://www.googleapis.com/admin/directory/v1/customers/my_customer</code> The <code>id</code> field in the response contains the customer ID starting with the letter &#39;C&#39;. The customer ID to be used in this API is the string after the letter &#39;C&#39; (not including &#39;C&#39;)</li>
 </ul>
 </li>
 </ul>
@@ -340,7 +357,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>name=erat</code><ul>
-<li>Output only. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the ClientState in format: <code>devices/{device_id}/deviceUsers/{device_user_id}/clientState/{partner_id}</code>, where partner_id corresponds to the partner storing the data. For partners belonging to the &#34;BeyondCorp Alliance&#34;, this is the partner ID specified to you by Google. For all other callers, this is a string of the form: <code>{customer_id}-suffix</code>, where <code>customer_id</code> is your customer ID. The <em>suffix</em> is any string the caller specifies. This string will be displayed verbatim in the administration console. This suffix is used in setting up Custom Access Levels in Context-Aware Access. Your organization&#39;s customer ID can be obtained from the URL: <code>GET https://www.googleapis.com/admin/directory/v1/customers/my_customer</code> The <code>id</code> field in the response contains the customer ID starting with the letter &#39;C&#39;. The customer ID to be used in this API is the string after the letter &#39;C&#39; (not including &#39;C&#39;)</li>
+<li>Output only. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the ClientState in format: <code>devices/{device}/deviceUsers/{device_user}/clientState/{partner}</code>, where partner corresponds to the partner storing the data. For partners belonging to the &#34;BeyondCorp Alliance&#34;, this is the partner ID specified to you by Google. For all other callers, this is a string of the form: <code>{customer}-suffix</code>, where <code>customer</code> is your customer ID. The <em>suffix</em> is any string the caller specifies. This string will be displayed verbatim in the administration console. This suffix is used in setting up Custom Access Levels in Context-Aware Access. Your organization&#39;s customer ID can be obtained from the URL: <code>GET https://www.googleapis.com/admin/directory/v1/customers/my_customer</code> The <code>id</code> field in the response contains the customer ID starting with the letter &#39;C&#39;. The customer ID to be used in this API is the string after the letter &#39;C&#39; (not including &#39;C&#39;)</li>
 </ul>
 </li>
 <li><code>owner-type=sed</code><ul>
@@ -379,7 +396,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p customer=string</strong></p>
 <ul>
-<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code> If you&#39;re using this API to manage another organization, use <code>customers/{customer_id}</code>, where customer_id is the customer to whom the device belongs.</li>
+<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code> If you&#39;re using this API to manage another organization, use <code>customers/{customer}</code>, where customer is the customer to whom the device belongs.</li>
 </ul>
 </li>
 <li>

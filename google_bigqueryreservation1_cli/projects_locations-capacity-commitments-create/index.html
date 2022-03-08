@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Capacity Commitments Create - BigQuery Reservation v2.0.4+20210324</title>
+  <title>Locations Capacity Commitments Create - BigQuery Reservation v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Reservation v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Reservation v3.0.0+20220226</a>
         
       </div>
 
@@ -230,6 +230,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   failure-status:
     code: integer
     message: string
+  multi-region-auxiliary: boolean
   name: string
   plan: string
   renewal-plan: string
@@ -259,24 +260,28 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    name=voluptua.</code></p>
+<p><code>..    multi-region-auxiliary=false</code></p>
 <ul>
-<li>Output only. The resource name of the capacity commitment, e.g., <code>projects/myproject/locations/US/capacityCommitments/123</code></li>
+<li>Applicable only for commitments located within one of the BigQuery multi-regions (US or EU). If set to true, this commitment is placed in the organization&#39;s secondary region which is designated for disaster recovery purposes. If false, this commitment is placed in the organization&#39;s default region.</li>
 </ul>
 </li>
-<li><code>plan=at</code><ul>
+<li><code>name=amet.</code><ul>
+<li>Output only. The resource name of the capacity commitment, e.g., <code>projects/myproject/locations/US/capacityCommitments/123</code> For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.</li>
+</ul>
+</li>
+<li><code>plan=takimata</code><ul>
 <li>Capacity commitment commitment plan.</li>
 </ul>
 </li>
-<li><code>renewal-plan=sanctus</code><ul>
+<li><code>renewal-plan=amet.</code><ul>
 <li>The plan this capacity commitment is converted to after commitment_end_time passes. Once the plan is changed, committed period is extended according to commitment plan. Only applicable for ANNUAL and TRIAL commitments.</li>
 </ul>
 </li>
-<li><code>slot-count=-80</code><ul>
+<li><code>slot-count=-20</code><ul>
 <li>Number of slots in this commitment.</li>
 </ul>
 </li>
-<li><code>state=amet.</code><ul>
+<li><code>state=ipsum</code><ul>
 <li>Output only. State of the commitment.</li>
 </ul>
 </li>
@@ -305,7 +310,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
 <code>-p</code> for completeness.</p>
 <ul>
-<li><strong>-p enforce-single-admin-project-per-org=boolean</strong><ul>
+<li>
+<p><strong>-p capacity-commitment-id=string</strong></p>
+<ul>
+<li>The optional capacity commitment ID. Capacity commitment name will be generated automatically if this field is empty. This field must only contain lower case alphanumeric characters or dashes. The first and last character cannot be a dash. Max length is 64 characters. NOTE: this ID won&#39;t be kept if the capacity commitment is split or merged.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p enforce-single-admin-project-per-org=boolean</strong></p>
+<ul>
 <li>If true, fail the request if another project in the organization has a capacity commitment.</li>
 </ul>
 </li>

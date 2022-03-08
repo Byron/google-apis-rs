@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - drive v2.0.4+20210322</title>
+  <title>Insert - drive v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
         
       </div>
 
@@ -587,6 +587,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   id: string
   kind: string
   name: string
+  org-unit-id: string
   restrictions:
     admin-managed-restrictions: boolean
     copy-requires-writer-permission: boolean
@@ -722,11 +723,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The name of this shared drive.</li>
 </ul>
 </li>
+<li><code>org-unit-id=aliquyam</code><ul>
+<li>The organizational unit of this shared drive. This field is only populated on drives.list responses when the useDomainAdminAccess parameter is set to true.</li>
+</ul>
+</li>
 <li><code>restrictions    admin-managed-restrictions=false</code><ul>
 <li>Whether administrative privileges on this shared drive are required to modify restrictions.</li>
 </ul>
 </li>
-<li><code>copy-requires-writer-permission=false</code><ul>
+<li><code>copy-requires-writer-permission=true</code><ul>
 <li>Whether the options to copy, print, or download files inside this shared drive, should be disabled for readers and commenters. When this restriction is set to true, it will override the similarly named field to true for any file inside this shared drive.</li>
 </ul>
 </li>
@@ -741,7 +746,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    theme-id=sit</code></p>
+<p><code>..    theme-id=sed</code></p>
 <ul>
 <li>The ID of the theme from which the background image and color will be set. The set of possible driveThemes can be retrieved from a drive.about.get response. When not specified on a drive.drives.insert request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don&#39;t set colorRgb or backgroundImageFile.</li>
 </ul>

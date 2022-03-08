@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Refund - Shopping Content v2.0.4+20210325</title>
+  <title>Refund - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -663,19 +663,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .amount    currency=aliquyam</code><ul>
-<li>The currency of the price.</li>
-</ul>
-</li>
-<li>
-<p><code>value=no</code></p>
-<ul>
-<li>The price represented as a number.</li>
-</ul>
-</li>
-<li>
-<p><code>..amount-pretax    currency=amet.</code></p>
-<ul>
+<li><code>-r .amount    currency=amet.</code><ul>
 <li>The currency of the price.</li>
 </ul>
 </li>
@@ -686,7 +674,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..amount-tax    currency=lorem</code></p>
+<p><code>..amount-pretax    currency=lorem</code></p>
 <ul>
 <li>The currency of the price.</li>
 </ul>
@@ -698,16 +686,28 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    operation-id=gubergren</code></p>
+<p><code>..amount-tax    currency=gubergren</code></p>
+<ul>
+<li>The currency of the price.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sadipscing</code></p>
+<ul>
+<li>The price represented as a number.</li>
+</ul>
+</li>
+<li>
+<p><code>..    operation-id=at</code></p>
 <ul>
 <li>The ID of the operation. Unique across all operations for a given order.</li>
 </ul>
 </li>
-<li><code>reason=sadipscing</code><ul>
+<li><code>reason=sit</code><ul>
 <li>The reason for the refund. Acceptable values are: - &#34;<code>adjustment</code>&#34; - &#34;<code>courtesyAdjustment</code>&#34; - &#34;<code>customerCanceled</code>&#34; - &#34;<code>customerDiscretionaryReturn</code>&#34; - &#34;<code>deliveredLateByCarrier</code>&#34; - &#34;<code>feeAdjustment</code>&#34; - &#34;<code>lateShipmentCredit</code>&#34; - &#34;<code>noInventory</code>&#34; - &#34;<code>other</code>&#34; - &#34;<code>priceError</code>&#34; - &#34;<code>productArrivedDamaged</code>&#34; - &#34;<code>productNotAsDescribed</code>&#34; - &#34;<code>shippingCostAdjustment</code>&#34; - &#34;<code>taxAdjustment</code>&#34; - &#34;<code>undeliverableShippingAddress</code>&#34; - &#34;<code>wrongProductShipped</code>&#34; </li>
 </ul>
 </li>
-<li><code>reason-text=at</code><ul>
+<li><code>reason-text=duo</code><ul>
 <li>The explanation of the reason.</li>
 </ul>
 </li>

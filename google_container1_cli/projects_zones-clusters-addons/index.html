@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Zones Clusters Addons - Container v2.0.4+20210314</title>
+  <title>Zones Clusters Addons - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -451,6 +451,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       enabled: boolean
     gce-persistent-disk-csi-driver-config:
       enabled: boolean
+    gcp-filestore-csi-driver-config:
+      enabled: boolean
     horizontal-pod-autoscaling:
       disabled: boolean
     http-load-balancing:
@@ -468,12 +470,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .addons-config.cloud-run-config    disabled=false</code><ul>
+<li><code>-r .addons-config.cloud-run-config    disabled=true</code><ul>
 <li>Whether Cloud Run addon is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>load-balancer-type=stet</code></p>
+<p><code>load-balancer-type=et</code></p>
 <ul>
 <li>Which load balancer type is installed for Cloud Run.</li>
 </ul>
@@ -497,7 +499,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..horizontal-pod-autoscaling    disabled=true</code></p>
+<p><code>..gcp-filestore-csi-driver-config    enabled=false</code></p>
+<ul>
+<li>Whether the GCP Filestore CSI driver is enabled for this cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>..horizontal-pod-autoscaling    disabled=false</code></p>
 <ul>
 <li>Whether the Horizontal Pod Autoscaling feature is enabled in the cluster. When enabled, it ensures that metrics are collected into Stackdriver Monitoring.</li>
 </ul>
@@ -521,20 +529,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...    cluster-id=sed</code></p>
+<p><code>...    cluster-id=takimata</code></p>
 <ul>
 <li>Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>name=at</code><ul>
+<li><code>name=duo</code><ul>
 <li>The name (project, location, cluster) of the cluster to set addons. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
 </ul>
 </li>
-<li><code>project-id=stet</code><ul>
+<li><code>project-id=tempor</code><ul>
 <li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
-<li><code>zone=sit</code><ul>
+<li><code>zone=clita</code><ul>
 <li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>

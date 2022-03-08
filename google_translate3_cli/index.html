@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Translate v2.0.4+20210312</title>
+  <title>Translate v3.0.0+20220121</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Translate v2.0.4+20210312</a>
+        <a href="." class="icon icon-home"> Translate v3.0.0+20220121</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_get-supported-languages/">Get Supported Languages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-batch-translate-document/">Locations Batch Translate Document</a>
                     
                 </li>
             
@@ -125,6 +130,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-translate-document/">Locations Translate Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-translate-text/">Locations Translate Text</a>
                     
                 </li>
@@ -189,11 +199,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/translate3-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Translate</em> API at revision <em>20210312</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Translate</em> API at revision <em>20220121</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">translate3 [options]
         projects
                 detect-language &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 get-supported-languages &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-batch-translate-document &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-batch-translate-text &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-detect-language &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -208,6 +219,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-wait &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-translate-document &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-translate-text &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 translate-text &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   translate3 --help

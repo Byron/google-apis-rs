@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Copy - drive v2.0.4+20210322</title>
+  <title>Copy - drive v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
         
       </div>
 
@@ -571,11 +571,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   can-comment: boolean
   can-read-revisions: boolean
   capabilities:
+    can-accept-ownership: boolean
     can-add-children: boolean
     can-add-folder-from-another-drive: boolean
     can-add-my-drive-parent: boolean
     can-change-copy-requires-writer-permission: boolean
     can-change-restricted-download: boolean
+    can-change-security-update-enabled: boolean
     can-comment: boolean
     can-copy: boolean
     can-delete: boolean
@@ -672,6 +674,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       url: string
   last-modifying-user-name: string
   last-viewed-by-me-date: string
+  link-share-metadata:
+    security-update-eligible: boolean
+    security-update-enabled: boolean
   marked-viewed-by-me-date: string
   md5-checksum: string
   mime-type: string
@@ -683,6 +688,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   owner-names: [string]
   permission-ids: [string]
   quota-bytes-used: string
+  resource-key: string
   self-link: string
   shareable: boolean
   shared: boolean
@@ -698,6 +704,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   shortcut-details:
     target-id: string
     target-mime-type: string
+    target-resource-key: string
   spaces: [string]
   team-drive-id: string
   thumbnail:
@@ -726,6 +733,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     id: string
     kind: string
     name: string
+    pending-owner: boolean
     photo-link: string
     role: string
     self-link: string
@@ -762,24 +770,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Deprecated: use capabilities/canReadRevisions.</li>
 </ul>
 </li>
-<li><code>capabilities    can-add-children=true</code><ul>
+<li><code>capabilities    can-accept-ownership=true</code><ul>
+<li>Whether the current user is the pending owner of the file. Not populated for shared drive files.</li>
+</ul>
+</li>
+<li><code>can-add-children=false</code><ul>
 <li>Whether the current user can add children to this folder. This is always false when the item is not a folder.</li>
 </ul>
 </li>
-<li><code>can-add-folder-from-another-drive=false</code><ul>
+<li><code>can-add-folder-from-another-drive=true</code><ul>
 <li>Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>can-add-my-drive-parent=true</code><ul>
+<li><code>can-add-my-drive-parent=false</code><ul>
 <li>Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.</li>
 </ul>
 </li>
-<li><code>can-change-copy-requires-writer-permission=false</code><ul>
+<li><code>can-change-copy-requires-writer-permission=true</code><ul>
 <li>Whether the current user can change the copyRequiresWriterPermission restriction of this file.</li>
 </ul>
 </li>
-<li><code>can-change-restricted-download=true</code><ul>
+<li><code>can-change-restricted-download=false</code><ul>
 <li>Deprecated</li>
+</ul>
+</li>
+<li><code>can-change-security-update-enabled=true</code><ul>
+<li>Whether the current user can change the securityUpdateEnabled field on link share metadata.</li>
 </ul>
 </li>
 <li><code>can-comment=false</code><ul>
@@ -790,7 +806,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.</li>
 </ul>
 </li>
-<li><code>can-delete=false</code><ul>
+<li><code>can-delete=true</code><ul>
 <li>Whether the current user can delete this file.</li>
 </ul>
 </li>
@@ -798,15 +814,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>can-download=true</code><ul>
+<li><code>can-download=false</code><ul>
 <li>Whether the current user can download this file.</li>
 </ul>
 </li>
-<li><code>can-edit=true</code><ul>
+<li><code>can-edit=false</code><ul>
 <li>Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see canChangeCopyRequiresWriterPermission or canModifyContent.</li>
 </ul>
 </li>
-<li><code>can-list-children=false</code><ul>
+<li><code>can-list-children=true</code><ul>
 <li>Whether the current user can list the children of this folder. This is always false when the item is not a folder.</li>
 </ul>
 </li>
@@ -822,11 +838,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>can-move-children-out-of-team-drive=true</code><ul>
+<li><code>can-move-children-out-of-team-drive=false</code><ul>
 <li>Deprecated - use canMoveChildrenOutOfDrive instead.</li>
 </ul>
 </li>
-<li><code>can-move-children-within-drive=false</code><ul>
+<li><code>can-move-children-within-drive=true</code><ul>
 <li>Whether the current user can move children of this folder within this drive. This is false when the item is not a folder. Note that a request to move the child may still fail depending on the current user&#39;s access to the child and to the destination folder.</li>
 </ul>
 </li>
@@ -846,7 +862,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Deprecated - use canMoveItemOutOfDrive instead.</li>
 </ul>
 </li>
-<li><code>can-move-item-within-drive=false</code><ul>
+<li><code>can-move-item-within-drive=true</code><ul>
 <li>Whether the current user can move this item within this drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added and the parent that is being removed.</li>
 </ul>
 </li>
@@ -854,11 +870,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Deprecated - use canMoveItemWithinDrive instead.</li>
 </ul>
 </li>
-<li><code>can-move-team-drive-item=true</code><ul>
+<li><code>can-move-team-drive-item=false</code><ul>
 <li>Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.</li>
 </ul>
 </li>
-<li><code>can-read-drive=true</code><ul>
+<li><code>can-read-drive=false</code><ul>
 <li>Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.</li>
 </ul>
 </li>
@@ -866,19 +882,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.</li>
 </ul>
 </li>
-<li><code>can-read-team-drive=false</code><ul>
+<li><code>can-read-team-drive=true</code><ul>
 <li>Deprecated - use canReadDrive instead.</li>
 </ul>
 </li>
-<li><code>can-remove-children=false</code><ul>
+<li><code>can-remove-children=true</code><ul>
 <li>Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use canDeleteChildren or canTrashChildren instead.</li>
 </ul>
 </li>
-<li><code>can-remove-my-drive-parent=true</code><ul>
+<li><code>can-remove-my-drive-parent=false</code><ul>
 <li>Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.</li>
 </ul>
 </li>
-<li><code>can-rename=true</code><ul>
+<li><code>can-rename=false</code><ul>
 <li>Whether the current user can rename this file.</li>
 </ul>
 </li>
@@ -886,7 +902,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can modify the sharing settings for this file.</li>
 </ul>
 </li>
-<li><code>can-trash=false</code><ul>
+<li><code>can-trash=true</code><ul>
 <li>Whether the current user can move this file to trash.</li>
 </ul>
 </li>
@@ -901,32 +917,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    copy-requires-writer-permission=false</code></p>
+<p><code>..    copy-requires-writer-permission=true</code></p>
 <ul>
 <li>Whether the options to copy, print, or download this file, should be disabled for readers and commenters.</li>
 </ul>
 </li>
-<li><code>copyable=true</code><ul>
+<li><code>copyable=false</code><ul>
 <li>Deprecated: use capabilities/canCopy.</li>
 </ul>
 </li>
-<li><code>created-date=sed</code><ul>
+<li><code>created-date=diam</code><ul>
 <li>Create time for this file (formatted RFC 3339 timestamp).</li>
 </ul>
 </li>
-<li><code>default-open-with-link=est</code><ul>
+<li><code>default-open-with-link=at</code><ul>
 <li>A link to open this file with the user&#39;s default app for this file. Only populated when the drive.apps.readonly scope is used.</li>
 </ul>
 </li>
-<li><code>description=takimata</code><ul>
+<li><code>description=erat</code><ul>
 <li>A short description of the file.</li>
 </ul>
 </li>
-<li><code>download-url=dolor</code><ul>
+<li><code>download-url=justo</code><ul>
 <li>Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>drive-id=diam</code><ul>
+<li><code>drive-id=ipsum</code><ul>
 <li>ID of the shared drive the file resides in. Only populated for items in shared drives.</li>
 </ul>
 </li>
@@ -934,36 +950,36 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Deprecated: use capabilities/canEdit.</li>
 </ul>
 </li>
-<li><code>embed-link=erat</code><ul>
+<li><code>embed-link=dolores</code><ul>
 <li>A link for embedding the file.</li>
 </ul>
 </li>
-<li><code>etag=justo</code><ul>
+<li><code>etag=consetetur</code><ul>
 <li>ETag of the file.</li>
 </ul>
 </li>
-<li><code>explicitly-trashed=false</code><ul>
+<li><code>explicitly-trashed=true</code><ul>
 <li>Whether this file has been explicitly trashed, as opposed to recursively trashed.</li>
 </ul>
 </li>
-<li><code>export-links=key=dolores</code><ul>
+<li><code>export-links=key=diam</code><ul>
 <li>Links for exporting Docs Editors files to specific formats.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>file-extension=consetetur</code><ul>
+<li><code>file-extension=sea</code><ul>
 <li>The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>file-size=no</code><ul>
+<li><code>file-size=ipsum</code><ul>
 <li>The size of the file in bytes. This field is populated for files with content stored in Google Drive and for files in Docs Editors; it is not populated for shortcut files.</li>
 </ul>
 </li>
-<li><code>folder-color-rgb=justo</code><ul>
-<li>Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette. Not populated for items in shared drives.</li>
+<li><code>folder-color-rgb=stet</code><ul>
+<li>Folder color as an RGB hex string if the file is a folder or a shortcut to a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette.</li>
 </ul>
 </li>
-<li><code>full-file-extension=sadipscing</code><ul>
+<li><code>full-file-extension=gubergren</code><ul>
 <li>The full file extension; extracted from the title. May contain multiple concatenated extensions, such as &#34;tar.gz&#34;. Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
@@ -971,51 +987,51 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether there are permissions directly on this file. This field is only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>has-thumbnail=true</code><ul>
+<li><code>has-thumbnail=false</code><ul>
 <li>Whether this file has a thumbnail. This does not indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.</li>
 </ul>
 </li>
-<li><code>head-revision-id=stet</code><ul>
+<li><code>head-revision-id=kasd</code><ul>
 <li>The ID of the file&#39;s head revision. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>icon-link=gubergren</code><ul>
+<li><code>icon-link=amet</code><ul>
 <li>A link to the file&#39;s icon.</li>
 </ul>
 </li>
-<li><code>id=ipsum</code><ul>
+<li><code>id=lorem</code><ul>
 <li>The ID of the file.</li>
 </ul>
 </li>
-<li><code>image-media-metadata    aperture=0.3128221260388019</code><ul>
+<li><code>image-media-metadata    aperture=0.7922165291773876</code><ul>
 <li>The aperture used to create the photo (f-number).</li>
 </ul>
 </li>
-<li><code>camera-make=kasd</code><ul>
+<li><code>camera-make=invidunt</code><ul>
 <li>The make of the camera used to create the photo.</li>
 </ul>
 </li>
-<li><code>camera-model=amet</code><ul>
+<li><code>camera-model=sed</code><ul>
 <li>The model of the camera used to create the photo.</li>
 </ul>
 </li>
-<li><code>color-space=lorem</code><ul>
+<li><code>color-space=nonumy</code><ul>
 <li>The color space of the photo.</li>
 </ul>
 </li>
-<li><code>date=justo</code><ul>
+<li><code>date=sea</code><ul>
 <li>The date and time the photo was taken (EXIF format timestamp).</li>
 </ul>
 </li>
-<li><code>exposure-bias=0.10245711941261193</code><ul>
+<li><code>exposure-bias=0.015343650487020133</code><ul>
 <li>The exposure bias of the photo (APEX value).</li>
 </ul>
 </li>
-<li><code>exposure-mode=sed</code><ul>
+<li><code>exposure-mode=kasd</code><ul>
 <li>The exposure mode used to create the photo.</li>
 </ul>
 </li>
-<li><code>exposure-time=0.08117638318055986</code><ul>
+<li><code>exposure-time=0.6302128855856648</code><ul>
 <li>The length of the exposure, in seconds.</li>
 </ul>
 </li>
@@ -1023,70 +1039,70 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether a flash was used to create the photo.</li>
 </ul>
 </li>
-<li><code>focal-length=0.9075939379577609</code><ul>
+<li><code>focal-length=0.15692298624109202</code><ul>
 <li>The focal length used to create the photo, in millimeters.</li>
 </ul>
 </li>
-<li><code>height=80</code><ul>
+<li><code>height=25</code><ul>
 <li>The height of the image in pixels.</li>
 </ul>
 </li>
-<li><code>iso-speed=84</code><ul>
+<li><code>iso-speed=13</code><ul>
 <li>The ISO speed used to create the photo.</li>
 </ul>
 </li>
-<li><code>lens=at</code><ul>
+<li><code>lens=nonumy</code><ul>
 <li>The lens used to create the photo.</li>
 </ul>
 </li>
-<li><code>location    altitude=0.15692298624109202</code><ul>
+<li><code>location    altitude=0.15946238897772735</code><ul>
 <li>The altitude stored in the image.</li>
 </ul>
 </li>
-<li><code>latitude=0.19684676905379073</code><ul>
+<li><code>latitude=0.6425169848801962</code><ul>
 <li>The latitude stored in the image.</li>
 </ul>
 </li>
 <li>
-<p><code>longitude=0.07828901826934798</code></p>
+<p><code>longitude=0.40468451810982387</code></p>
 <ul>
 <li>The longitude stored in the image.</li>
 </ul>
 </li>
 <li>
-<p><code>..    max-aperture-value=0.5500428128430022</code></p>
+<p><code>..    max-aperture-value=0.595648037236413</code></p>
 <ul>
 <li>The smallest f-number of the lens at the focal length used to create the photo (APEX value).</li>
 </ul>
 </li>
-<li><code>metering-mode=ipsum</code><ul>
+<li><code>metering-mode=elitr</code><ul>
 <li>The metering mode used to create the photo.</li>
 </ul>
 </li>
-<li><code>rotation=73</code><ul>
+<li><code>rotation=55</code><ul>
 <li>The number of clockwise 90 degree rotations applied from the image&#39;s original orientation.</li>
 </ul>
 </li>
-<li><code>sensor=eos</code><ul>
+<li><code>sensor=et</code><ul>
 <li>The type of sensor used to create the photo.</li>
 </ul>
 </li>
-<li><code>subject-distance=31</code><ul>
+<li><code>subject-distance=87</code><ul>
 <li>The distance to the subject of the photo, in meters.</li>
 </ul>
 </li>
-<li><code>white-balance=elitr</code><ul>
+<li><code>white-balance=sit</code><ul>
 <li>The white balance mode used to create the photo.</li>
 </ul>
 </li>
 <li>
-<p><code>width=55</code></p>
+<p><code>width=42</code></p>
 <ul>
 <li>The width of the image in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..indexable-text    text=et</code></p>
+<p><code>..indexable-text    text=erat</code></p>
 <ul>
 <li>The text to be indexed for this file.</li>
 </ul>
@@ -1097,15 +1113,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the file was created or opened by the requesting app.</li>
 </ul>
 </li>
-<li><code>kind=takimata</code><ul>
+<li><code>kind=nonumy</code><ul>
 <li>The type of file. This is always drive#file.</li>
 </ul>
 </li>
-<li><code>labels    hidden=true</code><ul>
+<li><code>labels    hidden=false</code><ul>
 <li>Deprecated.</li>
 </ul>
 </li>
-<li><code>modified=true</code><ul>
+<li><code>modified=false</code><ul>
 <li>Whether the file has been modified by this user.</li>
 </ul>
 </li>
@@ -1122,62 +1138,74 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>viewed=false</code></p>
+<p><code>viewed=true</code></p>
 <ul>
 <li>Whether this file has been viewed by this user.</li>
 </ul>
 </li>
 <li>
-<p><code>..last-modifying-user    display-name=et</code></p>
+<p><code>..last-modifying-user    display-name=ea</code></p>
 <ul>
 <li>A plain text displayable name for this user.</li>
 </ul>
 </li>
-<li><code>email-address=ea</code><ul>
+<li><code>email-address=at</code><ul>
 <li>The email address of the user.</li>
 </ul>
 </li>
-<li><code>is-authenticated-user=false</code><ul>
+<li><code>is-authenticated-user=true</code><ul>
 <li>Whether this user is the same as the authenticated user for whom the request was made.</li>
 </ul>
 </li>
-<li><code>kind=ipsum</code><ul>
+<li><code>kind=sit</code><ul>
 <li>This is always drive#user.</li>
 </ul>
 </li>
-<li><code>permission-id=ea</code><ul>
+<li><code>permission-id=lorem</code><ul>
 <li>The user&#39;s ID as visible in the permissions collection.</li>
 </ul>
 </li>
 <li>
-<p><code>picture    url=at</code></p>
+<p><code>picture    url=stet</code></p>
 <ul>
 <li>A URL that points to a profile picture of this user.</li>
 </ul>
 </li>
 <li>
-<p><code>...    last-modifying-user-name=sit</code></p>
+<p><code>...    last-modifying-user-name=duo</code></p>
 <ul>
 <li>Name of the last user to modify this file.</li>
 </ul>
 </li>
-<li><code>last-viewed-by-me-date=sit</code><ul>
+<li><code>last-viewed-by-me-date=elitr</code><ul>
 <li>Last time this file was viewed by the user (formatted RFC 3339 timestamp).</li>
 </ul>
 </li>
-<li><code>marked-viewed-by-me-date=lorem</code><ul>
+<li><code>link-share-metadata    security-update-eligible=false</code><ul>
+<li>Whether the file is eligible for security update.</li>
+</ul>
+</li>
+<li>
+<p><code>security-update-enabled=true</code></p>
+<ul>
+<li>Whether the security update is enabled for this file.</li>
+</ul>
+</li>
+<li>
+<p><code>..    marked-viewed-by-me-date=rebum.</code></p>
+<ul>
 <li>Deprecated.</li>
 </ul>
 </li>
-<li><code>md5-checksum=stet</code><ul>
+<li><code>md5-checksum=et</code><ul>
 <li>An MD5 checksum for the content of this file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>mime-type=duo</code><ul>
+<li><code>mime-type=sed</code><ul>
 <li>The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content&#39;s MIME type.</li>
 </ul>
 </li>
-<li><code>modified-by-me-date=elitr</code><ul>
+<li><code>modified-by-me-date=stet</code><ul>
 <li>Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.</li>
 </ul>
 </li>
@@ -1185,12 +1213,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.</li>
 </ul>
 </li>
-<li><code>open-with-links=key=erat</code><ul>
+<li><code>open-with-links=key=kasd</code><ul>
 <li>A map of the id of each of the user&#39;s apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>original-filename=ut</code><ul>
+<li><code>original-filename=lorem</code><ul>
 <li>The original filename of the uploaded content if available, or else the original value of the title field. This is only available for files with binary content in Google Drive.</li>
 </ul>
 </li>
@@ -1198,25 +1226,29 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the file is owned by the current user. Not populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>owner-names=rebum.</code><ul>
+<li><code>owner-names=kasd</code><ul>
 <li>Name(s) of the owner(s) of this file. Not populated for items in shared drives.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>permission-ids=et</code><ul>
+<li><code>permission-ids=tempor</code><ul>
 <li>List of permission IDs for users with access to this file.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>quota-bytes-used=sed</code><ul>
+<li><code>quota-bytes-used=dolor</code><ul>
 <li>The number of quota bytes used by this file.</li>
 </ul>
 </li>
-<li><code>self-link=stet</code><ul>
+<li><code>resource-key=amet</code><ul>
+<li>A key needed to access the item via a shared link.</li>
+</ul>
+</li>
+<li><code>self-link=sit</code><ul>
 <li>A link back to this file.</li>
 </ul>
 </li>
-<li><code>shareable=false</code><ul>
+<li><code>shareable=true</code><ul>
 <li>Deprecated: use capabilities/canShare.</li>
 </ul>
 </li>
@@ -1224,92 +1256,96 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the file has been shared. Not populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>shared-with-me-date=sit</code><ul>
+<li><code>shared-with-me-date=ipsum</code><ul>
 <li>Time at which this file was shared with the user (formatted RFC 3339 timestamp).</li>
 </ul>
 </li>
-<li><code>sharing-user    display-name=kasd</code><ul>
+<li><code>sharing-user    display-name=et</code><ul>
 <li>A plain text displayable name for this user.</li>
 </ul>
 </li>
-<li><code>email-address=tempor</code><ul>
+<li><code>email-address=elitr</code><ul>
 <li>The email address of the user.</li>
 </ul>
 </li>
-<li><code>is-authenticated-user=true</code><ul>
+<li><code>is-authenticated-user=false</code><ul>
 <li>Whether this user is the same as the authenticated user for whom the request was made.</li>
 </ul>
 </li>
-<li><code>kind=amet</code><ul>
+<li><code>kind=dolor</code><ul>
 <li>This is always drive#user.</li>
 </ul>
 </li>
-<li><code>permission-id=sit</code><ul>
+<li><code>permission-id=sadipscing</code><ul>
 <li>The user&#39;s ID as visible in the permissions collection.</li>
 </ul>
 </li>
 <li>
-<p><code>picture    url=rebum.</code></p>
+<p><code>picture    url=dolor</code></p>
 <ul>
 <li>A URL that points to a profile picture of this user.</li>
 </ul>
 </li>
 <li>
-<p><code>...shortcut-details    target-id=sea</code></p>
+<p><code>...shortcut-details    target-id=dolor</code></p>
 <ul>
 <li>The ID of the file that this shortcut points to.</li>
 </ul>
 </li>
-<li>
-<p><code>target-mime-type=ipsum</code></p>
-<ul>
+<li><code>target-mime-type=consetetur</code><ul>
 <li>The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target&#39;s MIME type, captured when the shortcut is created.</li>
 </ul>
 </li>
 <li>
-<p><code>..    spaces=ipsum</code></p>
+<p><code>target-resource-key=et</code></p>
+<ul>
+<li>The ResourceKey for the target file.</li>
+</ul>
+</li>
+<li>
+<p><code>..    spaces=sit</code></p>
 <ul>
 <li>The list of spaces which contain the file. Supported values are &#39;drive&#39;, &#39;appDataFolder&#39; and &#39;photos&#39;.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>team-drive-id=et</code><ul>
+<li><code>team-drive-id=lorem</code><ul>
 <li>Deprecated - use driveId instead.</li>
 </ul>
 </li>
-<li><code>thumbnail    image=elitr</code><ul>
+<li><code>thumbnail    image=nonumy</code><ul>
 <li>The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.</li>
 </ul>
 </li>
 <li>
-<p><code>mime-type=eirmod</code></p>
+<p><code>mime-type=diam</code></p>
 <ul>
 <li>The MIME type of the thumbnail.</li>
 </ul>
 </li>
 <li>
-<p><code>..    thumbnail-link=dolor</code></p>
+<p><code>..    thumbnail-link=ipsum</code></p>
 <ul>
 <li>A short-lived link to the file&#39;s thumbnail. Typically lasts on the order of hours. Only populated when the requesting app can access the file&#39;s content. If the file isn&#39;t shared publicly, the URL returned in Files.thumbnailLink must be fetched using a credentialed request.</li>
 </ul>
 </li>
-<li><code>thumbnail-version=sadipscing</code><ul>
+<li><code>thumbnail-version=invidunt</code><ul>
 <li>The thumbnail version for use in thumbnail cache invalidation.</li>
 </ul>
 </li>
-<li><code>title=dolor</code><ul>
+<li><code>title=stet</code><ul>
 <li>The title of this file. Note that for immutable items such as the top level folders of shared drives, My Drive root folder, and Application Data folder the title is constant.</li>
 </ul>
 </li>
-<li><code>trashed-date=dolor</code><ul>
+<li><code>trashed-date=voluptua.</code><ul>
 <li>The time that the item was trashed (formatted RFC 3339 timestamp). Only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>trashing-user    display-name=consetetur</code><ul>
+<li><code>trashing-user    display-name=at</code><ul>
 <li>A plain text displayable name for this user.</li>
 </ul>
 </li>
-<li><code>email-address=et</code><ul>
+<li><code>email-address=diam</code><ul>
 <li>The email address of the user.</li>
 </ul>
 </li>
@@ -1317,28 +1353,28 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether this user is the same as the authenticated user for whom the request was made.</li>
 </ul>
 </li>
-<li><code>kind=lorem</code><ul>
+<li><code>kind=at</code><ul>
 <li>This is always drive#user.</li>
 </ul>
 </li>
-<li><code>permission-id=nonumy</code><ul>
+<li><code>permission-id=eirmod</code><ul>
 <li>The user&#39;s ID as visible in the permissions collection.</li>
 </ul>
 </li>
 <li>
-<p><code>picture    url=diam</code></p>
+<p><code>picture    url=erat</code></p>
 <ul>
 <li>A URL that points to a profile picture of this user.</li>
 </ul>
 </li>
 <li>
-<p><code>...user-permission    additional-roles=ipsum</code></p>
+<p><code>...user-permission    additional-roles=duo</code></p>
 <ul>
 <li>Additional roles for this user. Only commenter is currently allowed, though more may be supported in the future.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>auth-key=invidunt</code><ul>
+<li><code>auth-key=et</code><ul>
 <li>Deprecated.</li>
 </ul>
 </li>
@@ -1346,19 +1382,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
 </ul>
 </li>
-<li><code>domain=at</code><ul>
+<li><code>domain=sit</code><ul>
 <li>The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.</li>
 </ul>
 </li>
-<li><code>email-address=diam</code><ul>
+<li><code>email-address=accusam</code><ul>
 <li>The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.</li>
 </ul>
 </li>
-<li><code>etag=amet</code><ul>
+<li><code>etag=et</code><ul>
 <li>The ETag of the permission.</li>
 </ul>
 </li>
-<li><code>expiration-date=at</code><ul>
+<li><code>expiration-date=nonumy</code><ul>
 <li>The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  <ul>
 <li>They cannot be set on shared drive items </li>
 <li>They can only be set on user and group permissions </li>
@@ -1369,23 +1405,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>id=eirmod</code><ul>
+<li><code>id=accusam</code><ul>
 <li>The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
 </ul>
 </li>
-<li><code>kind=erat</code><ul>
+<li><code>kind=ut</code><ul>
 <li>This is always drive#permission.</li>
 </ul>
 </li>
-<li><code>name=duo</code><ul>
+<li><code>name=voluptua.</code><ul>
 <li>The name for this permission.</li>
 </ul>
 </li>
-<li><code>photo-link=et</code><ul>
+<li><code>pending-owner=true</code><ul>
+<li>Whether the account associated with this permission is a pending owner. Only populated for user type permissions for files that are not in a shared drive.</li>
+</ul>
+</li>
+<li><code>photo-link=dolor</code><ul>
 <li>A link to the profile photo, if available.</li>
 </ul>
 </li>
-<li><code>role=erat</code><ul>
+<li><code>role=amet</code><ul>
 <li>The primary role for this user. While new values may be supported in the future, the following are currently allowed:  <ul>
 <li>owner </li>
 <li>organizer </li>
@@ -1396,11 +1436,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>self-link=sit</code><ul>
+<li><code>self-link=et</code><ul>
 <li>A link back to this permission.</li>
 </ul>
 </li>
-<li><code>type=accusam</code><ul>
+<li><code>type=aliquyam</code><ul>
 <li>The account type. Allowed values are:  <ul>
 <li>user </li>
 <li>group </li>
@@ -1410,11 +1450,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>value=et</code><ul>
+<li><code>value=ipsum</code><ul>
 <li>The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
 </ul>
 </li>
-<li><code>view=nonumy</code><ul>
+<li><code>view=gubergren</code><ul>
 <li>Indicates the view for this permission. Only populated for permissions that belong to a view. published is the only supported value.</li>
 </ul>
 </li>
@@ -1425,32 +1465,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    version=ut</code></p>
+<p><code>..    version=sea</code></p>
 <ul>
 <li>A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.</li>
 </ul>
 </li>
-<li><code>video-media-metadata    duration-millis=voluptua.</code><ul>
+<li><code>video-media-metadata    duration-millis=duo</code><ul>
 <li>The duration of the video in milliseconds.</li>
 </ul>
 </li>
-<li><code>height=55</code><ul>
+<li><code>height=41</code><ul>
 <li>The height of the video in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>width=2</code></p>
+<p><code>width=36</code></p>
 <ul>
 <li>The width of the video in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    web-content-link=amet</code></p>
+<p><code>..    web-content-link=sadipscing</code></p>
 <ul>
 <li>A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.</li>
 </ul>
 </li>
-<li><code>web-view-link=et</code><ul>
+<li><code>web-view-link=no</code><ul>
 <li>A link only available on public folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive&#39;s Website Hosting.</li>
 </ul>
 </li>

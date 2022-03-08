@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Regions Autoscaling Policies Set Iam Policy - Dataproc v2.0.4+20210322</title>
+  <title>Regions Autoscaling Policies Set Iam Policy - Dataproc v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Dataproc v3.0.0+20220224</a>
         
       </div>
 
@@ -81,6 +81,26 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-autoscaling-policies-update">Locations Autoscaling Policies Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-create">Locations Batches Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-delete">Locations Batches Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-get">Locations Batches Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batches-list">Locations Batches List</a>
                     
                 </li>
             
@@ -232,6 +252,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_regions-clusters-patch">Regions Clusters Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-repair">Regions Clusters Repair</a>
                     
                 </li>
             
@@ -451,11 +476,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .policy    etag=ipsum</code><ul>
+<li><code>-r .policy    etag=takimata</code><ul>
 <li>etag is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the etag in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An etag is returned in the response to getIamPolicy, and systems are expected to put that etag in the request to setIamPolicy to ensure that their change will be applied to the same version of the policy.Important: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.</li>
 </ul>
 </li>
-<li><code>version=77</code><ul>
+<li><code>version=58</code><ul>
 <li>Specifies the format of the policy.Valid values are 0, 1, and 3. Requests that specify an invalid value are rejected.Any operation that affects conditional role bindings must specify version 3. This requirement applies to the following operations: Getting a policy that includes a conditional role binding Adding a conditional role binding to a policy Changing a conditional role binding in a policy Removing any role binding, with or without a condition, from a policy that includes conditionsImportant: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset.To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).</li>
 </ul>
 </li>

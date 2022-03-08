@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Customers Entitlements Create - Cloudchannel v2.0.4+20210326</title>
+  <title>Customers Entitlements Create - Cloudchannel v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloudchannel v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Cloudchannel v3.0.0+20220303</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_channel-partner-links-customers-get">Channel Partner Links Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_channel-partner-links-customers-import">Channel Partner Links Customers Import</a>
                     
                 </li>
             
@@ -166,6 +171,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-entitlements-lookup-offer">Customers Entitlements Lookup Offer</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-entitlements-start-paid-service">Customers Entitlements Start Paid Service</a>
                     
                 </li>
@@ -177,6 +187,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-get">Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-import">Customers Import</a>
                     
                 </li>
             
@@ -374,13 +389,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .entitlement.association-info    base-entitlement=amet</code></p>
+<p><code>-r .entitlement.association-info    base-entitlement=sea</code></p>
 <ul>
 <li>The name of the base entitlement, for which this entitlement is an add-on.</li>
 </ul>
 </li>
 <li>
-<p><code>..commitment-settings    end-time=erat</code></p>
+<p><code>..commitment-settings    end-time=nonumy</code></p>
 <ul>
 <li>Output only. Commitment end timestamp.</li>
 </ul>
@@ -389,41 +404,41 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>If false, the plan will be completed at the end date.</li>
 </ul>
 </li>
-<li><code>payment-cycle    duration=20</code><ul>
+<li><code>payment-cycle    duration=5</code><ul>
 <li>Total duration of Period Type defined.</li>
 </ul>
 </li>
 <li>
-<p><code>period-type=accusam</code></p>
+<p><code>period-type=sit</code></p>
 <ul>
 <li>Period Type.</li>
 </ul>
 </li>
 <li>
-<p><code>..    payment-plan=sea</code></p>
+<p><code>..    payment-plan=aliquyam</code></p>
 <ul>
 <li>Describes how a reseller will be billed.</li>
 </ul>
 </li>
 <li>
-<p><code>resize-unit-count=true</code></p>
+<p><code>resize-unit-count=false</code></p>
 <ul>
 <li>If true and enable_renewal = true, the unit (for example seats or licenses) will be set to the number of active units at renewal time.</li>
 </ul>
 </li>
 <li>
-<p><code>..    start-time=lorem</code></p>
+<p><code>..    start-time=dolores</code></p>
 <ul>
 <li>Output only. Commitment start timestamp.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=et</code></p>
+<p><code>..    create-time=consetetur</code></p>
 <ul>
 <li>Output only. The time at which the entitlement is created.</li>
 </ul>
 </li>
-<li><code>name=at</code><ul>
+<li><code>name=gubergren</code><ul>
 <li>Output only. Resource name of an entitlement in the form: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}.</li>
 </ul>
 </li>
@@ -431,31 +446,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. The offer resource name for which the entitlement is to be created. Takes the form: accounts/{account_id}/offers/{offer_id}.</li>
 </ul>
 </li>
-<li><code>provisioned-service    product-id=et</code><ul>
+<li><code>provisioned-service    product-id=aliquyam</code><ul>
 <li>Output only. The product pertaining to the provisioning resource as specified in the Offer.</li>
 </ul>
 </li>
-<li><code>provisioning-id=sit</code><ul>
-<li>Output only. Provisioning ID of the entitlement. For Google Workspace, this would be the underlying Subscription ID.</li>
+<li><code>provisioning-id=no</code><ul>
+<li>Output only. Provisioning ID of the entitlement. For Google Workspace, this is the underlying Subscription ID. For Google Cloud Platform, this is the Billing Account ID of the billing subaccount.&#34;</li>
 </ul>
 </li>
 <li>
-<p><code>sku-id=erat</code></p>
+<p><code>sku-id=amet.</code></p>
 <ul>
 <li>Output only. The SKU pertaining to the provisioning resource as specified in the Offer.</li>
 </ul>
 </li>
 <li>
-<p><code>..    provisioning-state=sea</code></p>
+<p><code>..    provisioning-state=ipsum</code></p>
 <ul>
 <li>Output only. Current provisioning state of the entitlement.</li>
 </ul>
 </li>
-<li><code>purchase-order-id=nonumy</code><ul>
+<li><code>purchase-order-id=lorem</code><ul>
 <li>Optional. This purchase order (PO) information is for resellers to use for their company tracking usage. If a purchaseOrderId value is given, it appears in the API responses and shows up in the invoice. The property accepts up to 80 plain text characters.</li>
 </ul>
 </li>
-<li><code>suspension-reasons=et</code><ul>
+<li><code>suspension-reasons=accusam</code><ul>
 <li>Output only. Enumerable of all current suspension reasons for an entitlement.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -471,7 +486,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    update-time=consetetur</code></p>
+<p><code>..    update-time=at</code></p>
 <ul>
 <li>Output only. The time at which the entitlement is updated.</li>
 </ul>

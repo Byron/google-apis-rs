@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Patch - groupssettings v2.0.4+20210325</title>
+  <title>Patch - groupssettings v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> groupssettings v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> groupssettings v3.0.0+20220224</a>
         
       </div>
 
@@ -141,6 +141,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   custom-reply-to: string
   custom-roles-enabled-for-settings-to-be-merged: string
   default-message-deny-notification-text: string
+  default-sender: string
   description: string
   email: string
   enable-collaborative-inbox: string
@@ -258,16 +259,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>When a message is rejected, this is text for the rejection notification sent to the message&#39;s author. By default, this property is empty and has no value in the API&#39;s response body. The maximum notification text size is 10,000 characters. Note: Requires sendMessageDenyNotification property to be true.</li>
 </ul>
 </li>
-<li><code>description=amet.</code><ul>
+<li><code>default-sender=amet.</code><ul>
+<li>Default sender for members who can post messages as the group. Possible values are: - <code>DEFAULT_SELF</code>: By default messages will be sent from the user - <code>GROUP</code>: By default messages will be sent from the group</li>
+</ul>
+</li>
+<li><code>description=takimata</code><ul>
 <li>Description of the group. This property value may be an empty string if no group description has been entered. If entered, the maximum group description is no more than 300 characters.</li>
 </ul>
 </li>
-<li><code>email=takimata</code><ul>
+<li><code>email=amet.</code><ul>
 <li>The group&#39;s email address. This property can be updated using the Directory API. Note: Only a group owner can change a group&#39;s email address. A group manager can&#39;t do this.
     When you change your group&#39;s address using the Directory API or the control panel, you are changing the address your subscribers use to send email and the web address people use to access your group. People can&#39;t reach your group by visiting the old address.</li>
 </ul>
 </li>
-<li><code>enable-collaborative-inbox=amet.</code><ul>
+<li><code>enable-collaborative-inbox=duo</code><ul>
 <li>Specifies whether a collaborative inbox will remain turned on for the group. Possible values are:  <ul>
 <li>true </li>
 <li>false</li>
@@ -275,7 +280,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>favorite-replies-on-top=duo</code><ul>
+<li><code>favorite-replies-on-top=ipsum</code><ul>
 <li>Indicates if favorite replies should be displayed above other replies.  <ul>
 <li>true: Favorite replies will be displayed above other replies. </li>
 <li>false: Favorite replies will not be displayed above other replies.</li>
@@ -283,7 +288,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>include-custom-footer=ipsum</code><ul>
+<li><code>include-custom-footer=gubergren</code><ul>
 <li>Whether to include custom footer. Possible values are:  <ul>
 <li>true </li>
 <li>false</li>
@@ -291,7 +296,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>include-in-global-address-list=gubergren</code><ul>
+<li><code>include-in-global-address-list=lorem</code><ul>
 <li>Enables the group to be included in the Global Address List. For more information, see the help center. Possible values are:  <ul>
 <li>true: Group is included in the Global Address List. </li>
 <li>false: Group is not included in the Global Address List.</li>
@@ -299,7 +304,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>is-archived=lorem</code><ul>
+<li><code>is-archived=gubergren</code><ul>
 <li>Allows the Group contents to be archived. Possible values are:  <ul>
 <li>true: Archive messages sent to the group. </li>
 <li>false: Do not keep an archive of messages sent to this group. If false, previously archived messages remain in the archive.</li>
@@ -307,15 +312,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>kind=gubergren</code><ul>
+<li><code>kind=eos</code><ul>
 <li>The type of the resource. It is always groupsSettings#groups.</li>
 </ul>
 </li>
-<li><code>max-message-bytes=26</code><ul>
+<li><code>max-message-bytes=97</code><ul>
 <li>Deprecated. The maximum size of a message is 25Mb.</li>
 </ul>
 </li>
-<li><code>members-can-post-as-the-group=dolor</code><ul>
+<li><code>members-can-post-as-the-group=ea</code><ul>
 <li>Enables members to post messages as the group. Possible values are:  <ul>
 <li>true: Group member can post messages using the group&#39;s email address instead of their own email address. Message appear to originate from the group itself. Note: When true, any message moderation settings on individual users or new members do not apply to posts made on behalf of the group. </li>
 <li>false: Members can not post in behalf of the group&#39;s email address.</li>
@@ -323,11 +328,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </li>
 </ul>
 </li>
-<li><code>message-display-font=ea</code><ul>
+<li><code>message-display-font=ipsum</code><ul>
 <li>Deprecated. The default message display font always has a value of &#34;DEFAULT_FONT&#34;.</li>
 </ul>
 </li>
-<li><code>message-moderation-level=ipsum</code><ul>
+<li><code>message-moderation-level=invidunt</code><ul>
 <li>Moderation level of incoming messages. Possible values are:  <ul>
 <li>MODERATE_ALL_MESSAGES: All messages are sent to the group owner&#39;s email address for approval. If approved, the message is sent to the group. </li>
 <li>MODERATE_NON_MEMBERS: All messages from non group members are sent to the group owner&#39;s email address for approval. If approved, the message is sent to the group. </li>
@@ -338,15 +343,15 @@ When memberCanPostAsTheGroup is true, any message moderation settings on individ
 </li>
 </ul>
 </li>
-<li><code>name=invidunt</code><ul>
+<li><code>name=amet</code><ul>
 <li>Name of the group, which has a maximum size of 75 characters.</li>
 </ul>
 </li>
-<li><code>primary-language=amet</code><ul>
+<li><code>primary-language=duo</code><ul>
 <li>The primary language for group. For a group&#39;s primary language use the language tags from the G Suite languages found at G Suite Email Settings API Email Language Tags.</li>
 </ul>
 </li>
-<li><code>reply-to=duo</code><ul>
+<li><code>reply-to=ipsum</code><ul>
 <li>
 <p>Specifies who receives the default reply. Possible values are:  </p>
 <ul>
@@ -361,7 +366,7 @@ When the group&#39;s ReplyTo property is set to REPLY_TO_CUSTOM, the customReply
 <li>REPLY_TO_OWNER: The reply is sent to the owner(s) of the group. This does not include the group&#39;s managers. </li>
 <li>REPLY_TO_IGNORE: Group users individually decide where the message reply is sent. </li>
 <li>REPLY_TO_MANAGERS: This reply message is sent to the group&#39;s managers, which includes all managers and the group owner.</li>
-<li><code>send-message-deny-notification=ipsum</code><ul>
+<li><code>send-message-deny-notification=sed</code><ul>
 <li>Allows a member to be notified if the member&#39;s message to the group is denied by the group owner. Possible values are:  </li>
 </ul>
 </li>
@@ -372,13 +377,13 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>
 <p>false: When a message is rejected, no notification is sent.</p>
 </li>
-<li><code>show-in-group-directory=sed</code><ul>
+<li><code>show-in-group-directory=ut</code><ul>
 <li>Deprecated. This is merged into the new whoCanDiscoverGroup setting. Allows the group to be visible in the Groups Directory. Possible values are:  </li>
 </ul>
 </li>
 <li>true: All groups in the account are listed in the Groups directory. </li>
 <li>false: All groups in the account are not listed in the directory.</li>
-<li><code>spam-moderation-level=ut</code><ul>
+<li><code>spam-moderation-level=gubergren</code><ul>
 <li>Specifies moderation levels for messages detected as spam. Possible values are:  </li>
 </ul>
 </li>
@@ -386,7 +391,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MODERATE: Send the message to the moderation queue. This is the default. </li>
 <li>SILENTLY_MODERATE: Send the message to the moderation queue, but do not send notification to moderators. </li>
 <li>REJECT: Immediately reject the message.</li>
-<li><code>who-can-add=gubergren</code><ul>
+<li><code>who-can-add=rebum.</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateMembers setting. Permissions to add members. Possible values are:  </li>
 </ul>
 </li>
@@ -394,11 +399,11 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>ALL_MANAGERS_CAN_ADD: Only managers can directly add new members. this includes the group&#39;s owner. </li>
 <li>ALL_OWNERS_CAN_ADD: Only owners can directly add new members. </li>
 <li>NONE_CAN_ADD: No one can directly add new members.</li>
-<li><code>who-can-add-references=rebum.</code><ul>
+<li><code>who-can-add-references=est</code><ul>
 <li>Deprecated. This functionality is no longer supported in the Google Groups UI. The value is always &#34;NONE&#34;.</li>
 </ul>
 </li>
-<li><code>who-can-approve-members=est</code><ul>
+<li><code>who-can-approve-members=ipsum</code><ul>
 <li>Specifies who can approve members who ask to join groups. This permission will be deprecated once it is merged into the new whoCanModerateMembers setting. Possible values are:  </li>
 </ul>
 </li>
@@ -414,7 +419,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-assign-topics=ipsum</code><ul>
+<li><code>who-can-assign-topics=est</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to assign topics in a forum to another user. Possible values are:  </li>
 </ul>
 </li>
@@ -423,7 +428,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-assist-content=est</code><ul>
+<li><code>who-can-assist-content=gubergren</code><ul>
 <li>Specifies who can moderate metadata. Possible values are:  </li>
 </ul>
 </li>
@@ -432,7 +437,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-ban-users=gubergren</code><ul>
+<li><code>who-can-ban-users=ea</code><ul>
 <li>Specifies who can deny membership to users. This permission will be deprecated once it is merged into the new whoCanModerateMembers setting. Possible values are:  </li>
 </ul>
 </li>
@@ -440,7 +445,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-contact-owner=ea</code><ul>
+<li><code>who-can-contact-owner=dolor</code><ul>
 <li>Permission to contact owner of the group via web UI. Possible values are:  </li>
 </ul>
 </li>
@@ -449,7 +454,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>ALL_MEMBERS_CAN_CONTACT </li>
 <li>ANYONE_CAN_CONTACT </li>
 <li>ALL_OWNERS_CAN_CONTACT</li>
-<li><code>who-can-delete-any-post=dolor</code><ul>
+<li><code>who-can-delete-any-post=lorem</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can delete replies to topics. (Authors can always delete their own posts). Possible values are:  </li>
 </ul>
 </li>
@@ -457,7 +462,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-delete-topics=lorem</code><ul>
+<li><code>who-can-delete-topics=eos</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can delete topics. Possible values are:  </li>
 </ul>
 </li>
@@ -465,14 +470,14 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-discover-group=eos</code><ul>
+<li><code>who-can-discover-group=labore</code><ul>
 <li>Specifies the set of users for whom this group is discoverable. Possible values are:  </li>
 </ul>
 </li>
 <li>ANYONE_CAN_DISCOVER </li>
 <li>ALL_IN_DOMAIN_CAN_DISCOVER </li>
 <li>ALL_MEMBERS_CAN_DISCOVER</li>
-<li><code>who-can-enter-free-form-tags=labore</code><ul>
+<li><code>who-can-enter-free-form-tags=sed</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to enter free form tags for topics in a forum. Possible values are:  </li>
 </ul>
 </li>
@@ -481,7 +486,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-hide-abuse=sed</code><ul>
+<li><code>who-can-hide-abuse=duo</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can hide posts by reporting them as abuse. Possible values are:  </li>
 </ul>
 </li>
@@ -489,7 +494,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-invite=duo</code><ul>
+<li><code>who-can-invite=sed</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateMembers setting. Permissions to invite new members. Possible values are:  </li>
 </ul>
 </li>
@@ -497,7 +502,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>ALL_MANAGERS_CAN_INVITE: Only managers can invite a new member. This includes the group&#39;s owner. </li>
 <li>ALL_OWNERS_CAN_INVITE: Only owners can invite a new member. </li>
 <li>NONE_CAN_INVITE: No one can invite a new member candidate.</li>
-<li><code>who-can-join=sed</code><ul>
+<li><code>who-can-join=no</code><ul>
 <li>Permission to join group. Possible values are:  </li>
 </ul>
 </li>
@@ -505,14 +510,14 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>ALL_IN_DOMAIN_CAN_JOIN: Any Internet user who is outside your domain can access your Google Groups service and view the list of groups in your Groups directory. Warning: Group owners can add external addresses, outside of the domain to their groups. They can also allow people outside your domain to join their groups. If you later disable this option, any external addresses already added to users&#39; groups remain in those groups. </li>
 <li>INVITED_CAN_JOIN: Candidates for membership can be invited to join.  </li>
 <li>CAN_REQUEST_TO_JOIN: Non members can request an invitation to join.</li>
-<li><code>who-can-leave-group=no</code><ul>
+<li><code>who-can-leave-group=stet</code><ul>
 <li>Permission to leave the group. Possible values are:  </li>
 </ul>
 </li>
 <li>ALL_MANAGERS_CAN_LEAVE </li>
 <li>ALL_MEMBERS_CAN_LEAVE </li>
 <li>NONE_CAN_LEAVE</li>
-<li><code>who-can-lock-topics=stet</code><ul>
+<li><code>who-can-lock-topics=kasd</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can prevent users from posting replies to topics. Possible values are:  </li>
 </ul>
 </li>
@@ -520,7 +525,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-make-topics-sticky=kasd</code><ul>
+<li><code>who-can-make-topics-sticky=et</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can make topics appear at the top of the topic list. Possible values are:  </li>
 </ul>
 </li>
@@ -528,7 +533,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-mark-duplicate=et</code><ul>
+<li><code>who-can-mark-duplicate=sed</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a topic as a duplicate of another topic. Possible values are:  </li>
 </ul>
 </li>
@@ -537,7 +542,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-mark-favorite-reply-on-any-topic=sed</code><ul>
+<li><code>who-can-mark-favorite-reply-on-any-topic=et</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark any other user&#39;s post as a favorite reply. Possible values are:  </li>
 </ul>
 </li>
@@ -555,7 +560,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-mark-no-response-needed=et</code><ul>
+<li><code>who-can-mark-no-response-needed=vero</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a topic as not needing a response. Possible values are:  </li>
 </ul>
 </li>
@@ -564,7 +569,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-moderate-content=vero</code><ul>
+<li><code>who-can-moderate-content=erat</code><ul>
 <li>Specifies who can moderate content. Possible values are:  </li>
 </ul>
 </li>
@@ -572,7 +577,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-moderate-members=erat</code><ul>
+<li><code>who-can-moderate-members=sed</code><ul>
 <li>Specifies who can manage members. Possible values are:  </li>
 </ul>
 </li>
@@ -580,7 +585,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-modify-members=sed</code><ul>
+<li><code>who-can-modify-members=duo</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateMembers setting. Specifies who can change group members&#39; roles. Possible values are:  </li>
 </ul>
 </li>
@@ -588,7 +593,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-modify-tags-and-categories=duo</code><ul>
+<li><code>who-can-modify-tags-and-categories=dolore</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to change tags and categories. Possible values are:  </li>
 </ul>
 </li>
@@ -597,7 +602,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-move-topics-in=dolore</code><ul>
+<li><code>who-can-move-topics-in=et</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can move topics into the group or forum. Possible values are:  </li>
 </ul>
 </li>
@@ -605,7 +610,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-move-topics-out=et</code><ul>
+<li><code>who-can-move-topics-out=voluptua.</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can move topics out of the group or forum. Possible values are:  </li>
 </ul>
 </li>
@@ -613,7 +618,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-post-announcements=voluptua.</code><ul>
+<li><code>who-can-post-announcements=amet.</code><ul>
 <li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can post announcements, a special topic type. Possible values are:  </li>
 </ul>
 </li>
@@ -621,7 +626,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>OWNERS_AND_MANAGERS </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-post-message=amet.</code><ul>
+<li><code>who-can-post-message=consetetur</code><ul>
 <li>Permissions to post messages. Possible values are:  </li>
 </ul>
 </li>
@@ -633,7 +638,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>ALL_OWNERS_CAN_POST: Only group owners can post a message. </li>
 <li>ALL_IN_DOMAIN_CAN_POST: Anyone in the account can post a message.  </li>
 <li>ANYONE_CAN_POST: Any Internet user who outside your account can access your Google Groups service and post a message. Note: When whoCanPostMessage is set to ANYONE_CAN_POST, we recommend the messageModerationLevel be set to MODERATE_NON_MEMBERS to protect the group from possible spam.</li>
-<li><code>who-can-take-topics=consetetur</code><ul>
+<li><code>who-can-take-topics=diam</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to take topics in a forum. Possible values are:  </li>
 </ul>
 </li>
@@ -642,7 +647,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-unassign-topic=diam</code><ul>
+<li><code>who-can-unassign-topic=dolor</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to unassign any topic in a forum. Possible values are:  </li>
 </ul>
 </li>
@@ -651,7 +656,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>MANAGERS_ONLY </li>
 <li>OWNERS_ONLY </li>
 <li>NONE</li>
-<li><code>who-can-unmark-favorite-reply-on-any-topic=dolor</code><ul>
+<li><code>who-can-unmark-favorite-reply-on-any-topic=et</code><ul>
 <li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to unmark any post from a favorite reply. Possible values are:  </li>
 </ul>
 </li>
@@ -668,7 +673,7 @@ The defaultMessageDenyNotificationText property is dependent on the sendMessageD
 <li>ALL_IN_DOMAIN_CAN_VIEW: Anyone in your account can view this group&#39;s messages. </li>
 <li>ALL_MEMBERS_CAN_VIEW: All group members can view the group&#39;s messages. </li>
 <li>ALL_MANAGERS_CAN_VIEW: Any group manager can view this group&#39;s messages.</li>
-<li><code>who-can-view-membership=et</code><ul>
+<li><code>who-can-view-membership=sadipscing</code><ul>
 <li>Permissions to view membership. Possible values are:  </li>
 </ul>
 </li>

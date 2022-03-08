@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Iam v2.0.4+20210325</title>
+  <title>List - Iam v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Iam v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Iam v3.0.0+20220224</a>
         
       </div>
 
@@ -51,6 +51,27 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../iam-policies_query-auditable-services">Query Auditable Services</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-operations-get">Workforce Pools Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-providers-operations-get">Workforce Pools Providers Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_workforce-pools-subjects-operations-get">Workforce Pools Subjects Operations Get</a>
                     
                 </li>
             
@@ -153,6 +174,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workload-identity-pools-providers-keys-operations-get">Locations Workload Identity Pools Providers Keys Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-workload-identity-pools-providers-list">Locations Workload Identity Pools Providers List</a>
                     
                 </li>
@@ -244,6 +270,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_service-accounts-keys-delete">Service Accounts Keys Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-disable">Service Accounts Keys Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_service-accounts-keys-enable">Service Accounts Keys Enable</a>
                     
                 </li>
             
@@ -411,7 +447,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p parent=string</strong></p>
 <ul>
-<li>The <code>parent</code> parameter&#39;s value depends on the target resource for the request, namely <a href="..//iam/reference/rest/v1/roles"><code>roles</code></a>, <a href="..//iam/reference/rest/v1/projects.roles"><code>projects</code></a>, or <a href="..//iam/reference/rest/v1/organizations.roles"><code>organizations</code></a>. Each resource type&#39;s <code>parent</code> value format is described below: * <a href="..//iam/reference/rest/v1/roles/list"><code>roles.list()</code></a>: An empty string. This method doesn&#39;t require a resource; it simply returns all <a href="..//iam/docs/understanding-roles#predefined_roles">predefined roles</a> in Cloud IAM. Example request URL: <code>https://iam.googleapis.com/v1/roles</code> * <a href="..//iam/reference/rest/v1/projects.roles/list"><code>projects.roles.list()</code></a>: <code>projects/{PROJECT_ID}</code>. This method lists all project-level <a href="..//iam/docs/understanding-custom-roles">custom roles</a>. Example request URL: <code>https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles</code> * <a href="..//iam/reference/rest/v1/organizations.roles/list"><code>organizations.roles.list()</code></a>: <code>organizations/{ORGANIZATION_ID}</code>. This method lists all organization-level <a href="..//iam/docs/understanding-custom-roles">custom roles</a>. Example request URL: <code>https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles</code> Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.</li>
+<li>The <code>parent</code> parameter&#39;s value depends on the target resource for the request, namely <a href="https://cloud.google.com/iam/reference/rest/v1/roles"><code>roles</code></a>, <a href="https://cloud.google.com/iam/reference/rest/v1/projects.roles"><code>projects</code></a>, or <a href="https://cloud.google.com/iam/reference/rest/v1/organizations.roles"><code>organizations</code></a>. Each resource type&#39;s <code>parent</code> value format is described below: * <a href="https://cloud.google.com/iam/reference/rest/v1/roles/list"><code>roles.list()</code></a>: An empty string. This method doesn&#39;t require a resource; it simply returns all <a href="https://cloud.google.com/iam/docs/understanding-roles#predefined_roles">predefined roles</a> in Cloud IAM. Example request URL: <code>https://iam.googleapis.com/v1/roles</code> * <a href="https://cloud.google.com/iam/reference/rest/v1/projects.roles/list"><code>projects.roles.list()</code></a>: <code>projects/{PROJECT_ID}</code>. This method lists all project-level <a href="https://cloud.google.com/iam/docs/understanding-custom-roles">custom roles</a>. Example request URL: <code>https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles</code> * <a href="https://cloud.google.com/iam/reference/rest/v1/organizations.roles/list"><code>organizations.roles.list()</code></a>: <code>organizations/{ORGANIZATION_ID}</code>. This method lists all organization-level <a href="https://cloud.google.com/iam/docs/understanding-custom-roles">custom roles</a>. Example request URL: <code>https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles</code> Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.</li>
 </ul>
 </li>
 <li>

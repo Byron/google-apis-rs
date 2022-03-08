@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Detect Language - Translate v2.0.4+20210312</title>
+  <title>Locations Detect Language - Translate v3.0.0+20220121</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Translate v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Translate v3.0.0+20220121</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_get-supported-languages">Get Supported Languages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batch-translate-document">Locations Batch Translate Document</a>
                     
                 </li>
             
@@ -146,6 +151,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-translate-document">Locations Translate Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-translate-text">Locations Translate Text</a>
                     
                 </li>
@@ -221,20 +231,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    content=takimata</code><ul>
+<li><code>-r .    content=lorem</code><ul>
 <li>The content of the input stored as a string.</li>
 </ul>
 </li>
-<li><code>labels=key=amet.</code><ul>
+<li><code>labels=key=gubergren</code><ul>
 <li>Optional. The labels with user-defined metadata for the request. Label keys and values can be no longer than 63 characters (Unicode codepoints), can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter. See https://cloud.google.com/translate/docs/advanced/labels for more information.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>mime-type=duo</code><ul>
+<li><code>mime-type=eos</code><ul>
 <li>Optional. The format of the source text, for example, &#34;text/html&#34;, &#34;text/plain&#34;. If left blank, the MIME type defaults to &#34;text/html&#34;.</li>
 </ul>
 </li>
-<li><code>model=ipsum</code><ul>
+<li><code>model=dolor</code><ul>
 <li>Optional. The language detection model to be used. Format: <code>projects/{project-number-or-id}/locations/{location-id}/models/language-detection/{model-id}</code> Only one language detection model is currently supported: <code>projects/{project-number-or-id}/locations/{location-id}/models/language-detection/default</code>. If not specified, the default model is used.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Memberships Create - Cloud Identity v2.0.4+20210310</title>
+  <title>Memberships Create - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -151,6 +151,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../groups_list">List</a>
                     
                 </li>
@@ -241,6 +246,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -289,7 +299,7 @@ You can set the scope for this method like this: <code>cloudidentity1 --scope &l
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The parent <code>Group</code> resource under which to create the <code>Membership</code>. Must be of the form <code>groups/{group_id}</code>.</li>
+<li>Required. The parent <code>Group</code> resource under which to create the <code>Membership</code>. Must be of the form <code>groups/{group}</code>.</li>
 </ul>
 </li>
 </ul>
@@ -310,31 +320,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=vero</code><ul>
+<li><code>-r .    create-time=stet</code><ul>
 <li>Output only. The time when the <code>Membership</code> was created.</li>
 </ul>
 </li>
 <li><code>name=vero</code><ul>
-<li>Output only. The <a href="https://cloud.google.com/apis/design/resource_names">resource name</a> of the <code>Membership</code>. Shall be of the form <code>groups/{group_id}/memberships/{membership_id}</code>.</li>
+<li>Output only. The <a href="https://cloud.google.com/apis/design/resource_names">resource name</a> of the <code>Membership</code>. Shall be of the form <code>groups/{group}/memberships/{membership}</code>.</li>
 </ul>
 </li>
-<li><code>preferred-member-key    id=invidunt</code><ul>
+<li><code>preferred-member-key    id=elitr</code><ul>
 <li>The ID of the entity. For Google-managed entities, the <code>id</code> should be the email address of an existing group or user. For external-identity-mapped entities, the <code>id</code> must be a string conforming to the Identity Source&#39;s requirements. Must be unique within a <code>namespace</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>namespace=stet</code></p>
+<p><code>namespace=lorem</code></p>
 <ul>
-<li>The namespace in which the entity exists. If not specified, the <code>EntityKey</code> represents a Google-managed entity such as a Google user or a Google Group. If specified, the <code>EntityKey</code> represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of `identitysources/{identity_source_id}.</li>
+<li>The namespace in which the entity exists. If not specified, the <code>EntityKey</code> represents a Google-managed entity such as a Google user or a Google Group. If specified, the <code>EntityKey</code> represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of <code>identitysources/{identity_source}</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    type=vero</code></p>
+<p><code>..    type=diam</code></p>
 <ul>
 <li>Output only. The type of the membership.</li>
 </ul>
 </li>
-<li><code>update-time=elitr</code><ul>
+<li><code>update-time=no</code><ul>
 <li>Output only. The time when the <code>Membership</code> was last updated.</li>
 </ul>
 </li>

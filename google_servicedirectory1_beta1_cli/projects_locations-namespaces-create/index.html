@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Namespaces Create - Service Directory v2.0.4+20210316</title>
+  <title>Locations Namespaces Create - Service Directory v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Service Directory v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Service Directory v3.0.0+20220224</a>
         
       </div>
 
@@ -241,20 +241,30 @@ You can set the scope for this method like this: <code>servicedirectory1-beta1 -
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>Namespace:
+  create-time: string
   labels: { string: string }
   name: string
+  update-time: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    labels=key=et</code><ul>
+<li><code>-r .    create-time=et</code><ul>
+<li>Output only. The timestamp when the namespace was created.</li>
+</ul>
+</li>
+<li><code>labels=key=magna</code><ul>
 <li>Optional. Resource labels associated with this namespace. No more than 64 user labels can be associated with a given resource. Label keys and values can be no longer than 63 characters.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=magna</code><ul>
+<li><code>name=no</code><ul>
 <li>Immutable. The resource name for the namespace in the format <code>projects/*/locations/*/namespaces/*</code>.</li>
+</ul>
+</li>
+<li><code>update-time=ipsum</code><ul>
+<li>Output only. The timestamp when the namespace was last updated.</li>
 </ul>
 </li>
 </ul>

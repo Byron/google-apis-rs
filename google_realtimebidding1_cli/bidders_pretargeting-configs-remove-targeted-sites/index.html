@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pretargeting Configs Remove Targeted Sites - Real-time Bidding v2.0.4+20210331</title>
+  <title>Pretargeting Configs Remove Targeted Sites - Real-time Bidding v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Real-time Bidding v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Real-time Bidding v3.0.0+20220307</a>
         
       </div>
 
@@ -61,6 +61,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../bidders_endpoints-list">Endpoints List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../bidders_endpoints-patch">Endpoints Patch</a>
                     
                 </li>
             
@@ -295,7 +300,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    sites=stet</code><ul>
+<li><code>-r .    sites=no</code><ul>
 <li>A list of site URLs to stop targeting in the pretargeting configuration. These values will be removed from the list of targeted URLs in PretargetingConfig.webTargeting.values.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

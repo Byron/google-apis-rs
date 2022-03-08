@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Android Publisher v2.0.4+20210401</title>
+  <title>Android Publisher v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Android Publisher v2.0.4+20210401</a>
+        <a href="." class="icon icon-home"> Android Publisher v3.0.0+20220307</a>
         
       </div>
 
@@ -71,6 +71,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="edits_commit/">Commit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="edits_countryavailability-get/">Countryavailability Get</a>
                     
                 </li>
             
@@ -223,6 +228,43 @@
 
     
         
+        <span>Generatedapks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="generatedapks_download/">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="generatedapks_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Grants</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="grants_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="grants_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="grants_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
         <span>Inappproducts</span>
             
                 <li class="toctree-l1 ">
@@ -268,6 +310,17 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="internalappsharingartifacts_uploadbundle/">Uploadbundle</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Monetization</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="monetization_convert-region-prices/">Convert Region Prices</a>
                     
                 </li>
             
@@ -383,6 +436,32 @@
         
 
     
+        
+        <span>Users</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="users_create/">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="users_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="users_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="users_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -435,7 +514,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Android Publisher</em> API at revision <em>20210401</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Android Publisher</em> API at revision <em>20220307</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">androidpublisher3 [options]
         edits
                 apks-addexternallyhosted &lt;package-name&gt; &lt;edit-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -444,6 +523,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 bundles-list &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 bundles-upload &lt;package-name&gt; &lt;edit-id&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 commit &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                countryavailability-get &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 delete &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]...
                 deobfuscationfiles-upload &lt;package-name&gt; &lt;edit-id&gt; &lt;apk-version-code&gt; &lt;deobfuscation-file-type&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 details-get &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -473,6 +553,13 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 tracks-patch &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 tracks-update &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 validate &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        generatedapks
+                download &lt;package-name&gt; &lt;version-code&gt; &lt;download-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;package-name&gt; &lt;version-code&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        grants
+                create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;name&gt; [-p &lt;v&gt;]...
+                patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         inappproducts
                 delete &lt;package-name&gt; &lt;sku&gt; [-p &lt;v&gt;]...
                 get &lt;package-name&gt; &lt;sku&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -483,6 +570,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
         internalappsharingartifacts
                 uploadapk &lt;package-name&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 uploadbundle &lt;package-name&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        monetization
+                convert-region-prices &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         orders
                 refund &lt;package-name&gt; &lt;order-id&gt; [-p &lt;v&gt;]...
         purchases
@@ -504,6 +593,11 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 variants-download &lt;package-name&gt; &lt;version-code&gt; &lt;variant-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 variants-get &lt;package-name&gt; &lt;version-code&gt; &lt;variant-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 variants-list &lt;package-name&gt; &lt;version-code&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        users
+                create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;name&gt; [-p &lt;v&gt;]...
+                list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   androidpublisher3 --help
 
 Configuration:

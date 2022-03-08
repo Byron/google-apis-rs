@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Attestors Update - Binary Authorization v2.0.4+20210318</title>
+  <title>Attestors Update - Binary Authorization v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Binary Authorization v2.0.4+20210318</a>
+        <a href=".." class="icon icon-home"> Binary Authorization v3.0.0+20220225</a>
         
       </div>
 
@@ -200,6 +200,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>Attestor:
   description: string
+  etag: string
   name: string
   update-time: string
   user-owned-drydock-note:
@@ -210,23 +211,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    description=amet.</code><ul>
+<li><code>-r .    description=takimata</code><ul>
 <li>Optional. A descriptive comment. This field may be updated. The field may be displayed in chooser dialogs.</li>
 </ul>
 </li>
-<li><code>name=takimata</code><ul>
+<li><code>etag=amet.</code><ul>
+<li>Optional. Used to prevent updating the attestor when another request has updated it since it was retrieved.</li>
+</ul>
+</li>
+<li><code>name=duo</code><ul>
 <li>Required. The resource name, in the format: <code>projects/*/attestors/*</code>. This field may not be updated.</li>
 </ul>
 </li>
-<li><code>update-time=amet.</code><ul>
+<li><code>update-time=ipsum</code><ul>
 <li>Output only. Time when the attestor was last updated.</li>
 </ul>
 </li>
-<li><code>user-owned-drydock-note    delegation-service-account-email=duo</code><ul>
+<li><code>user-owned-drydock-note    delegation-service-account-email=gubergren</code><ul>
 <li>Output only. This field will contain the service account email address that this Attestor will use as the principal when querying Container Analysis. Attestor administrators must grant this service account the IAM role needed to read attestations from the note_reference in Container Analysis (<code>containeranalysis.notes.occurrences.viewer</code>). This email address is fixed for the lifetime of the Attestor, but callers should not make any other assumptions about the service account email; future versions may use an email based on a different naming pattern.</li>
 </ul>
 </li>
-<li><code>note-reference=ipsum</code><ul>
+<li><code>note-reference=lorem</code><ul>
 <li>Required. The Drydock resource name of a ATTESTATION_AUTHORITY Note, created by the user, in the format: <code>projects/*/notes/*</code> (or the legacy <code>providers/*/notes/*</code>). This field may not be updated. An attestation by this attestor is stored as a Drydock ATTESTATION_AUTHORITY Occurrence that names a container image and that links to this Note. Drydock is an external dependency.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Creatives List - Real-time Bidding v2.0.4+20210331</title>
+  <title>Creatives List - Real-time Bidding v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Real-time Bidding v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Real-time Bidding v3.0.0+20220307</a>
         
       </div>
 
@@ -80,6 +80,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../bidders_endpoints-list">Endpoints List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../bidders_endpoints-patch">Endpoints Patch</a>
                     
                 </li>
             
@@ -313,7 +318,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-token=string</strong></p>
 <ul>
-<li>A token identifying a page of results the server should return. Typically, this is the value of ListCreativesResponse.nextPageToken returned from the previous call to the &#39;ListCreatives&#39; method.</li>
+<li>A token identifying a page of results the server should return. Typically, this is the value of ListCreativesResponse.nextPageToken returned from the previous call to the &#39;ListCreatives&#39; method. Page tokens for continued pages are valid for up to five hours, counting from the call to &#39;ListCreatives&#39; for the first page.</li>
 </ul>
 </li>
 <li>

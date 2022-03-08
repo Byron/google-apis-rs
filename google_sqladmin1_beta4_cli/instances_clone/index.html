@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Clone - SQL Admin v2.0.4+20210321</title>
+  <title>Clone - SQL Admin v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SQL Admin v2.0.4+20210321</a>
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
         
       </div>
 
@@ -61,6 +61,22 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
                     
                 </li>
             
@@ -410,6 +426,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>InstancesCloneRequest:
   clone-context:
+    allocated-ip-range: string
     bin-log-coordinates:
       bin-log-file-name: string
       bin-log-position: string
@@ -423,36 +440,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .clone-context.bin-log-coordinates    bin-log-file-name=sed</code><ul>
+<li><code>-r .clone-context    allocated-ip-range=voluptua.</code><ul>
+<li>The name of the allocated ip range for the private ip CloudSQL instance. For example: &#34;google-managed-services-default&#34;. If set, the cloned instance ip will be created in the allocated range. The range name must comply with <a href="https://tools.ietf.org/html/rfc1035">RFC 1035</a>. Specifically, the name must be 1-63 characters long and match the regular expression <a href="../[-a-z0-9]*[a-z0-9]">a-z</a>?. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>bin-log-coordinates    bin-log-file-name=amet.</code><ul>
 <li>Name of the binary log file for a Cloud SQL instance.</li>
 </ul>
 </li>
-<li><code>bin-log-position=duo</code><ul>
+<li><code>bin-log-position=consetetur</code><ul>
 <li>Position (offset) within the binary log file.</li>
 </ul>
 </li>
 <li>
-<p><code>kind=dolore</code></p>
+<p><code>kind=diam</code></p>
 <ul>
-<li>This is always <em>sql#binLogCoordinates</em>.</li>
+<li>This is always <code>sql#binLogCoordinates</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    destination-instance-name=et</code></p>
+<p><code>..    destination-instance-name=dolor</code></p>
 <ul>
 <li>Name of the Cloud SQL instance to be created as a clone.</li>
 </ul>
 </li>
-<li><code>kind=voluptua.</code><ul>
-<li>This is always <em>sql#cloneContext</em>.</li>
+<li><code>kind=et</code><ul>
+<li>This is always <code>sql#cloneContext</code>.</li>
 </ul>
 </li>
-<li><code>pitr-timestamp-ms=amet.</code><ul>
+<li><code>pitr-timestamp-ms=et</code><ul>
 <li>Reserved for future use.</li>
 </ul>
 </li>
-<li><code>point-in-time=consetetur</code><ul>
-<li>Reserved for future use.</li>
+<li><code>point-in-time=sadipscing</code><ul>
+<li>Timestamp, if specified, identifies the time to which the source instance is cloned.</li>
 </ul>
 </li>
 </ul>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Time Series Query - Monitoring v2.0.4+20210322</title>
+  <title>Time Series Query - Monitoring v3.0.0+20220218</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
         
       </div>
 
@@ -212,6 +212,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_time-series-list">Time Series List</a>
                     
                 </li>
@@ -370,7 +375,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Queries time series using Monitoring Query Language. This method does not require a Workspace.</p>
+              <p>Queries time series using Monitoring Query Language.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -383,7 +388,7 @@ You can set the scope for this method like this: <code>monitoring3 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] </li>
+<li>Required. The project (https://cloud.google.com/monitoring/api/v3#project_name) on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] </li>
 </ul>
 </li>
 </ul>
@@ -400,15 +405,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    page-size=42</code><ul>
+<li><code>-r .    page-size=92</code><ul>
 <li>A positive number that is the maximum number of time_series_data to return.</li>
 </ul>
 </li>
-<li><code>page-token=consetetur</code><ul>
+<li><code>page-token=dolores</code><ul>
 <li>If this field is not empty then it must contain the nextPageToken value returned by a previous call to this method. Using this field causes the method to return additional results from the previous method call.</li>
 </ul>
 </li>
-<li><code>query=voluptua.</code><ul>
+<li><code>query=gubergren</code><ul>
 <li>Required. The query in the Monitoring Query Language (https://cloud.google.com/monitoring/mql/reference) format. The default time zone is in UTC.</li>
 </ul>
 </li>

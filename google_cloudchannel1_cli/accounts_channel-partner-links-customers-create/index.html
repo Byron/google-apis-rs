@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Channel Partner Links Customers Create - Cloudchannel v2.0.4+20210326</title>
+  <title>Channel Partner Links Customers Create - Cloudchannel v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloudchannel v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Cloudchannel v3.0.0+20220303</a>
         
       </div>
 
@@ -82,6 +82,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_channel-partner-links-customers-get">Channel Partner Links Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_channel-partner-links-customers-import">Channel Partner Links Customers Import</a>
                     
                 </li>
             
@@ -166,6 +171,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-entitlements-lookup-offer">Customers Entitlements Lookup Offer</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-entitlements-start-paid-service">Customers Entitlements Start Paid Service</a>
                     
                 </li>
@@ -177,6 +187,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../accounts_customers-get">Customers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_customers-import">Customers Import</a>
                     
                 </li>
             
@@ -386,7 +401,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    alternate-email=ea</code><ul>
-<li>Secondary contact email. Alternate email and primary contact email are required to have different domains if primary contact email is present. When creating admin.google.com accounts, users get notified credentials at this email. This email address is also used as a recovery email.</li>
+<li>Secondary contact email. You need to provide an alternate email to create different domains if a primary contact email already exists. Users will receive a notification with credentials when you create an admin.google.com account. Secondary emails are also recovery email addresses. Alternate emails are optional when you create Team customers.</li>
 </ul>
 </li>
 <li><code>channel-partner-id=ipsum</code><ul>
@@ -394,7 +409,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>cloud-identity-id=invidunt</code><ul>
-<li>Output only. Customer&#39;s cloud_identity_id. Populated only if a Cloud Identity resource exists for this customer.</li>
+<li>Output only. The customer&#39;s Cloud Identity ID if the customer has a Cloud Identity resource.</li>
 </ul>
 </li>
 <li><code>cloud-identity-info    admin-console-uri=amet</code><ul>
@@ -446,11 +461,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    create-time=gubergren</code></p>
 <ul>
-<li>Output only. The time at which the customer is created.</li>
+<li>Output only. Time when the customer was created.</li>
 </ul>
 </li>
 <li><code>domain=ea</code><ul>
-<li>Required. Primary domain used by the customer. Domain of primary contact email is required to be same as the provided domain.</li>
+<li>Required. The customer&#39;s primary domain. Must match the primary contact email&#39;s domain.</li>
 </ul>
 </li>
 <li><code>language-code=dolor</code><ul>
@@ -496,7 +511,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>region-code=et</code><ul>
-<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
 </ul>
 </li>
 <li><code>revision=58</code><ul>
@@ -516,35 +531,35 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..primary-contact-info    display-name=vero</code></p>
 <ul>
-<li>Output only. Display name of the contact in the customer account. Populated by combining customer first name and last name.</li>
+<li>Output only. The customer account contact&#39;s display name, formatted as a combination of the customer&#39;s first and last name.</li>
 </ul>
 </li>
 <li><code>email=erat</code><ul>
-<li>Email of the contact in the customer account. Email is required for entitlements that need creation of admin.google.com accounts. The email will be the username used in credentials to access the admin.google.com account.</li>
+<li>The customer account&#39;s contact email. Required for entitlements that create admin.google.com accounts, and serves as the customer&#39;s username for those accounts. Use this email to invite Team customers.</li>
 </ul>
 </li>
 <li><code>first-name=sed</code><ul>
-<li>First name of the contact in the customer account.</li>
+<li>The customer account contact&#39;s first name. Optional for Team customers.</li>
 </ul>
 </li>
 <li><code>last-name=duo</code><ul>
-<li>Last name of the contact in the customer account.</li>
+<li>The customer account contact&#39;s last name. Optional for Team customers.</li>
 </ul>
 </li>
 <li><code>phone=dolore</code><ul>
-<li>Phone number of the contact in the customer account.</li>
+<li>The customer account&#39;s contact phone number.</li>
 </ul>
 </li>
 <li>
 <p><code>title=et</code></p>
 <ul>
-<li>Optional. Job title of the contact in the customer account.</li>
+<li>Optional. The customer account contact&#39;s job title.</li>
 </ul>
 </li>
 <li>
 <p><code>..    update-time=voluptua.</code></p>
 <ul>
-<li>Output only. The time at which the customer is updated.</li>
+<li>Output only. Time when the customer was updated.</li>
 </ul>
 </li>
 </ul>

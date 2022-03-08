@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Batch Get Assets History - Cloud Asset v2.0.4+20210319</title>
+  <title>Batch Get Assets History - Cloud Asset v3.0.0+20220225</title>
   
 
   
@@ -34,12 +34,34 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Asset v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Asset v3.0.0+20220225</a>
         
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
       <ul class="current">
+    
+        
+        <span>Assets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../assets_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Effective Iam Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../effective-iam-policies_batch-get">Batch Get</a>
+                    
+                </li>
+            
+        
+
     
         
         <span>Feeds</span>
@@ -82,6 +104,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../methods_analyze-iam-policy-longrunning">Analyze Iam Policy Longrunning</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../methods_analyze-move">Analyze Move</a>
                     
                 </li>
             
@@ -132,6 +159,37 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../operations_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Saved Queries</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../saved-queries_patch">Patch</a>
                     
                 </li>
             
@@ -223,6 +281,12 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>Start time of the time window (exclusive).</li>
 </ul>
 </li>
+<li>
+<p><strong>-p relationship-types=string</strong></p>
+<ul>
+<li>Optional. A list of relationship types to output, for example: <code>INSTANCE_TO_INSTANCEGROUP</code>. This field should only be specified if content_type=RELATIONSHIP. * If specified: it outputs specified relationships&#39; history on the [asset_names]. It returns an error if any of the [relationship_types] doesn&#39;t belong to the supported relationship types of the [asset_names] or if any of the [asset_names]&#39;s types doesn&#39;t belong to the source types of the [relationship_types]. * Otherwise: it outputs the supported relationships&#39; history on the [asset_names] or returns an error if any of the [asset_names]&#39;s types has no relationship support. See <a href="https://cloud.google.com/asset-inventory/docs/overview">Introduction to Cloud Asset Inventory</a> for all supported asset types and relationship types.</li>
+</ul>
+</li>
 </ul>
 <h1 id="optional-general-properties">Optional General Properties</h1>
 <p>The following properties can configure any call, and are not specific to this method.</p>
@@ -304,7 +368,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         <a href="../methods_export-assets" class="btn btn-neutral float-right" title="Export Assets"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../methods_analyze-iam-policy-longrunning" class="btn btn-neutral" title="Analyze Iam Policy Longrunning"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../methods_analyze-move" class="btn btn-neutral" title="Analyze Move"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -332,7 +396,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href="../methods_analyze-iam-policy-longrunning" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../methods_analyze-move" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../methods_export-assets" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

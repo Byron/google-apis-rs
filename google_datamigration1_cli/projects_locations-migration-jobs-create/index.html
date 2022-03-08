@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Migration Jobs Create - Database Migration Service v2.0.4+20210317</title>
+  <title>Locations Migration Jobs Create - Database Migration Service v3.0.0+20220216</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Database Migration Service v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Database Migration Service v3.0.0+20220216</a>
         
       </div>
 
@@ -325,7 +325,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>dump-path=sed</code><ul>
-<li>The path to the dump file in Google Cloud Storage, in the format: (gs://[BUCKET_NAME]/[OBJECT_NAME]).</li>
+<li>The path to the dump file in Google Cloud Storage, in the format: (gs://[BUCKET_NAME]/[OBJECT_NAME]). This field and the &#34;dump_flags&#34; field are mutually exclusive.</li>
 </ul>
 </li>
 <li><code>duration=no</code><ul>
@@ -354,7 +354,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>name=nonumy</code><ul>
-<li>The name (URI) of this migration job resource, in the form of: projects/{project}/locations/{location}/instances/{instance}.</li>
+<li>The name (URI) of this migration job resource, in the form of: projects/{project}/locations/{location}/migrationJobs/{migrationJob}.</li>
 </ul>
 </li>
 <li><code>phase=at</code><ul>

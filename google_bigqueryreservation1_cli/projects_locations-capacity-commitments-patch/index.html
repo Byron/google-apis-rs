@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Capacity Commitments Patch - BigQuery Reservation v2.0.4+20210324</title>
+  <title>Locations Capacity Commitments Patch - BigQuery Reservation v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Reservation v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Reservation v3.0.0+20220226</a>
         
       </div>
 
@@ -216,7 +216,7 @@ You can set the scope for this method like this: <code>bigqueryreservation1 --sc
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Output only. The resource name of the capacity commitment, e.g., <code>projects/myproject/locations/US/capacityCommitments/123</code></li>
+<li>Output only. The resource name of the capacity commitment, e.g., <code>projects/myproject/locations/US/capacityCommitments/123</code> For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.</li>
 </ul>
 </li>
 </ul>
@@ -230,6 +230,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   failure-status:
     code: integer
     message: string
+  multi-region-auxiliary: boolean
   name: string
   plan: string
   renewal-plan: string
@@ -240,43 +241,47 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    commitment-end-time=amet.</code><ul>
+<li><code>-r .    commitment-end-time=lorem</code><ul>
 <li>Output only. The end of the current commitment period. It is applicable only for ACTIVE capacity commitments.</li>
 </ul>
 </li>
-<li><code>commitment-start-time=duo</code><ul>
+<li><code>commitment-start-time=gubergren</code><ul>
 <li>Output only. The start of the current commitment period. It is applicable only for ACTIVE capacity commitments.</li>
 </ul>
 </li>
-<li><code>failure-status    code=46</code><ul>
+<li><code>failure-status    code=26</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
 <li>
-<p><code>message=gubergren</code></p>
+<p><code>message=dolor</code></p>
 <ul>
 <li>A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=lorem</code></p>
+<p><code>..    multi-region-auxiliary=true</code></p>
 <ul>
-<li>Output only. The resource name of the capacity commitment, e.g., <code>projects/myproject/locations/US/capacityCommitments/123</code></li>
+<li>Applicable only for commitments located within one of the BigQuery multi-regions (US or EU). If set to true, this commitment is placed in the organization&#39;s secondary region which is designated for disaster recovery purposes. If false, this commitment is placed in the organization&#39;s default region.</li>
 </ul>
 </li>
-<li><code>plan=gubergren</code><ul>
+<li><code>name=invidunt</code><ul>
+<li>Output only. The resource name of the capacity commitment, e.g., <code>projects/myproject/locations/US/capacityCommitments/123</code> For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.</li>
+</ul>
+</li>
+<li><code>plan=amet</code><ul>
 <li>Capacity commitment commitment plan.</li>
 </ul>
 </li>
-<li><code>renewal-plan=eos</code><ul>
+<li><code>renewal-plan=duo</code><ul>
 <li>The plan this capacity commitment is converted to after commitment_end_time passes. Once the plan is changed, committed period is extended according to commitment plan. Only applicable for ANNUAL and TRIAL commitments.</li>
 </ul>
 </li>
-<li><code>slot-count=-4</code><ul>
+<li><code>slot-count=-50</code><ul>
 <li>Number of slots in this commitment.</li>
 </ul>
 </li>
-<li><code>state=ea</code><ul>
+<li><code>state=sed</code><ul>
 <li>Output only. State of the commitment.</li>
 </ul>
 </li>

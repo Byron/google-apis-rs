@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Namespaces Services Endpoints Create - Service Directory v2.0.4+20210316</title>
+  <title>Locations Namespaces Services Endpoints Create - Service Directory v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Service Directory v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Service Directory v3.0.0+20220224</a>
         
       </div>
 
@@ -242,29 +242,44 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>Endpoint:
   address: string
+  create-time: string
   metadata: { string: string }
   name: string
+  network: string
   port: integer
+  update-time: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    address=sed</code><ul>
+<li><code>-r .    address=gubergren</code><ul>
 <li>Optional. An IPv4 or IPv6 address. Service Directory rejects bad addresses like: * <code>8.8.8</code> * <code>8.8.8.8:53</code> * <code>test:bad:address</code> * <code>[::1]</code> * <code>[::1]:8080</code> Limited to 45 characters.</li>
 </ul>
 </li>
-<li><code>metadata=key=amet.</code><ul>
-<li>Optional. Metadata for the endpoint. This data can be consumed by service clients. Restrictions: * The entire metadata dictionary may contain up to 512 characters, spread accoss all key-value pairs. Metadata that goes beyond this limit are rejected * Valid metadata keys have two segments: an optional prefix and name, separated by a slash (/). The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between. The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots (.), not longer than 253 characters in total, followed by a slash (/). Metadata that fails to meet these requirements are rejected * The <code>(*.)google.com/</code> and <code>(*.)googleapis.com/</code> prefixes are reserved for system metadata managed by Service Directory. If the user tries to write to these keyspaces, those entries are silently ignored by the system Note: This field is equivalent to the <code>annotations</code> field in the v1 API. They have the same syntax and read/write to the same location in Service Directory.</li>
+<li><code>create-time=lorem</code><ul>
+<li>Output only. The timestamp when the endpoint was created.</li>
+</ul>
+</li>
+<li><code>metadata=key=gubergren</code><ul>
+<li>Optional. Metadata for the endpoint. This data can be consumed by service clients. Restrictions: * The entire metadata dictionary may contain up to 512 characters, spread accoss all key-value pairs. Metadata that goes beyond this limit are rejected * Valid metadata keys have two segments: an optional prefix and name, separated by a slash (/). The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between. The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots (.), not longer than 253 characters in total, followed by a slash (/). Metadata that fails to meet these requirements are rejected Note: This field is equivalent to the <code>annotations</code> field in the v1 API. They have the same syntax and read/write to the same location in Service Directory.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=takimata</code><ul>
+<li><code>name=eos</code><ul>
 <li>Immutable. The resource name for the endpoint in the format <code>projects/*/locations/*/namespaces/*/services/*/endpoints/*</code>.</li>
 </ul>
 </li>
-<li><code>port=49</code><ul>
+<li><code>network=dolor</code><ul>
+<li>Immutable. The Google Compute Engine network (VPC) of the endpoint in the format <code>projects//locations/global/networks/*</code>. The project must be specified by project number (project id is rejected). Incorrectly formatted networks are rejected, but no other validation is performed on this field (ex. network or project existence, reachability, or permissions).</li>
+</ul>
+</li>
+<li><code>port=84</code><ul>
 <li>Optional. Service Directory rejects values outside of <code>[0, 65535]</code>.</li>
+</ul>
+</li>
+<li><code>update-time=ipsum</code><ul>
+<li>Output only. The timestamp when the endpoint was last updated.</li>
 </ul>
 </li>
 </ul>

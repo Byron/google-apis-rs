@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create - appengine v2.0.4+20210324</title>
+  <title>Create - appengine v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> appengine v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> appengine v3.0.0+20220226</a>
         
       </div>
 
@@ -316,6 +316,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   id: string
   location-id: string
   name: string
+  service-account: string
   serving-status: string
 
 </code></pre>
@@ -394,7 +395,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly</li>
 </ul>
 </li>
-<li><code>serving-status=duo</code><ul>
+<li><code>service-account=duo</code><ul>
+<li>The service account associated with the application. This is the app-level default identity. If no identity provided during create version, Admin API will fallback to this one.</li>
+</ul>
+</li>
+<li><code>serving-status=sed</code><ul>
 <li>Serving status of this application.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AdExchangeBuyerII v2.0.4+20210331</title>
+  <title>AdExchangeBuyerII v3.0.0+20220307</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> AdExchangeBuyerII v2.0.4+20210331</a>
+        <a href="." class="icon icon-home"> AdExchangeBuyerII v3.0.0+20220307</a>
         
       </div>
 
@@ -141,6 +141,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="accounts_finalized-proposals-list/">Finalized Proposals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_finalized-proposals-pause/">Finalized Proposals Pause</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accounts_finalized-proposals-resume/">Finalized Proposals Resume</a>
                     
                 </li>
             
@@ -415,7 +425,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer2_v2_beta1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>AdExchangeBuyerII</em> API at revision <em>20210331</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>AdExchangeBuyerII</em> API at revision <em>20220307</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">adexchangebuyer2-v2-beta1 [options]
         accounts
                 clients-create &lt;account-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -438,6 +448,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 creatives-update &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 creatives-watch &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 finalized-proposals-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                finalized-proposals-pause &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                finalized-proposals-resume &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 products-get &lt;account-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 products-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 proposals-accept &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

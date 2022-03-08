@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Memberships Patch - GKE Hub v2.0.4+20210322</title>
+  <title>Locations Memberships Patch - GKE Hub v3.0.0+20220211</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> GKE Hub v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> GKE Hub v3.0.0+20220211</a>
         
       </div>
 
@@ -43,6 +43,46 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-create">Locations Features Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-delete">Locations Features Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-get">Locations Features Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-get-iam-policy">Locations Features Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-list">Locations Features List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-patch">Locations Features Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-set-iam-policy">Locations Features Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-features-test-iam-permissions">Locations Features Test Iam Permissions</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -199,12 +239,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   authority:
     identity-provider: string
     issuer: string
+    oidc-jwks: string
     workload-identity-pool: string
   create-time: string
   delete-time: string
   description: string
   endpoint:
+    edge-cluster:
+      resource-link: string
     gke-cluster:
+      cluster-missing: boolean
       resource-link: string
     kubernetes-metadata:
       kubernetes-api-server-version: string
@@ -213,6 +257,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       node-provider-id: string
       update-time: string
       vcpu-count: integer
+    kubernetes-resource:
+      membership-cr-manifest: string
+      resource-options:
+        connect-version: string
+        k8s-version: string
+        v1beta1-crd: boolean
+    multi-cloud-cluster:
+      cluster-missing: boolean
+      resource-link: string
+    on-prem-cluster:
+      admin-cluster: boolean
+      cluster-missing: boolean
+      resource-link: string
   external-id: string
   labels: { string: string }
   last-connection-time: string
@@ -226,66 +283,130 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .authority    identity-provider=invidunt</code><ul>
+<li><code>-r .authority    identity-provider=vero</code><ul>
 <li>Output only. An identity provider that reflects the <code>issuer</code> in the workload identity pool.</li>
 </ul>
 </li>
-<li><code>issuer=amet</code><ul>
+<li><code>issuer=invidunt</code><ul>
 <li>Optional. A JSON Web Token (JWT) issuer URI. <code>issuer</code> must start with <code>https://</code> and be a valid URL with length &lt;2000 characters. If set, then Google will allow valid OIDC tokens from this issuer to authenticate within the workload_identity_pool. OIDC discovery will be performed on this URI to validate tokens from the issuer. Clearing <code>issuer</code> disables Workload Identity. <code>issuer</code> cannot be directly modified; it must be cleared (and Workload Identity disabled) before using a new issuer (and re-enabling Workload Identity).</li>
 </ul>
 </li>
+<li><code>oidc-jwks=stet</code><ul>
+<li>Optional. OIDC verification keys for this Membership in JWKS format (RFC 7517). When this field is set, OIDC discovery will NOT be performed on <code>issuer</code>, and instead OIDC tokens will be validated using this field.</li>
+</ul>
+</li>
 <li>
-<p><code>workload-identity-pool=duo</code></p>
+<p><code>workload-identity-pool=vero</code></p>
 <ul>
 <li>Output only. The name of the workload identity pool in which <code>issuer</code> will be recognized. There is a single Workload Identity Pool per Hub that is shared between all Memberships that belong to that Hub. For a Hub hosted in {PROJECT_ID}, the workload pool format is <code>{PROJECT_ID}.hub.id.goog</code>, although this is subject to change in newer versions of this API.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=ipsum</code></p>
+<p><code>..    create-time=elitr</code></p>
 <ul>
 <li>Output only. When the Membership was created.</li>
 </ul>
 </li>
-<li><code>delete-time=sed</code><ul>
+<li><code>delete-time=lorem</code><ul>
 <li>Output only. When the Membership was deleted.</li>
 </ul>
 </li>
-<li><code>description=ut</code><ul>
+<li><code>description=diam</code><ul>
 <li>Output only. Description of this membership, limited to 63 characters. Must match the regex: <code>a-zA-Z0-9*</code> This field is present for legacy purposes.</li>
 </ul>
 </li>
 <li>
-<p><code>endpoint.gke-cluster    resource-link=gubergren</code></p>
+<p><code>endpoint.edge-cluster    resource-link=no</code></p>
+<ul>
+<li>Immutable. Self-link of the GCP resource for the Edge Cluster. For example: //edgecontainer.googleapis.com/projects/my-project/locations/us-west1-a/clusters/my-cluster</li>
+</ul>
+</li>
+<li>
+<p><code>..gke-cluster    cluster-missing=false</code></p>
+<ul>
+<li>Output only. If cluster_missing is set then it denotes that the GKE cluster no longer exists in the GKE Control Plane.</li>
+</ul>
+</li>
+<li>
+<p><code>resource-link=accusam</code></p>
 <ul>
 <li>Immutable. Self-link of the GCP resource for the GKE cluster. For example: //container.googleapis.com/projects/my-project/locations/us-west1-a/clusters/my-cluster Zonal clusters are also supported.</li>
 </ul>
 </li>
 <li>
-<p><code>..kubernetes-metadata    kubernetes-api-server-version=rebum.</code></p>
+<p><code>..kubernetes-metadata    kubernetes-api-server-version=takimata</code></p>
 <ul>
 <li>Output only. Kubernetes API server version string as reported by <code>/version</code>.</li>
 </ul>
 </li>
-<li><code>memory-mb=44</code><ul>
+<li><code>memory-mb=55</code><ul>
 <li>Output only. The total memory capacity as reported by the sum of all Kubernetes nodes resources, defined in MB.</li>
 </ul>
 </li>
-<li><code>node-count=51</code><ul>
+<li><code>node-count=73</code><ul>
 <li>Output only. Node count as reported by Kubernetes nodes resources.</li>
 </ul>
 </li>
-<li><code>node-provider-id=ipsum</code><ul>
+<li><code>node-provider-id=et</code><ul>
 <li>Output only. Node providerID as reported by the first node in the list of nodes on the Kubernetes endpoint. On Kubernetes platforms that support zero-node clusters (like GKE-on-GCP), the node_count will be zero and the node_provider_id will be empty.</li>
 </ul>
 </li>
-<li><code>update-time=est</code><ul>
+<li><code>update-time=erat</code><ul>
 <li>Output only. The time at which these details were last updated. This update_time is different from the Membership-level update_time since EndpointDetails are updated internally for API consumers.</li>
 </ul>
 </li>
 <li>
-<p><code>vcpu-count=39</code></p>
+<p><code>vcpu-count=5</code></p>
 <ul>
 <li>Output only. vCPU count as reported by Kubernetes nodes resources.</li>
+</ul>
+</li>
+<li>
+<p><code>..kubernetes-resource    membership-cr-manifest=amet.</code></p>
+<ul>
+<li>Input only. The YAML representation of the Membership CR. This field is ignored for GKE clusters where Hub can read the CR directly. Callers should provide the CR that is currently present in the cluster during CreateMembership or UpdateMembership, or leave this field empty if none exists. The CR manifest is used to validate the cluster has not been registered with another Membership.</li>
+</ul>
+</li>
+<li><code>resource-options    connect-version=sed</code><ul>
+<li>Optional. The Connect agent version to use for connect_resources. Defaults to the latest GKE Connect version. The version must be a currently supported version, obsolete versions will be rejected.</li>
+</ul>
+</li>
+<li><code>k8s-version=takimata</code><ul>
+<li>Optional. Major version of the Kubernetes cluster. This is only used to determine which version to use for the CustomResourceDefinition resources, <code>apiextensions/v1beta1</code> or<code>apiextensions/v1</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>v1beta1-crd=true</code></p>
+<ul>
+<li>Optional. Use <code>apiextensions/v1beta1</code> instead of <code>apiextensions/v1</code> for CustomResourceDefinition resources. This option should be set for clusters with Kubernetes apiserver versions &lt;1.16.</li>
+</ul>
+</li>
+<li>
+<p><code>...multi-cloud-cluster    cluster-missing=false</code></p>
+<ul>
+<li>Output only. If cluster_missing is set then it denotes that API(gkemulticloud.googleapis.com) resource for this GKE Multi-Cloud cluster no longer exists.</li>
+</ul>
+</li>
+<li>
+<p><code>resource-link=accusam</code></p>
+<ul>
+<li>Immutable. Self-link of the GCP resource for the GKE Multi-Cloud cluster. For example: //gkemulticloud.googleapis.com/projects/my-project/locations/us-west1-a/awsClusters/my-cluster //gkemulticloud.googleapis.com/projects/my-project/locations/us-west1-a/azureClusters/my-cluster</li>
+</ul>
+</li>
+<li>
+<p><code>..on-prem-cluster    admin-cluster=false</code></p>
+<ul>
+<li>Immutable. Whether the cluster is an admin cluster.</li>
+</ul>
+</li>
+<li><code>cluster-missing=false</code><ul>
+<li>Output only. If cluster_missing is set then it denotes that API(gkeonprem.googleapis.com) resource for this GKE On-Prem cluster no longer exists.</li>
+</ul>
+</li>
+<li>
+<p><code>resource-link=amet.</code></p>
+<ul>
+<li>Immutable. Self-link of the GCP resource for the GKE On-Prem cluster. For example: //gkeonprem.googleapis.com/projects/my-project/locations/us-west1-a/vmwareClusters/my-cluster //gkeonprem.googleapis.com/projects/my-project/locations/us-west1-a/bareMetalClusters/my-cluster</li>
 </ul>
 </li>
 <li>
@@ -294,7 +415,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional. An externally-generated and managed ID for this Membership. This ID may be modified after creation, but this is not recommended. The ID must match the regex: <code>a-zA-Z0-9*</code> If this Membership represents a Kubernetes cluster, this value should be set to the UID of the <code>kube-system</code> namespace object.</li>
 </ul>
 </li>
-<li><code>labels=key=dolor</code><ul>
+<li><code>labels=key=sadipscing</code><ul>
 <li>Optional. GCP labels for this membership.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
@@ -303,23 +424,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. For clusters using Connect, the timestamp of the most recent connection established with Google Cloud. This time is updated every several minutes, not continuously. For clusters that do not use GKE Connect, or that have never connected successfully, this field will be unset.</li>
 </ul>
 </li>
-<li><code>name=eos</code><ul>
+<li><code>name=invidunt</code><ul>
 <li>Output only. The full, unique name of this Membership resource in the format <code>projects/*/locations/*/memberships/{membership_id}</code>, set during creation. <code>membership_id</code> must be a valid RFC 1123 compliant DNS label: 1. At most 63 characters in length 2. It must consist of lower case alphanumeric characters or <code>-</code> 3. It must start and end with an alphanumeric character Which can be expressed as the regex: <code>[a-z0-9]([-a-z0-9]*[a-z0-9])?</code>, with a maximum length of 63 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>state    code=labore</code></p>
+<p><code>state    code=no</code></p>
 <ul>
 <li>Output only. The current state of the Membership resource.</li>
 </ul>
 </li>
 <li>
-<p><code>..    unique-id=sed</code></p>
+<p><code>..    unique-id=est</code></p>
 <ul>
 <li>Output only. Google-generated UUID for this resource. This is unique across all Membership resources. If a Membership resource is deleted and another resource with the same name is created, it gets a different unique_id.</li>
 </ul>
 </li>
-<li><code>update-time=duo</code><ul>
+<li><code>update-time=at</code><ul>
 <li>Output only. When the Membership was last updated.</li>
 </ul>
 </li>

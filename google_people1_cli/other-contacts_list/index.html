@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - People Service v2.0.4+20210330</title>
+  <title>List - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -228,7 +228,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>List all &#34;Other contacts&#34;, that is contacts that are not in a contact group. &#34;Other contacts&#34; are typically auto created contacts from interactions.</p>
+              <p>List all &#34;Other contacts&#34;, that is contacts that are not in a contact group. &#34;Other contacts&#34; are typically auto created contacts from interactions. Sync tokens expire 7 days after the full sync. A request with an expired sync token will result in a 410 error. In the case of such an error clients should make a full sync request without a <code>sync_token</code>. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the <code>sync_token</code> is specified, resources deleted since the last sync will be returned as a person with <code>PersonMetadata.deleted</code> set to true. When the <code>page_token</code> or <code>sync_token</code> is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at <a href="..//people/v1/other-contacts#list_the_users_other_contacts_that_have_changed">List the user&#39;s other contacts that have changed</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/contacts.other.readonly</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/contacts.other.readonly</em>.
@@ -258,25 +258,31 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-token=string</strong></p>
 <ul>
-<li>Optional. A page token, received from a previous <code>ListOtherContacts</code> call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to <code>ListOtherContacts</code> must match the call that provided the page token.</li>
+<li>Optional. A page token, received from a previous response <code>next_page_token</code>. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to <code>otherContacts.list</code> must match the first call that provided the page token.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p read-mask=string</strong></p>
 <ul>
-<li>Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * emailAddresses * names * phoneNumbers</li>
+<li>Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. What values are valid depend on what ReadSourceType is used. If READ_SOURCE_TYPE_CONTACT is used, valid values are: * emailAddresses * metadata * names * phoneNumbers * photos If READ_SOURCE_TYPE_PROFILE is used, valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined</li>
 </ul>
 </li>
 <li>
 <p><strong>-p request-sync-token=boolean</strong></p>
 <ul>
-<li>Optional. Whether the response should include <code>next_sync_token</code>, which can be used to get all changes since the last request. For subsequent sync requests use the <code>sync_token</code> param instead. Initial sync requests that specify <code>request_sync_token</code> have an additional rate limit.</li>
+<li>Optional. Whether the response should return <code>next_sync_token</code> on the last page of results. It can be used to get incremental changes since the last request by setting it on the request <code>sync_token</code>. More details about sync behavior at <code>otherContacts.list</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p sources=string</strong></p>
+<ul>
+<li>Optional. A mask of what source types to return. Defaults to READ_SOURCE_TYPE_CONTACT if not set.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p sync-token=string</strong></p>
 <ul>
-<li>Optional. A sync token, received from a previous <code>ListOtherContacts</code> call. Provide this to retrieve only the resources changed since the last request. Sync requests that specify <code>sync_token</code> have an additional rate limit. When syncing, all other parameters provided to <code>ListOtherContacts</code> must match the call that provided the sync token.</li>
+<li>Optional. A sync token, received from a previous response <code>next_sync_token</code> Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to <code>otherContacts.list</code> must match the first call that provided the sync token. More details about sync behavior at <code>otherContacts.list</code>.</li>
 </ul>
 </li>
 </ul>

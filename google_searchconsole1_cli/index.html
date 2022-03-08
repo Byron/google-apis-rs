@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search Console v2.0.4+20210325</title>
+  <title>Search Console v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Search Console v2.0.4+20210325</a>
+        <a href="." class="icon icon-home"> Search Console v3.0.0+20220305</a>
         
       </div>
 
@@ -105,6 +105,17 @@
 
     
         
+        <span>Url Inspection</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-inspection_index-inspect/">Index Inspect</a>
+                    
+                </li>
+            
+        
+
+    
+        
         <span>Url Testing Tools</span>
             
                 <li class="toctree-l1 ">
@@ -167,7 +178,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/searchconsole1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Search Console</em> API at revision <em>20210325</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Search Console</em> API at revision <em>20220305</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">searchconsole1 [options]
         searchanalytics
                 query &lt;site-url&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -181,6 +192,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 delete &lt;site-url&gt; [-p &lt;v&gt;]...
                 get &lt;site-url&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        url-inspection
+                index-inspect (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         url-testing-tools
                 mobile-friendly-test-run (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
   searchconsole1 --help

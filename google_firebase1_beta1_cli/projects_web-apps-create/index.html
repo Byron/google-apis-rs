@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Web Apps Create - Firebase Management v2.0.4+20210329</title>
+  <title>Web Apps Create - Firebase Management v3.0.0+20220304</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firebase Management v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Firebase Management v3.0.0+20220304</a>
         
       </div>
 
@@ -289,6 +289,7 @@ You can set the scope for this method like this: <code>firebase1-beta1 --scope &
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>WebApp:
+  api-key-id: string
   app-id: string
   app-urls: [string]
   display-name: string
@@ -300,20 +301,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    app-id=no</code><ul>
+<li><code>-r .    api-key-id=sed</code><ul>
+<li>The key_id of the GCP ApiKey associated with this App. If set must have no restrictions, or only have restrictions that are valid for the associated Firebase App. Cannot be set in create requests, instead an existing valid API Key will be chosen, or if no valid API Keys exist, one will be provisioned for you. Cannot be set to an empty value in update requests.</li>
+</ul>
+</li>
+<li><code>app-id=et</code><ul>
 <li>Immutable. The globally unique, Firebase-assigned identifier for the <code>WebApp</code>. This identifier should be treated as an opaque token, as the data format is not specified.</li>
 </ul>
 </li>
-<li><code>app-urls=stet</code><ul>
+<li><code>app-urls=et</code><ul>
 <li>The URLs where the <code>WebApp</code> is hosted.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>display-name=kasd</code><ul>
+<li><code>display-name=vero</code><ul>
 <li>The user-assigned display name for the <code>WebApp</code>.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=erat</code><ul>
 <li>The resource name of the WebApp, in the format: projects/PROJECT_IDENTIFIER /webApps/APP_ID * PROJECT_IDENTIFIER: the parent Project&#39;s <a href="../../projects#FirebaseProject.FIELDS.project_number"><code>ProjectNumber</code></a> <strong><em>(recommended)</em></strong> or its <a href="../../projects#FirebaseProject.FIELDS.project_id"><code>ProjectId</code></a>. Learn more about using project identifiers in Google&#39;s <a href="https://google.aip.dev/cloud/2510">AIP 2510 standard</a>. Note that the value for PROJECT_IDENTIFIER in any response body will be the <code>ProjectId</code>. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see <a href="../../projects.webApps#WebApp.FIELDS.app_id"><code>appId</code></a>).</li>
 </ul>
 </li>
@@ -321,7 +326,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Immutable. A user-assigned unique identifier of the parent FirebaseProject for the <code>WebApp</code>.</li>
 </ul>
 </li>
-<li><code>web-id=et</code><ul>
+<li><code>web-id=duo</code><ul>
 <li>Output only. Immutable. A unique, Firebase-assigned identifier for the <code>WebApp</code>. This identifier is only used to populate the <code>namespace</code> value for the <code>WebApp</code>. For most use cases, use <code>appId</code> to identify or reference the App. The <code>webId</code> value is only unique within a <code>FirebaseProject</code> and its associated Apps.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Instances Create - Cloud Filestore v2.0.4+20210323</title>
+  <title>Locations Instances Create - Cloud Filestore v3.0.0+20220214</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Filestore v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Cloud Filestore v3.0.0+20220214</a>
         
       </div>
 
@@ -129,6 +129,31 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-create">Locations Instances Snapshots Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-delete">Locations Instances Snapshots Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-get">Locations Instances Snapshots Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-list">Locations Instances Snapshots List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-snapshots-patch">Locations Instances Snapshots Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-list">Locations List</a>
                     
                 </li>
@@ -197,7 +222,7 @@ You can set the scope for this method like this: <code>file1 --scope &lt;scope&g
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The instance&#39;s project and location, in the format projects/{project_id}/locations/{location}. In Cloud Filestore, locations map to GCP zones, for example <strong>us-west1-b</strong>.</li>
+<li>Required. The instance&#39;s project and location, in the format <code>projects/{project_id}/locations/{location}</code>. In Cloud Filestore, locations map to GCP zones, for example <strong>us-west1-b</strong>.</li>
 </ul>
 </li>
 </ul>
@@ -209,46 +234,62 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   create-time: string
   description: string
   etag: string
+  kms-key-name: string
   labels: { string: string }
   name: string
+  satisfies-pzs: boolean
   state: string
   status-message: string
+  suspension-reasons: [string]
   tier: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=duo</code><ul>
+<li><code>-r .    create-time=ut</code><ul>
 <li>Output only. The time when the instance was created.</li>
 </ul>
 </li>
-<li><code>description=ipsum</code><ul>
+<li><code>description=gubergren</code><ul>
 <li>The description of the instance (2048 characters or less).</li>
 </ul>
 </li>
-<li><code>etag=sed</code><ul>
+<li><code>etag=rebum.</code><ul>
 <li>Server-specified ETag for the instance resource to prevent simultaneous updates from overwriting each other.</li>
 </ul>
 </li>
-<li><code>labels=key=ut</code><ul>
+<li><code>kms-key-name=est</code><ul>
+<li>KMS key name used for data encryption.</li>
+</ul>
+</li>
+<li><code>labels=key=ipsum</code><ul>
 <li>Resource labels to represent user provided metadata.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=gubergren</code><ul>
-<li>Output only. The resource name of the instance, in the format projects/{project}/locations/{location}/instances/{instance}.</li>
+<li><code>name=ipsum</code><ul>
+<li>Output only. The resource name of the instance, in the format <code>projects/{project}/locations/{location}/instances/{instance}</code>.</li>
 </ul>
 </li>
-<li><code>state=rebum.</code><ul>
+<li><code>satisfies-pzs=true</code><ul>
+<li>Output only. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>state=ea</code><ul>
 <li>Output only. The instance state.</li>
 </ul>
 </li>
-<li><code>status-message=est</code><ul>
+<li><code>status-message=dolor</code><ul>
 <li>Output only. Additional information about the instance state, if available.</li>
 </ul>
 </li>
-<li><code>tier=ipsum</code><ul>
+<li><code>suspension-reasons=lorem</code><ul>
+<li>Output only. field indicates all the reasons the instance is in &#34;SUSPENDED&#34; state.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>tier=eos</code><ul>
 <li>The service tier of the instance.</li>
 </ul>
 </li>

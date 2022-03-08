@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Check - Service Control v2.0.4+20210326</title>
+  <title>Check - Service Control v3.0.0+20220227</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Service Control v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Service Control v3.0.0+20220227</a>
         
       </div>
 
@@ -116,7 +116,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Checks whether an operation on a service should be allowed to proceed based on the configuration of the service and related policies. It must be called before the operation is executed. If feasible, the client should cache the check results and reuse them for 60 seconds. In case of any server errors, the client should rely on the cached results for much longer time to avoid outage. WARNING: There is general 60s delay for the configuration and policy propagation, therefore callers MUST NOT depend on the <code>Check</code> method having the latest policy information. NOTE: the CheckRequest has the size limit of 64KB. This method requires the <code>servicemanagement.services.check</code> permission on the specified service. For more information, see <a href="https://cloud.google.com/iam">Cloud IAM</a>.</p>
+              <p>Checks whether an operation on a service should be allowed to proceed based on the configuration of the service and related policies. It must be called before the operation is executed. If feasible, the client should cache the check results and reuse them for 60 seconds. In case of any server errors, the client should rely on the cached results for much longer time to avoid outage. WARNING: There is general 60s delay for the configuration and policy propagation, therefore callers MUST NOT depend on the <code>Check</code> method having the latest policy information. NOTE: the CheckRequest has the size limit (wire-format byte size) of 1MB. This method requires the <code>servicemanagement.services.check</code> permission on the specified service. For more information, see <a href="https://cloud.google.com/iam">Cloud IAM</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>

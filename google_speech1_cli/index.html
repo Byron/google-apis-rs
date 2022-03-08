@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Speech v2.0.4+20210325</title>
+  <title>Speech v3.0.0+20220221</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Speech v2.0.4+20210325</a>
+        <a href="." class="icon icon-home"> Speech v3.0.0+20220221</a>
         
       </div>
 
@@ -51,6 +51,62 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="operations_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-custom-classes-create/">Locations Custom Classes Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-custom-classes-delete/">Locations Custom Classes Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-custom-classes-get/">Locations Custom Classes Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-custom-classes-list/">Locations Custom Classes List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-custom-classes-patch/">Locations Custom Classes Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-phrase-sets-create/">Locations Phrase Sets Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-phrase-sets-delete/">Locations Phrase Sets Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-phrase-sets-get/">Locations Phrase Sets Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-phrase-sets-list/">Locations Phrase Sets List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-phrase-sets-patch/">Locations Phrase Sets Patch</a>
                     
                 </li>
             
@@ -125,11 +181,22 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/speech1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Speech</em> API at revision <em>20210325</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Speech</em> API at revision <em>20220221</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">speech1 [options]
         operations
                 get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        projects
+                locations-custom-classes-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-classes-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-classes-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-classes-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-classes-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-phrase-sets-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-phrase-sets-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-phrase-sets-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-phrase-sets-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-phrase-sets-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
         speech
                 longrunningrecognize (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 recognize (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Structures Rooms List - Smart Device Management v2.0.4+20210319</title>
+  <title>Structures Rooms List - Smart Device Management v3.0.0+20220302</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Smart Device Management v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Smart Device Management v3.0.0+20220302</a>
         
       </div>
 
@@ -136,7 +136,11 @@
             <div class="section">
               <p>Lists rooms managed by the enterprise.</p>
 <h1 id="scopes">Scopes</h1>
-<p>You will need authorization for the <em>https://www.googleapis.com/auth/sdm.service</em> scope to make a valid call.</p>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/sdm.service</em></li>
+<li><em>https://www.googleapis.com/auth/sdm.thermostat.service</em></li>
+</ul>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/sdm.service</em>.
 You can set the scope for this method like this: <code>smartdevicemanagement1 --scope &lt;scope&gt; enterprises structures-rooms-list ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>

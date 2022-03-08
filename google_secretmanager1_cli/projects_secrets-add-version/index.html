@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Secrets Add Version - Secret Manager v2.0.4+20210319</title>
+  <title>Secrets Add Version - Secret Manager v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Secret Manager v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Secret Manager v3.0.0+20220226</a>
         
       </div>
 
@@ -205,6 +205,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>AddSecretVersionRequest:
   payload:
     data: string
+    data-crc32c: string
 
 </code></pre>
 
@@ -212,6 +213,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <ul>
 <li><code>-r .payload    data=et</code><ul>
 <li>The secret data. Must be no larger than 64KiB.</li>
+</ul>
+</li>
+<li><code>data-crc32c=magna</code><ul>
+<li>Optional. If specified, SecretManagerService will verify the integrity of the received data on SecretManagerService.AddSecretVersion calls using the crc32c checksum and store it to include in future SecretManagerService.AccessSecretVersion responses. If a checksum is not provided in the SecretManagerService.AddSecretVersion request, the SecretManagerService will generate and store one for you. The CRC32C value is encoded as a Int64 for compatibility, and can be safely downconverted to uint32 in languages that support this type. https://cloud.google.com/apis/design/design_patterns#integer_types</li>
 </ul>
 </li>
 </ul>

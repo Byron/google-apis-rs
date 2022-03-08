@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Catalogs Event Stores Placements Predict - Recommendations AI v2.0.4+20210319</title>
+  <title>Locations Catalogs Event Stores Placements Predict - Recommendations AI v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Recommendations AI v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Recommendations AI v3.0.0+20220224</a>
         
       </div>
 
@@ -219,7 +219,7 @@ You can set the scope for this method like this: <code>recommendationengine1-bet
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. Full resource name of the format: {name=projects/<em>/locations/global/catalogs/default_catalog/eventStores/default_event_store/placements/</em>} The id of the recommendation engine placement. This id is used to identify the set of models that will be used to make the prediction. We currently support three placements with the following IDs by default: * <code>shopping_cart</code>: Predicts items frequently bought together with one or more catalog items in the same shopping session. Commonly displayed after <code>add-to-cart</code> events, on product detail pages, or on the shopping cart page. * <code>home_page</code>: Predicts the next product that a user will most likely engage with or purchase based on the shopping or viewing history of the specified <code>userId</code> or <code>visitorId</code>. For example - Recommendations for you. * <code>product_detail</code>: Predicts the next product that a user will most likely engage with or purchase. The prediction is based on the shopping or viewing history of the specified <code>userId</code> or <code>visitorId</code> and its relevance to a specified <code>CatalogItem</code>. Typically used on product detail pages. For example - More items like this. * <code>recently_viewed_default</code>: Returns up to 75 items recently viewed by the specified <code>userId</code> or <code>visitorId</code>, most recent ones first. Returns nothing if neither of them has viewed any items yet. For example - Recently viewed. The full list of available placements can be seen at https://console.cloud.google.com/recommendation/datafeeds/default_catalog/dashboard</li>
+<li>Required. Full resource name of the format: <code>{name=projects/*/locations/global/catalogs/default_catalog/eventStores/default_event_store/placements/*}</code> The id of the recommendation engine placement. This id is used to identify the set of models that will be used to make the prediction. We currently support three placements with the following IDs by default: * <code>shopping_cart</code>: Predicts items frequently bought together with one or more catalog items in the same shopping session. Commonly displayed after <code>add-to-cart</code> events, on product detail pages, or on the shopping cart page. * <code>home_page</code>: Predicts the next product that a user will most likely engage with or purchase based on the shopping or viewing history of the specified <code>userId</code> or <code>visitorId</code>. For example - Recommendations for you. * <code>product_detail</code>: Predicts the next product that a user will most likely engage with or purchase. The prediction is based on the shopping or viewing history of the specified <code>userId</code> or <code>visitorId</code> and its relevance to a specified <code>CatalogItem</code>. Typically used on product detail pages. For example - More items like this. * <code>recently_viewed_default</code>: Returns up to 75 items recently viewed by the specified <code>userId</code> or <code>visitorId</code>, most recent ones first. Returns nothing if neither of them has viewed any items yet. For example - Recently viewed. The full list of available placements can be seen at https://console.cloud.google.com/recommendation/datafeeds/default_catalog/dashboard</li>
 </ul>
 </li>
 </ul>
@@ -265,7 +265,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    dry-run=true</code><ul>
-<li>Optional. Use dryRun mode for this prediction query. If set to true, a dummy model will be used that returns arbitrary catalog items. Note that the dryRun mode should only be used for testing the API, or if the model is not ready.</li>
+<li>Optional. Use dryRun mode for this prediction query. If set to true, a fake model will be used that returns arbitrary catalog items. Note that the dryRun mode should only be used for testing the API, or if the model is not ready.</li>
 </ul>
 </li>
 <li><code>filter=et</code><ul>
@@ -379,7 +379,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>visitor-id=diam</code><ul>
-<li>Required. A unique identifier for tracking visitors with a length limit of 128 bytes. For example, this could be implemented with a http cookie, which should be able to uniquely identify a visitor on a single device. This unique identifier should not change if the visitor log in/out of the website. Maximum length 128 bytes. Cannot be empty.</li>
+<li>Required. A unique identifier for tracking visitors with a length limit of 128 bytes. For example, this could be implemented with an HTTP cookie, which should be able to uniquely identify a visitor on a single device. This unique identifier should not change if the visitor logs in or out of the website. Maximum length 128 bytes. Cannot be empty.</li>
 </ul>
 </li>
 </ul>

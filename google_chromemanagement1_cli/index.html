@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Chrome Management v2.0.4+20210330</title>
+  <title>Chrome Management v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Chrome Management v2.0.4+20210330</a>
+        <a href="." class="icon icon-home"> Chrome Management v3.0.0+20220305</a>
         
       </div>
 
@@ -43,6 +43,26 @@
     
         
         <span>Customers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="customers_apps-android-get/">Apps Android Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="customers_apps-chrome-get/">Apps Chrome Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="customers_apps-count-chrome-app-requests/">Apps Count Chrome App Requests</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="customers_apps-web-get/">Apps Web Get</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="customers_reports-count-chrome-versions/">Reports Count Chrome Versions</a>
@@ -56,6 +76,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="customers_reports-find-installed-app-devices/">Reports Find Installed App Devices</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="customers_telemetry-devices-list/">Telemetry Devices List</a>
                     
                 </li>
             
@@ -114,12 +139,17 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/chromemanagement1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Chrome Management</em> API at revision <em>20210330</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Chrome Management</em> API at revision <em>20220305</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">chromemanagement1 [options]
         customers
+                apps-android-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apps-chrome-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apps-count-chrome-app-requests &lt;customer&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apps-web-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 reports-count-chrome-versions &lt;customer&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 reports-count-installed-apps &lt;customer&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 reports-find-installed-app-devices &lt;customer&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                telemetry-devices-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
   chromemanagement1 --help
 
 Configuration:
@@ -175,7 +205,7 @@ output to standard error <em>as-is</em>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="customers_reports-count-chrome-versions/" class="btn btn-neutral float-right" title="Reports Count Chrome Versions"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="customers_apps-android-get/" class="btn btn-neutral float-right" title="Apps Android Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>
@@ -205,7 +235,7 @@ output to standard error <em>as-is</em>.</p>
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="customers_reports-count-chrome-versions/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="customers_apps-android-get/" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

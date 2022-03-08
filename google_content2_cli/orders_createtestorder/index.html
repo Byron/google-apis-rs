@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Createtestorder - Shopping Content v2.0.4+20210325</title>
+  <title>Createtestorder - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -675,15 +675,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    country=dolore</code><ul>
+<li><code>-r .    country=lorem</code><ul>
 <li>The CLDR territory code of the country of the test order to create. Affects the currency and addresses of orders created via <code>template_name</code>, or the addresses of orders created via <code>test_order</code>. Acceptable values are: - &#34;<code>US</code>&#34; - &#34;<code>FR</code>&#34; Defaults to <code>US</code>.</li>
 </ul>
 </li>
-<li><code>template-name=eirmod</code><ul>
+<li><code>template-name=accusam</code><ul>
 <li>The test order template to use. Specify as an alternative to <code>testOrder</code> as a shortcut for retrieving a template and then creating an order using that template. Acceptable values are: - &#34;<code>template1</code>&#34; - &#34;<code>template1a</code>&#34; - &#34;<code>template1b</code>&#34; - &#34;<code>template2</code>&#34; - &#34;<code>template3</code>&#34; </li>
 </ul>
 </li>
-<li><code>test-order.customer    email=lorem</code><ul>
+<li><code>test-order.customer    email=amet</code><ul>
 <li>Required. Email address of the customer. Acceptable values are: - &#34;<code>pog.dwight.schrute@gmail.com</code>&#34; - &#34;<code>pog.jim.halpert@gmail.com</code>&#34; - &#34;<code>penpog.pam.beesly@gmail.comding</code>&#34; </li>
 </ul>
 </li>
@@ -695,75 +695,63 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Full name of the customer.</li>
 </ul>
 </li>
-<li><code>marketing-rights-info    explicit-marketing-preference=dolores</code><ul>
+<li><code>marketing-rights-info    explicit-marketing-preference=accusam</code><ul>
 <li>Last know user use selection regards marketing preferences. In certain cases selection might not be known, so this field would be empty. Acceptable values are: - &#34;<code>denied</code>&#34; - &#34;<code>granted</code>&#34; </li>
 </ul>
 </li>
 <li>
-<p><code>last-updated-timestamp=erat</code></p>
+<p><code>last-updated-timestamp=sea</code></p>
 <ul>
 <li>Timestamp when last time marketing preference was updated. Could be empty, if user wasn&#39;t offered a selection yet.</li>
 </ul>
 </li>
 <li>
-<p><code>...    enable-orderinvoices=false</code></p>
+<p><code>...    enable-orderinvoices=true</code></p>
 <ul>
 <li>Whether the orderinvoices service should support this order.</li>
 </ul>
 </li>
-<li><code>kind=sea</code><ul>
+<li><code>kind=lorem</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;<code>content#testOrder</code>&#34;</li>
 </ul>
 </li>
-<li><code>notification-mode=takimata</code><ul>
+<li><code>notification-mode=et</code><ul>
 <li>Restricted. Do not use.</li>
 </ul>
 </li>
-<li><code>payment-method    expiration-month=50</code><ul>
+<li><code>payment-method    expiration-month=24</code><ul>
 <li>The card expiration month (January = 1, February = 2 etc.).</li>
 </ul>
 </li>
-<li><code>expiration-year=79</code><ul>
+<li><code>expiration-year=97</code><ul>
 <li>The card expiration year (4-digit, e.g. 2015).</li>
 </ul>
 </li>
-<li><code>last-four-digits=at</code><ul>
+<li><code>last-four-digits=et</code><ul>
 <li>The last four digits of the card number.</li>
 </ul>
 </li>
-<li><code>predefined-billing-address=dolor</code><ul>
+<li><code>predefined-billing-address=sit</code><ul>
 <li>The billing address. Acceptable values are: - &#34;<code>dwight</code>&#34; - &#34;<code>jim</code>&#34; - &#34;<code>pam</code>&#34; </li>
 </ul>
 </li>
 <li>
-<p><code>type=et</code></p>
+<p><code>type=erat</code></p>
 <ul>
 <li>The type of instrument. Note that real orders might have different values than the four values accepted by <code>createTestOrder</code>. Acceptable values are: - &#34;<code>AMEX</code>&#34; - &#34;<code>DISCOVER</code>&#34; - &#34;<code>MASTERCARD</code>&#34; - &#34;<code>VISA</code>&#34; </li>
 </ul>
 </li>
 <li>
-<p><code>..    predefined-delivery-address=sit</code></p>
+<p><code>..    predefined-delivery-address=sea</code></p>
 <ul>
 <li>Required. Identifier of one of the predefined delivery addresses for the delivery. Acceptable values are: - &#34;<code>dwight</code>&#34; - &#34;<code>jim</code>&#34; - &#34;<code>pam</code>&#34; </li>
 </ul>
 </li>
-<li><code>predefined-pickup-details=erat</code><ul>
+<li><code>predefined-pickup-details=nonumy</code><ul>
 <li>Identifier of one of the predefined pickup details. Required for orders containing line items with shipping type <code>pickup</code>. Acceptable values are: - &#34;<code>dwight</code>&#34; - &#34;<code>jim</code>&#34; - &#34;<code>pam</code>&#34; </li>
 </ul>
 </li>
-<li><code>shipping-cost    currency=sea</code><ul>
-<li>The currency of the price.</li>
-</ul>
-</li>
-<li>
-<p><code>value=nonumy</code></p>
-<ul>
-<li>The price represented as a number.</li>
-</ul>
-</li>
-<li>
-<p><code>..shipping-cost-tax    currency=et</code></p>
-<ul>
+<li><code>shipping-cost    currency=et</code><ul>
 <li>The currency of the price.</li>
 </ul>
 </li>
@@ -774,7 +762,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    shipping-option=justo</code></p>
+<p><code>..shipping-cost-tax    currency=justo</code></p>
+<ul>
+<li>The currency of the price.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sea</code></p>
+<ul>
+<li>The price represented as a number.</li>
+</ul>
+</li>
+<li>
+<p><code>..    shipping-option=consetetur</code></p>
 <ul>
 <li>Required. The requested shipping option. Acceptable values are: - &#34;<code>economy</code>&#34; - &#34;<code>expedited</code>&#34; - &#34;<code>oneDay</code>&#34; - &#34;<code>sameDay</code>&#34; - &#34;<code>standard</code>&#34; - &#34;<code>twoDay</code>&#34; </li>
 </ul>

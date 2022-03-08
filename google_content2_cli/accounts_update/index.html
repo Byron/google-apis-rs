@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update - Shopping Content v2.0.4+20210325</title>
+  <title>Update - Shopping Content v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Shopping Content v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Shopping Content v3.0.0+20220303</a>
         
       </div>
 
@@ -661,6 +661,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       email: string
       phone-number: string
       url: string
+    korean-business-registration-number: string
     phone-number: string
   google-my-business-link:
     gmb-email: string
@@ -676,81 +677,87 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    adult-content=false</code><ul>
+<li><code>-r .    adult-content=true</code><ul>
 <li>Indicates whether the merchant sells adult content.</li>
 </ul>
 </li>
-<li><code>business-information.address    country=ut</code><ul>
+<li><code>business-information.address    country=ipsum</code><ul>
 <li>CLDR country code (e.g. &#34;US&#34;). This value cannot be set for a sub-account of an MCA. All MCA sub-accounts inherit the country of their parent MCA.</li>
 </ul>
 </li>
-<li><code>locality=gubergren</code><ul>
+<li><code>locality=ipsum</code><ul>
 <li>City, town or commune. May also include dependent localities or sublocalities (e.g. neighborhoods or suburbs).</li>
 </ul>
 </li>
-<li><code>postal-code=rebum.</code><ul>
+<li><code>postal-code=est</code><ul>
 <li>Postal code or ZIP (e.g. &#34;94043&#34;).</li>
 </ul>
 </li>
-<li><code>region=est</code><ul>
+<li><code>region=gubergren</code><ul>
 <li>Top-level administrative subdivision of the country. For example, a state like California (&#34;CA&#34;) or a province like Quebec (&#34;QC&#34;).</li>
 </ul>
 </li>
 <li>
-<p><code>street-address=ipsum</code></p>
+<p><code>street-address=ea</code></p>
 <ul>
 <li>Street-level part of the address.</li>
 </ul>
 </li>
 <li>
-<p><code>..customer-service    email=ipsum</code></p>
+<p><code>..customer-service    email=dolor</code></p>
 <ul>
 <li>Customer service email.</li>
 </ul>
 </li>
-<li><code>phone-number=est</code><ul>
+<li><code>phone-number=lorem</code><ul>
 <li>Customer service phone number.</li>
 </ul>
 </li>
 <li>
-<p><code>url=gubergren</code></p>
+<p><code>url=eos</code></p>
 <ul>
 <li>Customer service URL.</li>
 </ul>
 </li>
 <li>
-<p><code>..    phone-number=ea</code></p>
+<p><code>..    korean-business-registration-number=labore</code></p>
+<ul>
+<li>The 10-digit <a href="https://support.google.com/merchants/answer/9037766">Korean business registration number</a> separated with dashes in the format: XXX-XX-XXXXX. This field will only be updated if explicitly set.</li>
+</ul>
+</li>
+<li>
+<p><code>phone-number=sed</code></p>
 <ul>
 <li>The phone number of the business.</li>
 </ul>
 </li>
 <li>
-<p><code>..google-my-business-link    gmb-email=dolor</code></p>
+<p><code>..google-my-business-link    gmb-email=duo</code></p>
 <ul>
 <li>The GMB email address of which a specific account within a GMB account. A sample account within a GMB account could be a business account with set of locations, managed under the GMB account.</li>
 </ul>
 </li>
 <li>
-<p><code>status=lorem</code></p>
+<p><code>status=sed</code></p>
 <ul>
 <li>Status of the link between this Merchant Center account and the GMB account. Acceptable values are: - &#34;<code>active</code>&#34; - &#34;<code>pending</code>&#34; </li>
 </ul>
 </li>
 <li>
-<p><code>..    id=eos</code></p>
+<p><code>..    id=no</code></p>
 <ul>
 <li>Required for update. Merchant Center account ID.</li>
 </ul>
 </li>
-<li><code>kind=labore</code><ul>
+<li><code>kind=stet</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;<code>content#account</code>&#34;</li>
 </ul>
 </li>
-<li><code>name=sed</code><ul>
+<li><code>name=kasd</code><ul>
 <li>Required. Display name for the account.</li>
 </ul>
 </li>
-<li><code>reviews-url=duo</code><ul>
+<li><code>reviews-url=et</code><ul>
 <li>[DEPRECATED] This field is never returned and will be ignored if provided.</li>
 </ul>
 </li>
@@ -758,7 +765,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Client-specific, locally-unique, internal ID for the child account.</li>
 </ul>
 </li>
-<li><code>website-url=no</code><ul>
+<li><code>website-url=et</code><ul>
 <li>The merchant&#39;s website.</li>
 </ul>
 </li>

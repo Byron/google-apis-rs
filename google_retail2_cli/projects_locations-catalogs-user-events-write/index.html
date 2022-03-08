@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Catalogs User Events Write - Cloud Retail v2.0.4+20210319</title>
+  <title>Locations Catalogs User Events Write - Cloud Retail v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Retail v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Retail v3.0.0+20220224</a>
         
       </div>
 
@@ -46,6 +46,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-branches-operations-get">Locations Catalogs Branches Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-add-fulfillment-places">Locations Catalogs Branches Products Add Fulfillment Places</a>
                     
                 </li>
             
@@ -70,7 +75,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-list">Locations Catalogs Branches Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-branches-products-patch">Locations Catalogs Branches Products Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-set-inventory">Locations Catalogs Branches Products Set Inventory</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-complete-query">Locations Catalogs Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-completion-data-import">Locations Catalogs Completion Data Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-get-default-branch">Locations Catalogs Get Default Branch</a>
                     
                 </li>
             
@@ -96,6 +131,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-placements-predict">Locations Catalogs Placements Predict</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-placements-search">Locations Catalogs Placements Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-set-default-branch">Locations Catalogs Set Default Branch</a>
                     
                 </li>
             
@@ -155,6 +200,16 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
+                    
+                </li>
+            
         
 
     
@@ -210,9 +265,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>GoogleCloudRetailV2UserEvent:
   attribution-token: string
   cart-id: string
+  completion-detail:
+    completion-attribution-token: string
+    selected-position: integer
+    selected-suggestion: string
   event-time: string
   event-type: string
   experiment-ids: [string]
+  filter: string
+  offset: integer
+  order-by: string
   page-categories: [string]
   page-view-id: string
   purchase-transaction:
@@ -223,6 +285,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     tax: number
   referrer-uri: string
   search-query: string
+  session-id: string
   uri: string
   user-info:
     direct-user-request: boolean
@@ -236,68 +299,100 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    attribution-token=accusam</code><ul>
-<li>Highly recommended for user events that are the result of PredictionService.Predict. This field enables accurate attribution of recommendation model performance. The value must be a valid PredictResponse.attribution_token for user events that are the result of PredictionService.Predict. This token enables us to accurately attribute page view or purchase back to the event and the particular predict response containing this clicked/purchased product. If user clicks on product K in the recommendation results, pass PredictResponse.attribution_token as a URL parameter to product K&#39;s page. When recording events on product K&#39;s page, log the PredictResponse.attribution_token to this field.</li>
+<li>Highly recommended for user events that are the result of PredictionService.Predict. This field enables accurate attribution of recommendation model performance. The value must be a valid PredictResponse.attribution_token for user events that are the result of PredictionService.Predict. The value must be a valid SearchResponse.attribution_token for user events that are the result of SearchService.Search. This token enables us to accurately attribute page view or purchase back to the event and the particular predict response containing this clicked/purchased product. If user clicks on product K in the recommendation results, pass PredictResponse.attribution_token as a URL parameter to product K&#39;s page. When recording events on product K&#39;s page, log the PredictResponse.attribution_token to this field.</li>
 </ul>
 </li>
-<li><code>cart-id=voluptua.</code><ul>
-<li>The id or name of the associated shopping cart. This id is used to associate multiple items added or present in the cart before purchase. This can only be set for <code>add-to-cart</code>, <code>purchase-complete</code>, or <code>shopping-cart-page-view</code> events.</li>
+<li><code>cart-id=dolores</code><ul>
+<li>The ID or name of the associated shopping cart. This ID is used to associate multiple items added or present in the cart before purchase. This can only be set for <code>add-to-cart</code>, <code>purchase-complete</code>, or <code>shopping-cart-page-view</code> events.</li>
 </ul>
 </li>
-<li><code>event-time=dolore</code><ul>
+<li><code>completion-detail    completion-attribution-token=consetetur</code><ul>
+<li>Completion attribution token in CompleteQueryResponse.attribution_token.</li>
+</ul>
+</li>
+<li><code>selected-position=90</code><ul>
+<li>End user selected CompleteQueryResponse.CompletionResult.suggestion position, starting from 0.</li>
+</ul>
+</li>
+<li>
+<p><code>selected-suggestion=justo</code></p>
+<ul>
+<li>End user selected CompleteQueryResponse.CompletionResult.suggestion.</li>
+</ul>
+</li>
+<li>
+<p><code>..    event-time=sadipscing</code></p>
+<ul>
 <li>Only required for UserEventService.ImportUserEvents method. Timestamp of when the user event happened.</li>
 </ul>
 </li>
-<li><code>event-type=dolore</code><ul>
+<li><code>event-type=diam</code><ul>
 <li>Required. User event type. Allowed values are: * <code>add-to-cart</code>: Products being added to cart. * <code>category-page-view</code>: Special pages such as sale or promotion pages viewed. * <code>detail-page-view</code>: Products detail page viewed. * <code>home-page-view</code>: Homepage viewed. * <code>promotion-offered</code>: Promotion is offered to a user. * <code>promotion-not-offered</code>: Promotion is not offered to a user. * <code>purchase-complete</code>: User finishing a purchase. * <code>search</code>: Product search. * <code>shopping-cart-page-view</code>: User viewing a shopping cart.</li>
 </ul>
 </li>
-<li><code>experiment-ids=dolore</code><ul>
+<li><code>experiment-ids=sea</code><ul>
 <li>A list of identifiers for the independent experiment groups this user event belongs to. This is used to distinguish between user events associated with different experiment setups (e.g. using Retail API, using different recommendation models).</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>page-categories=voluptua.</code><ul>
+<li><code>filter=ipsum</code><ul>
+<li>The filter syntax consists of an expression language for constructing a predicate from one or more fields of the products being filtered. See SearchRequest.filter for definition and syntax. The value must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li><code>offset=86</code><ul>
+<li>An integer that specifies the current offset for pagination (the 0-indexed starting location, amongst the products deemed by the API as relevant). See SearchRequest.offset for definition. If this field is negative, an INVALID_ARGUMENT is returned. This can only be set for <code>search</code> events. Other event types should not set this field. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li><code>order-by=gubergren</code><ul>
+<li>The order in which products are returned. See SearchRequest.order_by for definition and syntax. The value must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. This can only be set for <code>search</code> events. Other event types should not set this field. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li><code>page-categories=ipsum</code><ul>
 <li>The categories associated with a category page. To represent full path of category, use &#39;&gt;&#39; sign to separate different hierarchies. If &#39;&gt;&#39; is part of the category name, please replace it with other character(s). Category pages include special pages such as sales or promotions. For instance, a special sale page may have the category hierarchy: &#34;pageCategories&#34; : [&#34;Sales &gt; 2017 Black Friday Deals&#34;]. Required for <code>category-page-view</code> events. At least one of search_query or page_categories is required for <code>search</code> events. Other event types should not set this field. Otherwise, an INVALID_ARGUMENT error is returned.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>page-view-id=amet.</code><ul>
-<li>A unique id of a web page view. This should be kept the same for all user events triggered from the same pageview. For example, an item detail page view could trigger multiple events as the user is browsing the page. The <code>pageViewId</code> property should be kept the same for all these events so that they can be grouped together properly. When using the client side event reporting with JavaScript pixel and Google Tag Manager, this value is filled in automatically.</li>
+<li><code>page-view-id=no</code><ul>
+<li>A unique ID of a web page view. This should be kept the same for all user events triggered from the same pageview. For example, an item detail page view could trigger multiple events as the user is browsing the page. The <code>pageViewId</code> property should be kept the same for all these events so that they can be grouped together properly. When using the client side event reporting with JavaScript pixel and Google Tag Manager, this value is filled in automatically.</li>
 </ul>
 </li>
-<li><code>purchase-transaction    cost=0.6626374874296354</code><ul>
+<li><code>purchase-transaction    cost=0.025057633900670395</code><ul>
 <li>All the costs associated with the products. These can be manufacturing costs, shipping expenses not borne by the end user, or any other costs, such that: * Profit = revenue - tax - cost</li>
 </ul>
 </li>
-<li><code>currency-code=lorem</code><ul>
+<li><code>currency-code=amet</code><ul>
 <li>Required. Currency code. Use three-character ISO-4217 code.</li>
 </ul>
 </li>
-<li><code>id=invidunt</code><ul>
+<li><code>id=lorem</code><ul>
 <li>The transaction ID with a length limit of 128 characters.</li>
 </ul>
 </li>
-<li><code>revenue=0.7036393712200139</code><ul>
+<li><code>revenue=0.7922165291773876</code><ul>
 <li>Required. Total non-zero revenue or grand total associated with the transaction. This value include shipping, tax, or other adjustments to total revenue that you want to include as part of your revenue calculations.</li>
 </ul>
 </li>
 <li>
-<p><code>tax=0.583760056310784</code></p>
+<p><code>tax=0.10245711941261193</code></p>
 <ul>
 <li>All the taxes associated with the transaction.</li>
 </ul>
 </li>
 <li>
-<p><code>..    referrer-uri=sit</code></p>
+<p><code>..    referrer-uri=sed</code></p>
 <ul>
 <li>The referrer URL of the current page. When using the client side event reporting with JavaScript pixel and Google Tag Manager, this value is filled in automatically.</li>
 </ul>
 </li>
-<li><code>search-query=et</code><ul>
-<li>The user&#39;s search query. The value must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. At least one of search_query or page_categories is required for <code>search</code> events. Other event types should not set this field. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+<li><code>search-query=nonumy</code><ul>
+<li>The user&#39;s search query. See SearchRequest.query for definition. The value must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. At least one of search_query or page_categories is required for <code>search</code> events. Other event types should not set this field. Otherwise, an INVALID_ARGUMENT error is returned.</li>
 </ul>
 </li>
-<li><code>uri=tempor</code><ul>
+<li><code>session-id=sea</code><ul>
+<li>A unique identifier for tracking a visitor session with a length limit of 128 bytes. A session is an aggregation of an end user behavior in a time span. A general guideline to populate the sesion_id: 1. If user has no activity for 30 min, a new session_id should be assigned. 2. The session_id should be unique across users, suggest use uuid or add visitor_id as prefix.</li>
+</ul>
+</li>
+<li><code>uri=ipsum</code><ul>
 <li>Complete URL (window.location.href) of the user&#39;s current page. When using the client side event reporting with JavaScript pixel and Google Tag Manager, this value is filled in automatically. Maximum length 5,000 characters.</li>
 </ul>
 </li>
@@ -305,24 +400,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>True if the request is made directly from the end user, in which case the ip_address and user_agent can be populated from the HTTP request. This flag should be set only if the API request is made directly from the end user such as a mobile app (and not if a gateway or a server is processing and pushing the user events). This should not be set when using the JavaScript tag in UserEventService.CollectUserEvent.</li>
 </ul>
 </li>
-<li><code>ip-address=est</code><ul>
-<li>The end user&#39;s IP address. This field is used to extract location information for personalization. This field must be either an IPv4 address (e.g. &#34;104.133.9.80&#34;) or an IPv6 address (e.g. &#34;2001:0db8:85a3:0000:0000:8a2e:0370:7334&#34;). Otherwise, an INVALID_ARGUMENT error is returned. This should not be set when using the JavaScript tag in UserEventService.CollectUserEvent or if direct_user_request is set.</li>
+<li><code>ip-address=justo</code><ul>
+<li>The end user&#39;s IP address. Required for getting SearchResponse.sponsored_results. This field is used to extract location information for personalization. This field must be either an IPv4 address (e.g. &#34;104.133.9.80&#34;) or an IPv6 address (e.g. &#34;2001:0db8:85a3:0000:0000:8a2e:0370:7334&#34;). Otherwise, an INVALID_ARGUMENT error is returned. This should not be set when using the JavaScript tag in UserEventService.CollectUserEvent or if direct_user_request is set.</li>
 </ul>
 </li>
-<li><code>user-agent=sed</code><ul>
-<li>User agent as included in the HTTP header. The field must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. This should not be set when using the client side event reporting with GTM or JavaScript tag in UserEventService.CollectUserEvent or if direct_user_request is set.</li>
+<li><code>user-agent=ea</code><ul>
+<li>User agent as included in the HTTP header. Required for getting SearchResponse.sponsored_results. The field must be a UTF-8 encoded string with a length limit of 1,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. This should not be set when using the client side event reporting with GTM or JavaScript tag in UserEventService.CollectUserEvent or if direct_user_request is set.</li>
 </ul>
 </li>
 <li>
-<p><code>user-id=diam</code></p>
+<p><code>user-id=at</code></p>
 <ul>
 <li>Highly recommended for logged-in users. Unique identifier for logged-in user, such as a user name. The field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
 </ul>
 </li>
 <li>
-<p><code>..    visitor-id=dolores</code></p>
+<p><code>..    visitor-id=erat</code></p>
 <ul>
-<li>Required. A unique identifier for tracking visitors. For example, this could be implemented with an HTTP cookie, which should be able to uniquely identify a visitor on a single device. This unique identifier should not change if the visitor log in/out of the website. The field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+<li>Required. A unique identifier for tracking visitors. For example, this could be implemented with an HTTP cookie, which should be able to uniquely identify a visitor on a single device. This unique identifier should not change if the visitor log in/out of the website. The field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned. The field should not contain PII or user-data. We recommend to use Google Analystics <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#clientId">Client ID</a> for this field.</li>
 </ul>
 </li>
 </ul>

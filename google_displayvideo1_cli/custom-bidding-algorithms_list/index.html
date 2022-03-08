@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Display Video v2.0.4+20210325</title>
+  <title>List - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -462,6 +472,11 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
@@ -484,6 +499,31 @@
                             
                         
                         </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -510,12 +550,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -626,6 +681,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -854,7 +914,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>Allows filtering by custom bidding algorithm fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by <code>AND</code>. A sequence of restrictions * implicitly uses <code>AND</code>. * A restriction has the form of <code>{field} {operator} {value}</code>. * The operator must be <code>CONTAINS (:)</code> or <code>EQUALS (=)</code>. * The operator must be <code>CONTAINS (:)</code> for the following field: - <code>displayName</code> * The operator must be <code>EQUALS (=)</code> for the following field: - <code>customBiddingAlgorithmType</code> * For <code>displayName</code>, the value is a string. We return all custom bidding algorithms whose display_name contains such string. * For <code>customBiddingAlgorithmType</code>, the value is a string. We return all algorithms whose custom_bidding_algorithm_type is equal to the given type. Examples: * All custom bidding algorithms for which the display name contains &#34;politics&#34;: <code>displayName:politics</code>. * All custom bidding algorithms for which the type is &#34;SCRIPT_BASED&#34;: <code>customBiddingAlgorithmType=SCRIPT_BASED</code> The length of this field should be no more than 500 characters.</li>
+<li>Allows filtering by custom bidding algorithm fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by <code>AND</code>. A sequence of restrictions * implicitly uses <code>AND</code>. * A restriction has the form of <code>{field} {operator} {value}</code>. * The operator must be <code>CONTAINS (:)</code> or <code>EQUALS (=)</code>. * The operator must be <code>CONTAINS (:)</code> for the following field: - <code>displayName</code> * The operator must be <code>EQUALS (=)</code> for the following field: - <code>customBiddingAlgorithmType</code> - <code>customBiddingAlgorithmState</code> * For <code>displayName</code>, the value is a string. We return all custom bidding algorithms whose display_name contains such string. * For <code>customBiddingAlgorithmType</code>, the value is a string. We return all algorithms whose custom_bidding_algorithm_type is equal to the given type. * For <code>customBiddingAlgorithmState</code>, the value is a string. We return all algorithms whose custom_bidding_algorithm_state is equal to the given type. Examples: * All custom bidding algorithms for which the display name contains &#34;politics&#34;: <code>displayName:politics</code>. * All custom bidding algorithms for which the type is &#34;SCRIPT_BASED&#34;: <code>customBiddingAlgorithmType=SCRIPT_BASED</code> * All custom bidding algorithms for which the state is &#34;ENABLED&#34;: <code>customBiddingAlgorithmState=ENABLED</code> The length of this field should be no more than 500 characters.</li>
 </ul>
 </li>
 <li>
@@ -959,7 +1019,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../custom-lists_get" class="btn btn-neutral float-right" title="Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../custom-bidding-algorithms_patch" class="btn btn-neutral float-right" title="Patch"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../custom-bidding-algorithms_get" class="btn btn-neutral" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -991,7 +1051,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../custom-bidding-algorithms_get" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../custom-lists_get" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../custom-bidding-algorithms_patch" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

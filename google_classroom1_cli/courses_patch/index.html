@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Patch - classroom v2.0.4+20210323</title>
+  <title>Patch - classroom v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> classroom v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> classroom v3.0.0+20220224</a>
         
       </div>
 
@@ -452,6 +452,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   description: string
   description-heading: string
   enrollment-code: string
+  gradebook-settings:
+    calculation-type: string
+    display-setting: string
   guardians-enabled: boolean
   id: string
   name: string
@@ -469,27 +472,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    alternate-link=sea</code><ul>
+<li><code>-r .    alternate-link=lorem</code><ul>
 <li>Absolute link to this course in the Classroom web UI. Read-only.</li>
 </ul>
 </li>
-<li><code>calendar-id=et</code><ul>
+<li><code>calendar-id=accusam</code><ul>
 <li>The Calendar ID for a calendar that all course members can see, to which Classroom adds events for course work and announcements in the course. Read-only.</li>
 </ul>
 </li>
-<li><code>course-group-email=at</code><ul>
+<li><code>course-group-email=amet</code><ul>
 <li>The email address of a Google group containing all members of the course. This group does not accept email and can only be used for permissions. Read-only.</li>
 </ul>
 </li>
-<li><code>course-state=dolore</code><ul>
+<li><code>course-state=erat</code><ul>
 <li>State of the course. If unspecified, the default state is <code>PROVISIONED</code>.</li>
 </ul>
 </li>
-<li><code>creation-time=eirmod</code><ul>
+<li><code>creation-time=dolores</code><ul>
 <li>Creation time of the course. Specifying this field in a course update mask results in an error. Read-only.</li>
 </ul>
 </li>
-<li><code>description=lorem</code><ul>
+<li><code>description=erat</code><ul>
 <li>Optional description. For example, &#34;We&#39;ll be learning about the structure of living creatures from a combination of textbooks, guest lectures, and lab work. Expect to be excited!&#34; If set, this field must be a valid UTF-8 string and no longer than 30,000 characters.</li>
 </ul>
 </li>
@@ -497,55 +500,67 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional heading for the description. For example, &#34;Welcome to 10th Grade Biology.&#34; If set, this field must be a valid UTF-8 string and no longer than 3600 characters.</li>
 </ul>
 </li>
-<li><code>enrollment-code=amet</code><ul>
+<li><code>enrollment-code=sea</code><ul>
 <li>Enrollment code to use when joining this course. Specifying this field in a course update mask results in an error. Read-only.</li>
 </ul>
 </li>
-<li><code>guardians-enabled=true</code><ul>
+<li><code>gradebook-settings    calculation-type=takimata</code><ul>
+<li>Indicates how the overall grade is calculated.</li>
+</ul>
+</li>
+<li>
+<p><code>display-setting=lorem</code></p>
+<ul>
+<li>Indicates who can see the overall grade..</li>
+</ul>
+</li>
+<li>
+<p><code>..    guardians-enabled=false</code></p>
+<ul>
 <li>Whether or not guardian notifications are enabled for this course. Read-only.</li>
 </ul>
 </li>
-<li><code>id=erat</code><ul>
+<li><code>id=dolor</code><ul>
 <li>Identifier for this course assigned by Classroom. When creating a course, you may optionally set this identifier to an alias string in the request to create a corresponding alias. The <code>id</code> is still assigned by Classroom and cannot be updated after the course is created. Specifying this field in a course update mask results in an error.</li>
 </ul>
 </li>
-<li><code>name=accusam</code><ul>
+<li><code>name=et</code><ul>
 <li>Name of the course. For example, &#34;10th Grade Biology&#34;. The name is required. It must be between 1 and 750 characters and a valid UTF-8 string.</li>
 </ul>
 </li>
-<li><code>owner-id=sea</code><ul>
+<li><code>owner-id=sit</code><ul>
 <li>The identifier of the owner of a course. When specified as a parameter of a create course request, this field is required. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal <code>&amp;#34;me&amp;#34;</code>, indicating the requesting user This must be set in a create request. Admins can also specify this field in a patch course request to transfer ownership. In other contexts, it is read-only.</li>
 </ul>
 </li>
-<li><code>room=takimata</code><ul>
+<li><code>room=erat</code><ul>
 <li>Optional room location. For example, &#34;301&#34;. If set, this field must be a valid UTF-8 string and no longer than 650 characters.</li>
 </ul>
 </li>
-<li><code>section=lorem</code><ul>
+<li><code>section=sea</code><ul>
 <li>Section of the course. For example, &#34;Period 2&#34;. If set, this field must be a valid UTF-8 string and no longer than 2800 characters.</li>
 </ul>
 </li>
-<li><code>teacher-folder    alternate-link=et</code><ul>
+<li><code>teacher-folder    alternate-link=nonumy</code><ul>
 <li>URL that can be used to access the Drive folder. Read-only.</li>
 </ul>
 </li>
-<li><code>id=at</code><ul>
+<li><code>id=et</code><ul>
 <li>Drive API resource ID.</li>
 </ul>
 </li>
 <li>
-<p><code>title=dolor</code></p>
+<p><code>title=gubergren</code></p>
 <ul>
 <li>Title of the Drive folder. Read-only.</li>
 </ul>
 </li>
 <li>
-<p><code>..    teacher-group-email=et</code></p>
+<p><code>..    teacher-group-email=justo</code></p>
 <ul>
 <li>The email address of a Google group containing all teachers of the course. This group does not accept email and can only be used for permissions. Read-only.</li>
 </ul>
 </li>
-<li><code>update-time=sit</code><ul>
+<li><code>update-time=sea</code><ul>
 <li>Time of the most recent update to this course. Specifying this field in a course update mask results in an error. Read-only.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search - Photos Library v2.0.4+20210331</title>
+  <title>Search - Photos Library v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Photos Library v2.0.4+20210331</a>
+        <a href=".." class="icon icon-home"> Photos Library v3.0.0+20220303</a>
         
       </div>
 
@@ -231,6 +231,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     include-archived-media: boolean
     media-type-filter:
       media-types: [string]
+  order-by: string
   page-size: integer
   page-token: string
 
@@ -281,12 +282,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...    page-size=94</code></p>
+<p><code>...    order-by=est</code></p>
 <ul>
+<li>An optional field to specify the sort order of the search results. The <code>orderBy</code> field only works when a dateFilter is used. When this field is not specified, results are displayed newest first, oldest last by their creationTime. Providing <code>MediaMetadata.creation_time</code> displays search results in the opposite order, oldest first then newest last. To display results newest first then oldest last, include the <code>desc</code> argument as follows: <code>MediaMetadata.creation_time desc</code>. The only additional filters that can be used with this parameter are includeArchivedMedia and excludeNonAppCreatedData. No other filters are supported.</li>
+</ul>
+</li>
+<li><code>page-size=74</code><ul>
 <li>Maximum number of media items to return in the response. Fewer media items might be returned than the specified number. The default <code>pageSize</code> is 25, the maximum is 100.</li>
 </ul>
 </li>
-<li><code>page-token=at</code><ul>
+<li><code>page-token=sed</code><ul>
 <li>A continuation token to get the next page of the results. Adding this to the request returns the rows after the <code>pageToken</code>. The <code>pageToken</code> should be the value returned in the <code>nextPageToken</code> parameter in the response to the <code>searchMediaItems</code> request.</li>
 </ul>
 </li>

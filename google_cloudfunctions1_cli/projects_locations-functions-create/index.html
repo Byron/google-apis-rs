@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Functions Create - Cloud Functions v2.0.4+20210325</title>
+  <title>Locations Functions Create - Cloud Functions v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Functions v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Cloud Functions v3.0.0+20220224</a>
         
       </div>
 
@@ -197,8 +197,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   available-memory-mb: integer
   build-environment-variables: { string: string }
   build-id: string
+  build-name: string
   build-worker-pool: string
   description: string
+  docker-registry: string
+  docker-repository: string
   entry-point: string
   environment-variables: { string: string }
   event-trigger:
@@ -209,8 +212,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     security-level: string
     url: string
   ingress-settings: string
+  kms-key-name: string
   labels: { string: string }
   max-instances: integer
+  min-instances: integer
   name: string
   network: string
   runtime: string
@@ -245,125 +250,145 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. The Cloud Build ID of the latest successful deployment of the function.</li>
 </ul>
 </li>
-<li><code>build-worker-pool=voluptua.</code><ul>
-<li>Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is <code>projects/{project}/locations/{region}/workerPools/{workerPool}</code> where {project} and {region} are the project id and region respectively where the worker pool is defined and {workerPool} is the short name of the worker pool. If the project id is not the same as the function, then the Cloud Functions Service Agent (service-@gcf-admin-robot.iam.gserviceaccount.com) must be granted the role Cloud Build Custom Workers Builder (roles/cloudbuild.customworkers.builder) in the project.</li>
+<li><code>build-name=voluptua.</code><ul>
+<li>Output only. The Cloud Build Name of the function deployment. <code>projects//locations//builds/</code>.</li>
 </ul>
 </li>
-<li><code>description=at</code><ul>
+<li><code>build-worker-pool=at</code><ul>
+<li>Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is <code>projects/{project}/locations/{region}/workerPools/{workerPool}</code> where <code>{project}</code> and <code>{region}</code> are the project id and region respectively where the worker pool is defined and <code>{workerPool}</code> is the short name of the worker pool. If the project id is not the same as the function, then the Cloud Functions Service Agent (<code>service-@gcf-admin-robot.iam.gserviceaccount.com</code>) must be granted the role Cloud Build Custom Workers Builder (<code>roles/cloudbuild.customworkers.builder</code>) in the project.</li>
+</ul>
+</li>
+<li><code>description=sanctus</code><ul>
 <li>User-provided description of a function.</li>
 </ul>
 </li>
-<li><code>entry-point=sanctus</code><ul>
+<li><code>docker-registry=sed</code><ul>
+<li>Docker Registry to use for this deployment. If <code>docker_repository</code> field is specified, this field will be automatically set as <code>ARTIFACT_REGISTRY</code>. If unspecified, it currently defaults to <code>CONTAINER_REGISTRY</code>. This field may be overridden by the backend for eligible deployments.</li>
+</ul>
+</li>
+<li><code>docker-repository=amet.</code><ul>
+<li>User managed repository created in Artifact Registry optionally with a customer managed encryption key. If specified, deployments will use Artifact Registry. If unspecified and the deployment is eligible to use Artifact Registry, GCF will create and use a repository named &#39;gcf-artifacts&#39; for every deployed region. This is the repository to which the function docker image will be pushed after it is built by Cloud Build. It must match the pattern <code>projects/{project}/locations/{location}/repositories/{repository}</code>. Cross-project repositories are not supported. Cross-location repositories are not supported. Repository format must be &#39;DOCKER&#39;.</li>
+</ul>
+</li>
+<li><code>entry-point=takimata</code><ul>
 <li>The name of the function (as defined in source code) that will be executed. Defaults to the resource name suffix, if not specified. For backward compatibility, if function with given name is not found, then the system will try to use function named &#34;function&#34;. For Node.js this is name of a function exported by the module specified in <code>source_location</code>.</li>
 </ul>
 </li>
-<li><code>environment-variables=key=sed</code><ul>
+<li><code>environment-variables=key=amet.</code><ul>
 <li>Environment variables that shall be available during function execution.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>event-trigger    event-type=amet.</code><ul>
+<li><code>event-trigger    event-type=duo</code><ul>
 <li>Required. The type of event to observe. For example: <code>providers/cloud.storage/eventTypes/object.change</code> and <code>providers/cloud.pubsub/eventTypes/topic.publish</code>. Event types match pattern <code>providers/*/eventTypes/*.*</code>. The pattern contains: 1. namespace: For example, <code>cloud.storage</code> and <code>google.firebase.analytics</code>. 2. resource type: The type of resource on which event occurs. For example, the Google Cloud Storage API includes the type <code>object</code>. 3. action: The action that generates the event. For example, action for a Google Cloud Storage Object is &#39;change&#39;. These parts are lower case.</li>
 </ul>
 </li>
-<li><code>resource=takimata</code><ul>
+<li><code>resource=ipsum</code><ul>
 <li>Required. The resource(s) from which to observe events, for example, <code>projects/_/buckets/myBucket</code>. Not all syntactically correct values are accepted by all services. For example: 1. The authorization model must support it. Google Cloud Functions only allows EventTriggers to be deployed that observe resources in the same project as the <code>CloudFunction</code>. 2. The resource type must match the pattern expected for an <code>event_type</code>. For example, an <code>EventTrigger</code> that has an <code>event_type</code> of &#34;google.pubsub.topic.publish&#34; should have a resource that matches Google Cloud Pub/Sub topics. Additionally, some services may support short names when creating an <code>EventTrigger</code>. These will always be returned in the normalized &#34;long&#34; format. See each <em>service&#39;s</em> documentation for supported formats.</li>
 </ul>
 </li>
 <li>
-<p><code>service=amet.</code></p>
+<p><code>service=gubergren</code></p>
 <ul>
 <li>The hostname of the service that should be observed. If no string is provided, the default service implementing the API will be used. For example, <code>storage.googleapis.com</code> is the default for all event types in the <code>google.storage</code> namespace.</li>
 </ul>
 </li>
 <li>
-<p><code>..https-trigger    security-level=duo</code></p>
+<p><code>..https-trigger    security-level=lorem</code></p>
 <ul>
 <li>The security level for the function.</li>
 </ul>
 </li>
 <li>
-<p><code>url=ipsum</code></p>
+<p><code>url=gubergren</code></p>
 <ul>
 <li>Output only. The deployed url for the function.</li>
 </ul>
 </li>
 <li>
-<p><code>..    ingress-settings=gubergren</code></p>
+<p><code>..    ingress-settings=eos</code></p>
 <ul>
 <li>The ingress settings for the function, controlling what traffic can reach it.</li>
 </ul>
 </li>
-<li><code>labels=key=lorem</code><ul>
+<li><code>kms-key-name=dolor</code><ul>
+<li>Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources. It must match the pattern <code>projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}</code>. If specified, you must also provide an artifact registry repository using the <code>docker_repository</code> field that was created with the same KMS crypto key. The following service accounts need to be granted the role &#39;Cloud KMS CryptoKey Encrypter/Decrypter (roles/cloudkms.cryptoKeyEncrypterDecrypter)&#39; on the Key/KeyRing/Project/Organization (least access preferred). 1. Google Cloud Functions service account (service-{project_number}@gcf-admin-robot.iam.gserviceaccount.com) - Required to protect the function&#39;s image. 2. Google Storage service account (service-{project_number}@gs-project-accounts.iam.gserviceaccount.com) - Required to protect the function&#39;s source code. If this service account does not exist, deploying a function without a KMS key or retrieving the service agent name provisions it. For more information, see https://cloud.google.com/storage/docs/projects#service-agents and https://cloud.google.com/storage/docs/getting-service-agent#gsutil. Google Cloud Functions delegates access to service agents to protect function resources in internal projects that are not accessible by the end user.</li>
+</ul>
+</li>
+<li><code>labels=key=ea</code><ul>
 <li>Labels associated with this Cloud Function.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>max-instances=89</code><ul>
+<li><code>max-instances=46</code><ul>
 <li>The limit on the maximum number of function instances that may coexist at a given time. In some cases, such as rapid traffic surges, Cloud Functions may, for a short period of time, create more instances than the specified max instances limit. If your function cannot tolerate this temporary behavior, you may want to factor in a safety margin and set a lower max instances value than your function can tolerate. See the <a href="https://cloud.google.com/functions/docs/max-instances">Max Instances</a> Guide for more details.</li>
 </ul>
 </li>
-<li><code>name=eos</code><ul>
+<li><code>min-instances=13</code><ul>
+<li>A lower bound for the number function instances that may coexist at a given time.</li>
+</ul>
+</li>
+<li><code>name=amet</code><ul>
 <li>A user-defined name of the function. Function names must be unique globally and match pattern <code>projects/*/locations/*/functions/*</code></li>
 </ul>
 </li>
-<li><code>network=dolor</code><ul>
-<li>The VPC Network that this cloud function can connect to. It can be either the fully-qualified URI, or the short name of the network resource. If the short network name is used, the network must belong to the same project. Otherwise, it must belong to a project within the same organization. The format of this field is either <code>projects/{project}/global/networks/{network}</code> or <code>{network}</code>, where {project} is a project id where the network is defined, and {network} is the short name of the network. This field is mutually exclusive with <code>vpc_connector</code> and will be replaced by it. See <a href="https://cloud.google.com/compute/docs/vpc">the VPC documentation</a> for more information on connecting Cloud projects.</li>
+<li><code>network=duo</code><ul>
+<li>The VPC Network that this cloud function can connect to. It can be either the fully-qualified URI, or the short name of the network resource. If the short network name is used, the network must belong to the same project. Otherwise, it must belong to a project within the same organization. The format of this field is either <code>projects/{project}/global/networks/{network}</code> or <code>{network}</code>, where <code>{project}</code> is a project id where the network is defined, and <code>{network}</code> is the short name of the network. This field is mutually exclusive with <code>vpc_connector</code> and will be replaced by it. See <a href="https://cloud.google.com/compute/docs/vpc">the VPC documentation</a> for more information on connecting Cloud projects.</li>
 </ul>
 </li>
-<li><code>runtime=ea</code><ul>
-<li>The runtime in which to run the function. Required when deploying a new function, optional when updating an existing function. For a complete list of possible choices, see the <a href="..//sdk/gcloud/reference/functions/deploy#--runtime"><code>gcloud</code> command reference</a>.</li>
+<li><code>runtime=ipsum</code><ul>
+<li>The runtime in which to run the function. Required when deploying a new function, optional when updating an existing function. For a complete list of possible choices, see the <a href="https://cloud.google.com/sdk/gcloud/reference/functions/deploy#--runtime"><code>gcloud</code> command reference</a>.</li>
 </ul>
 </li>
-<li><code>service-account-email=ipsum</code><ul>
+<li><code>service-account-email=sed</code><ul>
 <li>The email of the function&#39;s service account. If empty, defaults to <code>{project_id}@appspot.gserviceaccount.com</code>.</li>
 </ul>
 </li>
-<li><code>source-archive-url=invidunt</code><ul>
-<li>The Google Cloud Storage URL, starting with gs://, pointing to the zip archive which contains the function.</li>
+<li><code>source-archive-url=ut</code><ul>
+<li>The Google Cloud Storage URL, starting with <code>gs://</code>, pointing to the zip archive which contains the function.</li>
 </ul>
 </li>
-<li><code>source-repository    deployed-url=amet</code><ul>
+<li><code>source-repository    deployed-url=gubergren</code><ul>
 <li>Output only. The URL pointing to the hosted repository where the function were defined at the time of deployment. It always points to a specific commit in the format described above.</li>
 </ul>
 </li>
 <li>
-<p><code>url=duo</code></p>
+<p><code>url=rebum.</code></p>
 <ul>
 <li>The URL pointing to the hosted repository where the function is defined. There are supported Cloud Source Repository URLs in the following formats: To refer to a specific commit: <code>https://source.developers.google.com/projects/*/repos/*/revisions/*/paths/*</code> To refer to a moveable alias (branch): <code>https://source.developers.google.com/projects/*/repos/*/moveable-aliases/*/paths/*</code> In particular, to refer to HEAD use <code>master</code> moveable alias. To refer to a specific fixed alias (tag): <code>https://source.developers.google.com/projects/*/repos/*/fixed-aliases/*/paths/*</code> You may omit <code>paths/*</code> if you want to use the main directory.</li>
 </ul>
 </li>
 <li>
-<p><code>..    source-token=ipsum</code></p>
+<p><code>..    source-token=est</code></p>
 <ul>
 <li>Input only. An identifier for Firebase function sources. Disclaimer: This field is only supported for Firebase function deployments.</li>
 </ul>
 </li>
-<li><code>source-upload-url=sed</code><ul>
-<li>The Google Cloud Storage signed URL used for source uploading, generated by google.cloud.functions.v1.GenerateUploadUrl</li>
+<li><code>source-upload-url=ipsum</code><ul>
+<li>The Google Cloud Storage signed URL used for source uploading, generated by calling [google.cloud.functions.v1.GenerateUploadUrl]. The signature is validated on write methods (Create, Update) The signature is stripped from the Function object on read methods (Get, List)</li>
 </ul>
 </li>
-<li><code>status=ut</code><ul>
+<li><code>status=ipsum</code><ul>
 <li>Output only. Status of the function deployment.</li>
 </ul>
 </li>
-<li><code>timeout=gubergren</code><ul>
+<li><code>timeout=est</code><ul>
 <li>The function execution timeout. Execution is considered failed and can be terminated if the function is not completed at the end of the timeout period. Defaults to 60 seconds.</li>
 </ul>
 </li>
-<li><code>update-time=rebum.</code><ul>
+<li><code>update-time=gubergren</code><ul>
 <li>Output only. The last update timestamp of a Cloud Function.</li>
 </ul>
 </li>
-<li><code>version-id=est</code><ul>
+<li><code>version-id=ea</code><ul>
 <li>Output only. The version identifier of the Cloud Function. Each deployment attempt results in a new version of a function being created.</li>
 </ul>
 </li>
-<li><code>vpc-connector=ipsum</code><ul>
+<li><code>vpc-connector=dolor</code><ul>
 <li>The VPC Network Connector that this cloud function can connect to. It can be either the fully-qualified URI, or the short name of the network connector resource. The format of this field is <code>projects/*/locations/*/connectors/*</code> This field is mutually exclusive with <code>network</code> field and will eventually replace it. See <a href="https://cloud.google.com/compute/docs/vpc">the VPC documentation</a> for more information on connecting Cloud projects.</li>
 </ul>
 </li>
-<li><code>vpc-connector-egress-settings=ipsum</code><ul>
+<li><code>vpc-connector-egress-settings=lorem</code><ul>
 <li>The egress settings for the connector, controlling what traffic is diverted through it.</li>
 </ul>
 </li>

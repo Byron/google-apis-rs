@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Notes Patch - Container Analysis v2.0.4+20210326</title>
+  <title>Notes Patch - Container Analysis v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container Analysis v2.0.4+20210326</a>
+        <a href=".." class="icon icon-home"> Container Analysis v3.0.0+20220225</a>
         
       </div>
 
@@ -273,7 +273,35 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   package:
     name: string
   related-note-names: [string]
+  sbom:
+    data-licence: string
+    spdx-version: string
   short-description: string
+  spdx-file:
+    checksum: [string]
+    file-type: string
+    title: string
+  spdx-package:
+    analyzed: boolean
+    attribution: string
+    checksum: string
+    copyright: string
+    detailed-description: string
+    download-location: string
+    files-license-info: [string]
+    home-page: string
+    license-declared:
+      comments: string
+      expression: string
+    originator: string
+    package-type: string
+    summary-description: string
+    supplier: string
+    title: string
+    verification-code: string
+    version: string
+  spdx-relationship:
+    type: string
   update-time: string
   vulnerability:
     cvss-score: number
@@ -303,88 +331,88 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...base-image.fingerprint    v1-name=sed</code></p>
+<p><code>...base-image.fingerprint    v1-name=vero</code></p>
 <ul>
 <li>Required. The layer ID of the final layer in the Docker image&#39;s v1 representation.</li>
 </ul>
 </li>
-<li><code>v2-blob=no</code><ul>
+<li><code>v2-blob=vero</code><ul>
 <li>Required. The ordered list of v2 blobs that represent a given image.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>v2-name=stet</code></p>
+<p><code>v2-name=invidunt</code></p>
 <ul>
 <li>Output only. The name of the image&#39;s v2 blobs computed via: [bottom] := v2_blobbottom := sha256(v2_blob[N] + &#34; &#34; + v2_name[N+1]) Only the name of the final blob is kept.</li>
 </ul>
 </li>
 <li>
-<p><code>..    resource-url=kasd</code></p>
+<p><code>..    resource-url=stet</code></p>
 <ul>
 <li>Required. Immutable. The resource_url for the resource representing the basis of associated occurrence images.</li>
 </ul>
 </li>
 <li>
-<p><code>..build    builder-version=et</code></p>
+<p><code>..build    builder-version=vero</code></p>
 <ul>
 <li>Required. Immutable. Version of the builder which produced this build.</li>
 </ul>
 </li>
-<li><code>signature    key-id=sed</code><ul>
+<li><code>signature    key-id=elitr</code><ul>
 <li>An ID for the key used to sign. This could be either an ID for the key stored in <code>public_key</code> (such as the ID or fingerprint for a PGP key, or the CN for a cert), or a reference to an external key (such as a reference to a key in Cloud Key Management Service).</li>
 </ul>
 </li>
-<li><code>key-type=et</code><ul>
+<li><code>key-type=lorem</code><ul>
 <li>The type of the key, either stored in <code>public_key</code> or referenced in <code>key_id</code>.</li>
 </ul>
 </li>
-<li><code>public-key=et</code><ul>
+<li><code>public-key=diam</code><ul>
 <li>Public key of the builder which can be used to verify that the related findings are valid and unchanged. If <code>key_type</code> is empty, this defaults to PEM encoded public keys. This field may be empty if <code>key_id</code> references an external key. For Cloud Build based signatures, this is a PEM encoded public key. To verify the Cloud Build signature, place the contents of this field into a file (public.pem). The signature field is base64-decoded into its binary representation in signature.bin, and the provenance bytes from <code>BuildDetails</code> are base64-decoded into a binary representation in signed.bin. OpenSSL can then verify the signature: <code>openssl sha256 -verify public.pem -signature signature.bin signed.bin</code></li>
 </ul>
 </li>
 <li>
-<p><code>signature=vero</code></p>
+<p><code>signature=no</code></p>
 <ul>
 <li>Required. Signature of the related <code>BuildProvenance</code>. In JSON, this is base-64 encoded.</li>
 </ul>
 </li>
 <li>
-<p><code>...    create-time=erat</code></p>
+<p><code>...    create-time=ipsum</code></p>
 <ul>
 <li>Output only. The time this note was created. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
 <li>
-<p><code>deployable    resource-uri=sed</code></p>
+<p><code>deployable    resource-uri=accusam</code></p>
 <ul>
 <li>Required. Resource URI for the artifact being deployed.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..discovery    analysis-kind=duo</code></p>
+<p><code>..discovery    analysis-kind=takimata</code></p>
 <ul>
 <li>Required. Immutable. The kind of analysis that is handled by this discovery.</li>
 </ul>
 </li>
 <li>
-<p><code>..    expiration-time=dolore</code></p>
+<p><code>..    expiration-time=consetetur</code></p>
 <ul>
 <li>Time of expiration for this note. Empty if note does not expire.</li>
 </ul>
 </li>
-<li><code>intoto    expected-command=et</code><ul>
+<li><code>intoto    expected-command=voluptua.</code><ul>
 <li>This field contains the expected command used to perform the step.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>step-name=voluptua.</code><ul>
+<li><code>step-name=et</code><ul>
 <li>This field identifies the name of the step in the supply chain.</li>
 </ul>
 </li>
 <li>
-<p><code>threshold=amet.</code></p>
+<p><code>threshold=erat</code></p>
 <ul>
 <li>This field contains a value that indicates the minimum number of keys that need to be used to sign the step&#39;s in-toto link.</li>
 </ul>
@@ -395,68 +423,180 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. The type of analysis. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
-<li><code>long-description=diam</code><ul>
+<li><code>long-description=amet.</code><ul>
 <li>A detailed description of this note.</li>
 </ul>
 </li>
-<li><code>name=dolor</code><ul>
+<li><code>name=sed</code><ul>
 <li>Output only. The name of the note in the form of <code>projects/[PROVIDER_ID]/notes/[NOTE_ID]</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>package    name=et</code></p>
+<p><code>package    name=takimata</code></p>
 <ul>
 <li>Required. Immutable. The name of the package.</li>
 </ul>
 </li>
 <li>
-<p><code>..    related-note-names=et</code></p>
+<p><code>..    related-note-names=dolores</code></p>
 <ul>
 <li>Other notes related to this note.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>short-description=sadipscing</code><ul>
+<li><code>sbom    data-licence=gubergren</code><ul>
+<li>Compliance with the SPDX specification includes populating the SPDX fields therein with data related to such fields (&#34;SPDX-Metadata&#34;)</li>
+</ul>
+</li>
+<li>
+<p><code>spdx-version=et</code></p>
+<ul>
+<li>Provide a reference number that can be used to understand how to parse and interpret the rest of the file</li>
+</ul>
+</li>
+<li>
+<p><code>..    short-description=accusam</code></p>
+<ul>
 <li>A one sentence description of this note.</li>
 </ul>
 </li>
-<li><code>update-time=stet</code><ul>
+<li><code>spdx-file    checksum=voluptua.</code><ul>
+<li>Provide a unique identifier to match analysis information on each specific file in a package</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>file-type=dolore</code><ul>
+<li>This field provides information about the type of file identified</li>
+</ul>
+</li>
+<li>
+<p><code>title=dolore</code></p>
+<ul>
+<li>Identify the full path and filename that corresponds to the file information in this section</li>
+</ul>
+</li>
+<li>
+<p><code>..spdx-package    analyzed=false</code></p>
+<ul>
+<li>Indicates whether the file content of this package has been available for or subjected to analysis when creating the SPDX document</li>
+</ul>
+</li>
+<li><code>attribution=amet.</code><ul>
+<li>A place for the SPDX data creator to record, at the package level, acknowledgements that may be needed to be communicated in some contexts</li>
+</ul>
+</li>
+<li><code>checksum=ea</code><ul>
+<li>Provide an independently reproducible mechanism that permits unique identification of a specific package that correlates to the data in this SPDX file</li>
+</ul>
+</li>
+<li><code>copyright=sadipscing</code><ul>
+<li>Identify the copyright holders of the package, as well as any dates present</li>
+</ul>
+</li>
+<li><code>detailed-description=lorem</code><ul>
+<li>A more detailed description of the package</li>
+</ul>
+</li>
+<li><code>download-location=invidunt</code><ul>
+<li>This section identifies the download Universal Resource Locator (URL), or a specific location within a version control system (VCS) for the package at the time that the SPDX file was created</li>
+</ul>
+</li>
+<li><code>files-license-info=no</code><ul>
+<li>Contain the license the SPDX file creator has concluded as governing the This field is to contain a list of all licenses found in the package. The relationship between licenses (i.e., conjunctive, disjunctive) is not specified in this field – it is simply a listing of all licenses found</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>home-page=est</code><ul>
+<li>Provide a place for the SPDX file creator to record a web site that serves as the package&#39;s home page</li>
+</ul>
+</li>
+<li><code>license-declared    comments=at</code><ul>
+<li>Comments</li>
+</ul>
+</li>
+<li>
+<p><code>expression=sed</code></p>
+<ul>
+<li>Expression: https://spdx.github.io/spdx-spec/appendix-IV-SPDX-license-expressions/</li>
+</ul>
+</li>
+<li>
+<p><code>..    originator=sit</code></p>
+<ul>
+<li>If the package identified in the SPDX file originated from a different person or organization than identified as Package Supplier, this field identifies from where or whom the package originally came</li>
+</ul>
+</li>
+<li><code>package-type=et</code><ul>
+<li>The type of package: OS, MAVEN, GO, GO_STDLIB, etc.</li>
+</ul>
+</li>
+<li><code>summary-description=tempor</code><ul>
+<li>A short description of the package</li>
+</ul>
+</li>
+<li><code>supplier=aliquyam</code><ul>
+<li>Identify the actual distribution source for the package/directory identified in the SPDX file</li>
+</ul>
+</li>
+<li><code>title=ipsum</code><ul>
+<li>Identify the full name of the package as given by the Package Originator</li>
+</ul>
+</li>
+<li><code>verification-code=et</code><ul>
+<li>This field provides an independently reproducible mechanism identifying specific contents of a package based on the actual files (except the SPDX file itself, if it is included in the package) that make up each package and that correlates to the data in this SPDX file</li>
+</ul>
+</li>
+<li>
+<p><code>version=sanctus</code></p>
+<ul>
+<li>Identify the version of the package</li>
+</ul>
+</li>
+<li>
+<p><code>..spdx-relationship    type=lorem</code></p>
+<ul>
+<li>The type of relationship between the source and target SPDX elements</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-time=est</code></p>
+<ul>
 <li>Output only. The time this note was last updated. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
-<li><code>vulnerability    cvss-score=0.017140519879742522</code><ul>
+<li><code>vulnerability    cvss-score=0.5583798423289809</code><ul>
 <li>The CVSS score for this vulnerability.</li>
 </ul>
 </li>
-<li><code>cvss-v3    attack-complexity=vero</code><ul>
+<li><code>cvss-v3    attack-complexity=diam</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>attack-vector=vero</code><ul>
+<li><code>attack-vector=dolores</code><ul>
 <li>Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.</li>
 </ul>
 </li>
-<li><code>availability-impact=invidunt</code><ul>
+<li><code>availability-impact=dolores</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>base-score=0.28492583480905564</code><ul>
+<li><code>base-score=0.261779375871928</code><ul>
 <li>The base score is a function of the base metric scores.</li>
 </ul>
 </li>
-<li><code>confidentiality-impact=elitr</code><ul>
+<li><code>confidentiality-impact=no</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>exploitability-score=0.7491113388279885</code><ul>
+<li><code>exploitability-score=0.13049050381658622</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>impact-score=0.9996547162401588</code><ul>
+<li><code>impact-score=0.05889977442942862</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>integrity-impact=diam</code><ul>
+<li><code>integrity-impact=sed</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
@@ -464,23 +604,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>scope=ipsum</code><ul>
+<li><code>scope=nonumy</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>user-interaction=accusam</code></p>
+<p><code>user-interaction=at</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..    severity=takimata</code></p>
+<p><code>..    severity=sadipscing</code></p>
 <ul>
 <li>Note provider assigned impact of the vulnerability.</li>
 </ul>
 </li>
-<li><code>source-update-time=consetetur</code><ul>
+<li><code>source-update-time=aliquyam</code><ul>
 <li>The time this information was last changed at the source. This is an upstream timestamp from the underlying information source - e.g. Ubuntu security tracker.</li>
 </ul>
 </li>

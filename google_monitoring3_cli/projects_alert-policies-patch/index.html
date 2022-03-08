@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Alert Policies Patch - Monitoring v2.0.4+20210322</title>
+  <title>Alert Policies Patch - Monitoring v3.0.0+20220218</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v2.0.4+20210322</a>
+        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
         
       </div>
 
@@ -236,6 +236,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_time-series-list">Time Series List</a>
                     
                 </li>
@@ -394,6 +399,10 @@ You can set the scope for this method like this: <code>monitoring3 --scope &lt;s
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>AlertPolicy:
+  alert-strategy:
+    auto-close: string
+    notification-rate-limit:
+      period: string
   combiner: string
   creation-record:
     mutate-time: string
@@ -417,32 +426,44 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    combiner=gubergren</code><ul>
+<li><code>-r .alert-strategy    auto-close=dolor</code><ul>
+<li>If an alert policy that was active has no data for this long, any open incidents will close</li>
+</ul>
+</li>
+<li>
+<p><code>notification-rate-limit    period=ea</code></p>
+<ul>
+<li>Not more than one notification per period.</li>
+</ul>
+</li>
+<li>
+<p><code>...    combiner=ipsum</code></p>
+<ul>
 <li>How to combine the results of multiple conditions to determine if an incident should be opened. If condition_time_series_query_language is present, this must be COMBINE_UNSPECIFIED.</li>
 </ul>
 </li>
-<li><code>creation-record    mutate-time=eos</code><ul>
+<li><code>creation-record    mutate-time=invidunt</code><ul>
 <li>When the change occurred.</li>
 </ul>
 </li>
 <li>
-<p><code>mutated-by=dolor</code></p>
+<p><code>mutated-by=amet</code></p>
 <ul>
 <li>The email address of the user making the change.</li>
 </ul>
 </li>
 <li>
-<p><code>..    display-name=ea</code></p>
+<p><code>..    display-name=duo</code></p>
 <ul>
 <li>A short name or phrase used to identify the policy in dashboards, notifications, and incidents. To avoid confusion, don&#39;t use the same display name for multiple policies in the same project. The name is limited to 512 Unicode characters.</li>
 </ul>
 </li>
 <li><code>documentation    content=ipsum</code><ul>
-<li>The text of the documentation, interpreted according to mime_type. The content may not exceed 8,192 Unicode characters and may not exceed more than 10,240 bytes when encoded in UTF-8 format, whichever is smaller.</li>
+<li>The text of the documentation, interpreted according to mime_type. The content may not exceed 8,192 Unicode characters and may not exceed more than 10,240 bytes when encoded in UTF-8 format, whichever is smaller. This text can be templatized by using variables (https://cloud.google.com/monitoring/alerts/doc-variables).</li>
 </ul>
 </li>
 <li>
-<p><code>mime-type=invidunt</code></p>
+<p><code>mime-type=sed</code></p>
 <ul>
 <li>The format of the content field. Presently, only the value &#34;text/markdown&#34; is supported. See Markdown (https://en.wikipedia.org/wiki/Markdown) for more information.</li>
 </ul>
@@ -453,7 +474,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether or not the policy is enabled. On write, the default interpretation if unset is that the policy is enabled. On read, clients should not make any assumption about the state if it has not been populated. The field should always be populated on List and Get operations, unless a field projection has been specified that strips it out.</li>
 </ul>
 </li>
-<li><code>mutation-record    mutate-time=duo</code><ul>
+<li><code>mutation-record    mutate-time=ipsum</code><ul>
 <li>When the change occurred.</li>
 </ul>
 </li>
@@ -464,26 +485,26 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    name=sed</code></p>
+<p><code>..    name=est</code></p>
 <ul>
 <li>Required if the policy exists. The resource name for this policy. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID] [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request.</li>
 </ul>
 </li>
-<li><code>notification-channels=ut</code><ul>
+<li><code>notification-channels=gubergren</code><ul>
 <li>Identifies the notification channels to which notifications should be sent when incidents are opened or closed or when new violations occur on an already opened incident. Each element of this array corresponds to the name field in each of the NotificationChannel objects that are returned from the ListNotificationChannels method. The format of the entries in this field is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID] </li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>user-labels=key=gubergren</code><ul>
+<li><code>user-labels=key=ea</code><ul>
 <li>User-supplied key/value data to be used for organizing and identifying the AlertPolicy objects.The field can contain up to 64 entries. Each key and value is limited to 63 Unicode characters or 128 bytes, whichever is smaller. Labels and values can contain only lowercase letters, numerals, underscores, and dashes. Keys must begin with a letter.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>validity    code=85</code><ul>
+<li><code>validity    code=2</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
-<li><code>message=est</code><ul>
+<li><code>message=lorem</code><ul>
 <li>A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.</li>
 </ul>
 </li>

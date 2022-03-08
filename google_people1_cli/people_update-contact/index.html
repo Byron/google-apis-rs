@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Update Contact - People Service v2.0.4+20210330</title>
+  <title>Update Contact - People Service v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> People Service v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> People Service v3.0.0+20220303</a>
         
       </div>
 
@@ -236,7 +236,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Update contact data for an existing contact person. Any non-contact data will not be modified. Any non-contact data in the person to update will be ignored. All fields specified in the <code>update_mask</code> will be replaced. The server returns a 400 error if <code>person.metadata.sources</code> is not specified for the contact to be updated or if there is no contact source. The server returns a 400 error with reason <code>&amp;#34;failedPrecondition&amp;#34;</code> if <code>person.metadata.sources.etag</code> is different than the contact&#39;s etag, which indicates the contact has changed since its data was read. Clients should get the latest person and merge their updates into the latest person. The server returns a 400 error if <code>memberships</code> are being updated and there are no contact group memberships specified on the person. The server returns a 400 error if more than one field is specified on a field that is a singleton for contact sources: * biographies * birthdays * genders * names</p>
+              <p>Update contact data for an existing contact person. Any non-contact data will not be modified. Any non-contact data in the person to update will be ignored. All fields specified in the <code>update_mask</code> will be replaced. The server returns a 400 error if <code>person.metadata.sources</code> is not specified for the contact to be updated or if there is no contact source. The server returns a 400 error with reason <code>&amp;#34;failedPrecondition&amp;#34;</code> if <code>person.metadata.sources.etag</code> is different than the contact&#39;s etag, which indicates the contact has changed since its data was read. Clients should get the latest person and merge their updates into the latest person. The server returns a 400 error if <code>memberships</code> are being updated and there are no contact group memberships specified on the person. The server returns a 400 error if more than one field is specified on a field that is a singleton for contact sources: * biographies * birthdays * genders * names Mutate requests for the same user should be sent sequentially to avoid increased latency and failures.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/contacts</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/contacts</em>.
@@ -275,7 +275,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>metadata    deleted=true</code><ul>
-<li>Output only. True if the person resource has been deleted. Populated only for <a href="..//people/api/rest/v1/people.connections/list"><code>connections.list</code></a> requests that include a sync token.</li>
+<li>Output only. True if the person resource has been deleted. Populated only for <code>people.connections.list</code> and <code>otherContacts.list</code> sync requests.</li>
 </ul>
 </li>
 <li><code>linked-people-resource-names=et</code><ul>
@@ -290,7 +290,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>previous-resource-names=vero</code></p>
 <ul>
-<li>Output only. Any former resource names this person has had. Populated only for <a href="..//people/api/rest/v1/people.connections/list"><code>connections.list</code></a> requests that include a sync token. The resource name may change when adding or removing fields that link a contact and profile such as a verified email, verified phone number, or profile URL.</li>
+<li>Output only. Any former resource names this person has had. Populated only for <code>people.connections.list</code> requests that include a sync token. The resource name may change when adding or removing fields that link a contact and profile such as a verified email, verified phone number, or profile URL.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

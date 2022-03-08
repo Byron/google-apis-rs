@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Patch - My Business Business Information v3.0.0+20220305</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> My Business Business Information v3.0.0+20220305</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accounts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_locations-create">Locations Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_locations-list">Locations List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Attributes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../attributes_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Categories</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../categories_batch-get">Batch Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../categories_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Chains</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../chains_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../chains_search">Search</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Google Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../google-locations_search">Search</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_associate">Associate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_attributes-get-google-updated">Attributes Get Google Updated</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_clear-location-association">Clear Location Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_get-attributes">Get Attributes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_get-google-updated">Get Google Updated</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Patch</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_update-attributes">Update Attributes</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Patch</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessbusinessinformation1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates the specified location.</p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Google identifier for this location in the form: <code>locations/{location_id}</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Location:
+  ad-words-location-extensions:
+    ad-phone: string
+  categories:
+    primary-category:
+      display-name: string
+      name: string
+  labels: [string]
+  language-code: string
+  latlng:
+    latitude: number
+    longitude: number
+  metadata:
+    can-delete: boolean
+    can-have-business-calls: boolean
+    can-have-food-menus: boolean
+    can-modify-service-list: boolean
+    can-operate-health-data: boolean
+    can-operate-local-post: boolean
+    can-operate-lodging-data: boolean
+    duplicate-location: string
+    has-google-updated: boolean
+    has-pending-edits: boolean
+    has-voice-of-merchant: boolean
+    maps-uri: string
+    new-review-uri: string
+    place-id: string
+  name: string
+  open-info:
+    can-reopen: boolean
+    opening-date:
+      day: integer
+      month: integer
+      year: integer
+    status: string
+  phone-numbers:
+    additional-phones: [string]
+    primary-phone: string
+  profile:
+    description: string
+  relationship-data:
+    parent-chain: string
+    parent-location:
+      place-id: string
+      relation-type: string
+  service-area:
+    business-type: string
+    region-code: string
+  store-code: string
+  storefront-address:
+    address-lines: [string]
+    administrative-area: string
+    language-code: string
+    locality: string
+    organization: string
+    postal-code: string
+    recipients: [string]
+    region-code: string
+    revision: integer
+    sorting-code: string
+    sublocality: string
+  title: string
+  website-uri: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li>
+<p><code>-r .ad-words-location-extensions    ad-phone=et</code></p>
+<ul>
+<li>Required. An alternate phone number to display on AdWords location extensions instead of the location&#39;s primary phone number.</li>
+</ul>
+</li>
+<li>
+<p><code>..categories.primary-category    display-name=sed</code></p>
+<ul>
+<li>Output only. The human-readable name of the category. This is set when reading the location. When modifying the location, <code>category_id</code> must be set.</li>
+</ul>
+</li>
+<li>
+<p><code>name=no</code></p>
+<ul>
+<li>Required. A stable ID (provided by Google) for this category. The value must be specified when modifying the category (when creating or updating a location).</li>
+</ul>
+</li>
+<li>
+<p><code>...    labels=et</code></p>
+<ul>
+<li>Optional. A collection of free-form strings to allow you to tag your business. These labels are NOT user facing; only you can see them. Must be between 1-255 characters per label.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>language-code=elitr</code><ul>
+<li>Immutable. The language of the location. Set during creation and not updateable.</li>
+</ul>
+</li>
+<li><code>latlng    latitude=0.9036304069319014</code><ul>
+<li>The latitude in degrees. It must be in the range [-90.0, +90.0].</li>
+</ul>
+</li>
+<li>
+<p><code>longitude=0.3160448060928295</code></p>
+<ul>
+<li>The longitude in degrees. It must be in the range [-180.0, +180.0].</li>
+</ul>
+</li>
+<li>
+<p><code>..metadata    can-delete=false</code></p>
+<ul>
+<li>Output only. Indicates whether the location can be deleted using the API.</li>
+</ul>
+</li>
+<li><code>can-have-business-calls=false</code><ul>
+<li>Output only. Indicates if the listing is eligible for business calls.</li>
+</ul>
+</li>
+<li><code>can-have-food-menus=true</code><ul>
+<li>Output only. Indicates if the listing is eligible for food menu.</li>
+</ul>
+</li>
+<li><code>can-modify-service-list=true</code><ul>
+<li>Output only. Indicates if the listing can modify the service list.</li>
+</ul>
+</li>
+<li><code>can-operate-health-data=false</code><ul>
+<li>Output only. Indicates whether the location can operate on Health data.</li>
+</ul>
+</li>
+<li><code>can-operate-local-post=false</code><ul>
+<li>Output only. Indicates if the listing can manage local posts.</li>
+</ul>
+</li>
+<li><code>can-operate-lodging-data=true</code><ul>
+<li>Output only. Indicates whether the location can operate on Lodging data.</li>
+</ul>
+</li>
+<li><code>duplicate-location=est</code><ul>
+<li>Output only. The location resource that this location duplicates.</li>
+</ul>
+</li>
+<li><code>has-google-updated=false</code><ul>
+<li>Output only. Indicates whether the place ID associated with this location has updates that need to be updated or rejected by the client. If this boolean is set, you should call the <code>getGoogleUpdated</code> method to lookup information that&#39;s needs to be verified.</li>
+</ul>
+</li>
+<li><code>has-pending-edits=true</code><ul>
+<li>Output only. Indicates whether any of this Location&#39;s properties are in the edit pending state.</li>
+</ul>
+</li>
+<li><code>has-voice-of-merchant=true</code><ul>
+<li>Output only. Indicates if the listing has Voice of Merchant. If this boolean is false, you should call the locations.getVoiceOfMerchantState API to get details as to why they do not have Voice of Merchant.</li>
+</ul>
+</li>
+<li><code>maps-uri=est</code><ul>
+<li>Output only. A link to the location on Maps.</li>
+</ul>
+</li>
+<li><code>new-review-uri=aliquyam</code><ul>
+<li>Output only. A link to the page on Google Search where a customer can leave a review for the location.</li>
+</ul>
+</li>
+<li>
+<p><code>place-id=elitr</code></p>
+<ul>
+<li>Output only. If this locationappears on Google Maps, this field is populated with the place ID for the location. This ID can be used in various Places APIs. This field can be set during Create calls, but not for Update.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=duo</code></p>
+<ul>
+<li>Google identifier for this location in the form: <code>locations/{location_id}</code>.</li>
+</ul>
+</li>
+<li><code>open-info    can-reopen=true</code><ul>
+<li>Output only. Indicates whether this business is eligible for re-open.</li>
+</ul>
+</li>
+<li><code>opening-date    day=44</code><ul>
+<li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
+</ul>
+</li>
+<li><code>month=48</code><ul>
+<li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
+</ul>
+</li>
+<li>
+<p><code>year=8</code></p>
+<ul>
+<li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
+</ul>
+</li>
+<li>
+<p><code>..    status=eos</code></p>
+<ul>
+<li>Required. Indicates whether or not the Location is currently open for business. All locations are open by default, unless updated to be closed.</li>
+</ul>
+</li>
+<li>
+<p><code>..phone-numbers    additional-phones=lorem</code></p>
+<ul>
+<li>Optional. Up to two phone numbers (mobile or landline, no fax) at which your business can be called, in addition to your primary phone number.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>primary-phone=ea</code></p>
+<ul>
+<li>Required. A phone number that connects to your individual business location as directly as possible. Use a local phone number instead of a central, call center helpline number whenever possible.</li>
+</ul>
+</li>
+<li>
+<p><code>..profile    description=stet</code></p>
+<ul>
+<li>Required. Description of the location in your own voice, not editable by anyone else.</li>
+</ul>
+</li>
+<li>
+<p><code>..relationship-data    parent-chain=dolores</code></p>
+<ul>
+<li>The resource name of the Chain that this location is member of. How to find Chain ID</li>
+</ul>
+</li>
+<li><code>parent-location    place-id=eos</code><ul>
+<li>Required. Specify the location that is on the other side of the relation by its placeID.</li>
+</ul>
+</li>
+<li>
+<p><code>relation-type=et</code></p>
+<ul>
+<li>Required. The type of the relationship.</li>
+</ul>
+</li>
+<li>
+<p><code>...service-area    business-type=sea</code></p>
+<ul>
+<li>Required. Indicates the type of the service area business.</li>
+</ul>
+</li>
+<li>
+<p><code>region-code=et</code></p>
+<ul>
+<li>Immutable. CLDR region code of the country/region that this service area business is based in. See http://cldr.unicode.org/ and http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland. This field is required for CUSTOMER_LOCATION_ONLY businesses, and is ignored otherwise. The region specified here can be different from regions for the areas that this business serves (e.g. service area businesses that provide services in regions other than the one that they are based in). If this location requires verification after creation, the address provided for verification purposes <em>must</em> be located within this region, and the business owner or their authorized representative <em>must</em> be able to receive postal mail at the provided verification address.</li>
+</ul>
+</li>
+<li>
+<p><code>..    store-code=at</code></p>
+<ul>
+<li>Optional. External identifier for this location, which must be unique within a given account. This is a means of associating the location with your own records.</li>
+</ul>
+</li>
+<li><code>storefront-address    address-lines=dolore</code><ul>
+<li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>administrative-area=eirmod</code><ul>
+<li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
+</ul>
+</li>
+<li><code>language-code=lorem</code><ul>
+<li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
+</ul>
+</li>
+<li><code>locality=accusam</code><ul>
+<li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
+</ul>
+</li>
+<li><code>organization=amet</code><ul>
+<li>Optional. The name of the organization at the address.</li>
+</ul>
+</li>
+<li><code>postal-code=erat</code><ul>
+<li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
+</ul>
+</li>
+<li><code>recipients=dolores</code><ul>
+<li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>region-code=erat</code><ul>
+<li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
+</ul>
+</li>
+<li><code>revision=28</code><ul>
+<li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
+</ul>
+</li>
+<li><code>sorting-code=sea</code><ul>
+<li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
+</ul>
+</li>
+<li>
+<p><code>sublocality=takimata</code></p>
+<ul>
+<li>Optional. Sublocality of the address. For example, this can be neighborhoods, boroughs, districts.</li>
+</ul>
+</li>
+<li>
+<p><code>..    title=lorem</code></p>
+<ul>
+<li>Required. Location name should reflect your business&#39;s real-world name, as used consistently on your storefront, website, and stationery, and as known to customers. Any additional information, when relevant, can be included in other fields of the resource (for example, <code>Address</code>, <code>Categories</code>). Don&#39;t add unnecessary information to your name (for example, prefer &#34;Google&#34; over &#34;Google Inc. - Mountain View Corporate Headquarters&#34;). Don&#39;t include marketing taglines, store codes, special characters, hours or closed/open status, phone numbers, website URLs, service/product information, location/address or directions, or containment information (for example, &#34;Chase ATM in Duane Reade&#34;).</li>
+</ul>
+</li>
+<li><code>website-uri=et</code><ul>
+<li>Optional. A URL for this business. If possible, use a URL that represents this individual business location instead of a generic website/URL that represents all locations, or the brand.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p update-mask=string</strong></p>
+<ul>
+<li>Required. The specific fields to update.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p validate-only=boolean</strong></p>
+<ul>
+<li>Optional. If true, the request is validated without actually updating the location. When this field is set, we will only return validation errors if there were any. The response will be empty if no errors were found.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../locations_update-attributes" class="btn btn-neutral float-right" title="Update Attributes"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../locations_get-google-updated" class="btn btn-neutral" title="Get Google Updated"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../locations_get-google-updated" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../locations_update-attributes" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Line Items Generate Default - Display Video v2.0.4+20210325</title>
+  <title>Line Items Generate Default - Display Video v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Display Video v2.0.4+20210325</a>
+        <a href=".." class="icon icon-home"> Display Video v3.0.0+20220303</a>
         
       </div>
 
@@ -226,6 +226,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-list">Invoices List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_invoices-lookup-invoice-currency">Invoices Lookup Invoice Currency</a>
                     
                 </li>
             
@@ -483,12 +493,42 @@
         <span>Custom Bidding Algorithms</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-create">Scripts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-get">Scripts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_scripts-list">Scripts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_upload-script">Upload Script</a>
                     
                 </li>
             
@@ -515,12 +555,27 @@
         <span>First And Third Party Audiences</span>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_edit-customer-match-members">Edit Customer Match Members</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_get">Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_patch">Patch</a>
                     
                 </li>
             
@@ -631,6 +686,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
                     
                 </li>
             
@@ -829,7 +889,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates a new line item with settings (including targeting) inherited from the insertion order. Returns the newly created line item if successful. There are default values based on the three fields: * The insertion order&#39;s InsertionOrderType * The insertion order&#39;s InsertionOrderAutomationType * The given line_item_type</p>
+              <p>Creates a new line item with settings (including targeting) inherited from the insertion order and an <code>ENTITY_STATUS_DRAFT</code> entity_status. Returns the newly created line item if successful. There are default values based on the three fields: * The insertion order&#39;s insertion_order_type * The insertion order&#39;s automation_type * The given line_item_type</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/display-video</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/display-video</em>.
@@ -859,27 +919,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    display-name=aliquyam</code><ul>
+<li><code>-r .    display-name=sea</code><ul>
 <li>Required. The display name of the line item. Must be UTF-8 encoded with a maximum size of 240 bytes.</li>
 </ul>
 </li>
-<li><code>insertion-order-id=kasd</code><ul>
+<li><code>insertion-order-id=ipsum</code><ul>
 <li>Required. The unique ID of the insertion order that the line item belongs to.</li>
 </ul>
 </li>
-<li><code>line-item-type=lorem</code><ul>
+<li><code>line-item-type=ipsum</code><ul>
 <li>Required. The type of the line item.</li>
 </ul>
 </li>
-<li><code>mobile-app    app-id=sit</code><ul>
+<li><code>mobile-app    app-id=et</code><ul>
 <li>Required. The ID of the app provided by the platform store. Android apps are identified by the bundle ID used by Android&#39;s Play store, such as <code>com.google.android.gm</code>. iOS apps are identified by a nine-digit app ID used by Apple&#39;s App store, such as <code>422689480</code>.</li>
 </ul>
 </li>
-<li><code>display-name=kasd</code><ul>
+<li><code>display-name=elitr</code><ul>
 <li>Output only. The app name.</li>
 </ul>
 </li>
-<li><code>platform=tempor</code><ul>
+<li><code>platform=eirmod</code><ul>
 <li>Output only. The app platform.</li>
 </ul>
 </li>

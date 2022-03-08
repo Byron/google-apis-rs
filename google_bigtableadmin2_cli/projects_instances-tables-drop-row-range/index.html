@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Instances Tables Drop Row Range - Bigtable Admin v2.0.4+20210323</title>
+  <title>Instances Tables Drop Row Range - Bigtable Admin v3.0.0+20220222</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Bigtable Admin v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> Bigtable Admin v3.0.0+20220222</a>
         
       </div>
 
@@ -152,6 +152,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_instances-clusters-list">Instances Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_instances-clusters-partial-update-cluster">Instances Clusters Partial Update Cluster</a>
                     
                 </li>
             
@@ -363,11 +368,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    delete-all-data-from-table=true</code><ul>
+<li><code>-r .    delete-all-data-from-table=false</code><ul>
 <li>Delete all rows in the table. Setting this to false is a no-op.</li>
 </ul>
 </li>
-<li><code>row-key-prefix=consetetur</code><ul>
+<li><code>row-key-prefix=lorem</code><ul>
 <li>Delete all rows that start with this row key prefix. Prefix cannot be zero length.</li>
 </ul>
 </li>

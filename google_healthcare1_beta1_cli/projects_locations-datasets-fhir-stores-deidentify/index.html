@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Fhir Stores Deidentify - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Fhir Stores Deidentify - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -475,6 +475,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-configure-search">Locations Datasets Fhir Stores Configure Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-create">Locations Datasets Fhir Stores Create</a>
                     
                 </li>
@@ -859,6 +864,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       remove-list:
         tags: [string]
       skip-id-redaction: boolean
+    fhir:
+      default-keep-extensions: boolean
     image:
       text-redaction-mode: string
   destination-store: string
@@ -870,7 +877,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .config.annotation    annotation-store-name=aliquyam</code><ul>
+<li><code>-r .config.annotation    annotation-store-name=justo</code><ul>
 <li>The name of the annotation store, in the form <code>projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}</code>). * The destination annotation store must be in the same project as the source data. De-identifying data across multiple projects is not supported. * The destination annotation store must exist when using DeidentifyDicomStore or DeidentifyFhirStore. DeidentifyDataset automatically creates the destination annotation store.</li>
 </ul>
 </li>
@@ -881,20 +888,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..dicom    filter-profile=amet.</code></p>
+<p><code>..dicom    filter-profile=no</code></p>
 <ul>
 <li>Tag filtering profile that determines which tags to keep/remove.</li>
 </ul>
 </li>
 <li>
-<p><code>keep-list    tags=ipsum</code></p>
+<p><code>keep-list    tags=nonumy</code></p>
 <ul>
 <li>Tags to be filtered. Tags must be DICOM Data Elements, File Meta Elements, or Directory Structuring Elements, as defined at: http://dicom.nema.org/medical/dicom/current/output/html/part06.html#table_6-1,. They may be provided by &#34;Keyword&#34; or &#34;Tag&#34;. For example, &#34;PatientID&#34;, &#34;00100010&#34;.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..remove-list    tags=lorem</code></p>
+<p><code>..remove-list    tags=sed</code></p>
 <ul>
 <li>Tags to be filtered. Tags must be DICOM Data Elements, File Meta Elements, or Directory Structuring Elements, as defined at: http://dicom.nema.org/medical/dicom/current/output/html/part06.html#table_6-1,. They may be provided by &#34;Keyword&#34; or &#34;Tag&#34;. For example, &#34;PatientID&#34;, &#34;00100010&#34;.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
@@ -907,18 +914,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..image    text-redaction-mode=gubergren</code></p>
+<p><code>..fhir    default-keep-extensions=true</code></p>
+<ul>
+<li>The behaviour for handling FHIR extensions that aren&#39;t otherwise specified for de-identification. If true, all extensions are preserved during de-identification by default. If false or unspecified, all extensions are removed during de-identification by default.</li>
+</ul>
+</li>
+<li>
+<p><code>..image    text-redaction-mode=nonumy</code></p>
 <ul>
 <li>Determines how to redact text from image.</li>
 </ul>
 </li>
 <li>
-<p><code>...    destination-store=sadipscing</code></p>
+<p><code>...    destination-store=rebum.</code></p>
 <ul>
-<li>The name of the FHIR store to create and write the redacted data to. For example, <code>projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}</code>. * The destination dataset must exist. * The source dataset and destination dataset must both reside in the same project. De-identifying data across multiple projects is not supported. * The destination FHIR store must exist. * The caller must have the healthcare.fhirResources.update permission to write to the destination FHIR store.</li>
+<li>The name of the FHIR store to create and write the redacted data to. For example, <code>projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}</code>. * The destination dataset must exist. * The source dataset and destination dataset must both reside in the same location. De-identifying data across multiple locations is not supported. * The destination FHIR store must exist. * The caller must have the healthcare.fhirResources.update permission to write to the destination FHIR store.</li>
 </ul>
 </li>
-<li><code>resource-filter.resources    resources=at</code><ul>
+<li><code>resource-filter.resources    resources=tempor</code><ul>
 <li>List of resources IDs. For example, &#34;Patient/1234&#34;.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>

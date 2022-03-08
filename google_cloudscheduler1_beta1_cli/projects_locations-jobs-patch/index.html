@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Jobs Patch - Cloud Scheduler v2.0.4+20210315</title>
+  <title>Locations Jobs Patch - Cloud Scheduler v3.0.0+20220212</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Scheduler v2.0.4+20210315</a>
+        <a href=".." class="icon icon-home"> Cloud Scheduler v3.0.0+20220212</a>
         
       </div>
 
@@ -225,7 +225,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>instance=labore</code><ul>
-<li>App instance. By default, the job is sent to an instance which is available when the job is attempted. Requests can only be sent to a specific instance if <a href="https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine?hl=en_US#scaling_types_and_instance_classes">manual scaling is used in App Engine Standard</a>. App Engine Flex does not support instances. For more information, see <a href="https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed">App Engine Standard request routing</a> and <a href="https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed">App Engine Flex request routing</a>.</li>
+<li>App instance. By default, the job is sent to an instance which is available when the job is attempted. Requests can only be sent to a specific instance if <a href="https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine?#scaling_types_and_instance_classes">manual scaling is used in App Engine Standard</a>. App Engine Flex does not support instances. For more information, see <a href="https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed">App Engine Standard request routing</a> and <a href="https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed">App Engine Flex request routing</a>.</li>
 </ul>
 </li>
 <li><code>service=sed</code><ul>
@@ -245,7 +245,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>headers=key=no</code><ul>
-<li>HTTP request headers. This map contains the header field names and values. Headers can be set when the job is created. Cloud Scheduler sets some headers to default values: * <code>User-Agent</code>: By default, this header is <code>&amp;#34;AppEngine-Google; (+http://code.google.com/appengine)&amp;#34;</code>. This header can be modified, but Cloud Scheduler will append <code>&amp;#34;AppEngine-Google; (+http://code.google.com/appengine)&amp;#34;</code> to the modified <code>User-Agent</code>. * <code>X-CloudScheduler</code>: This header will be set to true. If the job has an body, Cloud Scheduler sets the following headers: * <code>Content-Type</code>: By default, the <code>Content-Type</code> header is set to <code>&amp;#34;application/octet-stream&amp;#34;</code>. The default can be overridden by explictly setting <code>Content-Type</code> to a particular media type when the job is created. For example, <code>Content-Type</code> can be set to <code>&amp;#34;application/json&amp;#34;</code>. * <code>Content-Length</code>: This is computed by Cloud Scheduler. This value is output only. It cannot be changed. The headers below are output only. They cannot be set or overridden: * <code>X-Google-*</code>: For Google internal use only. * <code>X-AppEngine-*</code>: For Google internal use only. In addition, some App Engine headers, which contain job-specific information, are also be sent to the job handler.</li>
+<li>HTTP request headers. This map contains the header field names and values. Headers can be set when the job is created. Cloud Scheduler sets some headers to default values: * <code>User-Agent</code>: By default, this header is <code>&amp;#34;AppEngine-Google; (+http://code.google.com/appengine)&amp;#34;</code>. This header can be modified, but Cloud Scheduler will append <code>&amp;#34;AppEngine-Google; (+http://code.google.com/appengine)&amp;#34;</code> to the modified <code>User-Agent</code>. * <code>X-CloudScheduler</code>: This header will be set to true. * <code>X-CloudScheduler-JobName</code>: This header will contain the job name. * <code>X-CloudScheduler-ScheduleTime</code>: For Cloud Scheduler jobs specified in the unix-cron format, this header will contain the job schedule time in RFC3339 UTC &#34;Zulu&#34; format. If the job has an body, Cloud Scheduler sets the following headers: * <code>Content-Type</code>: By default, the <code>Content-Type</code> header is set to <code>&amp;#34;application/octet-stream&amp;#34;</code>. The default can be overridden by explictly setting <code>Content-Type</code> to a particular media type when the job is created. For example, <code>Content-Type</code> can be set to <code>&amp;#34;application/json&amp;#34;</code>. * <code>Content-Length</code>: This is computed by Cloud Scheduler. This value is output only. It cannot be changed. The headers below are output only. They cannot be set or overridden: * <code>X-Google-*</code>: For Google internal use only. * <code>X-AppEngine-*</code>: For Google internal use only. In addition, some App Engine headers, which contain job-specific information, are also be sent to the job handler.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
@@ -262,7 +262,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    attempt-deadline=et</code></p>
 <ul>
-<li>The deadline for job attempts. If the request handler does not respond by this deadline then the request is cancelled and the attempt is marked as a <code>DEADLINE_EXCEEDED</code> failure. The failed attempt can be viewed in execution logs. Cloud Scheduler will retry the job according to the RetryConfig. The allowed duration for this deadline is: * For HTTP targets, between 15 seconds and 30 minutes. * For App Engine HTTP targets, between 15 seconds and 24 hours. * For PubSub targets, this field is ignored.</li>
+<li>The deadline for job attempts. If the request handler does not respond by this deadline then the request is cancelled and the attempt is marked as a <code>DEADLINE_EXCEEDED</code> failure. The failed attempt can be viewed in execution logs. Cloud Scheduler will retry the job according to the RetryConfig. The allowed duration for this deadline is: * For HTTP targets, between 15 seconds and 30 minutes. * For App Engine HTTP targets, between 15 seconds and 24 hours 15 seconds. * For Pub/Sub targets, this field is ignored.</li>
 </ul>
 </li>
 <li><code>description=sed</code><ul>
@@ -274,7 +274,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>headers=key=et</code><ul>
-<li>The user can specify HTTP request headers to send with the job&#39;s HTTP request. This map contains the header field names and values. Repeated headers are not supported, but a header value can contain commas. These headers represent a subset of the headers that will accompany the job&#39;s HTTP request. Some HTTP request headers will be ignored or replaced. A partial list of headers that will be ignored or replaced is below: - Host: This will be computed by Cloud Scheduler and derived from uri. * <code>Content-Length</code>: This will be computed by Cloud Scheduler. * <code>User-Agent</code>: This will be set to <code>&amp;#34;Google-Cloud-Scheduler&amp;#34;</code>. * <code>X-Google-*</code>: Google internal use only. * <code>X-AppEngine-*</code>: Google internal use only. The total size of headers must be less than 80KB.</li>
+<li>The user can specify HTTP request headers to send with the job&#39;s HTTP request. This map contains the header field names and values. Repeated headers are not supported, but a header value can contain commas. These headers represent a subset of the headers that will accompany the job&#39;s HTTP request. Some HTTP request headers will be ignored or replaced. A partial list of headers that will be ignored or replaced is below: - Host: This will be computed by Cloud Scheduler and derived from uri. * <code>Content-Length</code>: This will be computed by Cloud Scheduler. * <code>User-Agent</code>: This will be set to <code>&amp;#34;Google-Cloud-Scheduler&amp;#34;</code>. * <code>X-Google-*</code>: Google internal use only. * <code>X-AppEngine-*</code>: Google internal use only. * <code>X-CloudScheduler</code>: This header will be set to true. * <code>X-CloudScheduler-JobName</code>: This header will contain the job name. * <code>X-CloudScheduler-ScheduleTime</code>: For Cloud Scheduler jobs specified in the unix-cron format, this header will contain the job schedule time in RFC3339 UTC &#34;Zulu&#34; format. The total size of headers must be less than 80KB.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
@@ -336,7 +336,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>topic-name=et</code></p>
 <ul>
-<li>Required. The name of the Cloud Pub/Sub topic to which messages will be published when a job is delivered. The topic name must be in the same format as required by PubSub&#39;s <a href="https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#publishrequest">PublishRequest.name</a>, for example <code>projects/PROJECT_ID/topics/TOPIC_ID</code>. The topic must be in the same project as the Cloud Scheduler job.</li>
+<li>Required. The name of the Cloud Pub/Sub topic to which messages will be published when a job is delivered. The topic name must be in the same format as required by Pub/Sub&#39;s <a href="https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#publishrequest">PublishRequest.name</a>, for example <code>projects/PROJECT_ID/topics/TOPIC_ID</code>. The topic must be in the same project as the Cloud Scheduler job.</li>
 </ul>
 </li>
 <li>
@@ -366,7 +366,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    schedule=vero</code></p>
 <ul>
-<li>Required, except when used with UpdateJob. Describes the schedule on which the job will be executed. The schedule can be either of the following types: * <a href="http://en.wikipedia.org/wiki/Cron#Overview">Crontab</a> * English-like <a href="https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules">schedule</a> As a general rule, execution <code>n + 1</code> of a job will not begin until execution <code>n</code> has finished. Cloud Scheduler will never allow two simultaneously outstanding executions. For example, this implies that if the <code>n+1</code>th execution is scheduled to run at 16:00 but the <code>n</code>th execution takes until 16:15, the <code>n+1</code>th execution will not start until <code>16:15</code>. A scheduled start time will be delayed if the previous execution has not ended when its scheduled time occurs. If retry_count &gt; 0 and a job attempt fails, the job will be tried a total of retry_count times, with exponential backoff, until the next scheduled start time.</li>
+<li>Required, except when used with UpdateJob. Describes the schedule on which the job will be executed. The schedule can be either of the following types: * <a href="https://en.wikipedia.org/wiki/Cron#Overview">Crontab</a> * English-like <a href="https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules">schedule</a> As a general rule, execution <code>n + 1</code> of a job will not begin until execution <code>n</code> has finished. Cloud Scheduler will never allow two simultaneously outstanding executions. For example, this implies that if the <code>n+1</code>th execution is scheduled to run at 16:00 but the <code>n</code>th execution takes until 16:15, the <code>n+1</code>th execution will not start until <code>16:15</code>. A scheduled start time will be delayed if the previous execution has not ended when its scheduled time occurs. If retry_count &gt; 0 and a job attempt fails, the job will be tried a total of retry_count times, with exponential backoff, until the next scheduled start time.</li>
 </ul>
 </li>
 <li><code>schedule-time=invidunt</code><ul>

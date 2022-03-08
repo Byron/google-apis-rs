@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Versions Create - Firebase Hosting v2.0.4+20210315</title>
+  <title>Versions Create - Firebase Hosting v3.0.0+20220212</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firebase Hosting v2.0.4+20210315</a>
+        <a href=".." class="icon icon-home"> Firebase Hosting v3.0.0+20220212</a>
         
       </div>
 
@@ -412,9 +412,6 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     image-url: string
   labels: { string: string }
   name: string
-  preview:
-    active: boolean
-    expire-time: string
   status: string
   version-bytes: string
 
@@ -422,7 +419,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .config    app-association=et</code><ul>
+<li><code>-r .config    app-association=sea</code><ul>
 <li>How to handle well known App Association files.</li>
 </ul>
 </li>
@@ -431,24 +428,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>i18n    root=accusam</code></p>
+<p><code>i18n    root=ipsum</code></p>
 <ul>
 <li>Required. The user-supplied path where country and language specific content will be looked for within the public directory.</li>
 </ul>
 </li>
 <li>
-<p><code>..    trailing-slash-behavior=ut</code></p>
+<p><code>..    trailing-slash-behavior=et</code></p>
 <ul>
 <li>Defines how to handle a trailing slash in the URL path.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=voluptua.</code></p>
+<p><code>..    create-time=elitr</code></p>
 <ul>
 <li>Output only. The time at which the version was created.</li>
 </ul>
 </li>
-<li><code>create-user    email=consetetur</code><ul>
+<li><code>create-user    email=eirmod</code><ul>
 <li>The email address of the user when the user performed the action.</li>
 </ul>
 </li>
@@ -459,69 +456,57 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    delete-time=amet</code></p>
+<p><code>..    delete-time=sadipscing</code></p>
 <ul>
 <li>Output only. The time at which the version was <code>DELETED</code>.</li>
 </ul>
 </li>
-<li><code>delete-user    email=et</code><ul>
+<li><code>delete-user    email=dolor</code><ul>
 <li>The email address of the user when the user performed the action.</li>
 </ul>
 </li>
 <li>
-<p><code>image-url=aliquyam</code></p>
+<p><code>image-url=dolor</code></p>
 <ul>
 <li>A profile image URL for the user. May not be present if the user has changed their email address or deleted their account.</li>
 </ul>
 </li>
 <li>
-<p><code>..    file-count=-5</code></p>
+<p><code>..    file-count=-46</code></p>
 <ul>
 <li>Output only. The total number of files associated with the version. This value is calculated after a version is <code>FINALIZED</code>.</li>
 </ul>
 </li>
-<li><code>finalize-time=gubergren</code><ul>
+<li><code>finalize-time=et</code><ul>
 <li>Output only. The time at which the version was <code>FINALIZED</code>.</li>
 </ul>
 </li>
-<li><code>finalize-user    email=invidunt</code><ul>
+<li><code>finalize-user    email=sit</code><ul>
 <li>The email address of the user when the user performed the action.</li>
 </ul>
 </li>
 <li>
-<p><code>image-url=sea</code></p>
+<p><code>image-url=lorem</code></p>
 <ul>
 <li>A profile image URL for the user. May not be present if the user has changed their email address or deleted their account.</li>
 </ul>
 </li>
 <li>
-<p><code>..    labels=key=duo</code></p>
+<p><code>..    labels=key=nonumy</code></p>
 <ul>
 <li>The labels used for extra metadata and/or filtering.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=sea</code><ul>
+<li><code>name=diam</code><ul>
 <li>The fully-qualified resource name for the version, in the format: sites/ SITE_ID/versions/VERSION_ID This name is provided in the response body when you call <a href="../sites.versions/create"><code>CreateVersion</code></a>.</li>
 </ul>
 </li>
-<li><code>preview    active=true</code><ul>
-<li>If true, preview URLs are enabled for this version.</li>
-</ul>
-</li>
-<li>
-<p><code>expire-time=sadipscing</code></p>
-<ul>
-<li>Indicates the expiration time for previewing this version; preview URL requests received after this time will 404.</li>
-</ul>
-</li>
-<li>
-<p><code>..    status=no</code></p>
-<ul>
+<li><code>status=ipsum</code><ul>
 <li>The deploy status of the version. For a successful deploy, call <a href="../sites.versions/create"><code>CreateVersion</code></a> to make a new version (<code>CREATED</code> status), <a href="../sites.versions/populateFiles">upload all desired files</a> to the version, then <a href="../sites.versions/patch">update</a> the version to the <code>FINALIZED</code> status. Note that if you leave the version in the <code>CREATED</code> state for more than 12 hours, the system will automatically mark the version as <code>ABANDONED</code>. You can also change the status of a version to <code>DELETED</code> by calling <a href="../sites.versions/delete"><code>DeleteVersion</code></a>.</li>
 </ul>
 </li>
-<li><code>version-bytes=tempor</code><ul>
+<li><code>version-bytes=invidunt</code><ul>
 <li>Output only. The total stored bytesize of the version. This value is calculated after a version is <code>FINALIZED</code>.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Failover - SQL Admin v2.0.4+20210321</title>
+  <title>Failover - SQL Admin v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SQL Admin v2.0.4+20210321</a>
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
         
       </div>
 
@@ -61,6 +61,22 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
                     
                 </li>
             
@@ -384,7 +400,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Failover the instance to its failover replica instance. Using this operation might cause your instance to restart.</p>
+              <p>Initiates a manual failover of a high availability (HA) primary instance to a standby instance, which becomes the primary instance. Users are then rerouted to the new primary. For more information, see the <a href="https://cloud.google.com/sql/docs/mysql/high-availability">Overview of high availability</a> page in the Cloud SQL documentation. If using Legacy HA (MySQL only), this causes the instance to failover to its failover replica instance.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -417,11 +433,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .failover-context    kind=et</code><ul>
-<li>This is always <em>sql#failoverContext</em>.</li>
+<li><code>-r .failover-context    kind=dolore</code><ul>
+<li>This is always <code>sql#failoverContext</code>.</li>
 </ul>
 </li>
-<li><code>settings-version=erat</code><ul>
+<li><code>settings-version=voluptua.</code><ul>
 <li>The current settings version of this instance. Request will be rejected if this version doesn&#39;t match the current settings version.</li>
 </ul>
 </li>

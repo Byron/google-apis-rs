@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dataset Aggregate - fitness v2.0.4+20210323</title>
+  <title>Dataset Aggregate - fitness v3.0.0+20220302</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> fitness v2.0.4+20210323</a>
+        <a href=".." class="icon icon-home"> fitness v3.0.0+20220302</a>
         
       </div>
 
@@ -280,7 +280,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>...    end-time-millis=kasd</code></p>
 <ul>
-<li>The end of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.</li>
+<li>The end of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive. The maximum allowed difference between start_time_millis // and end_time_millis is 7776000000 (roughly 90 days).</li>
 </ul>
 </li>
 <li><code>filtered-data-quality-standard=et</code><ul>

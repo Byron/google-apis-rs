@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Datasets Fhir Stores Export - Cloud Healthcare v2.0.4+20210317</title>
+  <title>Locations Datasets Fhir Stores Export - Cloud Healthcare v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Cloud Healthcare v3.0.0+20220223</a>
         
       </div>
 
@@ -475,6 +475,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-configure-search">Locations Datasets Fhir Stores Configure Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-datasets-fhir-stores-create">Locations Datasets Fhir Stores Create</a>
                     
                 </li>
@@ -864,15 +869,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    -since=sit</code><ul>
+<li><code>-r .    -since=dolore</code><ul>
 <li>If provided, only resources updated after this time are exported. The time uses the format YYYY-MM-DDThh:mm:ss.sss+zz:zz. For example, <code>2015-02-07T13:28:17.239+02:00</code> or <code>2017-01-01T00:00:00Z</code>. The time must be specified to the second and include a time zone.</li>
 </ul>
 </li>
-<li><code>-type=duo</code><ul>
+<li><code>-type=eos</code><ul>
 <li>String of comma-delimited FHIR resource types. If provided, only resources of the specified resource type(s) are exported.</li>
 </ul>
 </li>
-<li><code>bigquery-destination    dataset-uri=sit</code><ul>
+<li><code>bigquery-destination    dataset-uri=amet.</code><ul>
 <li>BigQuery URI to an existing dataset, up to 2000 characters long, in the format <code>bq://projectId.bqDatasetId</code>.</li>
 </ul>
 </li>
@@ -880,24 +885,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Use <code>write_disposition</code> instead. If <code>write_disposition</code> is specified, this parameter is ignored. force=false is equivalent to write_disposition=WRITE_EMPTY and force=true is equivalent to write_disposition=WRITE_TRUNCATE.</li>
 </ul>
 </li>
-<li><code>schema-config    recursive-structure-depth=et</code><ul>
+<li><code>schema-config    recursive-structure-depth=amet</code><ul>
 <li>The depth for all recursive structures in the output analytics schema. For example, <code>concept</code> in the CodeSystem resource is a recursive structure; when the depth is 2, the CodeSystem table will have a column called <code>concept.concept</code> but not <code>concept.concept.concept</code>. If not specified or set to 0, the server will use the default value 2. The maximum depth allowed is 5.</li>
 </ul>
 </li>
 <li>
-<p><code>schema-type=rebum.</code></p>
+<p><code>schema-type=ut</code></p>
 <ul>
 <li>Specifies the output schema type. Schema type is required.</li>
 </ul>
 </li>
 <li>
-<p><code>..    write-disposition=dolor</code></p>
+<p><code>..    write-disposition=at</code></p>
 <ul>
-<li>Determines whether existing tables in the destination dataset are overwritten or appended to. If a write_disposition is specified, the <code>force</code> parameter is ignored.</li>
+<li>Determines if existing data in the destination dataset is overwritten, appended to, or not written if the tables contain data. If a write_disposition is specified, the <code>force</code> parameter is ignored.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-destination    uri-prefix=lorem</code></p>
+<p><code>..gcs-destination    uri-prefix=sit</code></p>
 <ul>
 <li>URI for a Cloud Storage directory where result files should be written (in the format <code>gs://{bucket-id}/{path/to/destination/dir}</code>). If there is no trailing slash, the service appends one when composing the object path. The Cloud Storage bucket referenced in <code>uri_prefix</code> must exist or an error occurs.</li>
 </ul>

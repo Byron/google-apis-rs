@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations List - Document v2.0.4+20210329</title>
+  <title>Locations List - Document v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Document v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Document v3.0.0+20220226</a>
         
       </div>
 
@@ -45,17 +45,7 @@
         <span>Operations</span>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="../operations_cancel">Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
                     <a class="" href="../operations_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_list">List</a>
                     
                 </li>
             
@@ -64,6 +54,11 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-fetch-processor-types">Locations Fetch Processor Types</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-get">Locations Get</a>
@@ -95,7 +90,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
                     
                 </li>
             
@@ -105,7 +110,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-create">Locations Processors Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-delete">Locations Processors Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-disable">Locations Processors Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-enable">Locations Processors Enable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-get">Locations Processors Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-processors-human-review-config-review-document">Locations Processors Human Review Config Review Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-list">Locations Processors List</a>
                     
                 </li>
             
@@ -120,7 +155,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-delete">Locations Processors Processor Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-deploy">Locations Processors Processor Versions Deploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-get">Locations Processors Processor Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-list">Locations Processors Processor Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-processors-processor-versions-process">Locations Processors Processor Versions Process</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-processor-versions-undeploy">Locations Processors Processor Versions Undeploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-processors-set-default-processor-version">Locations Processors Set Default Processor Version</a>
                     
                 </li>
             
@@ -146,7 +211,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../uiv1beta3_projects-locations-operations-cancel">Projects Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../uiv1beta3_projects-locations-operations-get">Projects Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../uiv1beta3_projects-locations-operations-list">Projects Locations Operations List</a>
                     
                 </li>
             
@@ -223,7 +298,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p page-size=integer</strong></p>
 <ul>
-<li>The maximum number of results to return. If not set, the service will select a default.</li>
+<li>The maximum number of results to return. If not set, the service selects a default.</li>
 </ul>
 </li>
 <li>
@@ -310,7 +385,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../projects_locations-operations-get" class="btn btn-neutral float-right" title="Locations Operations Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../projects_locations-operations-cancel" class="btn btn-neutral float-right" title="Locations Operations Cancel"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../projects_locations-get" class="btn btn-neutral" title="Locations Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -342,7 +417,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="../projects_locations-get" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-operations-get" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-operations-cancel" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

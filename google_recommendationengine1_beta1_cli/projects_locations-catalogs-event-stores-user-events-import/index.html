@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Catalogs Event Stores User Events Import - Recommendations AI v2.0.4+20210319</title>
+  <title>Locations Catalogs Event Stores User Events Import - Recommendations AI v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Recommendations AI v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Recommendations AI v3.0.0+20220224</a>
         
       </div>
 
@@ -219,7 +219,7 @@ You can set the scope for this method like this: <code>recommendationengine1-bet
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. &#34;projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store&#34;</li>
+<li>Required. <code>projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store</code></li>
 </ul>
 </li>
 </ul>
@@ -279,7 +279,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..gcs-source    input-uris=erat</code></p>
 <ul>
-<li>Required. Google Cloud Storage URIs to input files. URI can be up to 2000 characters long. URIs can match the full object path (for example, gs://bucket/directory/object.json) or a pattern matching one or more files, such as gs://bucket/directory/*.json. A request can contain at most 100 files, and each file can be up to 2 GB. See <a href="..//recommendations-ai/docs/upload-catalog">Importing catalog information</a> for the expected file format and setup instructions.</li>
+<li>Required. Google Cloud Storage URIs to input files. URI can be up to 2000 characters long. URIs can match the full object path (for example, <code>gs://bucket/directory/object.json</code>) or a pattern matching one or more files, such as <code>gs://bucket/directory/*.json</code>. A request can contain at most 100 files, and each file can be up to 2 GB. See <a href="..//recommendations-ai/docs/upload-catalog">Importing catalog information</a> for the expected file format and setup instructions.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

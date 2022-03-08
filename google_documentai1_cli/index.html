@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Document v2.0.4+20210329</title>
+  <title>Document v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Document v2.0.4+20210329</a>
+        <a href="." class="icon icon-home"> Document v3.0.0+20220226</a>
         
       </div>
 
@@ -45,17 +45,7 @@
         <span>Operations</span>
             
                 <li class="toctree-l1 ">
-                    <a class="" href="operations_cancel/">Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
                     <a class="" href="operations_delete/">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="operations_list/">List</a>
                     
                 </li>
             
@@ -64,6 +54,11 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-fetch-processor-types/">Locations Fetch Processor Types</a>
+                    
+                </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-get/">Locations Get</a>
@@ -76,7 +71,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-operations-get/">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-operations-list/">Locations Operations List</a>
                     
                 </li>
             
@@ -86,7 +91,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-create/">Locations Processors Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-delete/">Locations Processors Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-disable/">Locations Processors Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-enable/">Locations Processors Enable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-get/">Locations Processors Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-processors-human-review-config-review-document/">Locations Processors Human Review Config Review Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-list/">Locations Processors List</a>
                     
                 </li>
             
@@ -101,7 +136,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-processor-versions-delete/">Locations Processors Processor Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-processor-versions-deploy/">Locations Processors Processor Versions Deploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-processor-versions-get/">Locations Processors Processor Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-processor-versions-list/">Locations Processors Processor Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-processors-processor-versions-process/">Locations Processors Processor Versions Process</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-processor-versions-undeploy/">Locations Processors Processor Versions Undeploy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-processors-set-default-processor-version/">Locations Processors Set Default Processor Version</a>
                     
                 </li>
             
@@ -127,7 +192,17 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="uiv1beta3_projects-locations-operations-cancel/">Projects Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="uiv1beta3_projects-locations-operations-get/">Projects Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="uiv1beta3_projects-locations-operations-list/">Projects Locations Operations List</a>
                     
                 </li>
             
@@ -186,26 +261,41 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/documentai1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Document</em> API at revision <em>20210329</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Document</em> API at revision <em>20220226</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">documentai1 [options]
         operations
-                cancel &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
-                list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         projects
+                locations-fetch-processor-types &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-operations-cancel &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-processors-batch-process &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-disable &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-enable &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-processors-human-review-config-review-document &lt;human-review-config&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-processors-process &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-processors-processor-versions-batch-process &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-processor-versions-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-processor-versions-deploy &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-processor-versions-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-processor-versions-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-processors-processor-versions-process &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-processor-versions-undeploy &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-processors-set-default-processor-version &lt;processor&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         uiv1beta3
                 projects-locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 projects-locations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                projects-locations-operations-cancel &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 projects-locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                projects-locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
   documentai1 --help
 
 Configuration:
@@ -261,7 +351,7 @@ output to standard error <em>as-is</em>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="operations_cancel/" class="btn btn-neutral float-right" title="Cancel"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="operations_delete/" class="btn btn-neutral float-right" title="Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>
@@ -291,7 +381,7 @@ output to standard error <em>as-is</em>.</p>
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
       <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="operations_cancel/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span style="margin-left: 15px"><a href="operations_delete/" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>
 </body>

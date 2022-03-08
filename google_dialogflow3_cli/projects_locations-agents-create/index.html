@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Agents Create - Dialogflow v2.0.4+20210329</title>
+  <title>Locations Agents Create - Dialogflow v3.0.0+20220228</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dialogflow v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Dialogflow v3.0.0+20220228</a>
         
       </div>
 
@@ -43,6 +43,16 @@
     
         
         <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-get">Locations Agents Changelogs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-changelogs-list">Locations Agents Changelogs List</a>
+                    
+                </li>
             
                 <li class="toctree-l1 current">
                     <a class="current" href=".">Locations Agents Create</a>
@@ -101,12 +111,32 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-continuous-test-results-list">Locations Agents Environments Continuous Test Results List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-create">Locations Agents Environments Create</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-delete">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deploy-flow">Locations Agents Environments Deploy Flow</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-get">Locations Agents Environments Deployments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-deployments-list">Locations Agents Environments Deployments List</a>
                     
                 </li>
             
@@ -166,6 +196,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-environments-run-continuous-test">Locations Agents Environments Run Continuous Test</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-environments-sessions-detect-intent">Locations Agents Environments Sessions Detect Intent</a>
                     
                 </li>
@@ -221,12 +256,22 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-export">Locations Agents Flows Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get">Locations Agents Flows Get</a>
                     
                 </li>
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-get-validation-result">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-import">Locations Agents Flows Import</a>
                     
                 </li>
             
@@ -297,6 +342,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-agents-flows-validate">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agents-flows-versions-compare-versions">Locations Agents Flows Versions Compare Versions</a>
                     
                 </li>
             
@@ -511,6 +561,16 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
                     
                 </li>
@@ -601,7 +661,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates an agent in the specified location.</p>
+              <p>Creates an agent in the specified location. Note: You should always train flows prior to sending them queries. See the <a href="https://cloud.google.com/dialogflow/cx/docs/concept/training">training documentation</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -622,6 +682,10 @@ You can set the scope for this method like this: <code>dialogflow3 --scope &lt;s
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>GoogleCloudDialogflowCxV3Agent:
+  advanced-settings:
+    logging-settings:
+      enable-interaction-logging: boolean
+      enable-stackdriver-logging: boolean
   avatar-uri: string
   default-language-code: string
   description: string
@@ -633,57 +697,75 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   speech-to-text-settings:
     enable-speech-adaptation: boolean
   start-flow: string
+  supported-language-codes: [string]
   time-zone: string
 
 </code></pre>
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    avatar-uri=et</code><ul>
+<li><code>-r .advanced-settings.logging-settings    enable-interaction-logging=true</code><ul>
+<li>If true, DF Interaction logging is currently enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-stackdriver-logging=false</code></p>
+<ul>
+<li>If true, StackDriver logging is currently enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>...    avatar-uri=amet.</code></p>
+<ul>
 <li>The URI of the agent&#39;s avatar. Avatars are used throughout the Dialogflow console and in the self-hosted <a href="https://cloud.google.com/dialogflow/docs/integrations/web-demo">Web Demo</a> integration.</li>
 </ul>
 </li>
-<li><code>default-language-code=magna</code><ul>
-<li>Immutable. The default language of the agent as a language tag. See <a href="https://cloud.google.com/dialogflow/cx/docs/reference/language">Language Support</a> for a list of the currently supported language codes. This field cannot be set by the Agents.UpdateAgent method.</li>
+<li><code>default-language-code=takimata</code><ul>
+<li>Required. Immutable. The default language of the agent as a language tag. See <a href="https://cloud.google.com/dialogflow/cx/docs/reference/language">Language Support</a> for a list of the currently supported language codes. This field cannot be set by the Agents.UpdateAgent method.</li>
 </ul>
 </li>
-<li><code>description=no</code><ul>
+<li><code>description=amet.</code><ul>
 <li>The description of the agent. The maximum length is 500 characters. If exceeded, the request is rejected.</li>
 </ul>
 </li>
-<li><code>display-name=ipsum</code><ul>
+<li><code>display-name=duo</code><ul>
 <li>Required. The human-readable name of the agent, unique within the location.</li>
 </ul>
 </li>
-<li><code>enable-spell-correction=false</code><ul>
+<li><code>enable-spell-correction=true</code><ul>
 <li>Indicates if automatic spell correction is enabled in detect intent requests.</li>
 </ul>
 </li>
 <li><code>enable-stackdriver-logging=true</code><ul>
-<li>Indicates if stackdriver logging is enabled for the agent.</li>
+<li>Indicates if stackdriver logging is enabled for the agent. Please use agent.advanced_settings instead.</li>
 </ul>
 </li>
-<li><code>name=amet.</code><ul>
+<li><code>name=lorem</code><ul>
 <li>The unique identifier of the agent. Required for the Agents.UpdateAgent method. Agents.CreateAgent populates the name automatically. Format: <code>projects//locations//agents/</code>.</li>
 </ul>
 </li>
-<li><code>security-settings=duo</code><ul>
+<li><code>security-settings=gubergren</code><ul>
 <li>Name of the SecuritySettings reference for the agent. Format: <code>projects//locations//securitySettings/</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>speech-to-text-settings    enable-speech-adaptation=true</code></p>
+<p><code>speech-to-text-settings    enable-speech-adaptation=false</code></p>
 <ul>
 <li>Whether to use speech adaptation for speech recognition.</li>
 </ul>
 </li>
 <li>
-<p><code>..    start-flow=gubergren</code></p>
+<p><code>..    start-flow=dolor</code></p>
 <ul>
 <li>Immutable. Name of the start flow in this agent. A start flow will be automatically created when the agent is created, and can only be deleted by deleting the agent. Format: <code>projects//locations//agents//flows/</code>.</li>
 </ul>
 </li>
-<li><code>time-zone=lorem</code><ul>
+<li><code>supported-language-codes=ea</code><ul>
+<li>The list of all languages supported by the agent (except for the <code>default_language_code</code>).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>time-zone=ipsum</code><ul>
 <li>Required. The time zone of the agent from the <a href="https://www.iana.org/time-zones">time zone database</a>, e.g., America/New_York, Europe/Paris.</li>
 </ul>
 </li>
@@ -787,7 +869,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         <a href="../projects_locations-agents-delete" class="btn btn-neutral float-right" title="Locations Agents Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-agents-changelogs-list" class="btn btn-neutral" title="Locations Agents Changelogs List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -815,7 +897,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         
             <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
         
-      <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span><a href="../projects_locations-agents-changelogs-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
       <span style="margin-left: 15px"><a href="../projects_locations-agents-delete" style="color: #fcfcfc">Next &raquo;</a></span>
     </span>
 </div>

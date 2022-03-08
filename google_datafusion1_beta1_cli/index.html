@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Fusion v2.0.4+20210322</title>
+  <title>Data Fusion v3.0.0+20211028</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Data Fusion v2.0.4+20210322</a>
+        <a href="." class="icon icon-home"> Data Fusion v3.0.0+20211028</a>
         
       </div>
 
@@ -60,6 +60,21 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-dns-peerings-add/">Locations Instances Dns Peerings Add</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-dns-peerings-list/">Locations Instances Dns Peerings List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-dns-peerings-remove/">Locations Instances Dns Peerings Remove</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-instances-get/">Locations Instances Get</a>
                     
                 </li>
@@ -76,6 +91,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-instances-namespaces-get-iam-policy/">Locations Instances Namespaces Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-instances-namespaces-list/">Locations Instances Namespaces List</a>
                     
                 </li>
             
@@ -204,16 +224,20 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datafusion1_beta1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Data Fusion</em> API at revision <em>20210322</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Data Fusion</em> API at revision <em>20211028</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">datafusion1-beta1 [options]
         projects
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-dns-peerings-add &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-dns-peerings-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-dns-peerings-remove &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-namespaces-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-instances-namespaces-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-namespaces-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-namespaces-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-instances-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]

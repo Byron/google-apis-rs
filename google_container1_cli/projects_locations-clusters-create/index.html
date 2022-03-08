@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Clusters Create - Container v2.0.4+20210314</title>
+  <title>Locations Clusters Create - Container v3.0.0+20220215</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v2.0.4+20210314</a>
+        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
         
       </div>
 
@@ -444,6 +444,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         enabled: boolean
       gce-persistent-disk-csi-driver-config:
         enabled: boolean
+      gcp-filestore-csi-driver-config:
+        enabled: boolean
       horizontal-pod-autoscaling:
         disabled: boolean
       http-load-balancing:
@@ -463,6 +465,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         boot-disk-kms-key: string
         disk-size-gb: integer
         disk-type: string
+        image-type: string
         management:
           auto-repair: boolean
           auto-upgrade: boolean
@@ -478,10 +481,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         upgrade-settings:
           max-surge: integer
           max-unavailable: integer
+      autoscaling-profile: string
       enable-node-autoprovisioning: boolean
     binary-authorization:
       enabled: boolean
     cluster-ipv4-cidr: string
+    confidential-nodes:
+      enabled: boolean
     create-time: string
     current-master-version: string
     current-node-count: integer
@@ -496,6 +502,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     enable-tpu: boolean
     endpoint: string
     expire-time: string
+    id: string
+    identity-service-config:
+      enabled: boolean
     initial-cluster-version: string
     initial-node-count: integer
     instance-group-urls: [string]
@@ -518,6 +527,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       enabled: boolean
     location: string
     locations: [string]
+    logging-config:
+      component-config:
+        enable-components: [string]
     logging-service: string
     maintenance-policy:
       resource-version: string
@@ -529,6 +541,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
           recurrence: string
           window:
             end-time: string
+            maintenance-exclusion-options:
+              scope: string
             start-time: string
     master-auth:
       client-certificate: string
@@ -540,23 +554,42 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       username: string
     master-authorized-networks-config:
       enabled: boolean
+    mesh-certificates:
+      enable-certificates: boolean
+    monitoring-config:
+      component-config:
+        enable-components: [string]
     monitoring-service: string
     name: string
     network: string
     network-config:
+      datapath-provider: string
       default-snat-status:
         disabled: boolean
+      dns-config:
+        cluster-dns: string
+        cluster-dns-domain: string
+        cluster-dns-scope: string
       enable-intra-node-visibility: boolean
+      enable-l4ilb-subsetting: boolean
       network: string
       private-ipv6-google-access: string
+      service-external-ips-config:
+        enabled: boolean
       subnetwork: string
     network-policy:
       enabled: boolean
       provider: string
     node-config:
+      advanced-machine-features:
+        threads-per-core: string
       boot-disk-kms-key: string
       disk-size-gb: integer
       disk-type: string
+      gcfs-config:
+        enabled: boolean
+      gvnic:
+        enabled: boolean
       image-type: string
       kubelet-config:
         cpu-cfs-quota: boolean
@@ -582,13 +615,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       shielded-instance-config:
         enable-integrity-monitoring: boolean
         enable-secure-boot: boolean
+      spot: boolean
       tags: [string]
       workload-metadata-config:
         mode: string
     node-ipv4-cidr-size: integer
+    node-pool-auto-config:
+      network-tags:
+        tags: [string]
+    node-pool-defaults:
+      node-config-defaults:
+        gcfs-config:
+          enabled: boolean
     notification-config:
       pubsub:
         enabled: boolean
+        filter:
+          event-type: [string]
         topic: string
     private-cluster-config:
       enable-private-endpoint: boolean
@@ -658,37 +701,43 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
+<p><code>..gcp-filestore-csi-driver-config    enabled=true</code></p>
+<ul>
+<li>Whether the GCP Filestore CSI driver is enabled for this cluster.</li>
+</ul>
+</li>
+<li>
 <p><code>..horizontal-pod-autoscaling    disabled=true</code></p>
 <ul>
 <li>Whether the Horizontal Pod Autoscaling feature is enabled in the cluster. When enabled, it ensures that metrics are collected into Stackdriver Monitoring.</li>
 </ul>
 </li>
 <li>
-<p><code>..http-load-balancing    disabled=true</code></p>
+<p><code>..http-load-balancing    disabled=false</code></p>
 <ul>
 <li>Whether the HTTP Load Balancing controller is enabled in the cluster. When enabled, it runs a small pod in the cluster that manages the load balancers.</li>
 </ul>
 </li>
 <li>
-<p><code>..kubernetes-dashboard    disabled=false</code></p>
+<p><code>..kubernetes-dashboard    disabled=true</code></p>
 <ul>
 <li>Whether the Kubernetes Dashboard is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>..network-policy-config    disabled=true</code></p>
+<p><code>..network-policy-config    disabled=false</code></p>
 <ul>
 <li>Whether NetworkPolicy is enabled for this cluster.</li>
 </ul>
 </li>
 <li>
-<p><code>...authenticator-groups-config    enabled=false</code></p>
+<p><code>...authenticator-groups-config    enabled=true</code></p>
 <ul>
 <li>Whether this cluster should return group membership lookups during authentication using a group of security groups.</li>
 </ul>
 </li>
 <li>
-<p><code>security-group=amet</code></p>
+<p><code>security-group=duo</code></p>
 <ul>
 <li>The name of the security group-of-groups to be used. Only relevant if enabled = true.</li>
 </ul>
@@ -718,6 +767,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Type of the disk attached to each node (e.g. &#39;pd-standard&#39;, &#39;pd-ssd&#39; or &#39;pd-balanced&#39;) If unspecified, the default disk type is &#39;pd-standard&#39;</li>
 </ul>
 </li>
+<li><code>image-type=est</code><ul>
+<li>The image type to use for NAP created node.</li>
+</ul>
+</li>
 <li><code>management    auto-repair=true</code><ul>
 <li>A flag that specifies whether the node auto-repair is enabled for the node pool. If enabled, the nodes in this node pool will be monitored and, if they fail health checks too many times, an automatic repair action will be triggered.</li>
 </ul>
@@ -726,442 +779,29 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A flag that specifies whether node auto-upgrade is enabled for the node pool. If enabled, node auto-upgrade helps keep the nodes in your node pool up to date with the latest release version of Kubernetes.</li>
 </ul>
 </li>
-<li><code>upgrade-options    auto-upgrade-start-time=ipsum</code><ul>
+<li><code>upgrade-options    auto-upgrade-start-time=est</code><ul>
 <li>[Output only] This field is set when upgrades are about to commence with the approximate start time for the upgrades, in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
 </ul>
 </li>
 <li>
-<p><code>description=est</code></p>
+<p><code>description=gubergren</code></p>
 <ul>
 <li>[Output only] This field is set when upgrades are about to commence with the description of the upgrade.</li>
 </ul>
 </li>
 <li>
-<p><code>...    min-cpu-platform=gubergren</code></p>
+<p><code>...    min-cpu-platform=ea</code></p>
 <ul>
-<li>Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a> To unset the min cpu platform field pass &#34;automatic&#34; as field value.</li>
+<li>Deprecated. Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a> This field is deprecated, min_cpu_platform should be specified using cloud.google.com/requested-min-cpu-platform label selector on the pod. To unset the min cpu platform field pass &#34;automatic&#34; as field value.</li>
 </ul>
 </li>
-<li><code>oauth-scopes=ea</code><ul>
+<li><code>oauth-scopes=dolor</code><ul>
 <li>Scopes that are used by NAP when creating node pools.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>service-account=dolor</code><ul>
+<li><code>service-account=lorem</code><ul>
 <li>The Google Cloud Platform Service Account to be used by the node VMs.</li>
-</ul>
-</li>
-<li><code>shielded-instance-config    enable-integrity-monitoring=true</code><ul>
-<li>Defines whether the instance has integrity monitoring enabled. Enables monitoring and attestation of the boot integrity of the instance. The attestation is performed against the integrity policy baseline. This baseline is initially derived from the implicitly trusted boot image when the instance is created.</li>
-</ul>
-</li>
-<li>
-<p><code>enable-secure-boot=false</code></p>
-<ul>
-<li>Defines whether the instance has Secure Boot enabled. Secure Boot helps ensure that the system only runs authentic software by verifying the digital signature of all boot components, and halting the boot process if signature verification fails.</li>
-</ul>
-</li>
-<li>
-<p><code>..upgrade-settings    max-surge=58</code></p>
-<ul>
-<li>The maximum number of nodes that can be created beyond the current size of the node pool during the upgrade process.</li>
-</ul>
-</li>
-<li>
-<p><code>max-unavailable=31</code></p>
-<ul>
-<li>The maximum number of nodes that can be simultaneously unavailable during the upgrade process. A node is considered available if its status is Ready.</li>
-</ul>
-</li>
-<li>
-<p><code>...    enable-node-autoprovisioning=false</code></p>
-<ul>
-<li>Enables automatic node pool creation and deletion.</li>
-</ul>
-</li>
-<li>
-<p><code>..binary-authorization    enabled=true</code></p>
-<ul>
-<li>Enable Binary Authorization for this cluster. If enabled, all container images will be validated by Binary Authorization.</li>
-</ul>
-</li>
-<li>
-<p><code>..    cluster-ipv4-cidr=stet</code></p>
-<ul>
-<li>The IP address range of the container pods in this cluster, in <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>). Leave blank to have one automatically chosen or specify a <code>/14</code> block in <code>10.0.0.0/8</code>.</li>
-</ul>
-</li>
-<li><code>create-time=kasd</code><ul>
-<li>[Output only] The time the cluster was created, in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
-</ul>
-</li>
-<li><code>current-master-version=et</code><ul>
-<li>[Output only] The current software version of the master endpoint.</li>
-</ul>
-</li>
-<li><code>current-node-count=58</code><ul>
-<li>[Output only] The number of nodes currently in the cluster. Deprecated. Call Kubernetes API directly to retrieve node information.</li>
-</ul>
-</li>
-<li><code>current-node-version=et</code><ul>
-<li>[Output only] Deprecated, use <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools">NodePools.version</a> instead. The current version of the node software components. If they are currently at multiple versions because they&#39;re in the process of being upgraded, this reflects the minimum version of all nodes.</li>
-</ul>
-</li>
-<li><code>database-encryption    key-name=et</code><ul>
-<li>Name of CloudKMS key to use for the encryption of secrets in etcd. Ex. projects/my-project/locations/global/keyRings/my-ring/cryptoKeys/my-key</li>
-</ul>
-</li>
-<li>
-<p><code>state=vero</code></p>
-<ul>
-<li>Denotes the state of etcd encryption.</li>
-</ul>
-</li>
-<li>
-<p><code>..default-max-pods-constraint    max-pods-per-node=erat</code></p>
-<ul>
-<li>Constraint enforced on the max num of pods per node.</li>
-</ul>
-</li>
-<li>
-<p><code>..    description=sed</code></p>
-<ul>
-<li>An optional description of this cluster.</li>
-</ul>
-</li>
-<li><code>enable-kubernetes-alpha=false</code><ul>
-<li>Kubernetes alpha features are enabled on this cluster. This includes alpha API groups (e.g. v1alpha1) and features that may not be production ready in the kubernetes version of the master and nodes. The cluster has no SLA for uptime and master/node upgrades are disabled. Alpha enabled clusters are automatically deleted thirty days after creation.</li>
-</ul>
-</li>
-<li><code>enable-tpu=false</code><ul>
-<li>Enable the ability to use Cloud TPUs in this cluster.</li>
-</ul>
-</li>
-<li><code>endpoint=dolor</code><ul>
-<li>[Output only] The IP address of this cluster&#39;s master endpoint. The endpoint can be accessed from the internet at <code>https://username:password@endpoint/</code>. See the <code>masterAuth</code> property of this resource for username and password information.</li>
-</ul>
-</li>
-<li><code>expire-time=et</code><ul>
-<li>[Output only] The time the cluster will be automatically deleted in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
-</ul>
-</li>
-<li><code>initial-cluster-version=et</code><ul>
-<li>The initial Kubernetes version for this cluster. Valid versions are those found in validMasterVersions returned by getServerConfig. The version can be upgraded over time; such upgrades are reflected in currentMasterVersion and currentNodeVersion. Users may specify either explicit versions offered by Kubernetes Engine or version aliases, which have the following behavior: - &#34;latest&#34;: picks the highest valid Kubernetes version - &#34;1.X&#34;: picks the highest valid patch+gke.N patch in the 1.X version - &#34;1.X.Y&#34;: picks the highest valid gke.N patch in the 1.X.Y version - &#34;1.X.Y-gke.N&#34;: picks an explicit Kubernetes version - &#34;&#34;,&#34;-&#34;: picks the default Kubernetes version</li>
-</ul>
-</li>
-<li><code>initial-node-count=6</code><ul>
-<li>The number of nodes to create in this cluster. You must ensure that your Compute Engine <a href="https://cloud.google.com/compute/quotas">resource quota</a> is sufficient for this number of instances. You must also have available firewall and routes quota. For requests, this field should only be used in lieu of a &#34;node_pool&#34; object, since this configuration (along with the &#34;node_config&#34;) will be used to create a &#34;NodePool&#34; object with an auto-generated name. Do not use this and a node_pool at the same time. This field is deprecated, use node_pool.initial_node_count instead.</li>
-</ul>
-</li>
-<li><code>instance-group-urls=stet</code><ul>
-<li>Deprecated. Use node_pools.instance_group_urls.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>ip-allocation-policy    cluster-ipv4-cidr=dolor</code><ul>
-<li>This field is deprecated, use cluster_ipv4_cidr_block.</li>
-</ul>
-</li>
-<li><code>cluster-ipv4-cidr-block=duo</code><ul>
-<li>The IP address range for the cluster pod IPs. If this field is set, then <code>cluster.cluster_ipv4_cidr</code> must be left blank. This field is only applicable when <code>use_ip_aliases</code> is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
-</ul>
-</li>
-<li><code>cluster-secondary-range-name=vero</code><ul>
-<li>The name of the secondary range to be used for the cluster CIDR block. The secondary range will be used for pod IP addresses. This must be an existing secondary range associated with the cluster subnetwork. This field is only applicable with use_ip_aliases is true and create_subnetwork is false.</li>
-</ul>
-</li>
-<li><code>create-subnetwork=false</code><ul>
-<li>Whether a new subnetwork will be created automatically for the cluster. This field is only applicable when <code>use_ip_aliases</code> is true.</li>
-</ul>
-</li>
-<li><code>node-ipv4-cidr=invidunt</code><ul>
-<li>This field is deprecated, use node_ipv4_cidr_block.</li>
-</ul>
-</li>
-<li><code>node-ipv4-cidr-block=stet</code><ul>
-<li>The IP address range of the instance IPs in this cluster. This is applicable only if <code>create_subnetwork</code> is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
-</ul>
-</li>
-<li><code>services-ipv4-cidr=vero</code><ul>
-<li>This field is deprecated, use services_ipv4_cidr_block.</li>
-</ul>
-</li>
-<li><code>services-ipv4-cidr-block=elitr</code><ul>
-<li>The IP address range of the services IPs in this cluster. If blank, a range will be automatically chosen with the default size. This field is only applicable when <code>use_ip_aliases</code> is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
-</ul>
-</li>
-<li><code>services-secondary-range-name=lorem</code><ul>
-<li>The name of the secondary range to be used as for the services CIDR block. The secondary range will be used for service ClusterIPs. This must be an existing secondary range associated with the cluster subnetwork. This field is only applicable with use_ip_aliases is true and create_subnetwork is false.</li>
-</ul>
-</li>
-<li><code>subnetwork-name=diam</code><ul>
-<li>A custom subnetwork name to be used if <code>create_subnetwork</code> is true. If this field is empty, then an automatic name will be chosen for the new subnetwork.</li>
-</ul>
-</li>
-<li><code>tpu-ipv4-cidr-block=no</code><ul>
-<li>The IP address range of the Cloud TPUs in this cluster. If unspecified, a range will be automatically chosen with the default size. This field is only applicable when <code>use_ip_aliases</code> is true. If unspecified, the range will use the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
-</ul>
-</li>
-<li><code>use-ip-aliases=false</code><ul>
-<li>Whether alias IPs will be used for pod IPs in the cluster. This is used in conjunction with use_routes. It cannot be true if use_routes is true. If both use_ip_aliases and use_routes are false, then the server picks the default IP allocation mode</li>
-</ul>
-</li>
-<li>
-<p><code>use-routes=true</code></p>
-<ul>
-<li>Whether routes will be used for pod IPs in the cluster. This is used in conjunction with use_ip_aliases. It cannot be true if use_ip_aliases is true. If both use_ip_aliases and use_routes are false, then the server picks the default IP allocation mode</li>
-</ul>
-</li>
-<li>
-<p><code>..    label-fingerprint=consetetur</code></p>
-<ul>
-<li>The fingerprint of the set of labels for this cluster.</li>
-</ul>
-</li>
-<li>
-<p><code>legacy-abac    enabled=false</code></p>
-<ul>
-<li>Whether the ABAC authorizer is enabled for this cluster. When enabled, identities in the system, including service accounts, nodes, and controllers, will have statically granted permissions beyond those provided by the RBAC configuration or IAM.</li>
-</ul>
-</li>
-<li>
-<p><code>..    location=erat</code></p>
-<ul>
-<li>[Output only] The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available">zone</a> or <a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available">region</a> in which the cluster resides.</li>
-</ul>
-</li>
-<li><code>locations=consetetur</code><ul>
-<li>The list of Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zones</a> in which the cluster&#39;s nodes should be located. This field provides a default value if <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.locations">NodePool.Locations</a> are not specified during node pool creation. Warning: changing cluster locations will update the <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.locations">NodePool.Locations</a> of all node pools and will result in nodes being added and/or removed.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>logging-service=amet.</code><ul>
-<li>The logging service the cluster should use to write logs. Currently available options: * <code>logging.googleapis.com/kubernetes</code> - The Cloud Logging service with a Kubernetes-native resource model * <code>logging.googleapis.com</code> - The legacy Cloud Logging service (no longer available as of GKE 1.15). * <code>none</code> - no logs will be exported from the cluster. If left as an empty string,<code>logging.googleapis.com/kubernetes</code> will be used for GKE 1.14+ or <code>logging.googleapis.com</code> for earlier versions.</li>
-</ul>
-</li>
-<li><code>maintenance-policy    resource-version=sed</code><ul>
-<li>A hash identifying the version of this policy, so that updates to fields of the policy won&#39;t accidentally undo intermediate changes (and so that users of the API unaware of some fields won&#39;t accidentally remove other fields). Make a <code>get()</code> request to the cluster to get the current resource version and include it with requests to set the policy.</li>
-</ul>
-</li>
-<li><code>window.daily-maintenance-window    duration=takimata</code><ul>
-<li>[Output only] Duration of the time window, automatically chosen to be smallest possible in the given scenario. Duration will be in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format &#34;PTnHnMnS&#34;.</li>
-</ul>
-</li>
-<li>
-<p><code>start-time=dolores</code></p>
-<ul>
-<li>Time within the maintenance window to start the maintenance operations. Time format should be in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format &#34;HH:MM&#34;, where HH : [00-23] and MM : [00-59] GMT.</li>
-</ul>
-</li>
-<li>
-<p><code>..recurring-window    recurrence=gubergren</code></p>
-<ul>
-<li>An RRULE (https://tools.ietf.org/html/rfc5545#section-3.8.5.3) for how this window reccurs. They go on for the span of time between the start and end time. For example, to have something repeat every weekday, you&#39;d use: <code>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code> To repeat some window daily (equivalent to the DailyMaintenanceWindow): <code>FREQ=DAILY</code> For the first weekend of every month: <code>FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU</code> This specifies how frequently the window starts. Eg, if you wanted to have a 9-5 UTC-4 window every weekday, you&#39;d use something like: <code>start time = 2019-01-01T09:00:00-0400 end time = 2019-01-01T17:00:00-0400 recurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code> Windows can span multiple days. Eg, to make the window encompass every weekend from midnight Saturday till the last minute of Sunday UTC: <code>start time = 2019-01-05T00:00:00Z end time = 2019-01-07T23:59:00Z recurrence = FREQ=WEEKLY;BYDAY=SA</code> Note the start and end time&#39;s specific dates are largely arbitrary except to specify duration of the window and when it first starts. The FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.</li>
-</ul>
-</li>
-<li><code>window    end-time=et</code><ul>
-<li>The time that the window ends. The end time should take place after the start time.</li>
-</ul>
-</li>
-<li>
-<p><code>start-time=accusam</code></p>
-<ul>
-<li>The time that the window first starts.</li>
-</ul>
-</li>
-<li>
-<p><code>.....master-auth    client-certificate=voluptua.</code></p>
-<ul>
-<li>[Output only] Base64-encoded public certificate used by clients to authenticate to the cluster endpoint.</li>
-</ul>
-</li>
-<li>
-<p><code>client-certificate-config    issue-client-certificate=false</code></p>
-<ul>
-<li>Issue a client certificate.</li>
-</ul>
-</li>
-<li>
-<p><code>..    client-key=amet.</code></p>
-<ul>
-<li>[Output only] Base64-encoded private key used by clients to authenticate to the cluster endpoint.</li>
-</ul>
-</li>
-<li><code>cluster-ca-certificate=ea</code><ul>
-<li>[Output only] Base64-encoded public certificate that is the root of trust for the cluster.</li>
-</ul>
-</li>
-<li><code>password=sadipscing</code><ul>
-<li>The password to use for HTTP basic authentication to the master endpoint. Because the master endpoint is open to the Internet, you should create a strong password. If a password is provided for cluster creation, username must be non-empty. Warning: basic authentication is deprecated, and will be removed in GKE control plane versions 1.19 and newer. For a list of recommended authentication methods, see: https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-authentication</li>
-</ul>
-</li>
-<li>
-<p><code>username=lorem</code></p>
-<ul>
-<li>The username to use for HTTP basic authentication to the master endpoint. For clusters v1.6.0 and later, basic authentication can be disabled by leaving username unspecified (or setting it to the empty string). Warning: basic authentication is deprecated, and will be removed in GKE control plane versions 1.19 and newer. For a list of recommended authentication methods, see: https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-authentication</li>
-</ul>
-</li>
-<li>
-<p><code>..master-authorized-networks-config    enabled=true</code></p>
-<ul>
-<li>Whether or not master authorized networks is enabled.</li>
-</ul>
-</li>
-<li>
-<p><code>..    monitoring-service=no</code></p>
-<ul>
-<li>The monitoring service the cluster should use to write metrics. Currently available options: * &#34;monitoring.googleapis.com/kubernetes&#34; - The Cloud Monitoring service with a Kubernetes-native resource model * <code>monitoring.googleapis.com</code> - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * <code>none</code> - No metrics will be exported from the cluster. If left as an empty string,<code>monitoring.googleapis.com/kubernetes</code> will be used for GKE 1.14+ or <code>monitoring.googleapis.com</code> for earlier versions.</li>
-</ul>
-</li>
-<li><code>name=est</code><ul>
-<li>The name of this cluster. The name must be unique within this project and location (e.g. zone or region), and can be up to 40 characters with the following restrictions: * Lowercase letters, numbers, and hyphens only. * Must start with a letter. * Must end with a number or a letter.</li>
-</ul>
-</li>
-<li><code>network=at</code><ul>
-<li>The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/networks-and-firewalls#networks">network</a> to which the cluster is connected. If left unspecified, the <code>default</code> network will be used.</li>
-</ul>
-</li>
-<li>
-<p><code>network-config.default-snat-status    disabled=true</code></p>
-<ul>
-<li>Disables cluster default sNAT rules.</li>
-</ul>
-</li>
-<li>
-<p><code>..    enable-intra-node-visibility=false</code></p>
-<ul>
-<li>Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.</li>
-</ul>
-</li>
-<li><code>network=et</code><ul>
-<li>Output only. The relative name of the Google Compute Engine network(https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the cluster is connected. Example: projects/my-project/global/networks/my-network</li>
-</ul>
-</li>
-<li><code>private-ipv6-google-access=tempor</code><ul>
-<li>The desired state of IPv6 connectivity to Google Services. By default, no private IPv6 access to or from Google Services (all access will be via IPv4)</li>
-</ul>
-</li>
-<li>
-<p><code>subnetwork=aliquyam</code></p>
-<ul>
-<li>Output only. The relative name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/vpc">subnetwork</a> to which the cluster is connected. Example: projects/my-project/regions/us-central1/subnetworks/my-subnet</li>
-</ul>
-</li>
-<li>
-<p><code>..network-policy    enabled=true</code></p>
-<ul>
-<li>Whether network policy is enabled on the cluster.</li>
-</ul>
-</li>
-<li>
-<p><code>provider=est</code></p>
-<ul>
-<li>The selected network policy provider.</li>
-</ul>
-</li>
-<li>
-<p><code>..node-config    boot-disk-kms-key=sed</code></p>
-<ul>
-<li>The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool. This should be of the form projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]. For more information about protecting resources with Cloud KMS Keys please see: https://cloud.google.com/compute/docs/disks/customer-managed-encryption</li>
-</ul>
-</li>
-<li><code>disk-size-gb=72</code><ul>
-<li>Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB. If unspecified, the default disk size is 100GB.</li>
-</ul>
-</li>
-<li><code>disk-type=dolores</code><ul>
-<li>Type of the disk attached to each node (e.g. &#39;pd-standard&#39;, &#39;pd-ssd&#39; or &#39;pd-balanced&#39;) If unspecified, the default disk type is &#39;pd-standard&#39;</li>
-</ul>
-</li>
-<li><code>image-type=dolores</code><ul>
-<li>The image type to use for this node. Note that for a given image type, the latest version of it will be used.</li>
-</ul>
-</li>
-<li><code>kubelet-config    cpu-cfs-quota=true</code><ul>
-<li>Enable CPU CFS quota enforcement for containers that specify CPU limits. This option is enabled by default which makes kubelet use CFS quota (https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt) to enforce container CPU limits. Otherwise, CPU limits will not be enforced at all. Disable this option to mitigate CPU throttling problems while still having your pods to be in Guaranteed QoS class by specifying the CPU limits. The default value is &#39;true&#39; if unspecified.</li>
-</ul>
-</li>
-<li><code>cpu-cfs-quota-period=sed</code><ul>
-<li>Set the CPU CFS quota period value &#39;cpu.cfs_period_us&#39;. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as &#34;300ms&#34;. Valid time units are &#34;ns&#34;, &#34;us&#34; (or &#34;µs&#34;), &#34;ms&#34;, &#34;s&#34;, &#34;m&#34;, &#34;h&#34;. The value must be a positive duration.</li>
-</ul>
-</li>
-<li>
-<p><code>cpu-manager-policy=no</code></p>
-<ul>
-<li>Control the CPU management policy on the node. See https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/ The following values are allowed. - &#34;none&#34;: the default, which represents the existing scheduling behavior. - &#34;static&#34;: allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. The default value is &#39;none&#39; if unspecified.</li>
-</ul>
-</li>
-<li>
-<p><code>..    labels=key=et</code></p>
-<ul>
-<li>The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node. In case of conflict in label keys, the applied set may differ depending on the Kubernetes version -- it&#39;s best to assume the behavior is undefined and conflicts should be avoided. For more information, including usage and the valid values, see: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/</li>
-<li>the value will be associated with the given <code>key</code></li>
-</ul>
-</li>
-<li>
-<p><code>linux-node-config    sysctls=key=elitr</code></p>
-<ul>
-<li>The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.netdev_max_backlog net.core.rmem_max net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse</li>
-<li>the value will be associated with the given <code>key</code></li>
-</ul>
-</li>
-<li>
-<p><code>..    local-ssd-count=21</code></p>
-<ul>
-<li>The number of local SSD disks to be attached to the node. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information.</li>
-</ul>
-</li>
-<li><code>machine-type=no</code><ul>
-<li>The name of a Google Compute Engine <a href="https://cloud.google.com/compute/docs/machine-types">machine type</a> If unspecified, the default machine type is <code>e2-medium</code>.</li>
-</ul>
-</li>
-<li><code>metadata=key=nonumy</code><ul>
-<li>The metadata key/value pairs assigned to instances in the cluster. Keys must conform to the regexp <code>[a-zA-Z0-9-_]+</code> and be less than 128 bytes in length. These are reflected as part of a URL in the metadata server. Additionally, to avoid ambiguity, keys must not conflict with any other metadata keys for the project or be one of the reserved keys: - &#34;cluster-location&#34; - &#34;cluster-name&#34; - &#34;cluster-uid&#34; - &#34;configure-sh&#34; - &#34;containerd-configure-sh&#34; - &#34;enable-os-login&#34; - &#34;gci-ensure-gke-docker&#34; - &#34;gci-metrics-enabled&#34; - &#34;gci-update-strategy&#34; - &#34;instance-template&#34; - &#34;kube-env&#34; - &#34;startup-script&#34; - &#34;user-data&#34; - &#34;disable-address-manager&#34; - &#34;windows-startup-script-ps1&#34; - &#34;common-psm1&#34; - &#34;k8s-node-setup-psm1&#34; - &#34;install-ssh-psm1&#34; - &#34;user-profile-psm1&#34; The following keys are reserved for Windows nodes: - &#34;serial-port-logging-enable&#34; Values are free-form strings, and only have meaning as interpreted by the image running in the instance. The only restriction placed on them is that each value&#39;s size must be less than or equal to 32 KB. The total size of all keys and values must be less than 512 KB.</li>
-<li>the value will be associated with the given <code>key</code></li>
-</ul>
-</li>
-<li><code>min-cpu-platform=at</code><ul>
-<li>Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as <code>minCpuPlatform: &amp;#34;Intel Haswell&amp;#34;</code> or <code>minCpuPlatform: &amp;#34;Intel Sandy Bridge&amp;#34;</code>. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a></li>
-</ul>
-</li>
-<li><code>node-group=sadipscing</code><ul>
-<li>Setting this field will assign instances of this pool to run on the specified node group. This is useful for running workloads on <a href="https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes">sole tenant nodes</a>.</li>
-</ul>
-</li>
-<li><code>oauth-scopes=aliquyam</code><ul>
-<li>The set of Google API scopes to be made available on all of the node VMs under the &#34;default&#34; service account. The following scopes are recommended, but not required, and by default are not included: * <code>https://www.googleapis.com/auth/compute</code> is required for mounting persistent storage on your nodes. * <code>https://www.googleapis.com/auth/devstorage.read_only</code> is required for communicating with <strong>gcr.io</strong> (the <a href="https://cloud.google.com/container-registry/">Google Container Registry</a>). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>preemptible=true</code><ul>
-<li>Whether the nodes are created as preemptible VM instances. See: https://cloud.google.com/compute/docs/instances/preemptible for more information about preemptible VM instances.</li>
-</ul>
-</li>
-<li><code>reservation-affinity    consume-reservation-type=sadipscing</code><ul>
-<li>Corresponds to the type of reservation consumption.</li>
-</ul>
-</li>
-<li><code>key=erat</code><ul>
-<li>Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify &#34;googleapis.com/reservation-name&#34; as the key and specify the name of your reservation as its value.</li>
-</ul>
-</li>
-<li>
-<p><code>values=aliquyam</code></p>
-<ul>
-<li>Corresponds to the label value(s) of reservation resource(s).</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>..sandbox-config    type=amet</code></p>
-<ul>
-<li>Type of the sandbox to use for the node.</li>
-</ul>
-</li>
-<li>
-<p><code>..    service-account=est</code></p>
-<ul>
-<li>The Google Cloud Platform Service Account to be used by the node VMs. Specify the email address of the Service Account; otherwise, if no Service Account is specified, the &#34;default&#34; service account is used.</li>
 </ul>
 </li>
 <li><code>shielded-instance-config    enable-integrity-monitoring=false</code><ul>
@@ -1175,30 +815,573 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    tags=stet</code></p>
+<p><code>..upgrade-settings    max-surge=31</code></p>
 <ul>
+<li>The maximum number of nodes that can be created beyond the current size of the node pool during the upgrade process.</li>
+</ul>
+</li>
+<li>
+<p><code>max-unavailable=21</code></p>
+<ul>
+<li>The maximum number of nodes that can be simultaneously unavailable during the upgrade process. A node is considered available if its status is Ready.</li>
+</ul>
+</li>
+<li>
+<p><code>...    autoscaling-profile=no</code></p>
+<ul>
+<li>Defines autoscaling behaviour.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-node-autoprovisioning=true</code></p>
+<ul>
+<li>Enables automatic node pool creation and deletion.</li>
+</ul>
+</li>
+<li>
+<p><code>..binary-authorization    enabled=true</code></p>
+<ul>
+<li>Enable Binary Authorization for this cluster. If enabled, all container images will be validated by Binary Authorization.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cluster-ipv4-cidr=vero</code></p>
+<ul>
+<li>The IP address range of the container pods in this cluster, in <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>). Leave blank to have one automatically chosen or specify a <code>/14</code> block in <code>10.0.0.0/8</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>confidential-nodes    enabled=false</code></p>
+<ul>
+<li>Whether Confidential Nodes feature is enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>..    create-time=duo</code></p>
+<ul>
+<li>[Output only] The time the cluster was created, in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
+</ul>
+</li>
+<li><code>current-master-version=dolore</code><ul>
+<li>[Output only] The current software version of the master endpoint.</li>
+</ul>
+</li>
+<li><code>current-node-count=79</code><ul>
+<li>[Output only] The number of nodes currently in the cluster. Deprecated. Call Kubernetes API directly to retrieve node information.</li>
+</ul>
+</li>
+<li><code>current-node-version=voluptua.</code><ul>
+<li>[Output only] Deprecated, use <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools">NodePools.version</a> instead. The current version of the node software components. If they are currently at multiple versions because they&#39;re in the process of being upgraded, this reflects the minimum version of all nodes.</li>
+</ul>
+</li>
+<li><code>database-encryption    key-name=amet.</code><ul>
+<li>Name of CloudKMS key to use for the encryption of secrets in etcd. Ex. projects/my-project/locations/global/keyRings/my-ring/cryptoKeys/my-key</li>
+</ul>
+</li>
+<li>
+<p><code>state=consetetur</code></p>
+<ul>
+<li>Denotes the state of etcd encryption.</li>
+</ul>
+</li>
+<li>
+<p><code>..default-max-pods-constraint    max-pods-per-node=diam</code></p>
+<ul>
+<li>Constraint enforced on the max num of pods per node.</li>
+</ul>
+</li>
+<li>
+<p><code>..    description=dolor</code></p>
+<ul>
+<li>An optional description of this cluster.</li>
+</ul>
+</li>
+<li><code>enable-kubernetes-alpha=false</code><ul>
+<li>Kubernetes alpha features are enabled on this cluster. This includes alpha API groups (e.g. v1alpha1) and features that may not be production ready in the kubernetes version of the master and nodes. The cluster has no SLA for uptime and master/node upgrades are disabled. Alpha enabled clusters are automatically deleted thirty days after creation.</li>
+</ul>
+</li>
+<li><code>enable-tpu=false</code><ul>
+<li>Enable the ability to use Cloud TPUs in this cluster.</li>
+</ul>
+</li>
+<li><code>endpoint=duo</code><ul>
+<li>[Output only] The IP address of this cluster&#39;s master endpoint. The endpoint can be accessed from the internet at <code>https://username:password@endpoint/</code>. See the <code>masterAuth</code> property of this resource for username and password information.</li>
+</ul>
+</li>
+<li><code>expire-time=vero</code><ul>
+<li>[Output only] The time the cluster will be automatically deleted in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
+</ul>
+</li>
+<li><code>id=vero</code><ul>
+<li>Output only. Unique id for the cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>identity-service-config    enabled=false</code></p>
+<ul>
+<li>Whether to enable the Identity Service component</li>
+</ul>
+</li>
+<li>
+<p><code>..    initial-cluster-version=stet</code></p>
+<ul>
+<li>The initial Kubernetes version for this cluster. Valid versions are those found in validMasterVersions returned by getServerConfig. The version can be upgraded over time; such upgrades are reflected in currentMasterVersion and currentNodeVersion. Users may specify either explicit versions offered by Kubernetes Engine or version aliases, which have the following behavior: - &#34;latest&#34;: picks the highest valid Kubernetes version - &#34;1.X&#34;: picks the highest valid patch+gke.N patch in the 1.X version - &#34;1.X.Y&#34;: picks the highest valid gke.N patch in the 1.X.Y version - &#34;1.X.Y-gke.N&#34;: picks an explicit Kubernetes version - &#34;&#34;,&#34;-&#34;: picks the default Kubernetes version</li>
+</ul>
+</li>
+<li><code>initial-node-count=25</code><ul>
+<li>The number of nodes to create in this cluster. You must ensure that your Compute Engine <a href="https://cloud.google.com/compute/quotas">resource quota</a> is sufficient for this number of instances. You must also have available firewall and routes quota. For requests, this field should only be used in lieu of a &#34;node_pool&#34; object, since this configuration (along with the &#34;node_config&#34;) will be used to create a &#34;NodePool&#34; object with an auto-generated name. Do not use this and a node_pool at the same time. This field is deprecated, use node_pool.initial_node_count instead.</li>
+</ul>
+</li>
+<li><code>instance-group-urls=elitr</code><ul>
+<li>Deprecated. Use node_pools.instance_group_urls.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>ip-allocation-policy    cluster-ipv4-cidr=lorem</code><ul>
+<li>This field is deprecated, use cluster_ipv4_cidr_block.</li>
+</ul>
+</li>
+<li><code>cluster-ipv4-cidr-block=diam</code><ul>
+<li>The IP address range for the cluster pod IPs. If this field is set, then <code>cluster.cluster_ipv4_cidr</code> must be left blank. This field is only applicable when <code>use_ip_aliases</code> is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
+</ul>
+</li>
+<li><code>cluster-secondary-range-name=no</code><ul>
+<li>The name of the secondary range to be used for the cluster CIDR block. The secondary range will be used for pod IP addresses. This must be an existing secondary range associated with the cluster subnetwork. This field is only applicable with use_ip_aliases is true and create_subnetwork is false.</li>
+</ul>
+</li>
+<li><code>create-subnetwork=false</code><ul>
+<li>Whether a new subnetwork will be created automatically for the cluster. This field is only applicable when <code>use_ip_aliases</code> is true.</li>
+</ul>
+</li>
+<li><code>node-ipv4-cidr=accusam</code><ul>
+<li>This field is deprecated, use node_ipv4_cidr_block.</li>
+</ul>
+</li>
+<li><code>node-ipv4-cidr-block=takimata</code><ul>
+<li>The IP address range of the instance IPs in this cluster. This is applicable only if <code>create_subnetwork</code> is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
+</ul>
+</li>
+<li><code>services-ipv4-cidr=consetetur</code><ul>
+<li>This field is deprecated, use services_ipv4_cidr_block.</li>
+</ul>
+</li>
+<li><code>services-ipv4-cidr-block=voluptua.</code><ul>
+<li>The IP address range of the services IPs in this cluster. If blank, a range will be automatically chosen with the default size. This field is only applicable when <code>use_ip_aliases</code> is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
+</ul>
+</li>
+<li><code>services-secondary-range-name=et</code><ul>
+<li>The name of the secondary range to be used as for the services CIDR block. The secondary range will be used for service ClusterIPs. This must be an existing secondary range associated with the cluster subnetwork. This field is only applicable with use_ip_aliases is true and create_subnetwork is false.</li>
+</ul>
+</li>
+<li><code>subnetwork-name=erat</code><ul>
+<li>A custom subnetwork name to be used if <code>create_subnetwork</code> is true. If this field is empty, then an automatic name will be chosen for the new subnetwork.</li>
+</ul>
+</li>
+<li><code>tpu-ipv4-cidr-block=consetetur</code><ul>
+<li>The IP address range of the Cloud TPUs in this cluster. If unspecified, a range will be automatically chosen with the default size. This field is only applicable when <code>use_ip_aliases</code> is true. If unspecified, the range will use the default size. Set to /netmask (e.g. <code>/14</code>) to have a range chosen with a specific netmask. Set to a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>10.96.0.0/14</code>) from the RFC-1918 private networks (e.g. <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to pick a specific range to use.</li>
+</ul>
+</li>
+<li><code>use-ip-aliases=true</code><ul>
+<li>Whether alias IPs will be used for pod IPs in the cluster. This is used in conjunction with use_routes. It cannot be true if use_routes is true. If both use_ip_aliases and use_routes are false, then the server picks the default IP allocation mode</li>
+</ul>
+</li>
+<li>
+<p><code>use-routes=false</code></p>
+<ul>
+<li>Whether routes will be used for pod IPs in the cluster. This is used in conjunction with use_ip_aliases. It cannot be true if use_ip_aliases is true. If both use_ip_aliases and use_routes are false, then the server picks the default IP allocation mode</li>
+</ul>
+</li>
+<li>
+<p><code>..    label-fingerprint=accusam</code></p>
+<ul>
+<li>The fingerprint of the set of labels for this cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>legacy-abac    enabled=false</code></p>
+<ul>
+<li>Whether the ABAC authorizer is enabled for this cluster. When enabled, identities in the system, including service accounts, nodes, and controllers, will have statically granted permissions beyond those provided by the RBAC configuration or IAM.</li>
+</ul>
+</li>
+<li>
+<p><code>..    location=dolore</code></p>
+<ul>
+<li>[Output only] The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available">zone</a> or <a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available">region</a> in which the cluster resides.</li>
+</ul>
+</li>
+<li><code>locations=dolore</code><ul>
+<li>The list of Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zones</a> in which the cluster&#39;s nodes should be located. This field provides a default value if <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.locations">NodePool.Locations</a> are not specified during node pool creation. Warning: changing cluster locations will update the <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.locations">NodePool.Locations</a> of all node pools and will result in nodes being added and/or removed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>logging-config.component-config    enable-components=dolore</code></p>
+<ul>
+<li>Select components to collect logs. An empty set would disable all logging.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...    logging-service=voluptua.</code></p>
+<ul>
+<li>The logging service the cluster should use to write logs. Currently available options: * <code>logging.googleapis.com/kubernetes</code> - The Cloud Logging service with a Kubernetes-native resource model * <code>logging.googleapis.com</code> - The legacy Cloud Logging service (no longer available as of GKE 1.15). * <code>none</code> - no logs will be exported from the cluster. If left as an empty string,<code>logging.googleapis.com/kubernetes</code> will be used for GKE 1.14+ or <code>logging.googleapis.com</code> for earlier versions.</li>
+</ul>
+</li>
+<li><code>maintenance-policy    resource-version=amet.</code><ul>
+<li>A hash identifying the version of this policy, so that updates to fields of the policy won&#39;t accidentally undo intermediate changes (and so that users of the API unaware of some fields won&#39;t accidentally remove other fields). Make a <code>get()</code> request to the cluster to get the current resource version and include it with requests to set the policy.</li>
+</ul>
+</li>
+<li><code>window.daily-maintenance-window    duration=ea</code><ul>
+<li>[Output only] Duration of the time window, automatically chosen to be smallest possible in the given scenario. Duration will be in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format &#34;PTnHnMnS&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>start-time=sadipscing</code></p>
+<ul>
+<li>Time within the maintenance window to start the maintenance operations. Time format should be in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format &#34;HH:MM&#34;, where HH : [00-23] and MM : [00-59] GMT.</li>
+</ul>
+</li>
+<li>
+<p><code>..recurring-window    recurrence=lorem</code></p>
+<ul>
+<li>An RRULE (https://tools.ietf.org/html/rfc5545#section-3.8.5.3) for how this window reccurs. They go on for the span of time between the start and end time. For example, to have something repeat every weekday, you&#39;d use: <code>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code> To repeat some window daily (equivalent to the DailyMaintenanceWindow): <code>FREQ=DAILY</code> For the first weekend of every month: <code>FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU</code> This specifies how frequently the window starts. Eg, if you wanted to have a 9-5 UTC-4 window every weekday, you&#39;d use something like: <code>start time = 2019-01-01T09:00:00-0400 end time = 2019-01-01T17:00:00-0400 recurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code> Windows can span multiple days. Eg, to make the window encompass every weekend from midnight Saturday till the last minute of Sunday UTC: <code>start time = 2019-01-05T00:00:00Z end time = 2019-01-07T23:59:00Z recurrence = FREQ=WEEKLY;BYDAY=SA</code> Note the start and end time&#39;s specific dates are largely arbitrary except to specify duration of the window and when it first starts. The FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.</li>
+</ul>
+</li>
+<li><code>window    end-time=invidunt</code><ul>
+<li>The time that the window ends. The end time should take place after the start time.</li>
+</ul>
+</li>
+<li>
+<p><code>maintenance-exclusion-options    scope=no</code></p>
+<ul>
+<li>Scope specifies the upgrade scope which upgrades are blocked by the exclusion.</li>
+</ul>
+</li>
+<li>
+<p><code>..    start-time=est</code></p>
+<ul>
+<li>The time that the window first starts.</li>
+</ul>
+</li>
+<li>
+<p><code>.....master-auth    client-certificate=at</code></p>
+<ul>
+<li>[Output only] Base64-encoded public certificate used by clients to authenticate to the cluster endpoint.</li>
+</ul>
+</li>
+<li>
+<p><code>client-certificate-config    issue-client-certificate=true</code></p>
+<ul>
+<li>Issue a client certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>..    client-key=sit</code></p>
+<ul>
+<li>[Output only] Base64-encoded private key used by clients to authenticate to the cluster endpoint.</li>
+</ul>
+</li>
+<li><code>cluster-ca-certificate=et</code><ul>
+<li>[Output only] Base64-encoded public certificate that is the root of trust for the cluster.</li>
+</ul>
+</li>
+<li><code>password=tempor</code><ul>
+<li>The password to use for HTTP basic authentication to the master endpoint. Because the master endpoint is open to the Internet, you should create a strong password. If a password is provided for cluster creation, username must be non-empty. Warning: basic authentication is deprecated, and will be removed in GKE control plane versions 1.19 and newer. For a list of recommended authentication methods, see: https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-authentication</li>
+</ul>
+</li>
+<li>
+<p><code>username=aliquyam</code></p>
+<ul>
+<li>The username to use for HTTP basic authentication to the master endpoint. For clusters v1.6.0 and later, basic authentication can be disabled by leaving username unspecified (or setting it to the empty string). Warning: basic authentication is deprecated, and will be removed in GKE control plane versions 1.19 and newer. For a list of recommended authentication methods, see: https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-authentication</li>
+</ul>
+</li>
+<li>
+<p><code>..master-authorized-networks-config    enabled=true</code></p>
+<ul>
+<li>Whether or not master authorized networks is enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>..mesh-certificates    enable-certificates=true</code></p>
+<ul>
+<li>enable_certificates controls issuance of workload mTLS certificates. If set, the GKE Workload Identity Certificates controller and node agent will be deployed in the cluster, which can then be configured by creating a WorkloadCertificateConfig Custom Resource. Requires Workload Identity (workload_pool must be non-empty).</li>
+</ul>
+</li>
+<li>
+<p><code>..monitoring-config.component-config    enable-components=et</code></p>
+<ul>
+<li>Select components to collect metrics. An empty set would disable all monitoring.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...    monitoring-service=sed</code></p>
+<ul>
+<li>The monitoring service the cluster should use to write metrics. Currently available options: * &#34;monitoring.googleapis.com/kubernetes&#34; - The Cloud Monitoring service with a Kubernetes-native resource model * <code>monitoring.googleapis.com</code> - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * <code>none</code> - No metrics will be exported from the cluster. If left as an empty string,<code>monitoring.googleapis.com/kubernetes</code> will be used for GKE 1.14+ or <code>monitoring.googleapis.com</code> for earlier versions.</li>
+</ul>
+</li>
+<li><code>name=no</code><ul>
+<li>The name of this cluster. The name must be unique within this project and location (e.g. zone or region), and can be up to 40 characters with the following restrictions: * Lowercase letters, numbers, and hyphens only. * Must start with a letter. * Must end with a number or a letter.</li>
+</ul>
+</li>
+<li><code>network=et</code><ul>
+<li>The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/networks-and-firewalls#networks">network</a> to which the cluster is connected. If left unspecified, the <code>default</code> network will be used.</li>
+</ul>
+</li>
+<li><code>network-config    datapath-provider=elitr</code><ul>
+<li>The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.</li>
+</ul>
+</li>
+<li>
+<p><code>default-snat-status    disabled=false</code></p>
+<ul>
+<li>Disables cluster default sNAT rules.</li>
+</ul>
+</li>
+<li>
+<p><code>..dns-config    cluster-dns=no</code></p>
+<ul>
+<li>cluster_dns indicates which in-cluster DNS provider should be used.</li>
+</ul>
+</li>
+<li><code>cluster-dns-domain=nonumy</code><ul>
+<li>cluster_dns_domain is the suffix used for all cluster service records.</li>
+</ul>
+</li>
+<li>
+<p><code>cluster-dns-scope=at</code></p>
+<ul>
+<li>cluster_dns_scope indicates the scope of access to cluster DNS records.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enable-intra-node-visibility=true</code></p>
+<ul>
+<li>Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.</li>
+</ul>
+</li>
+<li><code>enable-l4ilb-subsetting=true</code><ul>
+<li>Whether L4ILB Subsetting is enabled for this cluster.</li>
+</ul>
+</li>
+<li><code>network=sadipscing</code><ul>
+<li>Output only. The relative name of the Google Compute Engine network(https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the cluster is connected. Example: projects/my-project/global/networks/my-network</li>
+</ul>
+</li>
+<li><code>private-ipv6-google-access=erat</code><ul>
+<li>The desired state of IPv6 connectivity to Google Services. By default, no private IPv6 access to or from Google Services (all access will be via IPv4)</li>
+</ul>
+</li>
+<li>
+<p><code>service-external-ips-config    enabled=false</code></p>
+<ul>
+<li>Whether Services with ExternalIPs field are allowed or not.</li>
+</ul>
+</li>
+<li>
+<p><code>..    subnetwork=amet</code></p>
+<ul>
+<li>Output only. The relative name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/vpc">subnetwork</a> to which the cluster is connected. Example: projects/my-project/regions/us-central1/subnetworks/my-subnet</li>
+</ul>
+</li>
+<li>
+<p><code>..network-policy    enabled=true</code></p>
+<ul>
+<li>Whether network policy is enabled on the cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>provider=et</code></p>
+<ul>
+<li>The selected network policy provider.</li>
+</ul>
+</li>
+<li>
+<p><code>..node-config.advanced-machine-features    threads-per-core=sea</code></p>
+<ul>
+<li>The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.</li>
+</ul>
+</li>
+<li>
+<p><code>..    boot-disk-kms-key=consetetur</code></p>
+<ul>
+<li>The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool. This should be of the form projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]. For more information about protecting resources with Cloud KMS Keys please see: https://cloud.google.com/compute/docs/disks/customer-managed-encryption</li>
+</ul>
+</li>
+<li><code>disk-size-gb=55</code><ul>
+<li>Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB. If unspecified, the default disk size is 100GB.</li>
+</ul>
+</li>
+<li><code>disk-type=stet</code><ul>
+<li>Type of the disk attached to each node (e.g. &#39;pd-standard&#39;, &#39;pd-ssd&#39; or &#39;pd-balanced&#39;) If unspecified, the default disk type is &#39;pd-standard&#39;</li>
+</ul>
+</li>
+<li>
+<p><code>gcfs-config    enabled=false</code></p>
+<ul>
+<li>Whether to use GCFS.</li>
+</ul>
+</li>
+<li>
+<p><code>..gvnic    enabled=false</code></p>
+<ul>
+<li>Whether gVNIC features are enabled in the node pool.</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-type=duo</code></p>
+<ul>
+<li>The image type to use for this node. Note that for a given image type, the latest version of it will be used.</li>
+</ul>
+</li>
+<li><code>kubelet-config    cpu-cfs-quota=true</code><ul>
+<li>Enable CPU CFS quota enforcement for containers that specify CPU limits. This option is enabled by default which makes kubelet use CFS quota (https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt) to enforce container CPU limits. Otherwise, CPU limits will not be enforced at all. Disable this option to mitigate CPU throttling problems while still having your pods to be in Guaranteed QoS class by specifying the CPU limits. The default value is &#39;true&#39; if unspecified.</li>
+</ul>
+</li>
+<li><code>cpu-cfs-quota-period=est</code><ul>
+<li>Set the CPU CFS quota period value &#39;cpu.cfs_period_us&#39;. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as &#34;300ms&#34;. Valid time units are &#34;ns&#34;, &#34;us&#34; (or &#34;µs&#34;), &#34;ms&#34;, &#34;s&#34;, &#34;m&#34;, &#34;h&#34;. The value must be a positive duration.</li>
+</ul>
+</li>
+<li>
+<p><code>cpu-manager-policy=sit</code></p>
+<ul>
+<li>Control the CPU management policy on the node. See https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/ The following values are allowed. * &#34;none&#34;: the default, which represents the existing scheduling behavior. * &#34;static&#34;: allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. The default value is &#39;none&#39; if unspecified.</li>
+</ul>
+</li>
+<li>
+<p><code>..    labels=key=sed</code></p>
+<ul>
+<li>The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node. In case of conflict in label keys, the applied set may differ depending on the Kubernetes version -- it&#39;s best to assume the behavior is undefined and conflicts should be avoided. For more information, including usage and the valid values, see: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>linux-node-config    sysctls=key=eos</code></p>
+<ul>
+<li>The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.netdev_max_backlog net.core.rmem_max net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    local-ssd-count=45</code></p>
+<ul>
+<li>The number of local SSD disks to be attached to the node. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information.</li>
+</ul>
+</li>
+<li><code>machine-type=ea</code><ul>
+<li>The name of a Google Compute Engine <a href="https://cloud.google.com/compute/docs/machine-types">machine type</a> If unspecified, the default machine type is <code>e2-medium</code>.</li>
+</ul>
+</li>
+<li><code>metadata=key=stet</code><ul>
+<li>The metadata key/value pairs assigned to instances in the cluster. Keys must conform to the regexp <code>[a-zA-Z0-9-_]+</code> and be less than 128 bytes in length. These are reflected as part of a URL in the metadata server. Additionally, to avoid ambiguity, keys must not conflict with any other metadata keys for the project or be one of the reserved keys: - &#34;cluster-location&#34; - &#34;cluster-name&#34; - &#34;cluster-uid&#34; - &#34;configure-sh&#34; - &#34;containerd-configure-sh&#34; - &#34;enable-os-login&#34; - &#34;gci-ensure-gke-docker&#34; - &#34;gci-metrics-enabled&#34; - &#34;gci-update-strategy&#34; - &#34;instance-template&#34; - &#34;kube-env&#34; - &#34;startup-script&#34; - &#34;user-data&#34; - &#34;disable-address-manager&#34; - &#34;windows-startup-script-ps1&#34; - &#34;common-psm1&#34; - &#34;k8s-node-setup-psm1&#34; - &#34;install-ssh-psm1&#34; - &#34;user-profile-psm1&#34; Values are free-form strings, and only have meaning as interpreted by the image running in the instance. The only restriction placed on them is that each value&#39;s size must be less than or equal to 32 KB. The total size of all keys and values must be less than 512 KB.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>min-cpu-platform=dolores</code><ul>
+<li>Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as <code>minCpuPlatform: &amp;#34;Intel Haswell&amp;#34;</code> or <code>minCpuPlatform: &amp;#34;Intel Sandy Bridge&amp;#34;</code>. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a></li>
+</ul>
+</li>
+<li><code>node-group=eos</code><ul>
+<li>Setting this field will assign instances of this pool to run on the specified node group. This is useful for running workloads on <a href="https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes">sole tenant nodes</a>.</li>
+</ul>
+</li>
+<li><code>oauth-scopes=et</code><ul>
+<li>The set of Google API scopes to be made available on all of the node VMs under the &#34;default&#34; service account. The following scopes are recommended, but not required, and by default are not included: * <code>https://www.googleapis.com/auth/compute</code> is required for mounting persistent storage on your nodes. * <code>https://www.googleapis.com/auth/devstorage.read_only</code> is required for communicating with <strong>gcr.io</strong> (the <a href="https://cloud.google.com/container-registry/">Google Container Registry</a>). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>preemptible=false</code><ul>
+<li>Whether the nodes are created as preemptible VM instances. See: https://cloud.google.com/compute/docs/instances/preemptible for more information about preemptible VM instances.</li>
+</ul>
+</li>
+<li><code>reservation-affinity    consume-reservation-type=at</code><ul>
+<li>Corresponds to the type of reservation consumption.</li>
+</ul>
+</li>
+<li><code>key=dolore</code><ul>
+<li>Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify &#34;googleapis.com/reservation-name&#34; as the key and specify the name of your reservation as its value.</li>
+</ul>
+</li>
+<li>
+<p><code>values=eirmod</code></p>
+<ul>
+<li>Corresponds to the label value(s) of reservation resource(s).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..sandbox-config    type=lorem</code></p>
+<ul>
+<li>Type of the sandbox to use for the node.</li>
+</ul>
+</li>
+<li>
+<p><code>..    service-account=accusam</code></p>
+<ul>
+<li>The Google Cloud Platform Service Account to be used by the node VMs. Specify the email address of the Service Account; otherwise, if no Service Account is specified, the &#34;default&#34; service account is used.</li>
+</ul>
+</li>
+<li><code>shielded-instance-config    enable-integrity-monitoring=true</code><ul>
+<li>Defines whether the instance has integrity monitoring enabled. Enables monitoring and attestation of the boot integrity of the instance. The attestation is performed against the integrity policy baseline. This baseline is initially derived from the implicitly trusted boot image when the instance is created.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-secure-boot=true</code></p>
+<ul>
+<li>Defines whether the instance has Secure Boot enabled. Secure Boot helps ensure that the system only runs authentic software by verifying the digital signature of all boot components, and halting the boot process if signature verification fails.</li>
+</ul>
+</li>
+<li>
+<p><code>..    spot=false</code></p>
+<ul>
+<li>Spot flag for enabling Spot VM, which is a rebrand of the existing preemptible flag.</li>
+</ul>
+</li>
+<li><code>tags=accusam</code><ul>
 <li>The list of instance tags applied to all nodes. Tags are used to identify valid sources or targets for network firewalls and are specified by the client during cluster or node pool creation. Each tag within the list must comply with RFC1035.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>workload-metadata-config    mode=est</code></p>
+<p><code>workload-metadata-config    mode=sea</code></p>
 <ul>
 <li>Mode is the configuration for how to expose metadata to workloads running on the node pool.</li>
 </ul>
 </li>
 <li>
-<p><code>...    node-ipv4-cidr-size=19</code></p>
+<p><code>...    node-ipv4-cidr-size=42</code></p>
 <ul>
 <li>[Output only] The size of the address space on each node for hosting containers. This is provisioned from within the <code>container_ipv4_cidr</code> range. This field will only be set when cluster is in route-based network mode.</li>
 </ul>
 </li>
-<li><code>notification-config.pubsub    enabled=false</code><ul>
+<li>
+<p><code>node-pool-auto-config.network-tags    tags=lorem</code></p>
+<ul>
+<li>List of network tags.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...node-pool-defaults.node-config-defaults.gcfs-config    enabled=false</code></p>
+<ul>
+<li>Whether to use GCFS.</li>
+</ul>
+</li>
+<li>
+<p><code>....notification-config.pubsub    enabled=true</code></p>
+<ul>
 <li>Enable notifications for Pub/Sub.</li>
 </ul>
 </li>
 <li>
-<p><code>topic=duo</code></p>
+<p><code>filter    event-type=erat</code></p>
+<ul>
+<li>Event types to allowlist.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    topic=sea</code></p>
 <ul>
 <li>The desired Pub/Sub topic to which notifications will be sent by GKE. Format is <code>projects/{project}/topics/{topic}</code>.</li>
 </ul>
@@ -1214,46 +1397,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>master-global-access-config    enabled=true</code></p>
+<p><code>master-global-access-config    enabled=false</code></p>
 <ul>
 <li>Whenever master is accessible globally or not.</li>
 </ul>
 </li>
 <li>
-<p><code>..    master-ipv4-cidr-block=sed</code></p>
+<p><code>..    master-ipv4-cidr-block=sit</code></p>
 <ul>
 <li>The IP range in CIDR notation to use for the hosted master network. This range will be used for assigning internal IP addresses to the master or set of masters, as well as the ILB VIP. This range must not overlap with any other ranges in use within the cluster&#39;s network.</li>
 </ul>
 </li>
-<li><code>peering-name=eos</code><ul>
+<li><code>peering-name=aliquyam</code><ul>
 <li>Output only. The peering name in the customer VPC used by this cluster.</li>
 </ul>
 </li>
-<li><code>private-endpoint=lorem</code><ul>
+<li><code>private-endpoint=eos</code><ul>
 <li>Output only. The internal IP address of this cluster&#39;s master endpoint.</li>
 </ul>
 </li>
 <li>
-<p><code>public-endpoint=ea</code></p>
+<p><code>public-endpoint=at</code></p>
 <ul>
 <li>Output only. The external IP address of this cluster&#39;s master endpoint.</li>
 </ul>
 </li>
 <li>
-<p><code>..release-channel    channel=stet</code></p>
+<p><code>..release-channel    channel=dolores</code></p>
 <ul>
 <li>channel specifies which release channel the cluster is subscribed to.</li>
 </ul>
 </li>
 <li>
-<p><code>..    resource-labels=key=dolores</code></p>
+<p><code>..    resource-labels=key=consetetur</code></p>
 <ul>
 <li>The resource labels for the cluster to use to annotate any related Google Compute Engine resources.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>resource-usage-export-config.bigquery-destination    dataset-id=eos</code></p>
+<p><code>resource-usage-export-config.bigquery-destination    dataset-id=gubergren</code></p>
 <ul>
 <li>The ID of a BigQuery Dataset.</li>
 </ul>
@@ -1265,18 +1448,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    enable-network-egress-metering=false</code></p>
+<p><code>..    enable-network-egress-metering=true</code></p>
 <ul>
 <li>Whether to enable network egress metering for this cluster. If enabled, a daemonset will be created in the cluster to meter network egress traffic.</li>
 </ul>
 </li>
 <li>
-<p><code>..    self-link=at</code></p>
+<p><code>..    self-link=lorem</code></p>
 <ul>
 <li>[Output only] Server-defined URL for the resource.</li>
 </ul>
 </li>
-<li><code>services-ipv4-cidr=dolore</code><ul>
+<li><code>services-ipv4-cidr=accusam</code><ul>
 <li>[Output only] The IP address range of the Kubernetes services in this cluster, in <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>1.2.3.4/29</code>). Service addresses are typically put in the last <code>/16</code> from the container CIDR.</li>
 </ul>
 </li>
@@ -1287,20 +1470,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    status=lorem</code></p>
+<p><code>..    status=sadipscing</code></p>
 <ul>
 <li>[Output only] The current status of this cluster.</li>
 </ul>
 </li>
-<li><code>status-message=accusam</code><ul>
+<li><code>status-message=at</code><ul>
 <li>[Output only] Deprecated. Use conditions instead. Additional information about the current status of this cluster, if available.</li>
 </ul>
 </li>
-<li><code>subnetwork=amet</code><ul>
+<li><code>subnetwork=sit</code><ul>
 <li>The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/subnetworks">subnetwork</a> to which the cluster is connected.</li>
 </ul>
 </li>
-<li><code>tpu-ipv4-cidr-block=erat</code><ul>
+<li><code>tpu-ipv4-cidr-block=duo</code><ul>
 <li>[Output only] The IP address range of the Cloud TPUs in this cluster, in <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation (e.g. <code>1.2.3.4/29</code>).</li>
 </ul>
 </li>
@@ -1311,24 +1494,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..workload-identity-config    workload-pool=erat</code></p>
+<p><code>..workload-identity-config    workload-pool=magna</code></p>
 <ul>
 <li>The workload pool to attach all Kubernetes service accounts to.</li>
 </ul>
 </li>
 <li>
-<p><code>..    zone=accusam</code></p>
+<p><code>..    zone=et</code></p>
 <ul>
 <li>[Output only] The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field is deprecated, use location instead.</li>
 </ul>
 </li>
 <li>
-<p><code>..    parent=sea</code></p>
+<p><code>..    parent=rebum.</code></p>
 <ul>
 <li>The parent (project and location) where the cluster will be created. Specified in the format <code>projects/*/locations/*</code>.</li>
 </ul>
 </li>
-<li><code>project-id=takimata</code><ul>
+<li><code>project-id=dolor</code><ul>
 <li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the parent field.</li>
 </ul>
 </li>

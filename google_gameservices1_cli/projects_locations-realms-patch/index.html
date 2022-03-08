@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Realms Patch - Game Services v2.0.4+20210312</title>
+  <title>Locations Realms Patch - Game Services v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Game Services v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Game Services v3.0.0+20220223</a>
         
       </div>
 
@@ -292,7 +292,7 @@ You can set the scope for this method like this: <code>gameservices1 --scope &lt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The resource name of the realm, in the following form: <code>projects/{project}/locations/{location}/realms/{realm}</code>. For example, <code>projects/my-project/locations/{location}/realms/my-realm</code>.</li>
+<li>The resource name of the realm, in the following form: <code>projects/{project}/locations/{locationId}/realms/{realmId}</code>. For example, <code>projects/my-project/locations/global/realms/my-realm</code>.</li>
 </ul>
 </li>
 </ul>
@@ -313,32 +313,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=lorem</code><ul>
+<li><code>-r .    create-time=amet.</code><ul>
 <li>Output only. The creation time.</li>
 </ul>
 </li>
-<li><code>description=diam</code><ul>
+<li><code>description=ea</code><ul>
 <li>Human readable description of the realm.</li>
 </ul>
 </li>
-<li><code>etag=no</code><ul>
-<li>ETag of the resource.</li>
+<li><code>etag=sadipscing</code><ul>
+<li>Used to perform consistent read-modify-write updates. If not set, a blind &#34;overwrite&#34; update happens.</li>
 </ul>
 </li>
-<li><code>labels=key=ipsum</code><ul>
+<li><code>labels=key=lorem</code><ul>
 <li>The labels associated with this realm. Each label is a key-value pair.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=accusam</code><ul>
-<li>The resource name of the realm, in the following form: <code>projects/{project}/locations/{location}/realms/{realm}</code>. For example, <code>projects/my-project/locations/{location}/realms/my-realm</code>.</li>
+<li><code>name=invidunt</code><ul>
+<li>The resource name of the realm, in the following form: <code>projects/{project}/locations/{locationId}/realms/{realmId}</code>. For example, <code>projects/my-project/locations/global/realms/my-realm</code>.</li>
 </ul>
 </li>
-<li><code>time-zone=takimata</code><ul>
-<li>Required. Time zone where all policies targeting this realm are evaluated. The value of this field must be from the IANA time zone database: https://www.iana.org/time-zones.</li>
+<li><code>time-zone=no</code><ul>
+<li>Required. Time zone where all policies targeting this realm are evaluated. The value of this field must be from the <a href="https://www.iana.org/time-zones">IANA time zone database</a>.</li>
 </ul>
 </li>
-<li><code>update-time=consetetur</code><ul>
+<li><code>update-time=est</code><ul>
 <li>Output only. The last-modified time.</li>
 </ul>
 </li>
@@ -368,7 +368,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>Required. The update mask applies to the resource. For the <code>FieldMask</code> definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask</li>
+<li>Required. The update mask to apply to the resource. For more information, see the <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"><code>FieldMask</code> definition</a>.</li>
 </ul>
 </li>
 </ul>

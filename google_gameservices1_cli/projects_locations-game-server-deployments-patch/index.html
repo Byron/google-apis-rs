@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Game Server Deployments Patch - Game Services v2.0.4+20210312</title>
+  <title>Locations Game Server Deployments Patch - Game Services v3.0.0+20220223</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Game Services v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Game Services v3.0.0+20220223</a>
         
       </div>
 
@@ -292,7 +292,7 @@ You can set the scope for this method like this: <code>gameservices1 --scope &lt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The resource name of the game server deployment, in the following form: <code>projects/{project}/locations/{location}/gameServerDeployments/{deployment}</code>. For example, <code>projects/my-project/locations/global/gameServerDeployments/my-deployment</code>.</li>
+<li>The resource name of the game server deployment, in the following form: <code>projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}</code>. For example, <code>projects/my-project/locations/global/gameServerDeployments/my-deployment</code>.</li>
 </ul>
 </li>
 </ul>
@@ -317,11 +317,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>description=ipsum</code><ul>
-<li>Human readable description of the game server delpoyment.</li>
+<li>Human readable description of the game server deployment.</li>
 </ul>
 </li>
 <li><code>etag=gubergren</code><ul>
-<li>ETag of the resource.</li>
+<li>Used to perform consistent read-modify-write updates. If not set, a blind &#34;overwrite&#34; update happens.</li>
 </ul>
 </li>
 <li><code>labels=key=lorem</code><ul>
@@ -330,7 +330,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>name=gubergren</code><ul>
-<li>The resource name of the game server deployment, in the following form: <code>projects/{project}/locations/{location}/gameServerDeployments/{deployment}</code>. For example, <code>projects/my-project/locations/global/gameServerDeployments/my-deployment</code>.</li>
+<li>The resource name of the game server deployment, in the following form: <code>projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}</code>. For example, <code>projects/my-project/locations/global/gameServerDeployments/my-deployment</code>.</li>
 </ul>
 </li>
 <li><code>update-time=eos</code><ul>
@@ -363,7 +363,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>Required. Mask of fields to update. At least one path must be supplied in this field. For the <code>FieldMask</code> definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask</li>
+<li>Required. The update mask to apply to the resource. At least one path must be supplied in this field. For more information, see the <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"><code>FieldMask</code> definition</a>.</li>
 </ul>
 </li>
 </ul>

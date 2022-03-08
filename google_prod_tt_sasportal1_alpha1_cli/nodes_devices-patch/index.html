@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Devices Patch - SAS Portal Testing v2.0.4+20210330</title>
+  <title>Devices Patch - SAS Portal Testing v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SAS Portal Testing v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> SAS Portal Testing v3.0.0+20220303</a>
         
       </div>
 
@@ -562,6 +562,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     state: string
     update-time: string
     user-id: string
+  device-metadata:
+    antenna-model: string
+    common-channel-group: string
+    interference-coordination-group: string
+    nrqz-validated: boolean
+    nrqz-validation:
+      case-id: string
+      cpi-id: string
+      latitude: number
+      longitude: number
   display-name: string
   fcc-id: string
   name: string
@@ -604,43 +614,43 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .active-config.air-interface    radio-technology=ipsum</code><ul>
+<li><code>-r .active-config.air-interface    radio-technology=amet</code><ul>
 <li>Conditional. This field specifies the radio access technology that is used for the CBSD.</li>
 </ul>
 </li>
 <li>
-<p><code>supported-spec=ea</code></p>
+<p><code>supported-spec=magna</code></p>
 <ul>
 <li>Optional. This field is related to the <code>radioTechnology</code> and provides the air interface specification that the CBSD is compliant with at the time of registration.</li>
 </ul>
 </li>
 <li>
-<p><code>..    call-sign=ipsum</code></p>
+<p><code>..    call-sign=sanctus</code></p>
 <ul>
 <li>The call sign of the device operator.</li>
 </ul>
 </li>
-<li><code>category=eos</code><ul>
+<li><code>category=clita</code><ul>
 <li>FCC category of the device.</li>
 </ul>
 </li>
-<li><code>installation-params    antenna-azimuth=75</code><ul>
+<li><code>installation-params    antenna-azimuth=13</code><ul>
 <li>Boresight direction of the horizontal plane of the antenna in degrees with respect to true north. The value of this parameter is an integer with a value between 0 and 359 inclusive. A value of 0 degrees means true north; a value of 90 degrees means east. This parameter is optional for Category A devices and conditional for Category B devices.</li>
 </ul>
 </li>
-<li><code>antenna-beamwidth=43</code><ul>
+<li><code>antenna-beamwidth=78</code><ul>
 <li>3-dB antenna beamwidth of the antenna in the horizontal-plane in degrees. This parameter is an unsigned integer having a value between 0 and 360 (degrees) inclusive; it is optional for Category A devices and conditional for Category B devices.</li>
 </ul>
 </li>
-<li><code>antenna-downtilt=32</code><ul>
+<li><code>antenna-downtilt=49</code><ul>
 <li>Antenna downtilt in degrees and is an integer with a value between -90 and +90 inclusive; a negative value means the antenna is tilted up (above horizontal). This parameter is optional for Category A devices and conditional for Category B devices.</li>
 </ul>
 </li>
-<li><code>antenna-gain=57</code><ul>
+<li><code>antenna-gain=43</code><ul>
 <li>Peak antenna gain in dBi. This parameter is an integer with a value between -127 and +128 (dBi) inclusive.</li>
 </ul>
 </li>
-<li><code>antenna-model=diam</code><ul>
+<li><code>antenna-model=invidunt</code><ul>
 <li>If an external antenna is used, the antenna model is optionally provided in this field. The string has a maximum length of 128 octets.</li>
 </ul>
 </li>
@@ -648,19 +658,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>If present, this parameter specifies whether the CBSD is a CPE-CBSD or not.</li>
 </ul>
 </li>
-<li><code>eirp-capability=0</code><ul>
+<li><code>eirp-capability=29</code><ul>
 <li>This parameter is the maximum device EIRP in units of dBm/10MHz and is an integer with a value between -127 and +47 (dBm/10 MHz) inclusive. If not included, SAS interprets it as maximum allowable EIRP in units of dBm/10MHz for device category.</li>
 </ul>
 </li>
-<li><code>height=0.5354399058077253</code><ul>
+<li><code>height=0.3687880282487306</code><ul>
 <li>Device antenna height in meters. When the <code>heightType</code> parameter value is &#34;AGL&#34;, the antenna height should be given relative to ground level. When the <code>heightType</code> parameter value is &#34;AMSL&#34;, it is given with respect to WGS84 datum.</li>
 </ul>
 </li>
-<li><code>height-type=et</code><ul>
+<li><code>height-type=sed</code><ul>
 <li>Specifies how the height is measured.</li>
 </ul>
 </li>
-<li><code>horizontal-accuracy=0.3135656598088504</code><ul>
+<li><code>horizontal-accuracy=0.6276788446559606</code><ul>
 <li>A positive number in meters to indicate accuracy of the device antenna horizontal location. This optional parameter should only be present if its value is less than the FCC requirement of 50 meters.</li>
 </ul>
 </li>
@@ -668,157 +678,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the device antenna is indoor or not. <code>true</code>: indoor. <code>false</code>: outdoor.</li>
 </ul>
 </li>
-<li><code>latitude=0.6392461380793163</code><ul>
+<li><code>latitude=0.8462983245501214</code><ul>
 <li>Latitude of the device antenna location in degrees relative to the WGS 84 datum. The allowed range is from -90.000000 to +90.000000. Positive values represent latitudes north of the equator; negative values south of the equator.</li>
 </ul>
 </li>
-<li><code>longitude=0.5681716890822454</code><ul>
+<li><code>longitude=0.1075406111494599</code><ul>
 <li>Longitude of the device antenna location in degrees relative to the WGS 84 datum. The allowed range is from -180.000000 to +180.000000. Positive values represent longitudes east of the prime meridian; negative values west of the prime meridian.</li>
 </ul>
 </li>
 <li>
-<p><code>vertical-accuracy=0.5250163635418567</code></p>
-<ul>
-<li>A positive number in meters to indicate accuracy of the device antenna vertical location. This optional parameter should only be present if its value is less than the FCC requirement of 3 meters.</li>
-</ul>
-</li>
-<li>
-<p><code>..    is-signed=true</code></p>
-<ul>
-<li>Output only. Whether the configuration has been signed by a CPI.</li>
-</ul>
-</li>
-<li><code>measurement-capabilities=ut</code><ul>
-<li>Measurement reporting capabilities of the device.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>model    firmware-version=est</code><ul>
-<li>The firmware version of the device.</li>
-</ul>
-</li>
-<li><code>hardware-version=sadipscing</code><ul>
-<li>The hardware version of the device.</li>
-</ul>
-</li>
-<li><code>name=sit</code><ul>
-<li>The name of the device model.</li>
-</ul>
-</li>
-<li><code>software-version=ipsum</code><ul>
-<li>The software version of the device.</li>
-</ul>
-</li>
-<li>
-<p><code>vendor=amet.</code></p>
-<ul>
-<li>The name of the device vendor.</li>
-</ul>
-</li>
-<li>
-<p><code>..    state=et</code></p>
-<ul>
-<li>State of the configuration.</li>
-</ul>
-</li>
-<li><code>update-time=ut</code><ul>
-<li>Output only. The last time the device configuration was edited.</li>
-</ul>
-</li>
-<li>
-<p><code>user-id=et</code></p>
-<ul>
-<li>The identifier of a device user.</li>
-</ul>
-</li>
-<li>
-<p><code>..    display-name=et</code></p>
-<ul>
-<li>Device display name.</li>
-</ul>
-</li>
-<li><code>fcc-id=at</code><ul>
-<li>The FCC identifier of the device.</li>
-</ul>
-</li>
-<li><code>name=sed</code><ul>
-<li>Output only. The resource path name.</li>
-</ul>
-</li>
-<li><code>preloaded-config.air-interface    radio-technology=stet</code><ul>
-<li>Conditional. This field specifies the radio access technology that is used for the CBSD.</li>
-</ul>
-</li>
-<li>
-<p><code>supported-spec=sadipscing</code></p>
-<ul>
-<li>Optional. This field is related to the <code>radioTechnology</code> and provides the air interface specification that the CBSD is compliant with at the time of registration.</li>
-</ul>
-</li>
-<li>
-<p><code>..    call-sign=voluptua.</code></p>
-<ul>
-<li>The call sign of the device operator.</li>
-</ul>
-</li>
-<li><code>category=et</code><ul>
-<li>FCC category of the device.</li>
-</ul>
-</li>
-<li><code>installation-params    antenna-azimuth=87</code><ul>
-<li>Boresight direction of the horizontal plane of the antenna in degrees with respect to true north. The value of this parameter is an integer with a value between 0 and 359 inclusive. A value of 0 degrees means true north; a value of 90 degrees means east. This parameter is optional for Category A devices and conditional for Category B devices.</li>
-</ul>
-</li>
-<li><code>antenna-beamwidth=3</code><ul>
-<li>3-dB antenna beamwidth of the antenna in the horizontal-plane in degrees. This parameter is an unsigned integer having a value between 0 and 360 (degrees) inclusive; it is optional for Category A devices and conditional for Category B devices.</li>
-</ul>
-</li>
-<li><code>antenna-downtilt=85</code><ul>
-<li>Antenna downtilt in degrees and is an integer with a value between -90 and +90 inclusive; a negative value means the antenna is tilted up (above horizontal). This parameter is optional for Category A devices and conditional for Category B devices.</li>
-</ul>
-</li>
-<li><code>antenna-gain=93</code><ul>
-<li>Peak antenna gain in dBi. This parameter is an integer with a value between -127 and +128 (dBi) inclusive.</li>
-</ul>
-</li>
-<li><code>antenna-model=no</code><ul>
-<li>If an external antenna is used, the antenna model is optionally provided in this field. The string has a maximum length of 128 octets.</li>
-</ul>
-</li>
-<li><code>cpe-cbsd-indication=true</code><ul>
-<li>If present, this parameter specifies whether the CBSD is a CPE-CBSD or not.</li>
-</ul>
-</li>
-<li><code>eirp-capability=51</code><ul>
-<li>This parameter is the maximum device EIRP in units of dBm/10MHz and is an integer with a value between -127 and +47 (dBm/10 MHz) inclusive. If not included, SAS interprets it as maximum allowable EIRP in units of dBm/10MHz for device category.</li>
-</ul>
-</li>
-<li><code>height=0.5971692543729825</code><ul>
-<li>Device antenna height in meters. When the <code>heightType</code> parameter value is &#34;AGL&#34;, the antenna height should be given relative to ground level. When the <code>heightType</code> parameter value is &#34;AMSL&#34;, it is given with respect to WGS84 datum.</li>
-</ul>
-</li>
-<li><code>height-type=at</code><ul>
-<li>Specifies how the height is measured.</li>
-</ul>
-</li>
-<li><code>horizontal-accuracy=0.03573725250461324</code><ul>
-<li>A positive number in meters to indicate accuracy of the device antenna horizontal location. This optional parameter should only be present if its value is less than the FCC requirement of 50 meters.</li>
-</ul>
-</li>
-<li><code>indoor-deployment=false</code><ul>
-<li>Whether the device antenna is indoor or not. <code>true</code>: indoor. <code>false</code>: outdoor.</li>
-</ul>
-</li>
-<li><code>latitude=0.6266937690203158</code><ul>
-<li>Latitude of the device antenna location in degrees relative to the WGS 84 datum. The allowed range is from -90.000000 to +90.000000. Positive values represent latitudes north of the equator; negative values south of the equator.</li>
-</ul>
-</li>
-<li><code>longitude=0.8064139024984145</code><ul>
-<li>Longitude of the device antenna location in degrees relative to the WGS 84 datum. The allowed range is from -180.000000 to +180.000000. Positive values represent longitudes east of the prime meridian; negative values west of the prime meridian.</li>
-</ul>
-</li>
-<li>
-<p><code>vertical-accuracy=0.9268468356320795</code></p>
+<p><code>vertical-accuracy=0.3116927524542511</code></p>
 <ul>
 <li>A positive number in meters to indicate accuracy of the device antenna vertical location. This optional parameter should only be present if its value is less than the FCC requirement of 3 meters.</li>
 </ul>
@@ -829,16 +698,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. Whether the configuration has been signed by a CPI.</li>
 </ul>
 </li>
-<li><code>measurement-capabilities=eirmod</code><ul>
+<li><code>measurement-capabilities=sed</code><ul>
 <li>Measurement reporting capabilities of the device.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>model    firmware-version=sanctus</code><ul>
+<li><code>model    firmware-version=ut</code><ul>
 <li>The firmware version of the device.</li>
 </ul>
 </li>
-<li><code>hardware-version=rebum.</code><ul>
+<li><code>hardware-version=et</code><ul>
 <li>The hardware version of the device.</li>
 </ul>
 </li>
@@ -846,39 +715,216 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The name of the device model.</li>
 </ul>
 </li>
-<li><code>software-version=voluptua.</code><ul>
+<li><code>software-version=gubergren</code><ul>
 <li>The software version of the device.</li>
 </ul>
 </li>
 <li>
-<p><code>vendor=erat</code></p>
+<p><code>vendor=et</code></p>
 <ul>
 <li>The name of the device vendor.</li>
 </ul>
 </li>
 <li>
-<p><code>..    state=nonumy</code></p>
+<p><code>..    state=at</code></p>
 <ul>
 <li>State of the configuration.</li>
 </ul>
 </li>
-<li><code>update-time=magna</code><ul>
+<li><code>update-time=ut</code><ul>
 <li>Output only. The last time the device configuration was edited.</li>
 </ul>
 </li>
 <li>
-<p><code>user-id=gubergren</code></p>
+<p><code>user-id=consetetur</code></p>
 <ul>
 <li>The identifier of a device user.</li>
 </ul>
 </li>
 <li>
-<p><code>..    serial-number=lorem</code></p>
+<p><code>..device-metadata    antenna-model=at</code></p>
+<ul>
+<li>If populated, the Antenna Model Pattern to use. Format is: RecordCreatorId:PatternId</li>
+</ul>
+</li>
+<li><code>common-channel-group=et</code><ul>
+<li>CCG. A group of CBSDs in the same ICG requesting a common primary channel assignment. See CBRSA-TS-2001 V3.0.0 for more details.</li>
+</ul>
+</li>
+<li><code>interference-coordination-group=dolor</code><ul>
+<li>ICG. A group of CBSDs that manage their own interference with the group. See CBRSA-TS-2001 V3.0.0 for more details.</li>
+</ul>
+</li>
+<li><code>nrqz-validated=false</code><ul>
+<li>Output only. Whether a CPI has validated to have coordinated with the National Quiet Zone office.</li>
+</ul>
+</li>
+<li><code>nrqz-validation    case-id=amet</code><ul>
+<li>Validation case id.</li>
+</ul>
+</li>
+<li><code>cpi-id=dolor</code><ul>
+<li>CPI who signed the validation.</li>
+</ul>
+</li>
+<li><code>latitude=0.13881637662508084</code><ul>
+<li>Device latitude associated with the validation.</li>
+</ul>
+</li>
+<li>
+<p><code>longitude=0.22662962651953522</code></p>
+<ul>
+<li>Device longitude associated with the validation.</li>
+</ul>
+</li>
+<li>
+<p><code>...    display-name=sanctus</code></p>
+<ul>
+<li>Device display name.</li>
+</ul>
+</li>
+<li><code>fcc-id=ipsum</code><ul>
+<li>The FCC identifier of the device.</li>
+</ul>
+</li>
+<li><code>name=lorem</code><ul>
+<li>Output only. The resource path name.</li>
+</ul>
+</li>
+<li><code>preloaded-config.air-interface    radio-technology=sed</code><ul>
+<li>Conditional. This field specifies the radio access technology that is used for the CBSD.</li>
+</ul>
+</li>
+<li>
+<p><code>supported-spec=tempor</code></p>
+<ul>
+<li>Optional. This field is related to the <code>radioTechnology</code> and provides the air interface specification that the CBSD is compliant with at the time of registration.</li>
+</ul>
+</li>
+<li>
+<p><code>..    call-sign=et</code></p>
+<ul>
+<li>The call sign of the device operator.</li>
+</ul>
+</li>
+<li><code>category=et</code><ul>
+<li>FCC category of the device.</li>
+</ul>
+</li>
+<li><code>installation-params    antenna-azimuth=6</code><ul>
+<li>Boresight direction of the horizontal plane of the antenna in degrees with respect to true north. The value of this parameter is an integer with a value between 0 and 359 inclusive. A value of 0 degrees means true north; a value of 90 degrees means east. This parameter is optional for Category A devices and conditional for Category B devices.</li>
+</ul>
+</li>
+<li><code>antenna-beamwidth=25</code><ul>
+<li>3-dB antenna beamwidth of the antenna in the horizontal-plane in degrees. This parameter is an unsigned integer having a value between 0 and 360 (degrees) inclusive; it is optional for Category A devices and conditional for Category B devices.</li>
+</ul>
+</li>
+<li><code>antenna-downtilt=8</code><ul>
+<li>Antenna downtilt in degrees and is an integer with a value between -90 and +90 inclusive; a negative value means the antenna is tilted up (above horizontal). This parameter is optional for Category A devices and conditional for Category B devices.</li>
+</ul>
+</li>
+<li><code>antenna-gain=66</code><ul>
+<li>Peak antenna gain in dBi. This parameter is an integer with a value between -127 and +128 (dBi) inclusive.</li>
+</ul>
+</li>
+<li><code>antenna-model=sea</code><ul>
+<li>If an external antenna is used, the antenna model is optionally provided in this field. The string has a maximum length of 128 octets.</li>
+</ul>
+</li>
+<li><code>cpe-cbsd-indication=false</code><ul>
+<li>If present, this parameter specifies whether the CBSD is a CPE-CBSD or not.</li>
+</ul>
+</li>
+<li><code>eirp-capability=43</code><ul>
+<li>This parameter is the maximum device EIRP in units of dBm/10MHz and is an integer with a value between -127 and +47 (dBm/10 MHz) inclusive. If not included, SAS interprets it as maximum allowable EIRP in units of dBm/10MHz for device category.</li>
+</ul>
+</li>
+<li><code>height=0.9976390267762442</code><ul>
+<li>Device antenna height in meters. When the <code>heightType</code> parameter value is &#34;AGL&#34;, the antenna height should be given relative to ground level. When the <code>heightType</code> parameter value is &#34;AMSL&#34;, it is given with respect to WGS84 datum.</li>
+</ul>
+</li>
+<li><code>height-type=magna</code><ul>
+<li>Specifies how the height is measured.</li>
+</ul>
+</li>
+<li><code>horizontal-accuracy=0.9525750277714381</code><ul>
+<li>A positive number in meters to indicate accuracy of the device antenna horizontal location. This optional parameter should only be present if its value is less than the FCC requirement of 50 meters.</li>
+</ul>
+</li>
+<li><code>indoor-deployment=true</code><ul>
+<li>Whether the device antenna is indoor or not. <code>true</code>: indoor. <code>false</code>: outdoor.</li>
+</ul>
+</li>
+<li><code>latitude=0.3126852180108842</code><ul>
+<li>Latitude of the device antenna location in degrees relative to the WGS 84 datum. The allowed range is from -90.000000 to +90.000000. Positive values represent latitudes north of the equator; negative values south of the equator.</li>
+</ul>
+</li>
+<li><code>longitude=0.8303423001017362</code><ul>
+<li>Longitude of the device antenna location in degrees relative to the WGS 84 datum. The allowed range is from -180.000000 to +180.000000. Positive values represent longitudes east of the prime meridian; negative values west of the prime meridian.</li>
+</ul>
+</li>
+<li>
+<p><code>vertical-accuracy=0.45819047284532677</code></p>
+<ul>
+<li>A positive number in meters to indicate accuracy of the device antenna vertical location. This optional parameter should only be present if its value is less than the FCC requirement of 3 meters.</li>
+</ul>
+</li>
+<li>
+<p><code>..    is-signed=false</code></p>
+<ul>
+<li>Output only. Whether the configuration has been signed by a CPI.</li>
+</ul>
+</li>
+<li><code>measurement-capabilities=sadipscing</code><ul>
+<li>Measurement reporting capabilities of the device.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>model    firmware-version=stet</code><ul>
+<li>The firmware version of the device.</li>
+</ul>
+</li>
+<li><code>hardware-version=ut</code><ul>
+<li>The hardware version of the device.</li>
+</ul>
+</li>
+<li><code>name=consetetur</code><ul>
+<li>The name of the device model.</li>
+</ul>
+</li>
+<li><code>software-version=amet</code><ul>
+<li>The software version of the device.</li>
+</ul>
+</li>
+<li>
+<p><code>vendor=vero</code></p>
+<ul>
+<li>The name of the device vendor.</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=ipsum</code></p>
+<ul>
+<li>State of the configuration.</li>
+</ul>
+</li>
+<li><code>update-time=no</code><ul>
+<li>Output only. The last time the device configuration was edited.</li>
+</ul>
+</li>
+<li>
+<p><code>user-id=rebum.</code></p>
+<ul>
+<li>The identifier of a device user.</li>
+</ul>
+</li>
+<li>
+<p><code>..    serial-number=est</code></p>
 <ul>
 <li>A serial number assigned to the device by the device manufacturer.</li>
 </ul>
 </li>
-<li><code>state=aliquyam</code><ul>
+<li><code>state=rebum.</code><ul>
 <li>Output only. Device state.</li>
 </ul>
 </li>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Connection Profiles Patch - Database Migration Service v2.0.4+20210317</title>
+  <title>Locations Connection Profiles Patch - Database Migration Service v3.0.0+20220216</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Database Migration Service v2.0.4+20210317</a>
+        <a href=".." class="icon icon-home"> Database Migration Service v3.0.0+20220216</a>
         
       </div>
 
@@ -257,7 +257,7 @@ You can set the scope for this method like this: <code>datamigration1 --scope &l
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The name of this connection profile resource in the form of projects/{project}/locations/{location}/instances/{instance}.</li>
+<li>The name of this connection profile resource in the form of projects/{project}/locations/{location}/connectionProfiles/{connectionProfile}.</li>
 </ul>
 </li>
 </ul>
@@ -273,6 +273,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     settings:
       activation-policy: string
       auto-storage-increase: boolean
+      cmek-key-name: string
       collation: string
       data-disk-size-gb: string
       data-disk-type: string
@@ -348,15 +349,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>[default: ON] If you enable this setting, Cloud SQL checks your available storage every 30 seconds. If the available storage falls below a threshold size, Cloud SQL automatically adds additional storage capacity. If the available storage repeatedly falls below the threshold size, Cloud SQL continues to add storage until it reaches the maximum of 30 TB.</li>
 </ul>
 </li>
-<li><code>collation=stet</code><ul>
+<li><code>cmek-key-name=stet</code><ul>
+<li>The KMS key name used for the csql instance.</li>
+</ul>
+</li>
+<li><code>collation=dolor</code><ul>
 <li>The Cloud SQL default instance level collation.</li>
 </ul>
 </li>
-<li><code>data-disk-size-gb=dolor</code><ul>
+<li><code>data-disk-size-gb=duo</code><ul>
 <li>The storage capacity available to the database, in GB. The minimum (and default) size is 10GB.</li>
 </ul>
 </li>
-<li><code>data-disk-type=duo</code><ul>
+<li><code>data-disk-type=vero</code><ul>
 <li>The type of storage: <code>PD_SSD</code> (default) or <code>PD_HDD</code>.</li>
 </ul>
 </li>
@@ -365,26 +370,26 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>database-version=vero</code><ul>
+<li><code>database-version=invidunt</code><ul>
 <li>The database engine type and version.</li>
 </ul>
 </li>
-<li><code>ip-config    enable-ipv4=false</code><ul>
+<li><code>ip-config    enable-ipv4=true</code><ul>
 <li>Whether the instance should be assigned an IPv4 address or not.</li>
 </ul>
 </li>
-<li><code>private-network=stet</code><ul>
-<li>The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, <code>/projects/myProject/global/networks/default</code>. This setting can be updated, but it cannot be removed after it is set.</li>
+<li><code>private-network=vero</code><ul>
+<li>The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, <code>projects/myProject/global/networks/default</code>. This setting can be updated, but it cannot be removed after it is set.</li>
 </ul>
 </li>
 <li>
-<p><code>require-ssl=false</code></p>
+<p><code>require-ssl=true</code></p>
 <ul>
 <li>Whether SSL connections over IP should be enforced or not.</li>
 </ul>
 </li>
 <li>
-<p><code>..    root-password=elitr</code></p>
+<p><code>..    root-password=lorem</code></p>
 <ul>
 <li>Input only. Initial root password.</li>
 </ul>
@@ -490,7 +495,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    name=amet.</code></p>
 <ul>
-<li>The name of this connection profile resource in the form of projects/{project}/locations/{location}/instances/{instance}.</li>
+<li>The name of this connection profile resource in the form of projects/{project}/locations/{location}/connectionProfiles/{connectionProfile}.</li>
 </ul>
 </li>
 <li><code>postgresql    cloud-sql-id=ea</code><ul>

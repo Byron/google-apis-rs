@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Entry Groups Entries Create - Data Catalog v2.0.4+20210316</title>
+  <title>Locations Entry Groups Entries Create - Data Catalog v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Data Catalog v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Data Catalog v3.0.0+20220224</a>
         
       </div>
 
@@ -430,6 +430,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     expire-time: string
     update-time: string
   type: string
+  usage-signal:
+    update-time: string
   user-specified-system: string
   user-specified-type: string
 
@@ -520,11 +522,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The type of the entry. Only used for Entries with types in the EntryType enum.</li>
 </ul>
 </li>
-<li><code>user-specified-system=ea</code><ul>
+<li>
+<p><code>usage-signal    update-time=ea</code></p>
+<ul>
+<li>The timestamp of the end of the usage statistics duration.</li>
+</ul>
+</li>
+<li>
+<p><code>..    user-specified-system=dolor</code></p>
+<ul>
 <li>This field indicates the entry&#39;s source system that Data Catalog does not integrate with. <code>user_specified_system</code> strings must begin with a letter or underscore and can only contain letters, numbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long.</li>
 </ul>
 </li>
-<li><code>user-specified-type=dolor</code><ul>
+<li><code>user-specified-type=lorem</code><ul>
 <li>Entry type if it does not fit any of the input-allowed values listed in <code>EntryType</code> enum above. When creating an entry, users should check the enum values first, if nothing matches the entry to be created, then provide a custom value, for example &#34;my_special_type&#34;. <code>user_specified_type</code> strings must begin with a letter or underscore and can only contain letters, numbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long. Currently, only FILESET enum value is allowed. All other entries created through Data Catalog must use <code>user_specified_type</code>.</li>
 </ul>
 </li>

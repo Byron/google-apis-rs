@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>List - Deployment Manager v2.0.4+20210320</title>
+  <title>List - Deployment Manager v3.0.0+20220225</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Deployment Manager v2.0.4+20210320</a>
+        <a href=".." class="icon icon-home"> Deployment Manager v3.0.0+20220225</a>
         
       </div>
 
@@ -250,7 +250,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p filter=string</strong></p>
 <ul>
-<li>A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either <code>=</code>, <code>!=</code>, <code>&amp;gt;</code>, or <code>&amp;lt;</code>. For example, if you are filtering Compute Engine instances, you can exclude instances named <code>example-instance</code> by specifying <code>name != example-instance</code>. You can also filter nested fields. For example, you could specify <code>scheduling.automaticRestart = false</code> to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels. To filter on multiple expressions, provide each separate expression within parentheses. For example: <code>(scheduling.automaticRestart = true) (cpuPlatform = &amp;#34;Intel Skylake&amp;#34;)</code> By default, each expression is an <code>AND</code> expression. However, you can include <code>AND</code> and <code>OR</code> expressions explicitly. For example: <code>(cpuPlatform = &amp;#34;Intel Skylake&amp;#34;) OR (cpuPlatform = &amp;#34;Intel Broadwell&amp;#34;) AND (scheduling.automaticRestart = true)</code></li>
+<li>A filter expression that filters resources listed in the response. The expression must specify the field name, an operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The operator must be either <code>=</code>, <code>!=</code>, <code>&amp;gt;</code>, <code>&amp;lt;</code>, <code>&amp;lt;=</code>, <code>&amp;gt;=</code> or <code>:</code>. For example, if you are filtering Compute Engine instances, you can exclude instances named <code>example-instance</code> by specifying <code>name != example-instance</code>. The <code>:</code> operator can be used with string fields to match substrings. For non-string fields it is equivalent to the <code>=</code> operator. The <code>:*</code> comparison can be used to test whether a key has been defined. For example, to find all objects with <code>owner</code> label use: <code>labels.owner:*</code> You can also filter nested fields. For example, you could specify <code>scheduling.automaticRestart = false</code> to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels. To filter on multiple expressions, provide each separate expression within parentheses. For example: <code>(scheduling.automaticRestart = true) (cpuPlatform = &amp;#34;Intel Skylake&amp;#34;)</code> By default, each expression is an <code>AND</code> expression. However, you can include <code>AND</code> and <code>OR</code> expressions explicitly. For example: <code>(cpuPlatform = &amp;#34;Intel Skylake&amp;#34;) OR (cpuPlatform = &amp;#34;Intel Broadwell&amp;#34;) AND (scheduling.automaticRestart = true)</code></li>
 </ul>
 </li>
 <li>

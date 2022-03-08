@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Set Iam Policy - Cloud Resource Manager v2.0.4+20210328</title>
+  <title>Set Iam Policy - Cloud Resource Manager v3.0.0+20220306</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Resource Manager v2.0.4+20210328</a>
+        <a href=".." class="icon icon-home"> Cloud Resource Manager v3.0.0+20220306</a>
         
       </div>
 
@@ -398,7 +398,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Sets the IAM access control policy for the specified project. CAUTION: This method will replace the existing policy, and cannot be used to append additional IAM settings. Note: Removing service accounts from policies or changing their roles can render services completely inoperable. It is important to understand how the service account is being used before removing or updating its roles. The following constraints apply when using <code>setIamPolicy()</code>: + Project does not support <code>allUsers</code> and <code>allAuthenticatedUsers</code> as <code>members</code> in a <code>Binding</code> of a <code>Policy</code>. + The owner role can be granted to a <code>user</code>, <code>serviceAccount</code>, or a group that is part of an organization. For example, group@myownpersonaldomain.com could be added as an owner to a project in the myownpersonaldomain.com organization, but not the examplepetstore.com organization. + Service accounts can be made owners of a project directly without any restrictions. However, to be added as an owner, a user must be invited using the Cloud Platform console and must accept the invitation. + A user cannot be granted the owner role using <code>setIamPolicy()</code>. The user must be granted the owner role using the Cloud Platform Console and must explicitly accept the invitation. + Invitations to grant the owner role cannot be sent using <code>setIamPolicy()</code>; they must be sent only using the Cloud Platform Console. + Membership changes that leave the project without any owners that have accepted the Terms of Service (ToS) will be rejected. + If the project is not part of an organization, there must be at least one owner who has accepted the Terms of Service (ToS) agreement in the policy. Calling <code>setIamPolicy()</code> to remove the last ToS-accepted owner from the policy will fail. This restriction also applies to legacy projects that no longer have owners who have accepted the ToS. Edits to IAM policies will be rejected until the lack of a ToS-accepting owner is rectified. + Calling this method requires enabling the App Engine Admin API.</p>
+              <p>Sets the IAM access control policy for the specified project, in the format <code>projects/{ProjectIdOrNumber}</code> e.g. projects/123. CAUTION: This method will replace the existing policy, and cannot be used to append additional IAM settings. Note: Removing service accounts from policies or changing their roles can render services completely inoperable. It is important to understand how the service account is being used before removing or updating its roles. The following constraints apply when using <code>setIamPolicy()</code>: + Project does not support <code>allUsers</code> and <code>allAuthenticatedUsers</code> as <code>members</code> in a <code>Binding</code> of a <code>Policy</code>. + The owner role can be granted to a <code>user</code>, <code>serviceAccount</code>, or a group that is part of an organization. For example, group@myownpersonaldomain.com could be added as an owner to a project in the myownpersonaldomain.com organization, but not the examplepetstore.com organization. + Service accounts can be made owners of a project directly without any restrictions. However, to be added as an owner, a user must be invited using the Cloud Platform console and must accept the invitation. + A user cannot be granted the owner role using <code>setIamPolicy()</code>. The user must be granted the owner role using the Cloud Platform Console and must explicitly accept the invitation. + Invitations to grant the owner role cannot be sent using <code>setIamPolicy()</code>; they must be sent only using the Cloud Platform Console. + If the project is not part of an organization, there must be at least one owner who has accepted the Terms of Service (ToS) agreement in the policy. Calling <code>setIamPolicy()</code> to remove the last ToS-accepted owner from the policy will fail. This restriction also applies to legacy projects that no longer have owners who have accepted the ToS. Edits to IAM policies will be rejected until the lack of a ToS-accepting owner is rectified. If the project is part of an organization, you can remove all owners, potentially making the organization inaccessible. + Calling this method requires enabling the App Engine Admin API.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.

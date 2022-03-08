@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Search Assignments - BigQuery Reservation v2.0.4+20210324</title>
+  <title>Locations Search Assignments - BigQuery Reservation v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> BigQuery Reservation v2.0.4+20210324</a>
+        <a href=".." class="icon icon-home"> BigQuery Reservation v3.0.0+20220226</a>
         
       </div>
 
@@ -199,8 +199,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn&#39;t have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project-&gt;folder-&gt;organization) happens in this API. 3. Parent here is <code>projects/*/locations/*</code>, instead of <code>projects/*/locations/*reservations/*</code>. <strong>Note</strong> &#34;-&#34; cannot be used for projects nor locations.</p>
-<h1 id="scopes">Scopes</h1>
+              <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
 <li><em>https://www.googleapis.com/auth/bigquery</em></li>

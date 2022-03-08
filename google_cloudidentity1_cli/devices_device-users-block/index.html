@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Device Users Block - Cloud Identity v2.0.4+20210310</title>
+  <title>Device Users Block - Cloud Identity v3.0.0+20220301</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Identity v2.0.4+20210310</a>
+        <a href=".." class="icon icon-home"> Cloud Identity v3.0.0+20220301</a>
         
       </div>
 
@@ -68,6 +68,9 @@
                     <a class="current" href=".">Device Users Block</a>
                     
                         <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
                         
                             <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
                             
@@ -169,6 +172,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../groups_get-security-settings">Get Security Settings</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../groups_list">List</a>
                     
                 </li>
@@ -238,6 +246,11 @@
                     
                 </li>
             
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_update-security-settings">Update Security Settings</a>
+                    
+                </li>
+            
         
 
     
@@ -275,10 +288,14 @@
           <div role="main">
             <div class="section">
               <p>Blocks device from accessing user data</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-identity.devices</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-identity.devices</em>.
+You can set the scope for this method like this: <code>cloudidentity1 --scope &lt;scope&gt; devices device-users-block ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the Device in format: <code>devices/{device_id}/deviceUsers/{device_user_id}</code>, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.</li>
+<li>Required. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the Device in format: <code>devices/{device}/deviceUsers/{device_user}</code>, where device is the unique ID assigned to the Device, and device_user is the unique ID assigned to the User.</li>
 </ul>
 </li>
 </ul>
@@ -294,7 +311,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    customer=duo</code><ul>
-<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code> If you&#39;re using this API to manage another organization, use <code>customers/{customer_id}</code>, where customer_id is the customer to whom the device belongs.</li>
+<li>Optional. <a href="https://cloud.google.com/apis/design/resource_names">Resource name</a> of the customer. If you&#39;re using this API for your own organization, use <code>customers/my_customer</code> If you&#39;re using this API to manage another organization, use <code>customers/{customer}</code>, where customer is the customer to whom the device belongs.</li>
 </ul>
 </li>
 </ul>

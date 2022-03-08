@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Catalogs User Events Import - Cloud Retail v2.0.4+20210319</title>
+  <title>Locations Catalogs User Events Import - Cloud Retail v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Retail v2.0.4+20210319</a>
+        <a href=".." class="icon icon-home"> Cloud Retail v3.0.0+20220224</a>
         
       </div>
 
@@ -46,6 +46,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-branches-operations-get">Locations Catalogs Branches Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-add-fulfillment-places">Locations Catalogs Branches Products Add Fulfillment Places</a>
                     
                 </li>
             
@@ -70,7 +75,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-list">Locations Catalogs Branches Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-branches-products-patch">Locations Catalogs Branches Products Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-branches-products-set-inventory">Locations Catalogs Branches Products Set Inventory</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-complete-query">Locations Catalogs Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-completion-data-import">Locations Catalogs Completion Data Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-get-default-branch">Locations Catalogs Get Default Branch</a>
                     
                 </li>
             
@@ -96,6 +131,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-catalogs-placements-predict">Locations Catalogs Placements Predict</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-placements-search">Locations Catalogs Placements Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-catalogs-set-default-branch">Locations Catalogs Set Default Branch</a>
                     
                 </li>
             
@@ -152,6 +197,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
                     
                 </li>
             
@@ -215,6 +270,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       data-schema: string
       dataset-id: string
       gcs-staging-dir: string
+      partition-date:
+        day: integer
+        month: integer
+        year: integer
       project-id: string
       table-id: string
     gcs-source:
@@ -226,43 +285,59 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .errors-config    gcs-prefix=consetetur</code></p>
+<p><code>-r .errors-config    gcs-prefix=nonumy</code></p>
 <ul>
-<li>Google Cloud Storage path for import errors. This must be an empty, existing Cloud Storage bucket. Import errors will be written to a file in this bucket, one per line, as a JSON-encoded <code>google.rpc.Status</code> message.</li>
+<li>Google Cloud Storage prefix for import errors. This must be an empty, existing Cloud Storage directory. Import errors will be written to sharded files in this directory, one per line, as a JSON-encoded <code>google.rpc.Status</code> message.</li>
 </ul>
 </li>
 <li>
-<p><code>..input-config.big-query-source    data-schema=voluptua.</code></p>
+<p><code>..input-config.big-query-source    data-schema=et</code></p>
 <ul>
-<li>The schema to use when parsing the data from the source. Supported values for product imports: * <code>product</code> (default): One JSON Product per line. Each product must have a valid Product.id. * <code>product_merchant_center</code>: See <a href="https://cloud.google.com/retail/recommendations-ai/docs/upload-catalog#mc">Importing catalog data from Merchant Center</a>. Supported values for user events imports: * <code>user_event</code> (default): One JSON UserEvent per line. * <code>user_event_ga360</code>: Using https://support.google.com/analytics/answer/3437719?hl=en.</li>
+<li>The schema to use when parsing the data from the source. Supported values for product imports: * <code>product</code> (default): One JSON Product per line. Each product must have a valid Product.id. * <code>product_merchant_center</code>: See <a href="https://cloud.google.com/retail/recommendations-ai/docs/upload-catalog#mc">Importing catalog data from Merchant Center</a>. Supported values for user events imports: * <code>user_event</code> (default): One JSON UserEvent per line. * <code>user_event_ga360</code>: The schema is available here: https://support.google.com/analytics/answer/3437719. * <code>user_event_ga4</code>: This feature is in private preview. Please contact the support team for importing Google Analytics 4 events. The schema is available here: https://support.google.com/analytics/answer/7029846.</li>
 </ul>
 </li>
-<li><code>dataset-id=et</code><ul>
+<li><code>dataset-id=sanctus</code><ul>
 <li>Required. The BigQuery data set to copy the data from with a length limit of 1,024 characters.</li>
 </ul>
 </li>
-<li><code>gcs-staging-dir=erat</code><ul>
+<li><code>gcs-staging-dir=accusam</code><ul>
 <li>Intermediate Cloud Storage directory used for the import with a length limit of 2,000 characters. Can be specified if one wants to have the BigQuery export to a specific Cloud Storage directory.</li>
 </ul>
 </li>
-<li><code>project-id=consetetur</code><ul>
-<li>The project id (can be project # or id) that the BigQuery source is in with a length limit of 128 characters. If not specified, inherits the project id from the parent request.</li>
+<li><code>partition-date    day=62</code><ul>
+<li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
+</ul>
+</li>
+<li><code>month=58</code><ul>
+<li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
 </ul>
 </li>
 <li>
-<p><code>table-id=amet.</code></p>
+<p><code>year=94</code></p>
+<ul>
+<li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
+</ul>
+</li>
+<li>
+<p><code>..    project-id=takimata</code></p>
+<ul>
+<li>The project ID (can be project # or ID) that the BigQuery source is in with a length limit of 128 characters. If not specified, inherits the project ID from the parent request.</li>
+</ul>
+</li>
+<li>
+<p><code>table-id=dolor</code></p>
 <ul>
 <li>Required. The BigQuery table to copy the data from with a length limit of 1,024 characters.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-source    data-schema=sed</code></p>
+<p><code>..gcs-source    data-schema=diam</code></p>
 <ul>
-<li>The schema to use when parsing the data from the source. Supported values for product imports: * <code>product</code> (default): One JSON Product per line. Each product must have a valid Product.id. * <code>product_merchant_center</code>: See <a href="https://cloud.google.com/retail/recommendations-ai/docs/upload-catalog#mcc">Importing catalog data from Merchant Center</a>. Supported values for user events imports: * <code>user_event</code> (default): One JSON UserEvent per line. * <code>user_event_ga360</code>: Using https://support.google.com/analytics/answer/3437719?hl=en.</li>
+<li>The schema to use when parsing the data from the source. Supported values for product imports: * <code>product</code> (default): One JSON Product per line. Each product must have a valid Product.id. * <code>product_merchant_center</code>: See <a href="https://cloud.google.com/retail/recommendations-ai/docs/upload-catalog#mc">Importing catalog data from Merchant Center</a>. Supported values for user events imports: * <code>user_event</code> (default): One JSON UserEvent per line. * <code>user_event_ga360</code>: Using https://support.google.com/analytics/answer/3437719. Supported values for control imports: * &#39;control&#39; (default): One JSON Control per line. Supported values for catalog attribute imports: * &#39;catalog_attribute&#39; (default): One CSV CatalogAttribute per line.</li>
 </ul>
 </li>
-<li><code>input-uris=takimata</code><ul>
-<li>Required. Google Cloud Storage URIs to input files. URI can be up to 2000 characters long. URIs can match the full object path (for example, <code>gs://bucket/directory/object.json</code>) or a pattern matching one or more files, such as <code>gs://bucket/directory/*.json</code>. A request can contain at most 100 files, and each file can be up to 2 GB. See <a href="https://cloud.google.com/recommendations-ai/docs/upload-catalog">Importing product information</a> for the expected file format and setup instructions.</li>
+<li><code>input-uris=at</code><ul>
+<li>Required. Google Cloud Storage URIs to input files. URI can be up to 2000 characters long. URIs can match the full object path (for example, <code>gs://bucket/directory/object.json</code>) or a pattern matching one or more files, such as <code>gs://bucket/directory/*.json</code>. A request can contain at most 100 files, and each file can be up to 2 GB. See <a href="https://cloud.google.com/retail/recommendations-ai/docs/upload-catalog">Importing product information</a> for the expected file format and setup instructions.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>

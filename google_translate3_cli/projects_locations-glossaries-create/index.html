@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Glossaries Create - Translate v2.0.4+20210312</title>
+  <title>Locations Glossaries Create - Translate v3.0.0+20220121</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Translate v2.0.4+20210312</a>
+        <a href=".." class="icon icon-home"> Translate v3.0.0+20220121</a>
         
       </div>
 
@@ -51,6 +51,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../projects_get-supported-languages">Get Supported Languages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-batch-translate-document">Locations Batch Translate Document</a>
                     
                 </li>
             
@@ -146,6 +151,11 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-translate-document">Locations Translate Document</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="../projects_locations-translate-text">Locations Translate Text</a>
                     
                 </li>
@@ -225,46 +235,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    end-time=gubergren</code><ul>
+<li><code>-r .    end-time=ea</code><ul>
 <li>Output only. When the glossary creation was finished.</li>
 </ul>
 </li>
-<li><code>entry-count=50</code><ul>
+<li><code>entry-count=46</code><ul>
 <li>Output only. The number of entries defined in the glossary.</li>
 </ul>
 </li>
 <li>
-<p><code>input-config.gcs-source    input-uri=gubergren</code></p>
+<p><code>input-config.gcs-source    input-uri=invidunt</code></p>
 <ul>
 <li>Required. Source data URI. For example, <code>gs://my_bucket/my_object</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...language-codes-set    language-codes=eos</code></p>
+<p><code>...language-codes-set    language-codes=amet</code></p>
 <ul>
 <li>The BCP-47 language code(s) for terms defined in the glossary. All entries are unique. The list contains at least two entries. Expected to be an exact match for GlossaryTerm.language_code.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..language-pair    source-language-code=dolor</code></p>
+<p><code>..language-pair    source-language-code=duo</code></p>
 <ul>
 <li>Required. The BCP-47 language code of the input text, for example, &#34;en-US&#34;. Expected to be an exact match for GlossaryTerm.language_code.</li>
 </ul>
 </li>
 <li>
-<p><code>target-language-code=ea</code></p>
+<p><code>target-language-code=ipsum</code></p>
 <ul>
 <li>Required. The BCP-47 language code for translation output, for example, &#34;zh-CN&#34;. Expected to be an exact match for GlossaryTerm.language_code.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=ipsum</code></p>
+<p><code>..    name=sed</code></p>
 <ul>
 <li>Required. The resource name of the glossary. Glossary names have the form <code>projects/{project-number-or-id}/locations/{location-id}/glossaries/{glossary-id}</code>.</li>
 </ul>
 </li>
-<li><code>submit-time=invidunt</code><ul>
+<li><code>submit-time=ut</code><ul>
 <li>Output only. When CreateGlossary was called.</li>
 </ul>
 </li>

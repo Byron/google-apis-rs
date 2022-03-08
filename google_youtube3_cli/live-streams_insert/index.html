@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - YouTube v2.0.4+20210330</title>
+  <title>Insert - YouTube v3.0.0+20220303</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v2.0.4+20210330</a>
+        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
         
       </div>
 
@@ -157,11 +157,6 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_update">Update</a>
                     
                 </li>
             
@@ -611,6 +606,17 @@
         
 
     
+        
+        <span>Youtube</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -691,34 +697,34 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .cdn    format=ipsum</code><ul>
+<li><code>-r .cdn    format=sea</code><ul>
 <li>The format of the video stream that you are sending to Youtube. </li>
 </ul>
 </li>
-<li><code>frame-rate=lorem</code><ul>
+<li><code>frame-rate=eos</code><ul>
 <li>The frame rate of the inbound video data.</li>
 </ul>
 </li>
-<li><code>ingestion-info    backup-ingestion-address=dolor</code><ul>
+<li><code>ingestion-info    backup-ingestion-address=dolore</code><ul>
 <li>The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.</li>
 </ul>
 </li>
-<li><code>ingestion-address=amet</code><ul>
+<li><code>ingestion-address=accusam</code><ul>
 <li>The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL. Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format: <em>STREAM_URL/STREAM_NAME</em> </li>
 </ul>
 </li>
-<li><code>rtmps-backup-ingestion-address=magna</code><ul>
+<li><code>rtmps-backup-ingestion-address=elitr</code><ul>
 <li>This ingestion url may be used instead of backupIngestionAddress in order to stream via RTMPS. Not applicable to non-RTMP streams.</li>
 </ul>
 </li>
-<li><code>rtmps-ingestion-address=magna</code><ul>
+<li><code>rtmps-ingestion-address=sed</code><ul>
 <li>This ingestion url may be used instead of ingestionAddress in order to stream via RTMPS. Not applicable to non-RTMP streams.</li>
 </ul>
 </li>
 <li>
-<p><code>stream-name=invidunt</code></p>
+<p><code>stream-name=labore</code></p>
 <ul>
-<li>The HTTP or RTMP stream name that YouTube assigns to the video stream.</li>
+<li>The stream name that YouTube assigns to the video stream.</li>
 </ul>
 </li>
 <li>
@@ -728,55 +734,55 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>resolution=et</code></p>
+<p><code>resolution=eirmod</code></p>
 <ul>
 <li>The resolution of the inbound video data.</li>
 </ul>
 </li>
 <li>
-<p><code>..content-details    closed-captions-ingestion-url=dolor</code></p>
+<p><code>..content-details    closed-captions-ingestion-url=sed</code></p>
 <ul>
 <li>The ingestion URL where the closed captions of this stream are sent.</li>
 </ul>
 </li>
 <li>
-<p><code>is-reusable=false</code></p>
+<p><code>is-reusable=true</code></p>
 <ul>
 <li>Indicates whether the stream is reusable, which means that it can be bound to multiple broadcasts. It is common for broadcasters to reuse the same stream for many different broadcasts if those broadcasts occur at different times. If you set this value to false, then the stream will not be reusable, which means that it can only be bound to one broadcast. Non-reusable streams differ from reusable streams in the following ways: - A non-reusable stream can only be bound to one broadcast. - A non-reusable stream might be deleted by an automated process after the broadcast ends. - The liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream. </li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=dolore</code></p>
+<p><code>..    etag=lorem</code></p>
 <ul>
 <li>Etag of this resource.</li>
 </ul>
 </li>
-<li><code>id=vero</code><ul>
+<li><code>id=dolor</code><ul>
 <li>The ID that YouTube assigns to uniquely identify the stream.</li>
 </ul>
 </li>
-<li><code>kind=ea</code><ul>
+<li><code>kind=amet</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#liveStream&#34;.</li>
 </ul>
 </li>
-<li><code>snippet    channel-id=et</code><ul>
+<li><code>snippet    channel-id=magna</code><ul>
 <li>The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.</li>
 </ul>
 </li>
-<li><code>description=amet.</code><ul>
+<li><code>description=magna</code><ul>
 <li>The stream&#39;s description. The value cannot be longer than 10000 characters.</li>
 </ul>
 </li>
-<li><code>is-default-stream=true</code><ul>
+<li><code>is-default-stream=false</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>published-at=sanctus</code><ul>
+<li><code>published-at=et</code><ul>
 <li>The date and time that the stream was created.</li>
 </ul>
 </li>
 <li>
-<p><code>title=sed</code></p>
+<p><code>title=et</code></p>
 <ul>
 <li>The stream&#39;s title. The value must be between 1 and 128 characters long.</li>
 </ul>
@@ -788,13 +794,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>status=et</code></p>
+<p><code>status=erat</code></p>
 <ul>
 <li>The status code of this stream</li>
 </ul>
 </li>
 <li>
-<p><code>..    stream-status=et</code></p>
+<p><code>..    stream-status=dolore</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>

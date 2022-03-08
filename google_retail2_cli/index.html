@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloud Retail v2.0.4+20210319</title>
+  <title>Cloud Retail v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Retail v2.0.4+20210319</a>
+        <a href="." class="icon icon-home"> Cloud Retail v3.0.0+20220224</a>
         
       </div>
 
@@ -46,6 +46,11 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-catalogs-branches-operations-get/">Locations Catalogs Branches Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-branches-products-add-fulfillment-places/">Locations Catalogs Branches Products Add Fulfillment Places</a>
                     
                 </li>
             
@@ -70,7 +75,37 @@
                 </li>
             
                 <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-branches-products-list/">Locations Catalogs Branches Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
                     <a class="" href="projects_locations-catalogs-branches-products-patch/">Locations Catalogs Branches Products Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-branches-products-remove-fulfillment-places/">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-branches-products-set-inventory/">Locations Catalogs Branches Products Set Inventory</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-complete-query/">Locations Catalogs Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-completion-data-import/">Locations Catalogs Completion Data Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-get-default-branch/">Locations Catalogs Get Default Branch</a>
                     
                 </li>
             
@@ -96,6 +131,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-catalogs-placements-predict/">Locations Catalogs Placements Predict</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-placements-search/">Locations Catalogs Placements Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-catalogs-set-default-branch/">Locations Catalogs Set Default Branch</a>
                     
                 </li>
             
@@ -131,6 +176,16 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="projects_locations-operations-list/">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_operations-get/">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_operations-list/">Operations List</a>
                     
                 </li>
             
@@ -189,20 +244,29 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Retail</em> API at revision <em>20210319</em>. The CLI is at version <em>2.0.4</em>.</p>
+<p>This documentation was generated from the <em>Cloud Retail</em> API at revision <em>20220224</em>. The CLI is at version <em>3.0.0</em>.</p>
 <pre><code class="bash">retail2 [options]
         projects
                 locations-catalogs-branches-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-branches-products-add-fulfillment-places &lt;product&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-branches-products-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-branches-products-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-branches-products-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-branches-products-import &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-branches-products-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-branches-products-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-branches-products-remove-fulfillment-places &lt;product&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-branches-products-set-inventory &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-complete-query &lt;catalog&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-completion-data-import &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-get-default-branch &lt;catalog&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-placements-predict &lt;placement&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-placements-search &lt;placement&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-catalogs-set-default-branch &lt;catalog&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-user-events-collect &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-user-events-import &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-catalogs-user-events-purge &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -210,6 +274,8 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-catalogs-user-events-write &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
   retail2 --help
 
 Configuration:

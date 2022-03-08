@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Locations Entry Groups Entries Patch - Data Catalog v2.0.4+20210316</title>
+  <title>Locations Entry Groups Entries Patch - Data Catalog v3.0.0+20220224</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Data Catalog v2.0.4+20210316</a>
+        <a href=".." class="icon icon-home"> Data Catalog v3.0.0+20220224</a>
         
       </div>
 
@@ -430,6 +430,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     expire-time: string
     update-time: string
   type: string
+  usage-signal:
+    update-time: string
   user-specified-system: string
   user-specified-type: string
 
@@ -437,57 +439,57 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .bigquery-date-sharded-spec    dataset=eos</code><ul>
+<li><code>-r .bigquery-date-sharded-spec    dataset=labore</code><ul>
 <li>Output only. The Data Catalog resource name of the dataset entry the current table belongs to, for example, <code>projects/{project_id}/locations/{location}/entrygroups/{entry_group_id}/entries/{entry_id}</code>.</li>
 </ul>
 </li>
-<li><code>shard-count=-86</code><ul>
+<li><code>shard-count=-43</code><ul>
 <li>Output only. Total number of shards.</li>
 </ul>
 </li>
 <li>
-<p><code>table-prefix=sed</code></p>
+<p><code>table-prefix=duo</code></p>
 <ul>
 <li>Output only. The table name prefix of the shards. The name of any given shard is <code>[table_prefix]YYYYMMDD</code>, for example, for shard <code>MyTable20180101</code>, the <code>table_prefix</code> is <code>MyTable</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..bigquery-table-spec    table-source-type=duo</code></p>
+<p><code>..bigquery-table-spec    table-source-type=sed</code></p>
 <ul>
 <li>Output only. The table source type.</li>
 </ul>
 </li>
 <li>
-<p><code>table-spec    grouped-entry=sed</code></p>
+<p><code>table-spec    grouped-entry=no</code></p>
 <ul>
 <li>Output only. If the table is a dated shard, i.e., with name pattern <code>[prefix]YYYYMMDD</code>, <code>grouped_entry</code> is the Data Catalog resource name of the date sharded grouped entry, for example, <code>projects/{project_id}/locations/{location}/entrygroups/{entry_group_id}/entries/{entry_id}</code>. Otherwise, <code>grouped_entry</code> is empty.</li>
 </ul>
 </li>
 <li>
-<p><code>..view-spec    view-query=no</code></p>
+<p><code>..view-spec    view-query=stet</code></p>
 <ul>
 <li>Output only. The query that defines the table view.</li>
 </ul>
 </li>
 <li>
-<p><code>...    description=stet</code></p>
+<p><code>...    description=kasd</code></p>
 <ul>
 <li>Entry description, which can consist of several sentences or paragraphs that describe entry contents. Default value is an empty string.</li>
 </ul>
 </li>
-<li><code>display-name=kasd</code><ul>
+<li><code>display-name=et</code><ul>
 <li>Display information such as title and description. A short name to identify the entry, for example, &#34;Analytics Data - Jan 2011&#34;. Default value is an empty string.</li>
 </ul>
 </li>
 <li>
-<p><code>gcs-fileset-spec    file-patterns=et</code></p>
+<p><code>gcs-fileset-spec    file-patterns=sed</code></p>
 <ul>
 <li>Required. Patterns to identify a set of files in Google Cloud Storage. See <a href="https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames">Cloud Storage documentation</a> for more information. Note that bucket wildcards are currently not supported. Examples of valid file_patterns: * <code>gs://bucket_name/dir/*</code>: matches all files within <code>bucket_name/dir</code> directory. * <code>gs://bucket_name/dir/**</code>: matches all files in <code>bucket_name/dir</code> spanning all subdirectories. * <code>gs://bucket_name/file*</code>: matches files prefixed by <code>file</code> in <code>bucket_name</code> * <code>gs://bucket_name/??.txt</code>: matches files with two characters followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/[aeiou].txt</code>: matches files that contain a single vowel character followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/[a-m].txt</code>: matches files that contain <code>a</code>, <code>b</code>, ... or <code>m</code> followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/a/*/b</code>: matches all files in <code>bucket_name</code> that match <code>a/*/b</code> pattern, such as <code>a/c/b</code>, <code>a/d/b</code> * <code>gs://another_bucket/a.txt</code>: matches <code>gs://another_bucket/a.txt</code> You can combine wildcards to provide more powerful matches, for example: * <code>gs://bucket_name/[a-m]??.j*g</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    integrated-system=sed</code></p>
+<p><code>..    integrated-system=et</code></p>
 <ul>
 <li>Output only. This field indicates the entry&#39;s source system that Data Catalog integrates with, such as BigQuery or Pub/Sub.</li>
 </ul>
@@ -496,35 +498,43 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The resource this metadata entry refers to. For Google Cloud Platform resources, <code>linked_resource</code> is the <a href="https://cloud.google.com/apis/design/resource_names#full_resource_name">full name of the resource</a>. For example, the <code>linked_resource</code> for a table resource from BigQuery is: * //bigquery.googleapis.com/projects/projectId/datasets/datasetId/tables/tableId Output only when Entry is of type in the EntryType enum. For entries with user_specified_type, this field is optional and defaults to an empty string.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=vero</code><ul>
 <li>Output only. The Data Catalog resource name of the entry in URL format. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id} Note that this Entry and its child resources may not actually be stored in the location in this name.</li>
 </ul>
 </li>
-<li><code>source-system-timestamps    create-time=vero</code><ul>
+<li><code>source-system-timestamps    create-time=erat</code><ul>
 <li>The creation time of the resource within the given system.</li>
 </ul>
 </li>
-<li><code>expire-time=erat</code><ul>
+<li><code>expire-time=sed</code><ul>
 <li>Output only. The expiration time of the resource within the given system. Currently only apllicable to BigQuery resources.</li>
 </ul>
 </li>
 <li>
-<p><code>update-time=sed</code></p>
+<p><code>update-time=duo</code></p>
 <ul>
 <li>The last-modified time of the resource within the given system.</li>
 </ul>
 </li>
 <li>
-<p><code>..    type=duo</code></p>
+<p><code>..    type=dolore</code></p>
 <ul>
 <li>The type of the entry. Only used for Entries with types in the EntryType enum.</li>
 </ul>
 </li>
-<li><code>user-specified-system=dolore</code><ul>
+<li>
+<p><code>usage-signal    update-time=et</code></p>
+<ul>
+<li>The timestamp of the end of the usage statistics duration.</li>
+</ul>
+</li>
+<li>
+<p><code>..    user-specified-system=voluptua.</code></p>
+<ul>
 <li>This field indicates the entry&#39;s source system that Data Catalog does not integrate with. <code>user_specified_system</code> strings must begin with a letter or underscore and can only contain letters, numbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long.</li>
 </ul>
 </li>
-<li><code>user-specified-type=et</code><ul>
+<li><code>user-specified-type=amet.</code><ul>
 <li>Entry type if it does not fit any of the input-allowed values listed in <code>EntryType</code> enum above. When creating an entry, users should check the enum values first, if nothing matches the entry to be created, then provide a custom value, for example &#34;my_special_type&#34;. <code>user_specified_type</code> strings must begin with a letter or underscore and can only contain letters, numbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long. Currently, only FILESET enum value is allowed. All other entries created through Data Catalog must use <code>user_specified_type</code>.</li>
 </ul>
 </li>

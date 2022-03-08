@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Policies Orgunits Batch Inherit - Chrome Policy v2.0.4+20210329</title>
+  <title>Policies Orgunits Batch Inherit - Chrome Policy v3.0.0+20220305</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Chrome Policy v2.0.4+20210329</a>
+        <a href=".." class="icon icon-home"> Chrome Policy v3.0.0+20220305</a>
         
       </div>
 
@@ -93,6 +93,17 @@
         
 
     
+        
+        <span>Media</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_upload">Upload</a>
+                    
+                </li>
+            
+        
+
+    
 </ul>
 
       </div>
@@ -126,7 +137,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Modify multiple policy values that are applied to a specific org unit so that they now inherit the value from a parent (if applicable). All targets must have the same target format. That is to say that they must point to the same target resource and must have the same keys specified in <code>additionalTargetKeyNames</code>. On failure the request will return the error details as part of the google.rpc.Status.</p>
+              <p>Modify multiple policy values that are applied to a specific org unit so that they now inherit the value from a parent (if applicable). All targets must have the same target format. That is to say that they must point to the same target resource and must have the same keys specified in <code>additionalTargetKeyNames</code>, though the values for those keys may be different. On failure the request will return the error details as part of the google.rpc.Status.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/chrome.management.policy</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/chrome.management.policy</em>.

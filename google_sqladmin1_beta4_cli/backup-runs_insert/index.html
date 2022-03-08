@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Insert - SQL Admin v2.0.4+20210321</title>
+  <title>Insert - SQL Admin v3.0.0+20220226</title>
   
 
   
@@ -34,7 +34,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> SQL Admin v2.0.4+20210321</a>
+        <a href=".." class="icon icon-home"> SQL Admin v3.0.0+20220226</a>
         
       </div>
 
@@ -82,6 +82,22 @@
             
                 <li class="toctree-l1 ">
                     <a class="" href="../backup-runs_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Connect</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_generate-ephemeral">Generate Ephemeral</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../connect_get">Get</a>
                     
                 </li>
             
@@ -384,7 +400,7 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>Creates a new backup run on demand. This method is applicable only to Second Generation instances.</p>
+              <p>Creates a new backup run on demand.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -446,7 +462,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>disk-encryption-configuration    kind=no</code><ul>
-<li>This is always <em>sql#diskEncryptionConfiguration</em>.</li>
+<li>This is always <code>sql#diskEncryptionConfiguration</code>.</li>
 </ul>
 </li>
 <li>
@@ -458,7 +474,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..disk-encryption-status    kind=voluptua.</code></p>
 <ul>
-<li>This is always <em>sql#diskEncryptionStatus</em>.</li>
+<li>This is always <code>sql#diskEncryptionStatus</code>.</li>
 </ul>
 </li>
 <li>
@@ -470,11 +486,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    end-time=sanctus</code></p>
 <ul>
-<li>The time the backup operation completed in UTC timezone in RFC 3339 format, for example <em>2012-11-15T16:19:00.094Z</em>.</li>
+<li>The time the backup operation completed in UTC timezone in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code>.</li>
 </ul>
 </li>
 <li><code>enqueued-time=sed</code><ul>
-<li>The time the run was enqueued in UTC timezone in RFC 3339 format, for example <em>2012-11-15T16:19:00.094Z</em>.</li>
+<li>The time the run was enqueued in UTC timezone in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code>.</li>
 </ul>
 </li>
 <li><code>error    code=amet.</code><ul>
@@ -482,7 +498,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>kind=takimata</code><ul>
-<li>This is always <em>sql#operationError</em>.</li>
+<li>This is always <code>sql#operationError</code>.</li>
 </ul>
 </li>
 <li>
@@ -502,7 +518,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>kind=gubergren</code><ul>
-<li>This is always <em>sql#backupRun</em>.</li>
+<li>This is always <code>sql#backupRun</code>.</li>
 </ul>
 </li>
 <li><code>location=lorem</code><ul>
@@ -514,7 +530,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>start-time=eos</code><ul>
-<li>The time the backup operation actually started in UTC timezone in RFC 3339 format, for example <em>2012-11-15T16:19:00.094Z</em>.</li>
+<li>The time the backup operation actually started in UTC timezone in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code>.</li>
 </ul>
 </li>
 <li><code>status=dolor</code><ul>
@@ -526,7 +542,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>window-start-time=ipsum</code><ul>
-<li>The start time of the backup window during which this the backup was attempted in RFC 3339 format, for example <em>2012-11-15T16:19:00.094Z</em>.</li>
+<li>The start time of the backup window during which this the backup was attempted in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for example <code>2012-11-15T16:19:00.094Z</code>.</li>
 </ul>
 </li>
 </ul>
