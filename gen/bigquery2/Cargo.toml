@@ -4,12 +4,12 @@
 [package]
 
 name = "google-bigquery2"
-version = "3.0.0+20220222"
+version = "3.0.1+20220222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with bigquery (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/bigquery2"
 homepage = "https://cloud.google.com/bigquery/"
-documentation = "https://docs.rs/google-bigquery2/3.0.0+20220222"
+documentation = "https://docs.rs/google-bigquery2/3.0.1+20220222"
 license = "MIT"
 keywords = ["bigquery", "google", "protocol", "web", "api"]
 autobins = false
