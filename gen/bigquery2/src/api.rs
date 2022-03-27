@@ -2032,7 +2032,7 @@ impl client::Part for JobStatus {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JsonObject(Option<HashMap<String, JsonValue>>);
+pub struct JsonObject(pub Option<HashMap<String, JsonValue>>);
 
 impl client::Part for JsonObject {}
 
@@ -2044,7 +2044,7 @@ impl client::Part for JsonObject {}
 /// The contained type is `Option<String>`.
 /// 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct JsonValue(json::Value);
+pub struct JsonValue(pub json::Value);
 
 impl Default for JsonValue {
     fn default() -> JsonValue {
