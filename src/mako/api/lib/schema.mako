@@ -21,7 +21,7 @@ ${struct} {
 % endfor
 }
 % elif 'additionalProperties' in s:
-${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
+${struct}(pub ${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
 % elif 'variant' in s:
 <% 
     et = s.id
@@ -33,7 +33,7 @@ pub enum ${et} {
     % if variant_type(p) != p.type_value:
     #[serde(rename="${p.type_value}")]
     % endif
-    ${variant_type(p)}(${to_rust_type(schemas, s.id, None, p, allow_optionals=allow_optionals)}),
+    ${variant_type(p)}(pub ${to_rust_type(schemas, s.id, None, p, allow_optionals=allow_optionals)}),
 % endfor
 }
 
@@ -87,7 +87,7 @@ ${_new_object(s, s.items.get('properties'), c, allow_optionals)}\
 % endif ## array item != 'object'
 % elif s.type == 'any':
 ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
-pub struct ${s_type}(json::Value);
+pub struct ${s_type}(pub json::Value);
 
 impl Default for ${s_type} {
     fn default() -> ${s_type} {
