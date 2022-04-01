@@ -144,7 +144,7 @@ impl<'a, > Bigquery<> {
         Bigquery {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.0.1".to_string(),
+            _user_agent: "google-api-rust-client/3.0.2".to_string(),
             _base_url: "https://bigquery.googleapis.com/bigquery/v2/".to_string(),
             _root_url: "https://bigquery.googleapis.com/".to_string(),
         }
@@ -176,7 +176,7 @@ impl<'a, > Bigquery<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.0.1`.
+    /// It defaults to `google-api-rust-client/3.0.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
