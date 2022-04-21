@@ -1,4 +1,4 @@
-site_name: discovery v3.0.0+20200806
+site_name: discovery v3.0.2+20200806
 site_url: http://byron.github.io/google-apis-rs/google-discovery1-cli
 site_description: A complete library to interact with discovery (protocol v1)
 

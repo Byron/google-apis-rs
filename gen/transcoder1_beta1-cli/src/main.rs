@@ -633,7 +633,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/transcoder1-beta1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::Transcoder::new(client, auth),
@@ -863,7 +869,7 @@ async fn main() {
     
     let mut app = App::new("transcoder1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20210323")
+           .version("3.0.2+20210323")
            .about("This API converts video files into formats suitable for consumer distribution. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_transcoder1_beta1_cli")
            .arg(Arg::with_name("url")

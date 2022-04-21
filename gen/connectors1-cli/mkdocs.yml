@@ -1,4 +1,4 @@
-site_name: Connectors v3.0.0+20220214
+site_name: Connectors v3.0.2+20220214
 site_url: http://byron.github.io/google-apis-rs/google-connectors1-cli
 site_description: A complete library to interact with Connectors (protocol v1)
 

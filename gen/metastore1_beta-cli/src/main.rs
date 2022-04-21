@@ -2654,7 +2654,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/metastore1-beta", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::DataprocMetastore::new(client, auth),
@@ -3518,7 +3524,7 @@ async fn main() {
     
     let mut app = App::new("metastore1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220222")
+           .version("3.0.2+20220222")
            .about("The Dataproc Metastore API is used to manage the lifecycle and configuration of metastore services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli")
            .arg(Arg::with_name("url")

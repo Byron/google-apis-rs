@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Fcmdata* API at revision *20220305*. The CLI is at version *3.0.0*.
+This documentation was generated from the *Fcmdata* API at revision *20220305*. The CLI is at version *3.0.2*.
 
 ```bash
 fcmdata1-beta1 [options]

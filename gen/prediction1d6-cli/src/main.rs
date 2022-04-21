@@ -671,7 +671,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/prediction1d6", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::Prediction::new(client, auth),
@@ -943,7 +949,7 @@ async fn main() {
     
     let mut app = App::new("prediction1d6")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20160511")
+           .version("3.0.2+20160511")
            .about("Lets you access a cloud hosted machine learning service that makes it easy to build smart apps")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_prediction1d6_cli")
            .arg(Arg::with_name("url")

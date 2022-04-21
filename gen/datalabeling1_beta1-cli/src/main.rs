@@ -3412,7 +3412,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/datalabeling1-beta1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::DataLabeling::new(client, auth),
@@ -4572,7 +4578,7 @@ async fn main() {
     
     let mut app = App::new("datalabeling1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220301")
+           .version("3.0.2+20220301")
            .about("Public API for Google Cloud AI Data Labeling Service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli")
            .arg(Arg::with_name("url")

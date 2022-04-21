@@ -689,7 +689,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/serviceregistryalpha", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::ServiceRegistry::new(client, auth),
@@ -955,7 +961,7 @@ async fn main() {
     
     let mut app = App::new("serviceregistryalpha")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20160401")
+           .version("3.0.2+20160401")
            .about("Manages service endpoints in Service Registry and provides integration with DNS for service discovery and name resolution.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_serviceregistryalpha_cli")
            .arg(Arg::with_name("url")

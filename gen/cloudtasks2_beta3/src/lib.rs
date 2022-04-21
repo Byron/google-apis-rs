@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *3.0.0+20220212*, where *20220212* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Cloud Tasks* crate version *3.0.2+20220212*, where *20220212* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.2*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).
@@ -97,7 +97,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = CloudTasks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = CloudTasks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

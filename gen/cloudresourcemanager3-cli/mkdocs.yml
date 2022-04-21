@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v3.0.0+20220306
+site_name: Cloud Resource Manager v3.0.2+20220306
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager3-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v3)
 

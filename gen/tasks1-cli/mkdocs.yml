@@ -1,4 +1,4 @@
-site_name: Tasks v3.0.0+20220305
+site_name: Tasks v3.0.2+20220305
 site_url: http://byron.github.io/google-apis-rs/google-tasks1-cli
 site_description: A complete library to interact with Tasks (protocol v1)
 

@@ -990,7 +990,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/replicapool1-beta2", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::Replicapool::new(client, auth),
@@ -1470,7 +1476,7 @@ async fn main() {
     
     let mut app = App::new("replicapool1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20160512")
+           .version("3.0.2+20160512")
            .about("[Deprecated. Please use Instance Group Manager in Compute API] Provides groups of homogenous Compute Engine instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli")
            .arg(Arg::with_name("url")

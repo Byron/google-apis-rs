@@ -1,4 +1,4 @@
-site_name: Fact Check Tools v3.0.0+20220305
+site_name: Fact Check Tools v3.0.2+20220305
 site_url: http://byron.github.io/google-apis-rs/google-factchecktools1_alpha1-cli
 site_description: A complete library to interact with Fact Check Tools (protocol v1alpha1)
 

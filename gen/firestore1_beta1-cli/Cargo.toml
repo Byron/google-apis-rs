@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firestore1_beta1-cli"
-version = "3.0.0+20220221"
+version = "3.0.2+20220221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firestore (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1_beta1-cli"
@@ -20,7 +20,7 @@ name = "firestore1-beta1"
 path = "src/main.rs"
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-firestore1_beta1]
 path = "../firestore1_beta1"
-version = "3.0.0+20220221"
+version = "3.0.2+20220221"

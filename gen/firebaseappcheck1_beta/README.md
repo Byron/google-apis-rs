@@ -5,18 +5,18 @@ DO NOT EDIT !
 -->
 The `google-firebaseappcheck1_beta` library allows access to all features of the *Google Firebaseappcheck* service.
 
-This documentation was generated from *Firebaseappcheck* crate version *3.0.0+20220225*, where *20220225* is the exact revision of the *firebaseappcheck:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+This documentation was generated from *Firebaseappcheck* crate version *3.0.2+20220225*, where *20220225* is the exact revision of the *firebaseappcheck:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.2*.
 
 Everything else about the *Firebaseappcheck* *v1_beta* API can be found at the
 [official documentation site](https://firebase.google.com/docs/app-check).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/Firebaseappcheck) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/Firebaseappcheck) ... 
 
 * jwks
- * [*get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::JwkGetCall)
+ * [*get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::JwkGetCall)
 * projects
- * [*apps app attest config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppAppAttestConfigBatchGetCall), [*apps app attest config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppAppAttestConfigGetCall), [*apps app attest config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppAppAttestConfigPatchCall), [*apps debug tokens create*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenCreateCall), [*apps debug tokens delete*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenDeleteCall), [*apps debug tokens get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenGetCall), [*apps debug tokens list*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenListCall), [*apps debug tokens patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenPatchCall), [*apps device check config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDeviceCheckConfigBatchGetCall), [*apps device check config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDeviceCheckConfigGetCall), [*apps device check config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppDeviceCheckConfigPatchCall), [*apps exchange app attest assertion*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeAppAttestAssertionCall), [*apps exchange app attest attestation*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeAppAttestAttestationCall), [*apps exchange custom token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeCustomTokenCall), [*apps exchange debug token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeDebugTokenCall), [*apps exchange device check token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeDeviceCheckTokenCall), [*apps exchange recaptcha enterprise token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeRecaptchaEnterpriseTokenCall), [*apps exchange recaptcha token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeRecaptchaTokenCall), [*apps exchange safety net token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeSafetyNetTokenCall), [*apps generate app attest challenge*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppGenerateAppAttestChallengeCall), [*apps recaptcha config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaConfigBatchGetCall), [*apps recaptcha config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaConfigGetCall), [*apps recaptcha config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaConfigPatchCall), [*apps recaptcha enterprise config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaEnterpriseConfigBatchGetCall), [*apps recaptcha enterprise config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaEnterpriseConfigGetCall), [*apps recaptcha enterprise config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaEnterpriseConfigPatchCall), [*apps safety net config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppSafetyNetConfigBatchGetCall), [*apps safety net config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppSafetyNetConfigGetCall), [*apps safety net config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectAppSafetyNetConfigPatchCall), [*services batch update*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectServiceBatchUpdateCall), [*services get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectServiceGetCall), [*services list*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectServiceListCall) and [*services patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/api::ProjectServicePatchCall)
+ * [*apps app attest config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppAppAttestConfigBatchGetCall), [*apps app attest config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppAppAttestConfigGetCall), [*apps app attest config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppAppAttestConfigPatchCall), [*apps debug tokens create*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenCreateCall), [*apps debug tokens delete*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenDeleteCall), [*apps debug tokens get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenGetCall), [*apps debug tokens list*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenListCall), [*apps debug tokens patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDebugTokenPatchCall), [*apps device check config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDeviceCheckConfigBatchGetCall), [*apps device check config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDeviceCheckConfigGetCall), [*apps device check config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppDeviceCheckConfigPatchCall), [*apps exchange app attest assertion*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeAppAttestAssertionCall), [*apps exchange app attest attestation*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeAppAttestAttestationCall), [*apps exchange custom token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeCustomTokenCall), [*apps exchange debug token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeDebugTokenCall), [*apps exchange device check token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeDeviceCheckTokenCall), [*apps exchange recaptcha enterprise token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeRecaptchaEnterpriseTokenCall), [*apps exchange recaptcha token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeRecaptchaTokenCall), [*apps exchange safety net token*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppExchangeSafetyNetTokenCall), [*apps generate app attest challenge*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppGenerateAppAttestChallengeCall), [*apps recaptcha config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaConfigBatchGetCall), [*apps recaptcha config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaConfigGetCall), [*apps recaptcha config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaConfigPatchCall), [*apps recaptcha enterprise config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaEnterpriseConfigBatchGetCall), [*apps recaptcha enterprise config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaEnterpriseConfigGetCall), [*apps recaptcha enterprise config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppRecaptchaEnterpriseConfigPatchCall), [*apps safety net config batch get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppSafetyNetConfigBatchGetCall), [*apps safety net config get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppSafetyNetConfigGetCall), [*apps safety net config patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectAppSafetyNetConfigPatchCall), [*services batch update*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectServiceBatchUpdateCall), [*services get*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectServiceGetCall), [*services list*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectServiceListCall) and [*services patch*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/api::ProjectServicePatchCall)
 
 
 
@@ -25,17 +25,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/Firebaseappcheck)**
+* **[Hub](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/Firebaseappcheck)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::CallBuilder)
-* **[Resources](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::CallBuilder)
+* **[Resources](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Part)**
+    * **[Parts](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -99,7 +99,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
@@ -132,17 +132,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -152,29 +152,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::RequestValue) and 
-[decodable](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::RequestValue) and 
+[decodable](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-firebaseappcheck1_beta/3.0.0+20220225/google_firebaseappcheck1_beta/client::RequestValue) are moved
+* [request values](https://docs.rs/google-firebaseappcheck1_beta/3.0.2+20220225/google_firebaseappcheck1_beta/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

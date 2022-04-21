@@ -1,4 +1,4 @@
-site_name: Service Broker v3.0.0+20190624
+site_name: Service Broker v3.0.2+20190624
 site_url: http://byron.github.io/google-apis-rs/google-servicebroker1-cli
 site_description: A complete library to interact with Service Broker (protocol v1)
 

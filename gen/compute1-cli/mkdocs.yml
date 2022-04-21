@@ -1,4 +1,4 @@
-site_name: compute v3.0.0+20220224
+site_name: compute v3.0.2+20220224
 site_url: http://byron.github.io/google-apis-rs/google-compute1-cli
 site_description: A complete library to interact with compute (protocol v1)
 

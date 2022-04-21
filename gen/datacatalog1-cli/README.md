@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Catalog* API at revision *20220224*. The CLI is at version *3.0.0*.
+This documentation was generated from the *Data Catalog* API at revision *20220224*. The CLI is at version *3.0.2*.
 
 ```bash
 datacatalog1 [options]

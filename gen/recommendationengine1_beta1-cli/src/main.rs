@@ -1796,7 +1796,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/recommendationengine1-beta1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::RecommendationsAI::new(client, auth),
@@ -2382,7 +2388,7 @@ async fn main() {
     
     let mut app = App::new("recommendationengine1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220224")
+           .version("3.0.2+20220224")
            .about("Note that we now highly recommend new customers to use Retail API, which incorporates the GA version of the Recommendations AI funtionalities. To enable Retail API, please visit https://console.cloud.google.com/apis/library/retail.googleapis.com. The Recommendations AI service enables customers to build end-to-end personalized recommendation systems without requiring a high level of expertise in machine learning, recommendation system, or Google Cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recommendationengine1_beta1_cli")
            .arg(Arg::with_name("url")

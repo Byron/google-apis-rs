@@ -4,12 +4,12 @@
 [package]
 
 name = "google-managedidentities1"
-version = "3.0.0+20220216"
+version = "3.0.2+20220216"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Managed Service for Microsoft Active Directory Consumer API (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/managedidentities1"
 homepage = "https://cloud.google.com/managed-microsoft-ad/"
-documentation = "https://docs.rs/google-managedidentities1/3.0.0+20220216"
+documentation = "https://docs.rs/google-managedidentities1/3.0.2+20220216"
 license = "MIT"
 keywords = ["managedidentities", "google", "protocol", "web", "api"]
 autobins = false
@@ -17,7 +17,7 @@ edition = "2018"
 
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"

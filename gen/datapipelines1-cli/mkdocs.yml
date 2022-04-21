@@ -1,4 +1,4 @@
-site_name: Datapipelines v3.0.0+20220218
+site_name: Datapipelines v3.0.2+20220218
 site_url: http://byron.github.io/google-apis-rs/google-datapipelines1-cli
 site_description: A complete library to interact with Datapipelines (protocol v1)
 

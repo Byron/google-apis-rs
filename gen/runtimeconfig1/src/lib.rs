@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud RuntimeConfig* crate version *3.0.0+20220228*, where *20220228* is the exact revision of the *runtimeconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Cloud RuntimeConfig* crate version *3.0.2+20220228*, where *20220228* is the exact revision of the *runtimeconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.2*.
 //! 
 //! Everything else about the *Cloud RuntimeConfig* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/runtime-configurator/).
@@ -93,7 +93,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = CloudRuntimeConfig::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = CloudRuntimeConfig::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

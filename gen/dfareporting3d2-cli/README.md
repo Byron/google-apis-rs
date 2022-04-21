@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dfareporting* API at revision *20190531*. The CLI is at version *3.0.0*.
+This documentation was generated from the *dfareporting* API at revision *20190531*. The CLI is at version *3.0.2*.
 
 ```bash
 dfareporting3d2 [options]

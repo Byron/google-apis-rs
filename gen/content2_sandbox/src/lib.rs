@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *3.0.0+20181009*, where *20181009* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Shopping Content* crate version *3.0.2+20181009*, where *20181009* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.2*.
 //! 
 //! Everything else about the *Shopping Content* *v2_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -118,7 +118,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

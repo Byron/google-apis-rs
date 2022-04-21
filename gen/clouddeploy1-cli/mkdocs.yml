@@ -1,4 +1,4 @@
-site_name: Cloud Deploy v3.0.0+20220223
+site_name: Cloud Deploy v3.0.2+20220223
 site_url: http://byron.github.io/google-apis-rs/google-clouddeploy1-cli
 site_description: A complete library to interact with Cloud Deploy (protocol v1)
 

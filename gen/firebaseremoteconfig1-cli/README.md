@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Remote Config* API at revision *20171129*. The CLI is at version *3.0.0*.
+This documentation was generated from the *Firebase Remote Config* API at revision *20171129*. The CLI is at version *3.0.2*.
 
 ```bash
 firebaseremoteconfig1 [options]

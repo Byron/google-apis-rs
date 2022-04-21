@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Speech* crate version *3.0.0+20181005*, where *20181005* is the exact revision of the *speech:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Speech* crate version *3.0.2+20181005*, where *20181005* is the exact revision of the *speech:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.2*.
 //! 
 //! Everything else about the *Speech* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/speech-to-text/docs/quickstart-protocol).
@@ -95,7 +95,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

@@ -1,4 +1,4 @@
-site_name: appsactivity v3.0.0+20200628
+site_name: appsactivity v3.0.2+20200628
 site_url: http://byron.github.io/google-apis-rs/google-appsactivity1-cli
 site_description: A complete library to interact with appsactivity (protocol v1)
 

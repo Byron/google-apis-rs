@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dns2"
-version = "3.0.0+20220217"
+version = "3.0.2+20220217"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dns (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dns2"
 homepage = "https://cloud.google.com/dns/docs"
-documentation = "https://docs.rs/google-dns2/3.0.0+20220217"
+documentation = "https://docs.rs/google-dns2/3.0.2+20220217"
 license = "MIT"
 keywords = ["dns", "google", "protocol", "web", "api"]
 autobins = false
@@ -17,7 +17,7 @@ edition = "2018"
 
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"

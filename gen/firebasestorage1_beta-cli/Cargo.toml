@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firebasestorage1_beta-cli"
-version = "3.0.0+20220218"
+version = "3.0.2+20220218"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebasestorage (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebasestorage1_beta-cli"
@@ -20,7 +20,7 @@ name = "firebasestorage1-beta"
 path = "src/main.rs"
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-firebasestorage1_beta]
 path = "../firebasestorage1_beta"
-version = "3.0.0+20220218"
+version = "3.0.2+20220218"

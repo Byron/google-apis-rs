@@ -5887,7 +5887,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/container1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::Container::new(client, auth),
@@ -7945,7 +7951,7 @@ async fn main() {
     
     let mut app = App::new("container1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220215")
+           .version("3.0.2+20220215")
            .about("Builds and manages container-based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_cli")
            .arg(Arg::with_name("url")

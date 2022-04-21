@@ -1995,7 +1995,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/datafusion1-beta1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::DataFusion::new(client, auth),
@@ -2659,7 +2665,7 @@ async fn main() {
     
     let mut app = App::new("datafusion1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20211028")
+           .version("3.0.2+20211028")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for quickly building and managing data pipelines. It provides a graphical interface to increase time efficiency and reduce complexity, and allows business users, developers, and data scientists to easily and reliably build scalable data integration solutions to cleanse, prepare, blend, transfer and transform data without having to wrestle with infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli")
            .arg(Arg::with_name("url")

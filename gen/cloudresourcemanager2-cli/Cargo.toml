@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudresourcemanager2-cli"
-version = "3.0.0+20220306"
+version = "3.0.2+20220306"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Resource Manager (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourcemanager2-cli"
@@ -20,7 +20,7 @@ name = "cloudresourcemanager2"
 path = "src/main.rs"
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudresourcemanager2]
 path = "../cloudresourcemanager2"
-version = "3.0.0+20220306"
+version = "3.0.2+20220306"

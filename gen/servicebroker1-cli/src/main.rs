@@ -321,7 +321,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/servicebroker1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::ServiceBroker::new(client, auth),
@@ -453,7 +459,7 @@ async fn main() {
     
     let mut app = App::new("servicebroker1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20190624")
+           .version("3.0.2+20190624")
            .about("The Google Cloud Platform Service Broker API provides Google hosted
            implementation of the Open Service Broker API
            (https://www.openservicebrokerapi.org/).

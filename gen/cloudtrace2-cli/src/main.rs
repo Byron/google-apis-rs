@@ -281,7 +281,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/cloudtrace2", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::CloudTrace::new(client, auth),
@@ -379,7 +385,7 @@ async fn main() {
     
     let mut app = App::new("cloudtrace2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220224")
+           .version("3.0.2+20220224")
            .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenTelemetry. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Certificate Manager v3.0.0+20220214
+site_name: Certificate Manager v3.0.2+20220214
 site_url: http://byron.github.io/google-apis-rs/google-certificatemanager1-cli
 site_description: A complete library to interact with Certificate Manager (protocol v1)
 

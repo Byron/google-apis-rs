@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Identity Toolkit* API at revision *20180723*. The CLI is at version *3.0.0*.
+This documentation was generated from the *Identity Toolkit* API at revision *20180723*. The CLI is at version *3.0.2*.
 
 ```bash
 identitytoolkit3 [options]

@@ -1,4 +1,4 @@
-site_name: storagetransfer v3.0.0+20220223
+site_name: storagetransfer v3.0.2+20220223
 site_url: http://byron.github.io/google-apis-rs/google-storagetransfer1-cli
 site_description: A complete library to interact with storagetransfer (protocol v1)
 

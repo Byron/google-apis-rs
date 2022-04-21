@@ -1,4 +1,4 @@
-site_name: Secret Manager v3.0.0+20220226
+site_name: Secret Manager v3.0.2+20220226
 site_url: http://byron.github.io/google-apis-rs/google-secretmanager1_beta1-cli
 site_description: A complete library to interact with Secret Manager (protocol v1beta1)
 

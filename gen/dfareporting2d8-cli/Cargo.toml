@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2d8-cli"
-version = "3.0.0+20180830"
+version = "3.0.2+20180830"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.8)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting2d8-cli"
@@ -20,7 +20,7 @@ name = "dfareporting2d8"
 path = "src/main.rs"
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-dfareporting2d8]
 path = "../dfareporting2d8"
-version = "3.0.0+20180830"
+version = "3.0.2+20180830"

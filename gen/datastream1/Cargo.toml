@@ -4,12 +4,12 @@
 [package]
 
 name = "google-datastream1"
-version = "3.0.0+20220207"
+version = "3.0.2+20220207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Datastream (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datastream1"
 homepage = "https://cloud.google.com/datastream/"
-documentation = "https://docs.rs/google-datastream1/3.0.0+20220207"
+documentation = "https://docs.rs/google-datastream1/3.0.2+20220207"
 license = "MIT"
 keywords = ["datastream", "google", "protocol", "web", "api"]
 autobins = false
@@ -17,7 +17,7 @@ edition = "2018"
 
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
