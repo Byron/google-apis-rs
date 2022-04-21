@@ -122,7 +122,7 @@ impl<'n> Engine<'n> {
         ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 
         let client = hyper::Client::builder().build(
-            hyper_rustls::HttpsConnector::with_native_roots()
+            hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
                 .https_or_http()
                 .enable_http1()
                 .enable_http2()
