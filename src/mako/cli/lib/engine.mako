@@ -121,7 +121,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnector::with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
 <% gpm = gen_global_parameter_names(parameters) %>\
         let engine = Engine {
             opt: opt,

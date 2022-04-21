@@ -26,7 +26,7 @@ path = "src/main.rs"
 % endif
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
 serde = "^ 1.0"
