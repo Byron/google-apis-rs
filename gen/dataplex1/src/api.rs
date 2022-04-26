@@ -71,7 +71,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -121,7 +121,7 @@ impl<'a, > CloudDataplex<> {
         CloudDataplex {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.0.0".to_string(),
+            _user_agent: "google-api-rust-client/3.1.0".to_string(),
             _base_url: "https://dataplex.googleapis.com/".to_string(),
             _root_url: "https://dataplex.googleapis.com/".to_string(),
         }
@@ -132,7 +132,7 @@ impl<'a, > CloudDataplex<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.0.0`.
+    /// It defaults to `google-api-rust-client/3.1.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2101,7 +2101,7 @@ impl client::Part for GoogleTypeExpr {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_get(...)`, `locations_lakes_actions_list(...)`, `locations_lakes_content_get_iam_policy(...)`, `locations_lakes_content_set_iam_policy(...)`, `locations_lakes_content_test_iam_permissions(...)`, `locations_lakes_contentitems_create(...)`, `locations_lakes_contentitems_delete(...)`, `locations_lakes_contentitems_get(...)`, `locations_lakes_contentitems_list(...)`, `locations_lakes_contentitems_patch(...)`, `locations_lakes_create(...)`, `locations_lakes_delete(...)`, `locations_lakes_environments_create(...)`, `locations_lakes_environments_delete(...)`, `locations_lakes_environments_get(...)`, `locations_lakes_environments_get_iam_policy(...)`, `locations_lakes_environments_list(...)`, `locations_lakes_environments_patch(...)`, `locations_lakes_environments_sessions_list(...)`, `locations_lakes_environments_set_iam_policy(...)`, `locations_lakes_environments_test_iam_permissions(...)`, `locations_lakes_get(...)`, `locations_lakes_get_iam_policy(...)`, `locations_lakes_list(...)`, `locations_lakes_patch(...)`, `locations_lakes_set_iam_policy(...)`, `locations_lakes_tasks_create(...)`, `locations_lakes_tasks_delete(...)`, `locations_lakes_tasks_get(...)`, `locations_lakes_tasks_get_iam_policy(...)`, `locations_lakes_tasks_jobs_cancel(...)`, `locations_lakes_tasks_jobs_get(...)`, `locations_lakes_tasks_jobs_list(...)`, `locations_lakes_tasks_list(...)`, `locations_lakes_tasks_patch(...)`, `locations_lakes_tasks_set_iam_policy(...)`, `locations_lakes_tasks_test_iam_permissions(...)`, `locations_lakes_test_iam_permissions(...)`, `locations_lakes_zones_actions_list(...)`, `locations_lakes_zones_assets_actions_list(...)`, `locations_lakes_zones_assets_create(...)`, `locations_lakes_zones_assets_delete(...)`, `locations_lakes_zones_assets_get(...)`, `locations_lakes_zones_assets_get_iam_policy(...)`, `locations_lakes_zones_assets_list(...)`, `locations_lakes_zones_assets_patch(...)`, `locations_lakes_zones_assets_set_iam_policy(...)`, `locations_lakes_zones_assets_test_iam_permissions(...)`, `locations_lakes_zones_create(...)`, `locations_lakes_zones_delete(...)`, `locations_lakes_zones_entities_create(...)`, `locations_lakes_zones_entities_delete(...)`, `locations_lakes_zones_entities_get(...)`, `locations_lakes_zones_entities_list(...)`, `locations_lakes_zones_entities_partitions_create(...)`, `locations_lakes_zones_entities_partitions_delete(...)`, `locations_lakes_zones_entities_partitions_get(...)`, `locations_lakes_zones_entities_partitions_list(...)`, `locations_lakes_zones_entities_update(...)`, `locations_lakes_zones_get(...)`, `locations_lakes_zones_get_iam_policy(...)`, `locations_lakes_zones_list(...)`, `locations_lakes_zones_patch(...)`, `locations_lakes_zones_set_iam_policy(...)`, `locations_lakes_zones_test_iam_permissions(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
 /// // to build up your call.
@@ -3479,7 +3479,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3759,7 +3759,7 @@ impl<'a> ProjectLocationLakeActionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4028,7 +4028,7 @@ impl<'a> ProjectLocationLakeContentGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4314,7 +4314,7 @@ impl<'a> ProjectLocationLakeContentSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4600,7 +4600,7 @@ impl<'a> ProjectLocationLakeContentTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4897,7 +4897,7 @@ impl<'a> ProjectLocationLakeContentitemCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5153,7 +5153,7 @@ impl<'a> ProjectLocationLakeContentitemDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5421,7 +5421,7 @@ impl<'a> ProjectLocationLakeContentitemGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5714,7 +5714,7 @@ impl<'a> ProjectLocationLakeContentitemListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6023,7 +6023,7 @@ impl<'a> ProjectLocationLakeContentitemPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6304,7 +6304,7 @@ impl<'a> ProjectLocationLakeEnvironmentSessionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6613,7 +6613,7 @@ impl<'a> ProjectLocationLakeEnvironmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6869,7 +6869,7 @@ impl<'a> ProjectLocationLakeEnvironmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7125,7 +7125,7 @@ impl<'a> ProjectLocationLakeEnvironmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7393,7 +7393,7 @@ impl<'a> ProjectLocationLakeEnvironmentGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7698,7 +7698,7 @@ impl<'a> ProjectLocationLakeEnvironmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8008,7 +8008,7 @@ impl<'a> ProjectLocationLakeEnvironmentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8294,7 +8294,7 @@ impl<'a> ProjectLocationLakeEnvironmentSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8580,7 +8580,7 @@ impl<'a> ProjectLocationLakeEnvironmentTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8865,7 +8865,7 @@ impl<'a> ProjectLocationLakeTaskJobCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9121,7 +9121,7 @@ impl<'a> ProjectLocationLakeTaskJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9402,7 +9402,7 @@ impl<'a> ProjectLocationLakeTaskJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9711,7 +9711,7 @@ impl<'a> ProjectLocationLakeTaskCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9967,7 +9967,7 @@ impl<'a> ProjectLocationLakeTaskDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10223,7 +10223,7 @@ impl<'a> ProjectLocationLakeTaskGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10491,7 +10491,7 @@ impl<'a> ProjectLocationLakeTaskGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10796,7 +10796,7 @@ impl<'a> ProjectLocationLakeTaskListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11106,7 +11106,7 @@ impl<'a> ProjectLocationLakeTaskPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11392,7 +11392,7 @@ impl<'a> ProjectLocationLakeTaskSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11677,7 +11677,7 @@ impl<'a> ProjectLocationLakeTaskTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11957,7 +11957,7 @@ impl<'a> ProjectLocationLakeZoneActionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12238,7 +12238,7 @@ impl<'a> ProjectLocationLakeZoneAssetActionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12547,7 +12547,7 @@ impl<'a> ProjectLocationLakeZoneAssetCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12803,7 +12803,7 @@ impl<'a> ProjectLocationLakeZoneAssetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13059,7 +13059,7 @@ impl<'a> ProjectLocationLakeZoneAssetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13327,7 +13327,7 @@ impl<'a> ProjectLocationLakeZoneAssetGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13632,7 +13632,7 @@ impl<'a> ProjectLocationLakeZoneAssetListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13942,7 +13942,7 @@ impl<'a> ProjectLocationLakeZoneAssetPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14228,7 +14228,7 @@ impl<'a> ProjectLocationLakeZoneAssetSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14514,7 +14514,7 @@ impl<'a> ProjectLocationLakeZoneAssetTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14811,7 +14811,7 @@ impl<'a> ProjectLocationLakeZoneEntityPartitionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15079,7 +15079,7 @@ impl<'a> ProjectLocationLakeZoneEntityPartitionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15335,7 +15335,7 @@ impl<'a> ProjectLocationLakeZoneEntityPartitionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15628,7 +15628,7 @@ impl<'a> ProjectLocationLakeZoneEntityPartitionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15925,7 +15925,7 @@ impl<'a> ProjectLocationLakeZoneEntityCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16193,7 +16193,7 @@ impl<'a> ProjectLocationLakeZoneEntityDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16461,7 +16461,7 @@ impl<'a> ProjectLocationLakeZoneEntityGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16766,7 +16766,7 @@ impl<'a> ProjectLocationLakeZoneEntityListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17064,7 +17064,7 @@ impl<'a> ProjectLocationLakeZoneEntityUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17373,7 +17373,7 @@ impl<'a> ProjectLocationLakeZoneCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17629,7 +17629,7 @@ impl<'a> ProjectLocationLakeZoneDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17885,7 +17885,7 @@ impl<'a> ProjectLocationLakeZoneGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18153,7 +18153,7 @@ impl<'a> ProjectLocationLakeZoneGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18458,7 +18458,7 @@ impl<'a> ProjectLocationLakeZoneListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18768,7 +18768,7 @@ impl<'a> ProjectLocationLakeZonePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19054,7 +19054,7 @@ impl<'a> ProjectLocationLakeZoneSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19340,7 +19340,7 @@ impl<'a> ProjectLocationLakeZoneTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19649,7 +19649,7 @@ impl<'a> ProjectLocationLakeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19905,7 +19905,7 @@ impl<'a> ProjectLocationLakeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20161,7 +20161,7 @@ impl<'a> ProjectLocationLakeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20429,7 +20429,7 @@ impl<'a> ProjectLocationLakeGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20734,7 +20734,7 @@ impl<'a> ProjectLocationLakeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21044,7 +21044,7 @@ impl<'a> ProjectLocationLakePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21330,7 +21330,7 @@ impl<'a> ProjectLocationLakeSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21616,7 +21616,7 @@ impl<'a> ProjectLocationLakeTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21901,7 +21901,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22157,7 +22157,7 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22413,7 +22413,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22705,7 +22705,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22961,7 +22961,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = CloudDataplex::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !

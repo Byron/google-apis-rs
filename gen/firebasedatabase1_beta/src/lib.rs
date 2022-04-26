@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Realtime Database* crate version *3.0.0+20220304*, where *20220304* is the exact revision of the *firebasedatabase:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Firebase Realtime Database* crate version *3.1.0+20220304*, where *20220304* is the exact revision of the *firebasedatabase:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
 //! 
 //! Everything else about the *Firebase Realtime Database* *v1_beta* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/reference/rest/database/database-management/rest/).
@@ -96,7 +96,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

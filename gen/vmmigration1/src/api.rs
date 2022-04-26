@@ -71,7 +71,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -121,7 +121,7 @@ impl<'a, > VMMigrationService<> {
         VMMigrationService {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.0.0".to_string(),
+            _user_agent: "google-api-rust-client/3.1.0".to_string(),
             _base_url: "https://vmmigration.googleapis.com/".to_string(),
             _root_url: "https://vmmigration.googleapis.com/".to_string(),
         }
@@ -132,7 +132,7 @@ impl<'a, > VMMigrationService<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.0.0`.
+    /// It defaults to `google-api-rust-client/3.1.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1482,7 +1482,7 @@ impl client::Part for VmwareVmsDetails {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_get(...)`, `locations_groups_add_group_migration(...)`, `locations_groups_create(...)`, `locations_groups_delete(...)`, `locations_groups_get(...)`, `locations_groups_list(...)`, `locations_groups_patch(...)`, `locations_groups_remove_group_migration(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_sources_create(...)`, `locations_sources_datacenter_connectors_create(...)`, `locations_sources_datacenter_connectors_delete(...)`, `locations_sources_datacenter_connectors_get(...)`, `locations_sources_datacenter_connectors_list(...)`, `locations_sources_datacenter_connectors_upgrade_appliance(...)`, `locations_sources_delete(...)`, `locations_sources_fetch_inventory(...)`, `locations_sources_get(...)`, `locations_sources_list(...)`, `locations_sources_migrating_vms_clone_jobs_cancel(...)`, `locations_sources_migrating_vms_clone_jobs_create(...)`, `locations_sources_migrating_vms_clone_jobs_get(...)`, `locations_sources_migrating_vms_clone_jobs_list(...)`, `locations_sources_migrating_vms_create(...)`, `locations_sources_migrating_vms_cutover_jobs_cancel(...)`, `locations_sources_migrating_vms_cutover_jobs_create(...)`, `locations_sources_migrating_vms_cutover_jobs_get(...)`, `locations_sources_migrating_vms_cutover_jobs_list(...)`, `locations_sources_migrating_vms_delete(...)`, `locations_sources_migrating_vms_finalize_migration(...)`, `locations_sources_migrating_vms_get(...)`, `locations_sources_migrating_vms_list(...)`, `locations_sources_migrating_vms_patch(...)`, `locations_sources_migrating_vms_pause_migration(...)`, `locations_sources_migrating_vms_resume_migration(...)`, `locations_sources_migrating_vms_start_migration(...)`, `locations_sources_patch(...)`, `locations_sources_utilization_reports_create(...)`, `locations_sources_utilization_reports_delete(...)`, `locations_sources_utilization_reports_get(...)`, `locations_sources_utilization_reports_list(...)`, `locations_target_projects_create(...)`, `locations_target_projects_delete(...)`, `locations_target_projects_get(...)`, `locations_target_projects_list(...)` and `locations_target_projects_patch(...)`
 /// // to build up your call.
@@ -2497,7 +2497,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2783,7 +2783,7 @@ impl<'a> ProjectLocationGroupAddGroupMigrationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3092,7 +3092,7 @@ impl<'a> ProjectLocationGroupCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3360,7 +3360,7 @@ impl<'a> ProjectLocationGroupDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3616,7 +3616,7 @@ impl<'a> ProjectLocationGroupGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3921,7 +3921,7 @@ impl<'a> ProjectLocationGroupListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4231,7 +4231,7 @@ impl<'a> ProjectLocationGroupPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4517,7 +4517,7 @@ impl<'a> ProjectLocationGroupRemoveGroupMigrationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4802,7 +4802,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5058,7 +5058,7 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5314,7 +5314,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5607,7 +5607,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5916,7 +5916,7 @@ impl<'a> ProjectLocationSourceDatacenterConnectorCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6184,7 +6184,7 @@ impl<'a> ProjectLocationSourceDatacenterConnectorDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6440,7 +6440,7 @@ impl<'a> ProjectLocationSourceDatacenterConnectorGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6745,7 +6745,7 @@ impl<'a> ProjectLocationSourceDatacenterConnectorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7031,7 +7031,7 @@ impl<'a> ProjectLocationSourceDatacenterConnectorUpgradeApplianceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7317,7 +7317,7 @@ impl<'a> ProjectLocationSourceMigratingVmCloneJobCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7626,7 +7626,7 @@ impl<'a> ProjectLocationSourceMigratingVmCloneJobCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7882,7 +7882,7 @@ impl<'a> ProjectLocationSourceMigratingVmCloneJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8187,7 +8187,7 @@ impl<'a> ProjectLocationSourceMigratingVmCloneJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8473,7 +8473,7 @@ impl<'a> ProjectLocationSourceMigratingVmCutoverJobCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8782,7 +8782,7 @@ impl<'a> ProjectLocationSourceMigratingVmCutoverJobCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9038,7 +9038,7 @@ impl<'a> ProjectLocationSourceMigratingVmCutoverJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9343,7 +9343,7 @@ impl<'a> ProjectLocationSourceMigratingVmCutoverJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9652,7 +9652,7 @@ impl<'a> ProjectLocationSourceMigratingVmCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9909,7 +9909,7 @@ impl<'a> ProjectLocationSourceMigratingVmDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10194,7 +10194,7 @@ impl<'a> ProjectLocationSourceMigratingVmFinalizeMigrationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10462,7 +10462,7 @@ impl<'a> ProjectLocationSourceMigratingVmGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10779,7 +10779,7 @@ impl<'a> ProjectLocationSourceMigratingVmListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11089,7 +11089,7 @@ impl<'a> ProjectLocationSourceMigratingVmPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11375,7 +11375,7 @@ impl<'a> ProjectLocationSourceMigratingVmPauseMigrationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11661,7 +11661,7 @@ impl<'a> ProjectLocationSourceMigratingVmResumeMigrationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11947,7 +11947,7 @@ impl<'a> ProjectLocationSourceMigratingVmStartMigrationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12256,7 +12256,7 @@ impl<'a> ProjectLocationSourceUtilizationReportCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12524,7 +12524,7 @@ impl<'a> ProjectLocationSourceUtilizationReportDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12792,7 +12792,7 @@ impl<'a> ProjectLocationSourceUtilizationReportGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13109,7 +13109,7 @@ impl<'a> ProjectLocationSourceUtilizationReportListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13418,7 +13418,7 @@ impl<'a> ProjectLocationSourceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13686,7 +13686,7 @@ impl<'a> ProjectLocationSourceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13954,7 +13954,7 @@ impl<'a> ProjectLocationSourceFetchInventoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14210,7 +14210,7 @@ impl<'a> ProjectLocationSourceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14515,7 +14515,7 @@ impl<'a> ProjectLocationSourceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14825,7 +14825,7 @@ impl<'a> ProjectLocationSourcePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15134,7 +15134,7 @@ impl<'a> ProjectLocationTargetProjectCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15402,7 +15402,7 @@ impl<'a> ProjectLocationTargetProjectDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15658,7 +15658,7 @@ impl<'a> ProjectLocationTargetProjectGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15963,7 +15963,7 @@ impl<'a> ProjectLocationTargetProjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16272,7 +16272,7 @@ impl<'a> ProjectLocationTargetProjectPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16528,7 +16528,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !

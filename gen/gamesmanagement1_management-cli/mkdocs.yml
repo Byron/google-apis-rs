@@ -1,4 +1,4 @@
-site_name: Games Management v3.0.0+20220217
+site_name: Games Management v3.1.0+20220217
 site_url: http://byron.github.io/google-apis-rs/google-gamesmanagement1_management-cli
 site_description: A complete library to interact with Games Management (protocol v1management)
 

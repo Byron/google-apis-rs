@@ -82,7 +82,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -128,7 +128,7 @@ impl<'a, > FirebaseHosting<> {
         FirebaseHosting {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.0.0".to_string(),
+            _user_agent: "google-api-rust-client/3.1.0".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
@@ -142,7 +142,7 @@ impl<'a, > FirebaseHosting<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.0.0`.
+    /// It defaults to `google-api-rust-client/3.1.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -960,7 +960,7 @@ impl client::Part for VersionFile {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `operations_get(...)`, `sites_channels_create(...)`, `sites_channels_delete(...)`, `sites_channels_get(...)`, `sites_channels_list(...)`, `sites_channels_patch(...)`, `sites_channels_releases_create(...)`, `sites_channels_releases_list(...)`, `sites_create(...)`, `sites_delete(...)`, `sites_domains_create(...)`, `sites_domains_delete(...)`, `sites_domains_get(...)`, `sites_domains_list(...)`, `sites_domains_update(...)`, `sites_get(...)`, `sites_get_config(...)`, `sites_list(...)`, `sites_patch(...)`, `sites_releases_create(...)`, `sites_releases_list(...)`, `sites_update_config(...)`, `sites_versions_clone(...)`, `sites_versions_create(...)`, `sites_versions_delete(...)`, `sites_versions_files_list(...)`, `sites_versions_list(...)`, `sites_versions_patch(...)` and `sites_versions_populate_files(...)`
 /// // to build up your call.
@@ -1546,7 +1546,7 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `channels_create(...)`, `channels_delete(...)`, `channels_get(...)`, `channels_list(...)`, `channels_patch(...)`, `channels_releases_create(...)`, `channels_releases_list(...)`, `domains_create(...)`, `domains_delete(...)`, `domains_get(...)`, `domains_list(...)`, `domains_update(...)`, `get_config(...)`, `releases_create(...)`, `releases_list(...)`, `update_config(...)`, `versions_clone(...)`, `versions_create(...)`, `versions_delete(...)`, `versions_files_list(...)`, `versions_list(...)`, `versions_patch(...)` and `versions_populate_files(...)`
 /// // to build up your call.
@@ -2029,7 +2029,7 @@ impl<'a> SiteMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2286,7 +2286,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2583,7 +2583,7 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2864,7 +2864,7 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3161,7 +3161,7 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3417,7 +3417,7 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3673,7 +3673,7 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3954,7 +3954,7 @@ impl<'a> ProjectSiteChannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4252,7 +4252,7 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4537,7 +4537,7 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4793,7 +4793,7 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5049,7 +5049,7 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5330,7 +5330,7 @@ impl<'a> ProjectSiteDomainListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5616,7 +5616,7 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5913,7 +5913,7 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6193,7 +6193,7 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6486,7 +6486,7 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6772,7 +6772,7 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7081,7 +7081,7 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7337,7 +7337,7 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7630,7 +7630,7 @@ impl<'a> ProjectSiteVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7928,7 +7928,7 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8214,7 +8214,7 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8511,7 +8511,7 @@ impl<'a> ProjectSiteCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8767,7 +8767,7 @@ impl<'a> ProjectSiteDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9023,7 +9023,7 @@ impl<'a> ProjectSiteGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9279,7 +9279,7 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9560,7 +9560,7 @@ impl<'a> ProjectSiteListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9858,7 +9858,7 @@ impl<'a> ProjectSitePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10156,7 +10156,7 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10453,7 +10453,7 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10734,7 +10734,7 @@ impl<'a> SiteChannelReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11031,7 +11031,7 @@ impl<'a> SiteChannelCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11287,7 +11287,7 @@ impl<'a> SiteChannelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11543,7 +11543,7 @@ impl<'a> SiteChannelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11824,7 +11824,7 @@ impl<'a> SiteChannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12122,7 +12122,7 @@ impl<'a> SiteChannelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12407,7 +12407,7 @@ impl<'a> SiteDomainCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12663,7 +12663,7 @@ impl<'a> SiteDomainDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12919,7 +12919,7 @@ impl<'a> SiteDomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13200,7 +13200,7 @@ impl<'a> SiteDomainListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13486,7 +13486,7 @@ impl<'a> SiteDomainUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13783,7 +13783,7 @@ impl<'a> SiteReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14063,7 +14063,7 @@ impl<'a> SiteReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14356,7 +14356,7 @@ impl<'a> SiteVersionFileListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14642,7 +14642,7 @@ impl<'a> SiteVersionCloneCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14951,7 +14951,7 @@ impl<'a> SiteVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15207,7 +15207,7 @@ impl<'a> SiteVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15500,7 +15500,7 @@ impl<'a> SiteVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15798,7 +15798,7 @@ impl<'a> SiteVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16083,7 +16083,7 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16340,7 +16340,7 @@ impl<'a> SiteGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

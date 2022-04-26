@@ -71,7 +71,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -119,7 +119,7 @@ impl<'a, > Document<> {
         Document {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.0.0".to_string(),
+            _user_agent: "google-api-rust-client/3.1.0".to_string(),
             _base_url: "https://documentai.googleapis.com/".to_string(),
             _root_url: "https://documentai.googleapis.com/".to_string(),
         }
@@ -136,7 +136,7 @@ impl<'a, > Document<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.0.0`.
+    /// It defaults to `google-api-rust-client/3.1.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1719,7 +1719,7 @@ impl client::Part for GoogleTypeTimeZone {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`
 /// // to build up your call.
@@ -1777,7 +1777,7 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_fetch_processor_types(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_processors_batch_process(...)`, `locations_processors_create(...)`, `locations_processors_delete(...)`, `locations_processors_disable(...)`, `locations_processors_enable(...)`, `locations_processors_get(...)`, `locations_processors_human_review_config_review_document(...)`, `locations_processors_list(...)`, `locations_processors_process(...)`, `locations_processors_processor_versions_batch_process(...)`, `locations_processors_processor_versions_delete(...)`, `locations_processors_processor_versions_deploy(...)`, `locations_processors_processor_versions_get(...)`, `locations_processors_processor_versions_list(...)`, `locations_processors_processor_versions_process(...)`, `locations_processors_processor_versions_undeploy(...)`, `locations_processors_set_default_processor_version(...)` and `operations_get(...)`
 /// // to build up your call.
@@ -2258,7 +2258,7 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `projects_locations_get(...)`, `projects_locations_list(...)`, `projects_locations_operations_cancel(...)`, `projects_locations_operations_get(...)` and `projects_locations_operations_list(...)`
 /// // to build up your call.
@@ -2397,7 +2397,7 @@ impl<'a> Uiv1beta3Methods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2653,7 +2653,7 @@ impl<'a> OperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2909,7 +2909,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3165,7 +3165,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3458,7 +3458,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3744,7 +3744,7 @@ impl<'a> ProjectLocationProcessorHumanReviewConfigReviewDocumentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4029,7 +4029,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionBatchProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4286,7 +4286,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4571,7 +4571,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionDeployCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4827,7 +4827,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5108,7 +5108,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5394,7 +5394,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5680,7 +5680,7 @@ impl<'a> ProjectLocationProcessorProcessorVersionUndeployCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5966,7 +5966,7 @@ impl<'a> ProjectLocationProcessorBatchProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6251,7 +6251,7 @@ impl<'a> ProjectLocationProcessorCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6508,7 +6508,7 @@ impl<'a> ProjectLocationProcessorDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6794,7 +6794,7 @@ impl<'a> ProjectLocationProcessorDisableCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7079,7 +7079,7 @@ impl<'a> ProjectLocationProcessorEnableCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7335,7 +7335,7 @@ impl<'a> ProjectLocationProcessorGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7616,7 +7616,7 @@ impl<'a> ProjectLocationProcessorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7902,7 +7902,7 @@ impl<'a> ProjectLocationProcessorProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8187,7 +8187,7 @@ impl<'a> ProjectLocationProcessorSetDefaultProcessorVersionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8443,7 +8443,7 @@ impl<'a> ProjectLocationFetchProcessorTypeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8699,7 +8699,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8991,7 +8991,7 @@ impl<'a> ProjectLocationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9247,7 +9247,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9503,7 +9503,7 @@ impl<'a> Uiv1beta3ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9759,7 +9759,7 @@ impl<'a> Uiv1beta3ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10051,7 +10051,7 @@ impl<'a> Uiv1beta3ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10307,7 +10307,7 @@ impl<'a> Uiv1beta3ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !

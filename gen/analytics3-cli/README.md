@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *analytics* API at revision *20190807*. The CLI is at version *3.0.0*.
+This documentation was generated from the *analytics* API at revision *20190807*. The CLI is at version *3.1.0*.
 
 ```bash
 analytics3 [options]

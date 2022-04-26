@@ -4,7 +4,7 @@
 [package]
 
 name = "google-recommender1_beta1-cli"
-version = "3.0.0+20220228"
+version = "3.1.0+20220228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Recommender (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/recommender1_beta1-cli"
@@ -20,12 +20,12 @@ name = "recommender1-beta1"
 path = "src/main.rs"
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 6.0"
+yup-oauth2 = "^ 6.6"
 itertools = "^ 0.10"
 strsim = "^0.5"
 clap = "^2.0"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-recommender1_beta1]
 path = "../recommender1_beta1"
-version = "3.0.0+20220228"
+version = "3.1.0+20220228"

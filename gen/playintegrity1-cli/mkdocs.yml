@@ -1,4 +1,4 @@
-site_name: Play Integrity v3.0.0+20220305
+site_name: Play Integrity v3.1.0+20220305
 site_url: http://byron.github.io/google-apis-rs/google-playintegrity1-cli
 site_description: A complete library to interact with Play Integrity (protocol v1)
 

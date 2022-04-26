@@ -1,4 +1,4 @@
-site_name: drive v3.0.0+20220225
+site_name: drive v3.1.0+20220225
 site_url: http://byron.github.io/google-apis-rs/google-drive2-cli
 site_description: A complete library to interact with drive (protocol v2)
 

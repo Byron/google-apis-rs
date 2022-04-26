@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Libraryagent* crate version *3.0.0+20220305*, where *20220305* is the exact revision of the *libraryagent:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Libraryagent* crate version *3.1.0+20220305*, where *20220305* is the exact revision of the *libraryagent:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
 //! 
 //! Everything else about the *Libraryagent* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/docs/quota).
@@ -93,7 +93,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Libraryagent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = Libraryagent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

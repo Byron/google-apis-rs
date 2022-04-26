@@ -1,4 +1,4 @@
-site_name: Google Analytics Admin v3.0.0+20220307
+site_name: Google Analytics Admin v3.1.0+20220307
 site_url: http://byron.github.io/google-apis-rs/google-analyticsadmin1_alpha-cli
 site_description: A complete library to interact with Google Analytics Admin (protocol v1alpha)
 

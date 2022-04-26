@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Logging* crate version *3.0.0+20190325*, where *20190325* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Logging* crate version *3.1.0+20190325*, where *20190325* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
 //! 
 //! Everything else about the *Logging* *v2_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).
@@ -98,7 +98,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

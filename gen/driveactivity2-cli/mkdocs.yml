@@ -1,4 +1,4 @@
-site_name: Drive Activity v3.0.0+20220301
+site_name: Drive Activity v3.1.0+20220301
 site_url: http://byron.github.io/google-apis-rs/google-driveactivity2-cli
 site_description: A complete library to interact with Drive Activity (protocol v2)
 

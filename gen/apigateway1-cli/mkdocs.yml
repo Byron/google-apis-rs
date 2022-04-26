@@ -1,4 +1,4 @@
-site_name: apigateway v3.0.0+20220223
+site_name: apigateway v3.1.0+20220223
 site_url: http://byron.github.io/google-apis-rs/google-apigateway1-cli
 site_description: A complete library to interact with apigateway (protocol v1)
 

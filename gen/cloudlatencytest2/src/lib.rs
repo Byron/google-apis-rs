@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudlatencytest* crate version *3.0.0+20160309*, where *20160309* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *cloudlatencytest* crate version *3.1.0+20160309*, where *20160309* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudlatencytest2).
 //! # Features
 //! 
@@ -89,7 +89,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

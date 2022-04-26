@@ -4,12 +4,12 @@
 [package]
 
 name = "google-ideahub1_beta"
-version = "3.0.0+20220305"
+version = "3.1.0+20220305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ideahub (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ideahub1_beta"
 homepage = "https://console.cloud.google.com/apis/library/ideahub.googleapis.com"
-documentation = "https://docs.rs/google-ideahub1_beta/3.0.0+20220305"
+documentation = "https://docs.rs/google-ideahub1_beta/3.1.0+20220305"
 license = "MIT"
 keywords = ["ideahub", "google", "protocol", "web", "api"]
 autobins = false
@@ -17,12 +17,12 @@ edition = "2018"
 
 
 [dependencies]
-hyper-rustls = "^0.22"
+hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 6.0"
+yup-oauth2 = "^ 6.6"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
 url = "= 1.7"

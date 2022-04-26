@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dialogflow* crate version *3.0.0+20220228*, where *20220228* is the exact revision of the *dialogflow:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.0.0*.
+//! This documentation was generated from *Dialogflow* crate version *3.1.0+20220228*, where *20220228* is the exact revision of the *dialogflow:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
 //! 
 //! Everything else about the *Dialogflow* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/dialogflow/).
@@ -108,7 +108,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+//! let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

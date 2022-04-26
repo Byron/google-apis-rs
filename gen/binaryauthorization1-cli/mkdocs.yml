@@ -1,4 +1,4 @@
-site_name: Binary Authorization v3.0.0+20220225
+site_name: Binary Authorization v3.1.0+20220225
 site_url: http://byron.github.io/google-apis-rs/google-binaryauthorization1-cli
 site_description: A complete library to interact with Binary Authorization (protocol v1)
 

@@ -1,4 +1,4 @@
-site_name: Assuredworkloads v3.0.0+20220224
+site_name: Assuredworkloads v3.1.0+20220224
 site_url: http://byron.github.io/google-apis-rs/google-assuredworkloads1-cli
 site_description: A complete library to interact with Assuredworkloads (protocol v1)
 

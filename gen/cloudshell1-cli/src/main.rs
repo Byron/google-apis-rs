@@ -769,7 +769,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/cloudshell1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::CloudShell::new(client, auth),
@@ -1042,7 +1048,7 @@ async fn main() {
     
     let mut app = App::new("cloudshell1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220301")
+           .version("3.1.0+20220301")
            .about("Allows users to start, configure, and connect to interactive shell sessions running in the cloud. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudshell1_cli")
            .arg(Arg::with_name("url")

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AnalyticsReporting* API at revision *20220215*. The CLI is at version *3.0.0*.
+This documentation was generated from the *AnalyticsReporting* API at revision *20220215*. The CLI is at version *3.1.0*.
 
 ```bash
 analyticsreporting4 [options]

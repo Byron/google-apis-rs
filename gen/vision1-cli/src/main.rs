@@ -3017,7 +3017,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/vision1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::Vision::new(client, auth),
@@ -4015,7 +4021,7 @@ async fn main() {
     
     let mut app = App::new("vision1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220225")
+           .version("3.1.0+20220225")
            .about("Integrates Google Vision features, including image labeling, face, logo, and landmark detection, optical character recognition (OCR), and detection of explicit content, into applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vision1_cli")
            .arg(Arg::with_name("url")

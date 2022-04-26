@@ -503,7 +503,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/playmoviespartner1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::PlayMovies::new(client, auth),
@@ -717,7 +723,7 @@ async fn main() {
     
     let mut app = App::new("playmoviespartner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20170919")
+           .version("3.1.0+20170919")
            .about("Gets the delivery status of titles for Google Play Movies Partners.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli")
            .arg(Arg::with_name("url")

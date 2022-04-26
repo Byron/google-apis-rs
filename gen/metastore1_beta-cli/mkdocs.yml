@@ -1,4 +1,4 @@
-site_name: Dataproc Metastore v3.0.0+20220222
+site_name: Dataproc Metastore v3.1.0+20220222
 site_url: http://byron.github.io/google-apis-rs/google-metastore1_beta-cli
 site_description: A complete library to interact with Dataproc Metastore (protocol v1beta)
 

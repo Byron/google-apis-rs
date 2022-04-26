@@ -2642,7 +2642,13 @@ impl<'n> Engine<'n> {
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/firebaseappcheck1-beta", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+        let client = hyper::Client::builder().build(
+            hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+                .https_or_http()
+                .enable_http1()
+                .enable_http2()
+                .build()
+	);
         let engine = Engine {
             opt: opt,
             hub: api::Firebaseappcheck::new(client, auth),
@@ -3543,7 +3549,7 @@ async fn main() {
     
     let mut app = App::new("firebaseappcheck1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.0.0+20220225")
+           .version("3.1.0+20220225")
            .about("Firebase App Check works alongside other Firebase services to help protect your backend resources from abuse, such as billing fraud or phishing.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli")
            .arg(Arg::with_name("url")
