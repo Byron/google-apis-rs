@@ -19,12 +19,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,8 +54,8 @@ ${lib.hub_usage_example(c)}\
 </%block>
 #[derive(Clone)]
 pub struct ${hub_type}${ht_params} {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -60,7 +65,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_para
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ${hub_type}${ht_params} {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client,
             auth: authenticator,

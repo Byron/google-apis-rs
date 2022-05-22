@@ -132,7 +132,13 @@ pub struct ${ThisType}
 
 impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
-impl${mb_tparams} ${ThisType} {
+impl${mb_tparams} ${ThisType}
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 % if api.get('no_upload_prefix') is not None and ThisType.startswith(api.no_upload_prefix):
 ${self._action_fn(c, resource, method, m, params, request_value, parts, doit_without_upload = True)}\
 % endif
@@ -179,9 +185,9 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn ${ADD_SCOPE_FN}<T, S>(mut self, scope: T) -> ${ThisType}
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn ${ADD_SCOPE_FN}<T, St>(mut self, scope: T) -> ${ThisType}
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ()),
           None => None,

@@ -29,5 +29,7 @@ cargo:
   dependencies:
     - strsim = "^0.5"
     - clap = "^2.0"
+    - http = "^0.2"
     - hyper = { version = "0.14", features = ["full"] }
     - tokio = { version = "^ 1.0", features = ["full"] }
+    - tower-service = "^0.3.1"

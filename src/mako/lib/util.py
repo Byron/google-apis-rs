@@ -112,7 +112,7 @@ data_unit_multipliers = {
     '%': 1,
 }
 
-HUB_TYPE_PARAMETERS = ()
+HUB_TYPE_PARAMETERS = ('S',)
 
 def items(p):
     if isinstance(p, dict):

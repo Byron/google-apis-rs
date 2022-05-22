@@ -35,8 +35,14 @@ async fn main() {
     ${argparse.new(c) | indent_all_but_first_by(1)}\
     let matches = app.get_matches();
 
-    let debug = matches.is_present("${DEBUG_FLAG}");
-    match Engine::new(matches).await {
+    let debug = matches.is_present("a${DEBUG_FLAG}");
+    let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .https_or_http()
+        .enable_http1()
+        .enable_http2()
+        .build();
+
+    match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();

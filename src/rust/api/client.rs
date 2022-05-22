@@ -1,4 +1,5 @@
 use std::error;
+use std::error::Error as StdError;
 use std::fmt::{self, Display};
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
 use std::str::FromStr;
@@ -7,7 +8,10 @@ use std::time::Duration;
 
 use itertools::Itertools;
 
+use http::Uri;
+
 use hyper::body::Buf;
+use hyper::client::connect;
 use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper::Method;
 use hyper::StatusCode;
@@ -15,6 +19,9 @@ use hyper::StatusCode;
 use mime::{Attr, Mime, SubLevel, TopLevel, Value};
 
 use serde_json as json;
+
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 
 const LINE_ENDING: &str = "\r\n";
 
@@ -564,9 +571,15 @@ impl RangeResponseHeader {
 }
 
 /// A utility type to perform a resumable upload from start to end.
-pub struct ResumableUploadHelper<'a, A: 'a> {
+pub struct ResumableUploadHelper<'a, A: 'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
     pub client: &'a hyper::client::Client<
-        hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>,
+        S,
         hyper::body::Body,
     >,
     pub delegate: &'a mut dyn Delegate,
@@ -580,7 +593,13 @@ pub struct ResumableUploadHelper<'a, A: 'a> {
     pub content_length: u64,
 }
 
-impl<'a, A> ResumableUploadHelper<'a, A> {
+impl<'a, A, S> ResumableUploadHelper<'a, A, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
     async fn query_transfer_status(
         &mut self,
     ) -> std::result::Result<u64, hyper::Result<hyper::Response<hyper::body::Body>>> {
