@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -139,61 +144,61 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct DriveHub<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct DriveHub<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for DriveHub<> {}
+impl<'a, S> client::Hub for DriveHub<S> {}
 
-impl<'a, > DriveHub<> {
+impl<'a, S> DriveHub<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DriveHub<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DriveHub<S> {
         DriveHub {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.0".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn about(&'a self) -> AboutMethods<'a> {
+    pub fn about(&'a self) -> AboutMethods<'a, S> {
         AboutMethods { hub: &self }
     }
-    pub fn changes(&'a self) -> ChangeMethods<'a> {
+    pub fn changes(&'a self) -> ChangeMethods<'a, S> {
         ChangeMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, S> {
         ChannelMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a> {
+    pub fn comments(&'a self) -> CommentMethods<'a, S> {
         CommentMethods { hub: &self }
     }
-    pub fn drives(&'a self) -> DriveMethods<'a> {
+    pub fn drives(&'a self) -> DriveMethods<'a, S> {
         DriveMethods { hub: &self }
     }
-    pub fn files(&'a self) -> FileMethods<'a> {
+    pub fn files(&'a self) -> FileMethods<'a, S> {
         FileMethods { hub: &self }
     }
-    pub fn permissions(&'a self) -> PermissionMethods<'a> {
+    pub fn permissions(&'a self) -> PermissionMethods<'a, S> {
         PermissionMethods { hub: &self }
     }
-    pub fn replies(&'a self) -> ReplyMethods<'a> {
+    pub fn replies(&'a self) -> ReplyMethods<'a, S> {
         ReplyMethods { hub: &self }
     }
-    pub fn revisions(&'a self) -> RevisionMethods<'a> {
+    pub fn revisions(&'a self) -> RevisionMethods<'a, S> {
         RevisionMethods { hub: &self }
     }
-    pub fn teamdrives(&'a self) -> TeamdriveMethods<'a> {
+    pub fn teamdrives(&'a self) -> TeamdriveMethods<'a, S> {
         TeamdriveMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1865,20 +1870,20 @@ impl client::Part for TeamDriveRestrictions {}
 /// let rb = hub.about();
 /// # }
 /// ```
-pub struct AboutMethods<'a>
-    where  {
+pub struct AboutMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for AboutMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AboutMethods<'a, S> {}
 
-impl<'a> AboutMethods<'a> {
+impl<'a, S> AboutMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets information about the user, the user's Drive, and system capabilities.
-    pub fn get(&self) -> AboutGetCall<'a> {
+    pub fn get(&self) -> AboutGetCall<'a, S> {
         AboutGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1918,20 +1923,20 @@ impl<'a> AboutMethods<'a> {
 /// let rb = hub.changes();
 /// # }
 /// ```
-pub struct ChangeMethods<'a>
-    where  {
+pub struct ChangeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChangeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChangeMethods<'a, S> {}
 
-impl<'a> ChangeMethods<'a> {
+impl<'a, S> ChangeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the starting pageToken for listing future changes.
-    pub fn get_start_page_token(&self) -> ChangeGetStartPageTokenCall<'a> {
+    pub fn get_start_page_token(&self) -> ChangeGetStartPageTokenCall<'a, S> {
         ChangeGetStartPageTokenCall {
             hub: self.hub,
             _team_drive_id: Default::default(),
@@ -1951,7 +1956,7 @@ impl<'a> ChangeMethods<'a> {
     /// # Arguments
     ///
     /// * `pageToken` - The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response or to the response from the getStartPageToken method.
-    pub fn list(&self, page_token: &str) -> ChangeListCall<'a> {
+    pub fn list(&self, page_token: &str) -> ChangeListCall<'a, S> {
         ChangeListCall {
             hub: self.hub,
             _page_token: page_token.to_string(),
@@ -1981,7 +1986,7 @@ impl<'a> ChangeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `pageToken` - The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response or to the response from the getStartPageToken method.
-    pub fn watch(&self, request: Channel, page_token: &str) -> ChangeWatchCall<'a> {
+    pub fn watch(&self, request: Channel, page_token: &str) -> ChangeWatchCall<'a, S> {
         ChangeWatchCall {
             hub: self.hub,
             _request: request,
@@ -2035,15 +2040,15 @@ impl<'a> ChangeMethods<'a> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a>
-    where  {
+pub struct ChannelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChannelMethods<'a, S> {}
 
-impl<'a> ChannelMethods<'a> {
+impl<'a, S> ChannelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2052,7 +2057,7 @@ impl<'a> ChannelMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a> {
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, S> {
         ChannelStopCall {
             hub: self.hub,
             _request: request,
@@ -2093,15 +2098,15 @@ impl<'a> ChannelMethods<'a> {
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a>
-    where  {
+pub struct CommentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for CommentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CommentMethods<'a, S> {}
 
-impl<'a> CommentMethods<'a> {
+impl<'a, S> CommentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2111,7 +2116,7 @@ impl<'a> CommentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn create(&self, request: Comment, file_id: &str) -> CommentCreateCall<'a> {
+    pub fn create(&self, request: Comment, file_id: &str) -> CommentCreateCall<'a, S> {
         CommentCreateCall {
             hub: self.hub,
             _request: request,
@@ -2130,7 +2135,7 @@ impl<'a> CommentMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a> {
+    pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a, S> {
         CommentDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2149,7 +2154,7 @@ impl<'a> CommentMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a> {
+    pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a, S> {
         CommentGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2168,7 +2173,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> CommentListCall<'a> {
+    pub fn list(&self, file_id: &str) -> CommentListCall<'a, S> {
         CommentListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2191,7 +2196,7 @@ impl<'a> CommentMethods<'a> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn update(&self, request: Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a> {
+    pub fn update(&self, request: Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a, S> {
         CommentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2234,15 +2239,15 @@ impl<'a> CommentMethods<'a> {
 /// let rb = hub.drives();
 /// # }
 /// ```
-pub struct DriveMethods<'a>
-    where  {
+pub struct DriveMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for DriveMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DriveMethods<'a, S> {}
 
-impl<'a> DriveMethods<'a> {
+impl<'a, S> DriveMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2252,7 +2257,7 @@ impl<'a> DriveMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `requestId` - An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned.
-    pub fn create(&self, request: Drive, request_id: &str) -> DriveCreateCall<'a> {
+    pub fn create(&self, request: Drive, request_id: &str) -> DriveCreateCall<'a, S> {
         DriveCreateCall {
             hub: self.hub,
             _request: request,
@@ -2270,7 +2275,7 @@ impl<'a> DriveMethods<'a> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn delete(&self, drive_id: &str) -> DriveDeleteCall<'a> {
+    pub fn delete(&self, drive_id: &str) -> DriveDeleteCall<'a, S> {
         DriveDeleteCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2287,7 +2292,7 @@ impl<'a> DriveMethods<'a> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn get(&self, drive_id: &str) -> DriveGetCall<'a> {
+    pub fn get(&self, drive_id: &str) -> DriveGetCall<'a, S> {
         DriveGetCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2305,7 +2310,7 @@ impl<'a> DriveMethods<'a> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn hide(&self, drive_id: &str) -> DriveHideCall<'a> {
+    pub fn hide(&self, drive_id: &str) -> DriveHideCall<'a, S> {
         DriveHideCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2318,7 +2323,7 @@ impl<'a> DriveMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the user's shared drives.
-    pub fn list(&self) -> DriveListCall<'a> {
+    pub fn list(&self) -> DriveListCall<'a, S> {
         DriveListCall {
             hub: self.hub,
             _use_domain_admin_access: Default::default(),
@@ -2338,7 +2343,7 @@ impl<'a> DriveMethods<'a> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn unhide(&self, drive_id: &str) -> DriveUnhideCall<'a> {
+    pub fn unhide(&self, drive_id: &str) -> DriveUnhideCall<'a, S> {
         DriveUnhideCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2356,7 +2361,7 @@ impl<'a> DriveMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `driveId` - The ID of the shared drive.
-    pub fn update(&self, request: Drive, drive_id: &str) -> DriveUpdateCall<'a> {
+    pub fn update(&self, request: Drive, drive_id: &str) -> DriveUpdateCall<'a, S> {
         DriveUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2399,15 +2404,15 @@ impl<'a> DriveMethods<'a> {
 /// let rb = hub.files();
 /// # }
 /// ```
-pub struct FileMethods<'a>
-    where  {
+pub struct FileMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for FileMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FileMethods<'a, S> {}
 
-impl<'a> FileMethods<'a> {
+impl<'a, S> FileMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2417,7 +2422,7 @@ impl<'a> FileMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn copy(&self, request: File, file_id: &str) -> FileCopyCall<'a> {
+    pub fn copy(&self, request: File, file_id: &str) -> FileCopyCall<'a, S> {
         FileCopyCall {
             hub: self.hub,
             _request: request,
@@ -2442,7 +2447,7 @@ impl<'a> FileMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: File) -> FileCreateCall<'a> {
+    pub fn create(&self, request: File) -> FileCreateCall<'a, S> {
         FileCreateCall {
             hub: self.hub,
             _request: request,
@@ -2467,7 +2472,7 @@ impl<'a> FileMethods<'a> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a> {
+    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, S> {
         FileDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2483,7 +2488,7 @@ impl<'a> FileMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Permanently deletes all of the user's trashed files.
-    pub fn empty_trash(&self) -> FileEmptyTrashCall<'a> {
+    pub fn empty_trash(&self) -> FileEmptyTrashCall<'a, S> {
         FileEmptyTrashCall {
             hub: self.hub,
             _enforce_single_parent: Default::default(),
@@ -2501,7 +2506,7 @@ impl<'a> FileMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `mimeType` - The MIME type of the format requested for this export.
-    pub fn export(&self, file_id: &str, mime_type: &str) -> FileExportCall<'a> {
+    pub fn export(&self, file_id: &str, mime_type: &str) -> FileExportCall<'a, S> {
         FileExportCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2515,7 +2520,7 @@ impl<'a> FileMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Generates a set of file IDs which can be provided in create or copy requests.
-    pub fn generate_ids(&self) -> FileGenerateIdCall<'a> {
+    pub fn generate_ids(&self) -> FileGenerateIdCall<'a, S> {
         FileGenerateIdCall {
             hub: self.hub,
             _type_: Default::default(),
@@ -2534,7 +2539,7 @@ impl<'a> FileMethods<'a> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn get(&self, file_id: &str) -> FileGetCall<'a> {
+    pub fn get(&self, file_id: &str) -> FileGetCall<'a, S> {
         FileGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2551,7 +2556,7 @@ impl<'a> FileMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists or searches files.
-    pub fn list(&self) -> FileListCall<'a> {
+    pub fn list(&self) -> FileListCall<'a, S> {
         FileListCall {
             hub: self.hub,
             _team_drive_id: Default::default(),
@@ -2582,7 +2587,7 @@ impl<'a> FileMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn update(&self, request: File, file_id: &str) -> FileUpdateCall<'a> {
+    pub fn update(&self, request: File, file_id: &str) -> FileUpdateCall<'a, S> {
         FileUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2610,7 +2615,7 @@ impl<'a> FileMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn watch(&self, request: Channel, file_id: &str) -> FileWatchCall<'a> {
+    pub fn watch(&self, request: Channel, file_id: &str) -> FileWatchCall<'a, S> {
         FileWatchCall {
             hub: self.hub,
             _request: request,
@@ -2656,15 +2661,15 @@ impl<'a> FileMethods<'a> {
 /// let rb = hub.permissions();
 /// # }
 /// ```
-pub struct PermissionMethods<'a>
-    where  {
+pub struct PermissionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for PermissionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PermissionMethods<'a, S> {}
 
-impl<'a> PermissionMethods<'a> {
+impl<'a, S> PermissionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2674,7 +2679,7 @@ impl<'a> PermissionMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file or shared drive.
-    pub fn create(&self, request: Permission, file_id: &str) -> PermissionCreateCall<'a> {
+    pub fn create(&self, request: Permission, file_id: &str) -> PermissionCreateCall<'a, S> {
         PermissionCreateCall {
             hub: self.hub,
             _request: request,
@@ -2701,7 +2706,7 @@ impl<'a> PermissionMethods<'a> {
     ///
     /// * `fileId` - The ID of the file or shared drive.
     /// * `permissionId` - The ID of the permission.
-    pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a> {
+    pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a, S> {
         PermissionDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2723,7 +2728,7 @@ impl<'a> PermissionMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `permissionId` - The ID of the permission.
-    pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a> {
+    pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a, S> {
         PermissionGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2744,7 +2749,7 @@ impl<'a> PermissionMethods<'a> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file or shared drive.
-    pub fn list(&self, file_id: &str) -> PermissionListCall<'a> {
+    pub fn list(&self, file_id: &str) -> PermissionListCall<'a, S> {
         PermissionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2769,7 +2774,7 @@ impl<'a> PermissionMethods<'a> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file or shared drive.
     /// * `permissionId` - The ID of the permission.
-    pub fn update(&self, request: Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a> {
+    pub fn update(&self, request: Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a, S> {
         PermissionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2817,15 +2822,15 @@ impl<'a> PermissionMethods<'a> {
 /// let rb = hub.replies();
 /// # }
 /// ```
-pub struct ReplyMethods<'a>
-    where  {
+pub struct ReplyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for ReplyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ReplyMethods<'a, S> {}
 
-impl<'a> ReplyMethods<'a> {
+impl<'a, S> ReplyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2836,7 +2841,7 @@ impl<'a> ReplyMethods<'a> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn create(&self, request: Reply, file_id: &str, comment_id: &str) -> ReplyCreateCall<'a> {
+    pub fn create(&self, request: Reply, file_id: &str, comment_id: &str) -> ReplyCreateCall<'a, S> {
         ReplyCreateCall {
             hub: self.hub,
             _request: request,
@@ -2857,7 +2862,7 @@ impl<'a> ReplyMethods<'a> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a> {
+    pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a, S> {
         ReplyDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2878,7 +2883,7 @@ impl<'a> ReplyMethods<'a> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a> {
+    pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a, S> {
         ReplyGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2899,7 +2904,7 @@ impl<'a> ReplyMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a> {
+    pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a, S> {
         ReplyListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2923,7 +2928,7 @@ impl<'a> ReplyMethods<'a> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn update(&self, request: Reply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a> {
+    pub fn update(&self, request: Reply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a, S> {
         ReplyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2967,15 +2972,15 @@ impl<'a> ReplyMethods<'a> {
 /// let rb = hub.revisions();
 /// # }
 /// ```
-pub struct RevisionMethods<'a>
-    where  {
+pub struct RevisionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for RevisionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RevisionMethods<'a, S> {}
 
-impl<'a> RevisionMethods<'a> {
+impl<'a, S> RevisionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2985,7 +2990,7 @@ impl<'a> RevisionMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a> {
+    pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a, S> {
         RevisionDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3004,7 +3009,7 @@ impl<'a> RevisionMethods<'a> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a> {
+    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, S> {
         RevisionGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3023,7 +3028,7 @@ impl<'a> RevisionMethods<'a> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> RevisionListCall<'a> {
+    pub fn list(&self, file_id: &str) -> RevisionListCall<'a, S> {
         RevisionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3044,7 +3049,7 @@ impl<'a> RevisionMethods<'a> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn update(&self, request: Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a> {
+    pub fn update(&self, request: Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a, S> {
         RevisionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3087,15 +3092,15 @@ impl<'a> RevisionMethods<'a> {
 /// let rb = hub.teamdrives();
 /// # }
 /// ```
-pub struct TeamdriveMethods<'a>
-    where  {
+pub struct TeamdriveMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for TeamdriveMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TeamdriveMethods<'a, S> {}
 
-impl<'a> TeamdriveMethods<'a> {
+impl<'a, S> TeamdriveMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3105,7 +3110,7 @@ impl<'a> TeamdriveMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `requestId` - An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned.
-    pub fn create(&self, request: TeamDrive, request_id: &str) -> TeamdriveCreateCall<'a> {
+    pub fn create(&self, request: TeamDrive, request_id: &str) -> TeamdriveCreateCall<'a, S> {
         TeamdriveCreateCall {
             hub: self.hub,
             _request: request,
@@ -3123,7 +3128,7 @@ impl<'a> TeamdriveMethods<'a> {
     /// # Arguments
     ///
     /// * `teamDriveId` - The ID of the Team Drive
-    pub fn delete(&self, team_drive_id: &str) -> TeamdriveDeleteCall<'a> {
+    pub fn delete(&self, team_drive_id: &str) -> TeamdriveDeleteCall<'a, S> {
         TeamdriveDeleteCall {
             hub: self.hub,
             _team_drive_id: team_drive_id.to_string(),
@@ -3140,7 +3145,7 @@ impl<'a> TeamdriveMethods<'a> {
     /// # Arguments
     ///
     /// * `teamDriveId` - The ID of the Team Drive
-    pub fn get(&self, team_drive_id: &str) -> TeamdriveGetCall<'a> {
+    pub fn get(&self, team_drive_id: &str) -> TeamdriveGetCall<'a, S> {
         TeamdriveGetCall {
             hub: self.hub,
             _team_drive_id: team_drive_id.to_string(),
@@ -3154,7 +3159,7 @@ impl<'a> TeamdriveMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deprecated use drives.list instead.
-    pub fn list(&self) -> TeamdriveListCall<'a> {
+    pub fn list(&self) -> TeamdriveListCall<'a, S> {
         TeamdriveListCall {
             hub: self.hub,
             _use_domain_admin_access: Default::default(),
@@ -3175,7 +3180,7 @@ impl<'a> TeamdriveMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `teamDriveId` - The ID of the Team Drive
-    pub fn update(&self, request: TeamDrive, team_drive_id: &str) -> TeamdriveUpdateCall<'a> {
+    pub fn update(&self, request: TeamDrive, team_drive_id: &str) -> TeamdriveUpdateCall<'a, S> {
         TeamdriveUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3226,18 +3231,24 @@ impl<'a> TeamdriveMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AboutGetCall<'a>
-    where  {
+pub struct AboutGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AboutGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AboutGetCall<'a, S> {}
 
-impl<'a> AboutGetCall<'a> {
+impl<'a, S> AboutGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3358,7 +3369,7 @@ impl<'a> AboutGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AboutGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AboutGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3379,7 +3390,7 @@ impl<'a> AboutGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3399,9 +3410,9 @@ impl<'a> AboutGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AboutGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AboutGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3445,10 +3456,10 @@ impl<'a> AboutGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeGetStartPageTokenCall<'a>
-    where  {
+pub struct ChangeGetStartPageTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -3458,9 +3469,15 @@ pub struct ChangeGetStartPageTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChangeGetStartPageTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ChangeGetStartPageTokenCall<'a, S> {}
 
-impl<'a> ChangeGetStartPageTokenCall<'a> {
+impl<'a, S> ChangeGetStartPageTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3590,28 +3607,28 @@ impl<'a> ChangeGetStartPageTokenCall<'a> {
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, S> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// The ID of the shared drive for which the starting pageToken for listing future changes from that shared drive is returned.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, S> {
         self._drive_id = Some(new_value.to_string());
         self
     }
@@ -3621,7 +3638,7 @@ impl<'a> ChangeGetStartPageTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeGetStartPageTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeGetStartPageTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3642,7 +3659,7 @@ impl<'a> ChangeGetStartPageTokenCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetStartPageTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetStartPageTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3662,9 +3679,9 @@ impl<'a> ChangeGetStartPageTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeGetStartPageTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChangeGetStartPageTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3716,10 +3733,10 @@ impl<'a> ChangeGetStartPageTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeListCall<'a>
-    where  {
+pub struct ChangeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _page_token: String,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
@@ -3738,9 +3755,15 @@ pub struct ChangeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChangeListCall<'a> {}
+impl<'a, S> client::CallBuilder for ChangeListCall<'a, S> {}
 
-impl<'a> ChangeListCall<'a> {
+impl<'a, S> ChangeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3898,91 +3921,91 @@ impl<'a> ChangeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, S> {
         self._page_token = new_value.to_string();
         self
     }
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeListCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeListCall<'a, S> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query within the user corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
     ///
     /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> ChangeListCall<'a> {
+    pub fn spaces(mut self, new_value: &str) -> ChangeListCall<'a, S> {
         self._spaces = Some(new_value.to_string());
         self
     }
     /// Whether to restrict the results to changes inside the My Drive hierarchy. This omits changes to files such as those in the Application Data folder or shared files which have not been added to My Drive.
     ///
     /// Sets the *restrict to my drive* query property to the given value.
-    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._restrict_to_my_drive = Some(new_value);
         self
     }
     /// The maximum number of changes to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ChangeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ChangeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._include_team_drive_items = Some(new_value);
         self
     }
     /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
     ///
     /// Sets the *include removed* query property to the given value.
-    pub fn include_removed(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn include_removed(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._include_removed = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeListCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeListCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
-    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// Whether changes should include the file resource if the file is still accessible by the user at the time of the request, even when a file was removed from the list of changes and there will be no further change entries for this file.
     ///
     /// Sets the *include corpus removals* query property to the given value.
-    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeListCall<'a> {
+    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeListCall<'a, S> {
         self._include_corpus_removals = Some(new_value);
         self
     }
     /// The shared drive from which changes are returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> ChangeListCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> ChangeListCall<'a, S> {
         self._drive_id = Some(new_value.to_string());
         self
     }
@@ -3992,7 +4015,7 @@ impl<'a> ChangeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4013,7 +4036,7 @@ impl<'a> ChangeListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4033,9 +4056,9 @@ impl<'a> ChangeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChangeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4093,10 +4116,10 @@ impl<'a> ChangeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeWatchCall<'a>
-    where  {
+pub struct ChangeWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Channel,
     _page_token: String,
     _team_drive_id: Option<String>,
@@ -4116,9 +4139,15 @@ pub struct ChangeWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChangeWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ChangeWatchCall<'a, S> {}
 
-impl<'a> ChangeWatchCall<'a> {
+impl<'a, S> ChangeWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4289,7 +4318,7 @@ impl<'a> ChangeWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChangeWatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ChangeWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4299,91 +4328,91 @@ impl<'a> ChangeWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
         self._page_token = new_value.to_string();
         self
     }
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query within the user corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
     ///
     /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a> {
+    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
         self._spaces = Some(new_value.to_string());
         self
     }
     /// Whether to restrict the results to changes inside the My Drive hierarchy. This omits changes to files such as those in the Application Data folder or shared files which have not been added to My Drive.
     ///
     /// Sets the *restrict to my drive* query property to the given value.
-    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._restrict_to_my_drive = Some(new_value);
         self
     }
     /// The maximum number of changes to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ChangeWatchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ChangeWatchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._include_team_drive_items = Some(new_value);
         self
     }
     /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
     ///
     /// Sets the *include removed* query property to the given value.
-    pub fn include_removed(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn include_removed(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._include_removed = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeWatchCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
-    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// Whether changes should include the file resource if the file is still accessible by the user at the time of the request, even when a file was removed from the list of changes and there will be no further change entries for this file.
     ///
     /// Sets the *include corpus removals* query property to the given value.
-    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeWatchCall<'a> {
+    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeWatchCall<'a, S> {
         self._include_corpus_removals = Some(new_value);
         self
     }
     /// The shared drive from which changes are returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
         self._drive_id = Some(new_value.to_string());
         self
     }
@@ -4393,7 +4422,7 @@ impl<'a> ChangeWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4414,7 +4443,7 @@ impl<'a> ChangeWatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4434,9 +4463,9 @@ impl<'a> ChangeWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChangeWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4482,19 +4511,25 @@ impl<'a> ChangeWatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelStopCall<'a>
-    where  {
+pub struct ChannelStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Channel,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelStopCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelStopCall<'a, S> {}
 
-impl<'a> ChannelStopCall<'a> {
+impl<'a, S> ChannelStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4617,7 +4652,7 @@ impl<'a> ChannelStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4627,7 +4662,7 @@ impl<'a> ChannelStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4648,7 +4683,7 @@ impl<'a> ChannelStopCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4668,9 +4703,9 @@ impl<'a> ChannelStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4716,10 +4751,10 @@ impl<'a> ChannelStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentCreateCall<'a>
-    where  {
+pub struct CommentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Comment,
     _file_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4727,9 +4762,15 @@ pub struct CommentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentCreateCall<'a, S> {}
 
-impl<'a> CommentCreateCall<'a> {
+impl<'a, S> CommentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4885,7 +4926,7 @@ impl<'a> CommentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentCreateCall<'a> {
+    pub fn request(mut self, new_value: Comment) -> CommentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4895,7 +4936,7 @@ impl<'a> CommentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentCreateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> CommentCreateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -4905,7 +4946,7 @@ impl<'a> CommentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4926,7 +4967,7 @@ impl<'a> CommentCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4946,9 +4987,9 @@ impl<'a> CommentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4988,10 +5029,10 @@ impl<'a> CommentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a>
-    where  {
+pub struct CommentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _comment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4999,9 +5040,15 @@ pub struct CommentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentDeleteCall<'a, S> {}
 
-impl<'a> CommentDeleteCall<'a> {
+impl<'a, S> CommentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5134,7 +5181,7 @@ impl<'a> CommentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -5144,7 +5191,7 @@ impl<'a> CommentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -5154,7 +5201,7 @@ impl<'a> CommentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5175,7 +5222,7 @@ impl<'a> CommentDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5195,9 +5242,9 @@ impl<'a> CommentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5238,10 +5285,10 @@ impl<'a> CommentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentGetCall<'a>
-    where  {
+pub struct CommentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _comment_id: String,
     _include_deleted: Option<bool>,
@@ -5250,9 +5297,15 @@ pub struct CommentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentGetCall<'a, S> {}
 
-impl<'a> CommentGetCall<'a> {
+impl<'a, S> CommentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5399,7 +5452,7 @@ impl<'a> CommentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -5409,14 +5462,14 @@ impl<'a> CommentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
     /// Whether to return deleted comments. Deleted comments will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -5426,7 +5479,7 @@ impl<'a> CommentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5447,7 +5500,7 @@ impl<'a> CommentGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5467,9 +5520,9 @@ impl<'a> CommentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5513,10 +5566,10 @@ impl<'a> CommentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListCall<'a>
-    where  {
+pub struct CommentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _start_modified_time: Option<String>,
     _page_token: Option<String>,
@@ -5527,9 +5580,15 @@ pub struct CommentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentListCall<'a, S> {}
 
-impl<'a> CommentListCall<'a> {
+impl<'a, S> CommentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5684,35 +5743,35 @@ impl<'a> CommentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// The minimum value of 'modifiedTime' for the result comments (RFC 3339 date-time).
     ///
     /// Sets the *start modified time* query property to the given value.
-    pub fn start_modified_time(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn start_modified_time(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._start_modified_time = Some(new_value.to_string());
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of comments to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CommentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CommentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Whether to include deleted comments. Deleted comments will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -5722,7 +5781,7 @@ impl<'a> CommentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5743,7 +5802,7 @@ impl<'a> CommentListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5763,9 +5822,9 @@ impl<'a> CommentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5811,10 +5870,10 @@ impl<'a> CommentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentUpdateCall<'a>
-    where  {
+pub struct CommentUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Comment,
     _file_id: String,
     _comment_id: String,
@@ -5823,9 +5882,15 @@ pub struct CommentUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentUpdateCall<'a, S> {}
 
-impl<'a> CommentUpdateCall<'a> {
+impl<'a, S> CommentUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5982,7 +6047,7 @@ impl<'a> CommentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a> {
+    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5992,7 +6057,7 @@ impl<'a> CommentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -6002,7 +6067,7 @@ impl<'a> CommentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -6012,7 +6077,7 @@ impl<'a> CommentUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6033,7 +6098,7 @@ impl<'a> CommentUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6053,9 +6118,9 @@ impl<'a> CommentUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6101,10 +6166,10 @@ impl<'a> CommentUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveCreateCall<'a>
-    where  {
+pub struct DriveCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Drive,
     _request_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6112,9 +6177,15 @@ pub struct DriveCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveCreateCall<'a, S> {}
 
-impl<'a> DriveCreateCall<'a> {
+impl<'a, S> DriveCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6249,7 +6320,7 @@ impl<'a> DriveCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Drive) -> DriveCreateCall<'a> {
+    pub fn request(mut self, new_value: Drive) -> DriveCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6259,7 +6330,7 @@ impl<'a> DriveCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request_id(mut self, new_value: &str) -> DriveCreateCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> DriveCreateCall<'a, S> {
         self._request_id = new_value.to_string();
         self
     }
@@ -6269,7 +6340,7 @@ impl<'a> DriveCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6290,7 +6361,7 @@ impl<'a> DriveCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6310,9 +6381,9 @@ impl<'a> DriveCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6352,19 +6423,25 @@ impl<'a> DriveCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveDeleteCall<'a>
-    where  {
+pub struct DriveDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveDeleteCall<'a, S> {}
 
-impl<'a> DriveDeleteCall<'a> {
+impl<'a, S> DriveDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6496,7 +6573,7 @@ impl<'a> DriveDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveDeleteCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveDeleteCall<'a, S> {
         self._drive_id = new_value.to_string();
         self
     }
@@ -6506,7 +6583,7 @@ impl<'a> DriveDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6527,7 +6604,7 @@ impl<'a> DriveDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6547,9 +6624,9 @@ impl<'a> DriveDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6590,10 +6667,10 @@ impl<'a> DriveDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveGetCall<'a>
-    where  {
+pub struct DriveGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _drive_id: String,
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6601,9 +6678,15 @@ pub struct DriveGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveGetCall<'a, S> {}
 
-impl<'a> DriveGetCall<'a> {
+impl<'a, S> DriveGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6749,14 +6832,14 @@ impl<'a> DriveGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveGetCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveGetCall<'a, S> {
         self._drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveGetCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveGetCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -6766,7 +6849,7 @@ impl<'a> DriveGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6787,7 +6870,7 @@ impl<'a> DriveGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6807,9 +6890,9 @@ impl<'a> DriveGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6849,19 +6932,25 @@ impl<'a> DriveGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveHideCall<'a>
-    where  {
+pub struct DriveHideCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveHideCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveHideCall<'a, S> {}
 
-impl<'a> DriveHideCall<'a> {
+impl<'a, S> DriveHideCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7004,7 +7093,7 @@ impl<'a> DriveHideCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveHideCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveHideCall<'a, S> {
         self._drive_id = new_value.to_string();
         self
     }
@@ -7014,7 +7103,7 @@ impl<'a> DriveHideCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveHideCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveHideCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7035,7 +7124,7 @@ impl<'a> DriveHideCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveHideCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveHideCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7055,9 +7144,9 @@ impl<'a> DriveHideCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveHideCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveHideCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7101,10 +7190,10 @@ impl<'a> DriveHideCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveListCall<'a>
-    where  {
+pub struct DriveListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _use_domain_admin_access: Option<bool>,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -7114,9 +7203,15 @@ pub struct DriveListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveListCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveListCall<'a, S> {}
 
-impl<'a> DriveListCall<'a> {
+impl<'a, S> DriveListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7246,28 +7341,28 @@ impl<'a> DriveListCall<'a> {
     /// Issue the request as a domain administrator; if set to true, then all shared drives of the domain in which the requester is an administrator are returned.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveListCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveListCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Query string for searching shared drives.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> DriveListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> DriveListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token for shared drives.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DriveListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DriveListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of shared drives to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DriveListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> DriveListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7277,7 +7372,7 @@ impl<'a> DriveListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7298,7 +7393,7 @@ impl<'a> DriveListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7318,9 +7413,9 @@ impl<'a> DriveListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7360,19 +7455,25 @@ impl<'a> DriveListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveUnhideCall<'a>
-    where  {
+pub struct DriveUnhideCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveUnhideCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveUnhideCall<'a, S> {}
 
-impl<'a> DriveUnhideCall<'a> {
+impl<'a, S> DriveUnhideCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7515,7 +7616,7 @@ impl<'a> DriveUnhideCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveUnhideCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveUnhideCall<'a, S> {
         self._drive_id = new_value.to_string();
         self
     }
@@ -7525,7 +7626,7 @@ impl<'a> DriveUnhideCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUnhideCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUnhideCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7546,7 +7647,7 @@ impl<'a> DriveUnhideCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveUnhideCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveUnhideCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7566,9 +7667,9 @@ impl<'a> DriveUnhideCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUnhideCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveUnhideCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7615,10 +7716,10 @@ impl<'a> DriveUnhideCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveUpdateCall<'a>
-    where  {
+pub struct DriveUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Drive,
     _drive_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -7627,9 +7728,15 @@ pub struct DriveUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DriveUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for DriveUpdateCall<'a, S> {}
 
-impl<'a> DriveUpdateCall<'a> {
+impl<'a, S> DriveUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7788,7 +7895,7 @@ impl<'a> DriveUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Drive) -> DriveUpdateCall<'a> {
+    pub fn request(mut self, new_value: Drive) -> DriveUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7798,14 +7905,14 @@ impl<'a> DriveUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveUpdateCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveUpdateCall<'a, S> {
         self._drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveUpdateCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveUpdateCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -7815,7 +7922,7 @@ impl<'a> DriveUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7836,7 +7943,7 @@ impl<'a> DriveUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7856,9 +7963,9 @@ impl<'a> DriveUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DriveUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7911,10 +8018,10 @@ impl<'a> DriveUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileCopyCall<'a>
-    where  {
+pub struct FileCopyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: File,
     _file_id: String,
     _supports_team_drives: Option<bool>,
@@ -7929,9 +8036,15 @@ pub struct FileCopyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileCopyCall<'a> {}
+impl<'a, S> client::CallBuilder for FileCopyCall<'a, S> {}
 
-impl<'a> FileCopyCall<'a> {
+impl<'a, S> FileCopyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8108,7 +8221,7 @@ impl<'a> FileCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: File) -> FileCopyCall<'a> {
+    pub fn request(mut self, new_value: File) -> FileCopyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8118,56 +8231,56 @@ impl<'a> FileCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileCopyCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileCopyCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileCopyCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileCopyCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A language hint for OCR processing during image import (ISO 639-1 code).
     ///
     /// Sets the *ocr language* query property to the given value.
-    pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, S> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
     /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
-    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCopyCall<'a> {
+    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCopyCall<'a, S> {
         self._keep_revision_forever = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCopyCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCopyCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether to ignore the domain's default visibility settings for the created file. Domain administrators can choose to make all uploaded files visible to the domain by default; this parameter bypasses that behavior for the request. Permissions are still inherited from parent folders.
     ///
     /// Sets the *ignore default visibility* query property to the given value.
-    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCopyCall<'a> {
+    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCopyCall<'a, S> {
         self._ignore_default_visibility = Some(new_value);
         self
     }
     /// Deprecated. Copying files into multiple folders is no longer supported. Use shortcuts instead.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a, S> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -8177,7 +8290,7 @@ impl<'a> FileCopyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCopyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCopyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8198,7 +8311,7 @@ impl<'a> FileCopyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileCopyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileCopyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8218,9 +8331,9 @@ impl<'a> FileCopyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileCopyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileCopyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8275,10 +8388,10 @@ impl<'a> FileCopyCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct FileCreateCall<'a>
-    where  {
+pub struct FileCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: File,
     _use_content_as_indexable_text: Option<bool>,
     _supports_team_drives: Option<bool>,
@@ -8293,9 +8406,15 @@ pub struct FileCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for FileCreateCall<'a, S> {}
 
-impl<'a> FileCreateCall<'a> {
+impl<'a, S> FileCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8566,63 +8685,63 @@ impl<'a> FileCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: File) -> FileCreateCall<'a> {
+    pub fn request(mut self, new_value: File) -> FileCreateCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Whether to use the uploaded content as indexable text.
     ///
     /// Sets the *use content as indexable text* query property to the given value.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileCreateCall<'a> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileCreateCall<'a, S> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileCreateCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileCreateCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileCreateCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileCreateCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A language hint for OCR processing during image import (ISO 639-1 code).
     ///
     /// Sets the *ocr language* query property to the given value.
-    pub fn ocr_language(mut self, new_value: &str) -> FileCreateCall<'a> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileCreateCall<'a, S> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
     /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
-    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCreateCall<'a> {
+    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCreateCall<'a, S> {
         self._keep_revision_forever = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCreateCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCreateCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether to ignore the domain's default visibility settings for the created file. Domain administrators can choose to make all uploaded files visible to the domain by default; this parameter bypasses that behavior for the request. Permissions are still inherited from parent folders.
     ///
     /// Sets the *ignore default visibility* query property to the given value.
-    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCreateCall<'a> {
+    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCreateCall<'a, S> {
         self._ignore_default_visibility = Some(new_value);
         self
     }
     /// Deprecated. Creating files in multiple folders is no longer supported.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCreateCall<'a> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCreateCall<'a, S> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -8632,7 +8751,7 @@ impl<'a> FileCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8653,7 +8772,7 @@ impl<'a> FileCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8673,9 +8792,9 @@ impl<'a> FileCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8718,10 +8837,10 @@ impl<'a> FileCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileDeleteCall<'a>
-    where  {
+pub struct FileDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -8731,9 +8850,15 @@ pub struct FileDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for FileDeleteCall<'a, S> {}
 
-impl<'a> FileDeleteCall<'a> {
+impl<'a, S> FileDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8874,28 +8999,28 @@ impl<'a> FileDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileDeleteCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileDeleteCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileDeleteCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileDeleteCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Deprecated. If an item is not in a shared drive and its last parent is deleted but the item itself is not, the item will be placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileDeleteCall<'a> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileDeleteCall<'a, S> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -8905,7 +9030,7 @@ impl<'a> FileDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8926,7 +9051,7 @@ impl<'a> FileDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8946,9 +9071,9 @@ impl<'a> FileDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8989,19 +9114,25 @@ impl<'a> FileDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileEmptyTrashCall<'a>
-    where  {
+pub struct FileEmptyTrashCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileEmptyTrashCall<'a> {}
+impl<'a, S> client::CallBuilder for FileEmptyTrashCall<'a, S> {}
 
-impl<'a> FileEmptyTrashCall<'a> {
+impl<'a, S> FileEmptyTrashCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9111,7 +9242,7 @@ impl<'a> FileEmptyTrashCall<'a> {
     /// Deprecated. If an item is not in a shared drive and its last parent is deleted but the item itself is not, the item will be placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileEmptyTrashCall<'a> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileEmptyTrashCall<'a, S> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -9121,7 +9252,7 @@ impl<'a> FileEmptyTrashCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileEmptyTrashCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileEmptyTrashCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9142,7 +9273,7 @@ impl<'a> FileEmptyTrashCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileEmptyTrashCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileEmptyTrashCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9162,9 +9293,9 @@ impl<'a> FileEmptyTrashCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileEmptyTrashCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileEmptyTrashCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9207,10 +9338,10 @@ impl<'a> FileEmptyTrashCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileExportCall<'a>
-    where  {
+pub struct FileExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _mime_type: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9218,9 +9349,15 @@ pub struct FileExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileExportCall<'a> {}
+impl<'a, S> client::CallBuilder for FileExportCall<'a, S> {}
 
-impl<'a> FileExportCall<'a> {
+impl<'a, S> FileExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9353,7 +9490,7 @@ impl<'a> FileExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileExportCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> FileExportCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -9363,7 +9500,7 @@ impl<'a> FileExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn mime_type(mut self, new_value: &str) -> FileExportCall<'a> {
+    pub fn mime_type(mut self, new_value: &str) -> FileExportCall<'a, S> {
         self._mime_type = new_value.to_string();
         self
     }
@@ -9373,7 +9510,7 @@ impl<'a> FileExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9394,7 +9531,7 @@ impl<'a> FileExportCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9414,9 +9551,9 @@ impl<'a> FileExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9459,10 +9596,10 @@ impl<'a> FileExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileGenerateIdCall<'a>
-    where  {
+pub struct FileGenerateIdCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _type_: Option<String>,
     _space: Option<String>,
     _count: Option<i32>,
@@ -9471,9 +9608,15 @@ pub struct FileGenerateIdCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileGenerateIdCall<'a> {}
+impl<'a, S> client::CallBuilder for FileGenerateIdCall<'a, S> {}
 
-impl<'a> FileGenerateIdCall<'a> {
+impl<'a, S> FileGenerateIdCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9600,21 +9743,21 @@ impl<'a> FileGenerateIdCall<'a> {
     /// The type of items which the IDs can be used for. Supported values are 'files' and 'shortcuts'. Note that 'shortcuts' are only supported in the drive 'space'. (Default: 'files')
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> FileGenerateIdCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> FileGenerateIdCall<'a, S> {
         self._type_ = Some(new_value.to_string());
         self
     }
     /// The space in which the IDs can be used to create new files. Supported values are 'drive' and 'appDataFolder'. (Default: 'drive')
     ///
     /// Sets the *space* query property to the given value.
-    pub fn space(mut self, new_value: &str) -> FileGenerateIdCall<'a> {
+    pub fn space(mut self, new_value: &str) -> FileGenerateIdCall<'a, S> {
         self._space = Some(new_value.to_string());
         self
     }
     /// The number of IDs to return.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> FileGenerateIdCall<'a> {
+    pub fn count(mut self, new_value: i32) -> FileGenerateIdCall<'a, S> {
         self._count = Some(new_value);
         self
     }
@@ -9624,7 +9767,7 @@ impl<'a> FileGenerateIdCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGenerateIdCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGenerateIdCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9645,7 +9788,7 @@ impl<'a> FileGenerateIdCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileGenerateIdCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileGenerateIdCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9665,9 +9808,9 @@ impl<'a> FileGenerateIdCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileGenerateIdCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileGenerateIdCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9716,10 +9859,10 @@ impl<'a> FileGenerateIdCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileGetCall<'a>
-    where  {
+pub struct FileGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -9730,9 +9873,15 @@ pub struct FileGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileGetCall<'a> {}
+impl<'a, S> client::CallBuilder for FileGetCall<'a, S> {}
 
-impl<'a> FileGetCall<'a> {
+impl<'a, S> FileGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9903,35 +10052,35 @@ impl<'a> FileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileGetCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileGetCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileGetCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileGetCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileGetCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileGetCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, S> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -9941,7 +10090,7 @@ impl<'a> FileGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9962,7 +10111,7 @@ impl<'a> FileGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9982,9 +10131,9 @@ impl<'a> FileGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10038,10 +10187,10 @@ impl<'a> FileGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileListCall<'a>
-    where  {
+pub struct FileListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -10061,9 +10210,15 @@ pub struct FileListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileListCall<'a> {}
+impl<'a, S> client::CallBuilder for FileListCall<'a, S> {}
 
-impl<'a> FileListCall<'a> {
+impl<'a, S> FileListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10223,98 +10378,98 @@ impl<'a> FileListCall<'a> {
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileListCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileListCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileListCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileListCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query within the corpus. Supported values are 'drive' and 'appDataFolder'.
     ///
     /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn spaces(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._spaces = Some(new_value.to_string());
         self
     }
     /// A query for filtering the file results. See the "Search for Files" guide for supported syntax.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of files to return per page. Partial or empty result pages are possible even before the end of the files list has been reached.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FileListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> FileListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A comma-separated list of sort keys. Valid keys are 'createdTime', 'folder', 'modifiedByMeTime', 'modifiedTime', 'name', 'name_natural', 'quotaBytesUsed', 'recency', 'sharedWithMeTime', 'starred', and 'viewedByMeTime'. Each key sorts ascending by default, but may be reversed with the 'desc' modifier. Example usage: ?orderBy=folder,modifiedTime desc,name. Please note that there is a current limitation for users with approximately one million files in which the requested sort order is ignored.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> FileListCall<'a> {
+    pub fn include_team_drive_items(mut self, new_value: bool) -> FileListCall<'a, S> {
         self._include_team_drive_items = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
-    pub fn include_items_from_all_drives(mut self, new_value: bool) -> FileListCall<'a> {
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> FileListCall<'a, S> {
         self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// ID of the shared drive to search.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn drive_id(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._drive_id = Some(new_value.to_string());
         self
     }
     /// The source of files to list. Deprecated: use 'corpora' instead.
     ///
     /// Sets the *corpus* query property to the given value.
-    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._corpus = Some(new_value.to_string());
         self
     }
     /// Groupings of files to which the query applies. Supported groupings are: 'user' (files created by, opened by, or shared directly with the user), 'drive' (files in the specified shared drive as indicated by the 'driveId'), 'domain' (files shared to the user's domain), and 'allDrives' (A combination of 'user' and 'drive' for all drives where the user is a member). When able, use 'user' or 'drive', instead of 'allDrives', for efficiency.
     ///
     /// Sets the *corpora* query property to the given value.
-    pub fn corpora(mut self, new_value: &str) -> FileListCall<'a> {
+    pub fn corpora(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._corpora = Some(new_value.to_string());
         self
     }
@@ -10324,7 +10479,7 @@ impl<'a> FileListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10345,7 +10500,7 @@ impl<'a> FileListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10365,9 +10520,9 @@ impl<'a> FileListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10423,10 +10578,10 @@ impl<'a> FileListCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct FileUpdateCall<'a>
-    where  {
+pub struct FileUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: File,
     _file_id: String,
     _use_content_as_indexable_text: Option<bool>,
@@ -10443,9 +10598,15 @@ pub struct FileUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for FileUpdateCall<'a, S> {}
 
-impl<'a> FileUpdateCall<'a> {
+impl<'a, S> FileUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
     /// Perform the operation you have build so far, but without uploading. This is used to e.g. renaming or updating the description for a file
     pub async fn doit_without_upload(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, File)> {
@@ -10916,7 +11077,7 @@ impl<'a> FileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: File) -> FileUpdateCall<'a> {
+    pub fn request(mut self, new_value: File) -> FileUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10926,70 +11087,70 @@ impl<'a> FileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Whether to use the uploaded content as indexable text.
     ///
     /// Sets the *use content as indexable text* query property to the given value.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a, S> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileUpdateCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileUpdateCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileUpdateCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileUpdateCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of parent IDs to remove.
     ///
     /// Sets the *remove parents* query property to the given value.
-    pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a> {
+    pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
         self._remove_parents = Some(new_value.to_string());
         self
     }
     /// A language hint for OCR processing during image import (ISO 639-1 code).
     ///
     /// Sets the *ocr language* query property to the given value.
-    pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
     /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
-    pub fn keep_revision_forever(mut self, new_value: bool) -> FileUpdateCall<'a> {
+    pub fn keep_revision_forever(mut self, new_value: bool) -> FileUpdateCall<'a, S> {
         self._keep_revision_forever = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileUpdateCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Deprecated. Adding files to multiple folders is no longer supported. Use shortcuts instead.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a, S> {
         self._enforce_single_parent = Some(new_value);
         self
     }
     /// A comma-separated list of parent IDs to add.
     ///
     /// Sets the *add parents* query property to the given value.
-    pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a> {
+    pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
         self._add_parents = Some(new_value.to_string());
         self
     }
@@ -10999,7 +11160,7 @@ impl<'a> FileUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11020,7 +11181,7 @@ impl<'a> FileUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11040,9 +11201,9 @@ impl<'a> FileUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11097,10 +11258,10 @@ impl<'a> FileUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileWatchCall<'a>
-    where  {
+pub struct FileWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Channel,
     _file_id: String,
     _supports_team_drives: Option<bool>,
@@ -11112,9 +11273,15 @@ pub struct FileWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FileWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for FileWatchCall<'a, S> {}
 
-impl<'a> FileWatchCall<'a> {
+impl<'a, S> FileWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11298,7 +11465,7 @@ impl<'a> FileWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> FileWatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> FileWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11308,35 +11475,35 @@ impl<'a> FileWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileWatchCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileWatchCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileWatchCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileWatchCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileWatchCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileWatchCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, S> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -11346,7 +11513,7 @@ impl<'a> FileWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11367,7 +11534,7 @@ impl<'a> FileWatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11387,9 +11554,9 @@ impl<'a> FileWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FileWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11443,10 +11610,10 @@ impl<'a> FileWatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionCreateCall<'a>
-    where  {
+pub struct PermissionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Permission,
     _file_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -11462,9 +11629,15 @@ pub struct PermissionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PermissionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PermissionCreateCall<'a, S> {}
 
-impl<'a> PermissionCreateCall<'a> {
+impl<'a, S> PermissionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11644,7 +11817,7 @@ impl<'a> PermissionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Permission) -> PermissionCreateCall<'a> {
+    pub fn request(mut self, new_value: Permission) -> PermissionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11654,63 +11827,63 @@ impl<'a> PermissionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionCreateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionCreateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect. File owners can only transfer ownership of files existing on My Drive. Files existing in a shared drive are owned by the organization that owns that shared drive. Ownership transfers are not supported for files and folders in shared drives. Organizers of a shared drive can move items from that shared drive into their My Drive which transfers the ownership to them.
     ///
     /// Sets the *transfer ownership* query property to the given value.
-    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._transfer_ownership = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to send a notification email when sharing to users or groups. This defaults to true for users and groups, and is not allowed for other requests. It must not be disabled for ownership transfers.
     ///
     /// Sets the *send notification email* query property to the given value.
-    pub fn send_notification_email(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn send_notification_email(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._send_notification_email = Some(new_value);
         self
     }
     /// This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. If set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, parents are not changed.
     ///
     /// Sets the *move to new owners root* query property to the given value.
-    pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._move_to_new_owners_root = Some(new_value);
         self
     }
     /// Deprecated. See moveToNewOwnersRoot for details.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionCreateCall<'a> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionCreateCall<'a, S> {
         self._enforce_single_parent = Some(new_value);
         self
     }
     /// A plain text custom message to include in the notification email.
     ///
     /// Sets the *email message* query property to the given value.
-    pub fn email_message(mut self, new_value: &str) -> PermissionCreateCall<'a> {
+    pub fn email_message(mut self, new_value: &str) -> PermissionCreateCall<'a, S> {
         self._email_message = Some(new_value.to_string());
         self
     }
@@ -11720,7 +11893,7 @@ impl<'a> PermissionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11741,7 +11914,7 @@ impl<'a> PermissionCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11761,9 +11934,9 @@ impl<'a> PermissionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11806,10 +11979,10 @@ impl<'a> PermissionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionDeleteCall<'a>
-    where  {
+pub struct PermissionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -11820,9 +11993,15 @@ pub struct PermissionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PermissionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PermissionDeleteCall<'a, S> {}
 
-impl<'a> PermissionDeleteCall<'a> {
+impl<'a, S> PermissionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11964,7 +12143,7 @@ impl<'a> PermissionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -11974,28 +12153,28 @@ impl<'a> PermissionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, S> {
         self._permission_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
@@ -12005,7 +12184,7 @@ impl<'a> PermissionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12026,7 +12205,7 @@ impl<'a> PermissionDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12046,9 +12225,9 @@ impl<'a> PermissionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12091,10 +12270,10 @@ impl<'a> PermissionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionGetCall<'a>
-    where  {
+pub struct PermissionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -12105,9 +12284,15 @@ pub struct PermissionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PermissionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PermissionGetCall<'a, S> {}
 
-impl<'a> PermissionGetCall<'a> {
+impl<'a, S> PermissionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12260,7 +12445,7 @@ impl<'a> PermissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12270,28 +12455,28 @@ impl<'a> PermissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, S> {
         self._permission_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionGetCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionGetCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionGetCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionGetCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
@@ -12301,7 +12486,7 @@ impl<'a> PermissionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12322,7 +12507,7 @@ impl<'a> PermissionGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12342,9 +12527,9 @@ impl<'a> PermissionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12390,10 +12575,10 @@ impl<'a> PermissionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionListCall<'a>
-    where  {
+pub struct PermissionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
@@ -12406,9 +12591,15 @@ pub struct PermissionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PermissionListCall<'a> {}
+impl<'a, S> client::CallBuilder for PermissionListCall<'a, S> {}
 
-impl<'a> PermissionListCall<'a> {
+impl<'a, S> PermissionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12569,49 +12760,49 @@ impl<'a> PermissionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionListCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionListCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionListCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionListCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PermissionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PermissionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of permissions to return per page. When not set for files in a shared drive, at most 100 results will be returned. When not set for files that are not in a shared drive, the entire list will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PermissionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PermissionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> PermissionListCall<'a> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> PermissionListCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
@@ -12621,7 +12812,7 @@ impl<'a> PermissionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12642,7 +12833,7 @@ impl<'a> PermissionListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12662,9 +12853,9 @@ impl<'a> PermissionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12715,10 +12906,10 @@ impl<'a> PermissionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionUpdateCall<'a>
-    where  {
+pub struct PermissionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Permission,
     _file_id: String,
     _permission_id: String,
@@ -12732,9 +12923,15 @@ pub struct PermissionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PermissionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PermissionUpdateCall<'a, S> {}
 
-impl<'a> PermissionUpdateCall<'a> {
+impl<'a, S> PermissionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12906,7 +13103,7 @@ impl<'a> PermissionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Permission) -> PermissionUpdateCall<'a> {
+    pub fn request(mut self, new_value: Permission) -> PermissionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12916,7 +13113,7 @@ impl<'a> PermissionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12926,42 +13123,42 @@ impl<'a> PermissionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, S> {
         self._permission_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect. File owners can only transfer ownership of files existing on My Drive. Files existing in a shared drive are owned by the organization that owns that shared drive. Ownership transfers are not supported for files and folders in shared drives. Organizers of a shared drive can move items from that shared drive into their My Drive which transfers the ownership to them.
     ///
     /// Sets the *transfer ownership* query property to the given value.
-    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
+    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, S> {
         self._transfer_ownership = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, S> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, S> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to remove the expiration date.
     ///
     /// Sets the *remove expiration* query property to the given value.
-    pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
+    pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a, S> {
         self._remove_expiration = Some(new_value);
         self
     }
@@ -12971,7 +13168,7 @@ impl<'a> PermissionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12992,7 +13189,7 @@ impl<'a> PermissionUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13012,9 +13209,9 @@ impl<'a> PermissionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13060,10 +13257,10 @@ impl<'a> PermissionUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyCreateCall<'a>
-    where  {
+pub struct ReplyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Reply,
     _file_id: String,
     _comment_id: String,
@@ -13072,9 +13269,15 @@ pub struct ReplyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReplyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ReplyCreateCall<'a, S> {}
 
-impl<'a> ReplyCreateCall<'a> {
+impl<'a, S> ReplyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13231,7 +13434,7 @@ impl<'a> ReplyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reply) -> ReplyCreateCall<'a> {
+    pub fn request(mut self, new_value: Reply) -> ReplyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13241,7 +13444,7 @@ impl<'a> ReplyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyCreateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyCreateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13251,7 +13454,7 @@ impl<'a> ReplyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyCreateCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyCreateCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13261,7 +13464,7 @@ impl<'a> ReplyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13282,7 +13485,7 @@ impl<'a> ReplyCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13302,9 +13505,9 @@ impl<'a> ReplyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13344,10 +13547,10 @@ impl<'a> ReplyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyDeleteCall<'a>
-    where  {
+pub struct ReplyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -13356,9 +13559,15 @@ pub struct ReplyDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReplyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ReplyDeleteCall<'a, S> {}
 
-impl<'a> ReplyDeleteCall<'a> {
+impl<'a, S> ReplyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13492,7 +13701,7 @@ impl<'a> ReplyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13502,7 +13711,7 @@ impl<'a> ReplyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13512,7 +13721,7 @@ impl<'a> ReplyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, S> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -13522,7 +13731,7 @@ impl<'a> ReplyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13543,7 +13752,7 @@ impl<'a> ReplyDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13563,9 +13772,9 @@ impl<'a> ReplyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13606,10 +13815,10 @@ impl<'a> ReplyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyGetCall<'a>
-    where  {
+pub struct ReplyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -13619,9 +13828,15 @@ pub struct ReplyGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReplyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ReplyGetCall<'a, S> {}
 
-impl<'a> ReplyGetCall<'a> {
+impl<'a, S> ReplyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13769,7 +13984,7 @@ impl<'a> ReplyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13779,7 +13994,7 @@ impl<'a> ReplyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13789,14 +14004,14 @@ impl<'a> ReplyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a, S> {
         self._reply_id = new_value.to_string();
         self
     }
     /// Whether to return deleted replies. Deleted replies will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -13806,7 +14021,7 @@ impl<'a> ReplyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13827,7 +14042,7 @@ impl<'a> ReplyGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13847,9 +14062,9 @@ impl<'a> ReplyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13892,10 +14107,10 @@ impl<'a> ReplyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyListCall<'a>
-    where  {
+pub struct ReplyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _comment_id: String,
     _page_token: Option<String>,
@@ -13906,9 +14121,15 @@ pub struct ReplyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReplyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ReplyListCall<'a, S> {}
 
-impl<'a> ReplyListCall<'a> {
+impl<'a, S> ReplyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14061,7 +14282,7 @@ impl<'a> ReplyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14071,28 +14292,28 @@ impl<'a> ReplyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of replies to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ReplyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ReplyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Whether to include deleted replies. Deleted replies will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -14102,7 +14323,7 @@ impl<'a> ReplyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14123,7 +14344,7 @@ impl<'a> ReplyListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14143,9 +14364,9 @@ impl<'a> ReplyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14191,10 +14412,10 @@ impl<'a> ReplyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyUpdateCall<'a>
-    where  {
+pub struct ReplyUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Reply,
     _file_id: String,
     _comment_id: String,
@@ -14204,9 +14425,15 @@ pub struct ReplyUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReplyUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ReplyUpdateCall<'a, S> {}
 
-impl<'a> ReplyUpdateCall<'a> {
+impl<'a, S> ReplyUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14364,7 +14591,7 @@ impl<'a> ReplyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reply) -> ReplyUpdateCall<'a> {
+    pub fn request(mut self, new_value: Reply) -> ReplyUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14374,7 +14601,7 @@ impl<'a> ReplyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14384,7 +14611,7 @@ impl<'a> ReplyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -14394,7 +14621,7 @@ impl<'a> ReplyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, S> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -14404,7 +14631,7 @@ impl<'a> ReplyUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14425,7 +14652,7 @@ impl<'a> ReplyUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14445,9 +14672,9 @@ impl<'a> ReplyUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14487,10 +14714,10 @@ impl<'a> ReplyUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionDeleteCall<'a>
-    where  {
+pub struct RevisionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _revision_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14498,9 +14725,15 @@ pub struct RevisionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RevisionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for RevisionDeleteCall<'a, S> {}
 
-impl<'a> RevisionDeleteCall<'a> {
+impl<'a, S> RevisionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14633,7 +14866,7 @@ impl<'a> RevisionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14643,7 +14876,7 @@ impl<'a> RevisionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, S> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -14653,7 +14886,7 @@ impl<'a> RevisionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14674,7 +14907,7 @@ impl<'a> RevisionDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14694,9 +14927,9 @@ impl<'a> RevisionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14742,10 +14975,10 @@ impl<'a> RevisionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionGetCall<'a>
-    where  {
+pub struct RevisionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _revision_id: String,
     _acknowledge_abuse: Option<bool>,
@@ -14754,9 +14987,15 @@ pub struct RevisionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RevisionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for RevisionGetCall<'a, S> {}
 
-impl<'a> RevisionGetCall<'a> {
+impl<'a, S> RevisionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14919,7 +15158,7 @@ impl<'a> RevisionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14929,14 +15168,14 @@ impl<'a> RevisionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, S> {
         self._revision_id = new_value.to_string();
         self
     }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> RevisionGetCall<'a> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> RevisionGetCall<'a, S> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -14946,7 +15185,7 @@ impl<'a> RevisionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14967,7 +15206,7 @@ impl<'a> RevisionGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14987,9 +15226,9 @@ impl<'a> RevisionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15031,10 +15270,10 @@ impl<'a> RevisionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionListCall<'a>
-    where  {
+pub struct RevisionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _file_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15043,9 +15282,15 @@ pub struct RevisionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RevisionListCall<'a> {}
+impl<'a, S> client::CallBuilder for RevisionListCall<'a, S> {}
 
-impl<'a> RevisionListCall<'a> {
+impl<'a, S> RevisionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15194,21 +15439,21 @@ impl<'a> RevisionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RevisionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> RevisionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of revisions to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> RevisionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> RevisionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -15218,7 +15463,7 @@ impl<'a> RevisionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15239,7 +15484,7 @@ impl<'a> RevisionListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15259,9 +15504,9 @@ impl<'a> RevisionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15307,10 +15552,10 @@ impl<'a> RevisionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionUpdateCall<'a>
-    where  {
+pub struct RevisionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: Revision,
     _file_id: String,
     _revision_id: String,
@@ -15319,9 +15564,15 @@ pub struct RevisionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RevisionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for RevisionUpdateCall<'a, S> {}
 
-impl<'a> RevisionUpdateCall<'a> {
+impl<'a, S> RevisionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15478,7 +15729,7 @@ impl<'a> RevisionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Revision) -> RevisionUpdateCall<'a> {
+    pub fn request(mut self, new_value: Revision) -> RevisionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15488,7 +15739,7 @@ impl<'a> RevisionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, S> {
         self._file_id = new_value.to_string();
         self
     }
@@ -15498,7 +15749,7 @@ impl<'a> RevisionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, S> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -15508,7 +15759,7 @@ impl<'a> RevisionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15529,7 +15780,7 @@ impl<'a> RevisionUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15549,9 +15800,9 @@ impl<'a> RevisionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15597,10 +15848,10 @@ impl<'a> RevisionUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveCreateCall<'a>
-    where  {
+pub struct TeamdriveCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: TeamDrive,
     _request_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15608,9 +15859,15 @@ pub struct TeamdriveCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TeamdriveCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for TeamdriveCreateCall<'a, S> {}
 
-impl<'a> TeamdriveCreateCall<'a> {
+impl<'a, S> TeamdriveCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15745,7 +16002,7 @@ impl<'a> TeamdriveCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveCreateCall<'a> {
+    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15755,7 +16012,7 @@ impl<'a> TeamdriveCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request_id(mut self, new_value: &str) -> TeamdriveCreateCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> TeamdriveCreateCall<'a, S> {
         self._request_id = new_value.to_string();
         self
     }
@@ -15765,7 +16022,7 @@ impl<'a> TeamdriveCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15786,7 +16043,7 @@ impl<'a> TeamdriveCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15806,9 +16063,9 @@ impl<'a> TeamdriveCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15848,19 +16105,25 @@ impl<'a> TeamdriveCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveDeleteCall<'a>
-    where  {
+pub struct TeamdriveDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _team_drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TeamdriveDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TeamdriveDeleteCall<'a, S> {}
 
-impl<'a> TeamdriveDeleteCall<'a> {
+impl<'a, S> TeamdriveDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15992,7 +16255,7 @@ impl<'a> TeamdriveDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveDeleteCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveDeleteCall<'a, S> {
         self._team_drive_id = new_value.to_string();
         self
     }
@@ -16002,7 +16265,7 @@ impl<'a> TeamdriveDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16023,7 +16286,7 @@ impl<'a> TeamdriveDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16043,9 +16306,9 @@ impl<'a> TeamdriveDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16086,10 +16349,10 @@ impl<'a> TeamdriveDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveGetCall<'a>
-    where  {
+pub struct TeamdriveGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _team_drive_id: String,
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16097,9 +16360,15 @@ pub struct TeamdriveGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TeamdriveGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TeamdriveGetCall<'a, S> {}
 
-impl<'a> TeamdriveGetCall<'a> {
+impl<'a, S> TeamdriveGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16245,14 +16514,14 @@ impl<'a> TeamdriveGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveGetCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveGetCall<'a, S> {
         self._team_drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveGetCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveGetCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -16262,7 +16531,7 @@ impl<'a> TeamdriveGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16283,7 +16552,7 @@ impl<'a> TeamdriveGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16303,9 +16572,9 @@ impl<'a> TeamdriveGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16349,10 +16618,10 @@ impl<'a> TeamdriveGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveListCall<'a>
-    where  {
+pub struct TeamdriveListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _use_domain_admin_access: Option<bool>,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -16362,9 +16631,15 @@ pub struct TeamdriveListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TeamdriveListCall<'a> {}
+impl<'a, S> client::CallBuilder for TeamdriveListCall<'a, S> {}
 
-impl<'a> TeamdriveListCall<'a> {
+impl<'a, S> TeamdriveListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16494,28 +16769,28 @@ impl<'a> TeamdriveListCall<'a> {
     /// Issue the request as a domain administrator; if set to true, then all Team Drives of the domain in which the requester is an administrator are returned.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveListCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveListCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Query string for searching Team Drives.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> TeamdriveListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> TeamdriveListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token for Team Drives.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TeamdriveListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TeamdriveListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of Team Drives to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TeamdriveListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> TeamdriveListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16525,7 +16800,7 @@ impl<'a> TeamdriveListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16546,7 +16821,7 @@ impl<'a> TeamdriveListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16566,9 +16841,9 @@ impl<'a> TeamdriveListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16615,10 +16890,10 @@ impl<'a> TeamdriveListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveUpdateCall<'a>
-    where  {
+pub struct TeamdriveUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DriveHub<>,
+    hub: &'a DriveHub<S>,
     _request: TeamDrive,
     _team_drive_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -16627,9 +16902,15 @@ pub struct TeamdriveUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TeamdriveUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TeamdriveUpdateCall<'a, S> {}
 
-impl<'a> TeamdriveUpdateCall<'a> {
+impl<'a, S> TeamdriveUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16788,7 +17069,7 @@ impl<'a> TeamdriveUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveUpdateCall<'a> {
+    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16798,14 +17079,14 @@ impl<'a> TeamdriveUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveUpdateCall<'a> {
+    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveUpdateCall<'a, S> {
         self._team_drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveUpdateCall<'a> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveUpdateCall<'a, S> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -16815,7 +17096,7 @@ impl<'a> TeamdriveUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16836,7 +17117,7 @@ impl<'a> TeamdriveUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16856,9 +17137,9 @@ impl<'a> TeamdriveUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
