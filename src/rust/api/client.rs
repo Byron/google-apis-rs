@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use itertools::Itertools;
 
-use http::Uri;
+use hyper::http::Uri;
 
 use hyper::body::Buf;
 use hyper::client::connect;
