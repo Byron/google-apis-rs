@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive3-cli"
-version = "3.1.0+20220225"
+version = "4.0.0+20220225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/drive3-cli"
@@ -25,16 +25,18 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 6.6"
+yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
 strsim = "^0.5"
 clap = "^2.0"
+http = "^0.2"
 hyper = { version = "0.14", features = ["full"] }
 tokio = { version = "^ 1.0", features = ["full"] }
+tower-service = "^0.3.1"
 
 
 
 
 [dependencies.google-drive3]
 path = "../drive3"
-version = "3.1.0+20220225"
+version = "4.0.0+20220225"
