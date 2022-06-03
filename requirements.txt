@@ -1,5 +1,5 @@
 mako==1.1.4
-pyyaml
+pyyaml<6
 mkdocs==0.11
 pytest
 pytest-cov
