@@ -93,7 +93,7 @@ extern crate google_sheets4 as sheets4;
 use sheets4::api::ValueRange;
 use sheets4::{Result, Error};
 use std::default::Default;
-use sheets4::{Sheets, oauth2, hyper, hyper_rustls};
+use sheets4::{Sheets, oauth2, hyper, hyper_rustls::{self, ConfigBuilderExt}};
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -107,7 +107,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
