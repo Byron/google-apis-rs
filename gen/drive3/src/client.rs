@@ -10,7 +10,7 @@ use std::time::Duration;
 
 use itertools::Itertools;
 
-use hyper::http::Uri;
+use http::Uri;
 
 use hyper::body::Buf;
 use hyper::client::connect;
@@ -716,11 +716,14 @@ where
                     }
 
                     let (res_parts, res_body) = res.into_parts();
-                    let res_body = match hyper::body::to_bytes(res_body).await {
-                        Ok(res_body) => res_body.into_iter().collect(),
-                        Err(err) => return Some(Err(err)),
-                    };
-                    let res_body_string: String = String::from_utf8(res_body).unwrap();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
                     let reconstructed_result =
                         hyper::Response::from_parts(res_parts, res_body_string.clone().into());
 
