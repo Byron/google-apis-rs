@@ -2,7 +2,7 @@
     import json
     import os
     import yaml
-    from util import (api_json_path, library_name, library_to_crate_name,
+    from lib.util import (api_json_path, library_name, library_to_crate_name,
                       gen_crate_dir, api_index, crates_io_url, program_name,
                       crate_version)
 

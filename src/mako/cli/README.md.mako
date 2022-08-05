@@ -1,6 +1,6 @@
 <%
-    from util import (markdown_comment, new_context)
-    from cli import (CONFIG_DIR, CONFIG_DIR_FLAG, SCOPE_FLAG, application_secret_path, DEBUG_FLAG)
+    from lib.util import (markdown_comment, new_context)
+    from lib.cli import (CONFIG_DIR, CONFIG_DIR_FLAG, SCOPE_FLAG, application_secret_path, DEBUG_FLAG)
 
     c = new_context(schemas, resources, context.get('methods'))
 %>\

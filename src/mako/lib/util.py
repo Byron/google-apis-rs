@@ -1,6 +1,7 @@
 import re
 import os
 from random import (randint, random, choice, seed)
+from typing import Any, List, Mapping, Optional, Tuple
 import collections
 from copy import deepcopy
 import subprocess
@@ -10,9 +11,9 @@ seed(1337)
 re_linestart = re.compile('^', flags=re.MULTILINE)
 re_spaces_after_newline = re.compile('^ {4}', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
-re_desc_parts = re.compile("((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
+re_desc_parts = re.compile(r"((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
 
-re_find_replacements = re.compile("\{[/\+]?\w+\*?\}")
+re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH" ))
 
@@ -120,9 +121,7 @@ def items(p):
     else:
         return p._items()
 
-def custom_sorted(p):
-    if not isinstance(p, list):
-        assert(false, p, "unexpected type")
+def custom_sorted(p: List[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
     return sorted(p, key = lambda p: p['name'])
 
 # ==============================================================================
@@ -491,7 +490,7 @@ def is_schema_with_optionals(schema_markers):
 ## @name Activity Utilities
 # @{
 # return (category, name|None, method)
-def activity_split(fqan):
+def activity_split(fqan: str) -> Tuple[str, Optional[str], str]:
     t = fqan.split('.')
     mt = t[2:]
     if not mt:
@@ -512,10 +511,6 @@ def to_fqan(name, resource, method):
 # videos -> Video
 def activity_name_to_type_name(an):
     return canonical_type_name(an)[:-1]
-
-# yields (category, resource, activity, activity_data)
-def iter_acitivities(c):
-    return ((activity_split(an) + [a]) for an, a in c.fqan_map.items())
 
 # return a list of parameter structures of all params of the given method dict
 # apply a prune filter to restrict the set of returned parameters.
@@ -810,7 +805,7 @@ def _is_special_version(v):
     return v.endswith('alpha') or v.endswith('beta')
 
 def to_api_version(v):
-    m = re.search("_?v(\d(\.\d)*)_?", v)
+    m = re.search(r"_?v(\d(\.\d)*)_?", v)
     if not m and _is_special_version(v):
         return v
     assert m, "Expected to find a version within '%s'" % v

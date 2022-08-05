@@ -1,5 +1,5 @@
 <%!
-    from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
+    from lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, singular, hub_type, mangle_ident, mb_type, property,
                       to_fqan, indent_all_but_first_by, is_repeated_property, is_required_property,
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 

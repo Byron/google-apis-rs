@@ -1,4 +1,4 @@
-import util
+import lib.util as util
 
 import os
 import re
@@ -239,7 +239,7 @@ def field_to_value(f):
     return v
 
 # split the result along split segments
-def process_template_result(r, output_file):
+def process_template_result(r, output_file: str):
     found = False
     dir = None
     if output_file:
@@ -249,6 +249,8 @@ def process_template_result(r, output_file):
     # end handle output directory
 
     for m in re_splitters.finditer(r):
+        if not dir:
+            raise RuntimeError("Missing directory; was output_file specified?")
         found = True
         fh = open(os.path.join(dir, m.group(1)), 'wb')
         fh.write(m.group(2).encode('UTF-8'))

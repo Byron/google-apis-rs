@@ -1,5 +1,5 @@
 <%!
-    from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
+    from lib.util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, CALL_BUILDER_MARKERT_TRAIT, 

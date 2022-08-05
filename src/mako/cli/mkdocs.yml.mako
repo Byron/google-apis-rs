@@ -1,6 +1,6 @@
 <%
-    from util import (put_and, new_context)
-    from cli import (subcommand_md_filename, mangle_subcommand, pretty)
+    from lib.util import (put_and, new_context)
+    from lib.cli import (subcommand_md_filename, mangle_subcommand, pretty)
 
     c = new_context(schemas, resources, context.get('methods'))
 %>\

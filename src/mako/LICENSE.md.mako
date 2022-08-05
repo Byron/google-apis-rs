@@ -1,5 +1,5 @@
 ## -*- coding: utf-8 -*-
-<%! import util %>\
+<%! import lib.util as util %>\
 <%namespace name="mutil" file="lib/util.mako"/>\
 <%block filter="util.markdown_comment">\
 <%mutil:gen_info source="${self.uri}" />\
