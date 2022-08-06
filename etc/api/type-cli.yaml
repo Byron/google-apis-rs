@@ -5,7 +5,7 @@ mkdocs:
   # if docs_dir changes, remember to update the sources as well.
   docs_dir: docs
 mako:
-  post_processor_module: "lib.cli"
+  post_processor_module: "generator.lib.cli"
 make:
   id: cli
   target_name: CLIs

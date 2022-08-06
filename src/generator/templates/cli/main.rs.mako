@@ -1,10 +1,10 @@
 <%namespace name="argparse" file="lib/argparse.mako"/>\
 <%namespace name="engine" file="lib/engine.mako"/>\
-<%namespace name="util" file="../lib/util.mako"/>\
+<%namespace name="util" file="../../lib/util.mako"/>\
 <%  
-    from lib.util import (new_context, rust_comment, to_extern_crate_name, library_to_crate_name, library_name,
+    from generator.lib.util import (new_context, rust_comment, to_extern_crate_name, library_to_crate_name, library_name,
                       indent_all_but_first_by)
-    from lib.cli import OUT_ARG, DEBUG_FLAG, opt_value
+    from generator.lib.cli import OUT_ARG, DEBUG_FLAG, opt_value
 
     c = new_context(schemas, resources, context.get('methods'))
     default_user_agent = "google-cli-rust-client/" + cargo.build_version

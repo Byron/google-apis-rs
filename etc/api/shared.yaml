@@ -83,7 +83,7 @@ directories:
   # where are all the API meta files
   api_base: etc/api
   # all mako source files
-  mako_src: src/mako
+  mako_src: src/generator/templates
   # The subdirectory to contain documentation from all APIs and related programs
   doc_subdir: doc
 cargo:

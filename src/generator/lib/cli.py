@@ -1,4 +1,4 @@
-import lib.util as util
+import generator.lib.util as util
 
 import os
 import re

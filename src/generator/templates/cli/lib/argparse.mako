@@ -1,9 +1,9 @@
-<%namespace name="util" file="../../lib/util.mako"/>\
+<%namespace name="util" file="../../../lib/util.mako"/>\
 <%!
     import os
 
-    from lib.util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and, escape_rust_string)
-    from lib.cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
+    from generator.lib.util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and, escape_rust_string)
+    from generator.lib.cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
                      CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, MODE_ARG, SCOPE_ARG,
                      CONFIG_DIR_ARG, FILE_FLAG, MIME_FLAG, subcommand_md_filename)

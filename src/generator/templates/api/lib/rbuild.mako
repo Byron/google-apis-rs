@@ -1,5 +1,5 @@
 <%!
-    from lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
+    from generator.lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, singular, hub_type, mangle_ident, mb_type, property,
                       to_fqan, indent_all_but_first_by, is_repeated_property, is_required_property,
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
@@ -8,7 +8,7 @@
                       struct_type_bounds_s, METHODS_RESOURCE, SPACES_PER_TAB, prefix_all_but_first_with,
                       METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines, method_default_scope, rust_doc_sanitize)
 %>\
-<%namespace name="util" file="../../lib/util.mako"/>\
+<%namespace name="util" file="../../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
 
 ## Creates a Resource builder type

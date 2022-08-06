@@ -341,11 +341,16 @@ def _assure_unique_type_name(schemas, tn):
     return tn
 
 # map a json type to an rust type
-# sn = schema name
-# pn = property name
 # t = type dict
 # NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
-def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
+def to_rust_type(
+    schemas,
+    schema_name, 
+    property_name, 
+    t, 
+    allow_optionals=True, 
+    _is_recursive=False
+):
     def nested_type(nt):
         if 'items' in nt:
             nt = nt['items']
@@ -354,8 +359,8 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
         else:
             assert(is_nested_type_property(nt))
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
-            return _assure_unique_type_name(schemas, nested_type_name(sn, pn))
-        return to_rust_type(schemas, sn, pn, nt, allow_optionals=False, _is_recursive=True)
+            return _assure_unique_type_name(schemas, nested_type_name(schema_name, property_name))
+        return to_rust_type(schemas, schema_name, property_name, nt, allow_optionals=False, _is_recursive=True)
 
     def wrap_type(tn):
         if allow_optionals:
@@ -368,7 +373,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
         # which is fine for now. 'allow_optionals' implicitly restricts type boxing for simple types - it
         # usually is on on the first call, and off when recursion is involved.
         tn = t[TREF]
-        if not _is_recursive and tn == sn:
+        if not _is_recursive and tn == schema_name:
             tn = 'Option<Box<%s>>' % tn
         return wrap_type(tn)
     try:

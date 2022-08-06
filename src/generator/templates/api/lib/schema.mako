@@ -1,5 +1,5 @@
 <%!
-    from lib.util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and,
+    from generator.lib.util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and,
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE,
                       PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals,

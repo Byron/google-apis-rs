@@ -1,4 +1,4 @@
-<%! import lib.util as util %>\
+<%! import generator.lib.util as util %>\
 
 ## source should be ${self.uri}
 ## you need to escape the output, using a filter for example

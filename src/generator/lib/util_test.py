@@ -4,8 +4,8 @@ import importlib.resources
 import unittest
 import json
 
-from lib.util import to_api_version, library_name, re_find_replacements, to_rust_type, new_context
-import lib.test_data as test_data
+from generator.lib.util import to_api_version, library_name, re_find_replacements, to_rust_type, new_context
+import generator.lib.test_data as test_data
 
 
 TEST_JSON_FILE = "photoslibrary-api.json"

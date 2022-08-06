@@ -58,7 +58,7 @@
 <% continue %>\
 % endif
 <%
-	import lib.util as util
+	import generator.lib.util as util
 	import os
 	import json
 
@@ -191,7 +191,7 @@ help${agsuffix}:
 
 % for info in (apis.get('items') or []):
 <%
-	import lib.util as util
+	import generator.lib.util as util
 	import os
 	name = util.normalize_library_name(info['name'])
 	target = util.api_json_path(directories.api_base, name, info['version'])

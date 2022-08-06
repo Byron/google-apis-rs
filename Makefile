@@ -18,7 +18,9 @@ TPL := $(PYTHON) $(MAKO_RENDER)
 MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
 GHP_IMPORT  := $(shell pwd)/$(VENV_DIR)/bin/ghp-import
 
-MAKO_SRC = src/mako
+GEN_SRC = src/generator
+GEN_LIB_SRC = $(GEN_SRC)/lib
+MAKO_SRC = src/generator/templates
 RUST_SRC = src/rust
 PREPROC_DIR = $(RUST_SRC)/preproc
 PREPROC = target/release/preproc
@@ -36,9 +38,8 @@ else
 API_LIST := $(API_LIST)api-list.yaml
 endif
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
-MAKO_LIB_DIR = $(MAKO_SRC)/lib
-MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
-MAKO = export PREPROC=$(PREPROC); export PYTHONPATH=$(MAKO_SRC):$(PYTHONPATH); $(TPL) --template-dir '.'
+MAKO_LIB_FILES = $(shell find $(GEN_LIB_SRC) -type f -name '*.*')
+MAKO = export PREPROC=$(PREPROC); export PYTHONPATH=src:$(PYTHONPATH); $(TPL) --template-dir '.'
 MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER) $(PREPROC)
 
 help:
@@ -71,7 +72,7 @@ $(PYTHON_BIN): $(VENV_BIN) requirements.txt
 	python3 -m virtualenv -p python3 $(VENV_DIR)
 	$@ -m pip install -r requirements.txt
 
-$(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(MAKO_LIB_DIR)/*)
+$(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(GEN_LIB_SRC)/*)
 
 # Explicitly NOT depending on $(MAKO_LIB_FILES), as it's quite stable and now takes 'too long' thanks
 # to a URL get call to the google discovery service
@@ -99,7 +100,7 @@ test-gen: $(PYTHON_BIN)
 test: test-gen
 
 typecheck: $(PYTHON_BIN)
-	$(PYTHON) -m pyright $(MAKO_LIB_DIR)
+	$(PYTHON) -m pyright $(GEN_LIB_SRC)
 
 clean: clean-all-api clean-all-cli docs-all-clean
 	-rm -Rf $(VENV_DIR)

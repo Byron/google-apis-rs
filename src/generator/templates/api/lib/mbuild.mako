@@ -1,5 +1,5 @@
 <%!
-    from lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
+    from generator.lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
                       activity_rust_type, mangle_ident, activity_input_type, get_word,
                       split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST,
@@ -28,7 +28,7 @@
         part_desc = part_desc[:-1]
         return part_desc
 %>\
-<%namespace name="util" file="../../lib/util.mako"/>\
+<%namespace name="util" file="../../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
 
 ## Creates a method builder type
