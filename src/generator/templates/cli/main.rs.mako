@@ -6,7 +6,7 @@
                       indent_all_but_first_by)
     from generator.lib.cli import OUT_ARG, DEBUG_FLAG, opt_value
 
-    c = new_context(schemas, resources, context.get('methods'))
+    c = new_context(schemas, resources)
     default_user_agent = "google-cli-rust-client/" + cargo.build_version
 %>\
 <%block filter="rust_comment">\

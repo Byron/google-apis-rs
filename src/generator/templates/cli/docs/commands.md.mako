@@ -15,7 +15,7 @@
     NO_DESC = 'No description provided.'
 %>\
 <%
-    c = new_context(schemas, resources, context.get('methods'))
+    c = new_context(schemas, resources)
 %>\
 % for resource in sorted(c.rta_map.keys()):
 % for method in sorted(c.rta_map[resource]):

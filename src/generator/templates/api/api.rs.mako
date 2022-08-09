@@ -9,7 +9,7 @@
                       rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS, METHODS_RESOURCE,
                       UNUSED_TYPE_MARKER, schema_markers)
 
-    c = new_context(schemas, resources, context.get('methods'))
+    c = new_context(schemas, resources)
     hub_type = hub_type(c.schemas, util.canonical_name())
     ht_params = hub_type_params_s()
 

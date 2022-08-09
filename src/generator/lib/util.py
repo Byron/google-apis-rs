@@ -1,10 +1,11 @@
-import re
 import os
-from random import (randint, random, choice, seed)
-from typing import Any, List, Mapping, Optional, Tuple
-import collections
-from copy import deepcopy
+import re
 import subprocess
+
+from dataclasses import dataclass
+from random import (randint, random, choice, seed)
+from typing import Any, Dict, List, Mapping, Tuple
+from copy import deepcopy
 
 seed(1337)
 
@@ -494,8 +495,7 @@ def is_schema_with_optionals(schema_markers):
 # -------------------------
 ## @name Activity Utilities
 # @{
-# return (category, name|None, method)
-def activity_split(fqan: str) -> Tuple[str, Optional[str], str]:
+def activity_split(fqan: str) -> Tuple[str, str, str]:
     t = fqan.split('.')
     mt = t[2:]
     if not mt:
@@ -663,31 +663,37 @@ It should be used to handle progress information, and to implement a certain lev
 ## -- End Activity Utilities -- @}
 
 
-Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map', 'rtc_map', 'schemas'])
+@dataclass
+class Context:
+    sta_map: Dict[str, Any]
+    fqan_map: Dict[str, Any]
+    rta_map: Dict[str, Any]
+    rtc_map: Dict[str, Any]
+    schemas: Dict[str, Any]
 
 # return a newly build context from the given data
-def new_context(schemas, resources, methods):
+def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -> Context:
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }
     # fqan = fully qualified activity name
-    def build_activity_mappings(activities, res = None, fqan = None):
+    def build_activity_mappings(resources: Dict[str, Any], res = None, fqan = None) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         if res is None:
             res = dict()
         if fqan is None:
             fqan = dict()
-        for k,a in activities.items():
+        for k,a in resources.items():
             if 'resources' in a:
-                build_activity_mappings(a.resources, res, fqan)
+                build_activity_mappings(a["resources"], res, fqan)
             if 'methods' not in a:
                 continue
-            for mn, m in a.methods.items():
-                assert m.id not in fqan
-                category, resource, method = activity_split(m.id)
+            for mn, m in a["methods"].items():
+                assert m["id"] not in fqan
+                category, resource, method = activity_split(m["id"])
                 # This may be another name by which people try to find the method.
                 # As it has no resource, we put in a 'fake resource' (METHODS_RESOURCE), which
                 # needs some special treatment only in key-spots
-                fqan_key = m.id
+                fqan_key = m["id"]
                 if resource == METHODS_RESOURCE:
                     fqan_key = to_fqan(category, resource, method)
                 fqan[fqan_key] = m
@@ -697,7 +703,7 @@ def new_context(schemas, resources, methods):
                         continue
                     tn = to_rust_type(schemas, None, None, t, allow_optionals=False)
                     info = res.setdefault(tn, dict())
-                    io_info = info.setdefault(m.id, [])
+                    io_info = info.setdefault(m["id"], [])
                     io_info.append(in_out_type_name)
                 # end for each io type
 
@@ -707,8 +713,8 @@ def new_context(schemas, resources, methods):
                 #            the latter is used to deduce the resource name
                 tn = activity_name_to_type_name(resource)
                 info = res.setdefault(tn, dict())
-                if m.id not in info:
-                    info.setdefault(m.id, [])
+                if m["id"] not in info:
+                    info.setdefault(m["id"], [])
                 # end handle other cases
             # end for each method
         # end for each activity
@@ -717,7 +723,7 @@ def new_context(schemas, resources, methods):
 
     # A dict of {s.id -> schema} , with all schemas having the 'parents' key set with [s.id, ...] of all parents
     # in order of traversal, [-1] is first parent, [0] is the root of them all
-    def build_schema_map():
+    def build_schema_map() -> Dict[str, Any]:
         # 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
         PARENT = 'parents'
         USED_BY = 'used_by'
@@ -729,8 +735,8 @@ def new_context(schemas, resources, methods):
         def link_used(s, rs):
             if TREF in s:
                 l = assure_list(all_schemas[s[TREF]], USED_BY)
-                if rs.id not in l:
-                    l.append(rs.id)
+                if rs["id"] not in l:
+                    l.append(rs["id"])
 
         def append_unique(l, s):
             if s not in l:
@@ -738,14 +744,14 @@ def new_context(schemas, resources, methods):
             return l
 
         all_schemas = deepcopy(schemas)
-        def recurse_properties(prefix, rs, s, parent_ids):
+        def recurse_properties(prefix: str, rs: Any, s: Any, parent_ids: List[str]):
             assure_list(s, USED_BY)
             assure_list(s, PARENT).extend(parent_ids)
             link_used(s, rs)
 
             if is_nested_type_property(s) and 'id' not in s:
                 s.id = prefix
-                all_schemas[s.id] = s
+                all_schemas[s["id"]] = s
                 rs = s
             # end this is already a perfectly valid type
 
@@ -756,54 +762,46 @@ def new_context(schemas, resources, methods):
                 if is_nested_type_property(p):
                     ns = deepcopy(p)
                     ns.id = _assure_unique_type_name(schemas, nested_type_name(prefix, pn))
-                    all_schemas[ns.id] = ns
+                    all_schemas[ns["id"]] = ns
 
                     # To allow us recursing arrays, we simply put items one level up
                     if 'items' in p:
-                        ns.update((k, deepcopy(v)) for k, v in p.items.items())
+                        ns.update((k, deepcopy(v)) for k, v in p["items"].items())
 
-                    recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs.id))
+                    recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs["id"]))
                 elif is_map_prop(p):
                     recurse_properties(nested_type_name(prefix, pn), rs,
-                                                        p.additionalProperties, append_unique(parent_ids, rs.id))
+                                                        p["additionalProperties"], append_unique(parent_ids, rs["id"]))
                 elif 'items' in p:
                     recurse_properties(nested_type_name(prefix, pn), rs,
-                                                        p.items, append_unique(parent_ids, rs.id))
-                elif 'variant' in p:
-                    for enum in p.variant.map:
-                        recurse_properties(prefix, rs, enum, parent_ids)
+                                                        p["items"], append_unique(parent_ids, rs["id"]))
                 # end handle prop itself
             # end for each property
         # end utility
         for s in all_schemas.values():
-            recurse_properties(s.id, s, s, [])
+            recurse_properties(s["id"], s, s, [])
         # end for each schema
 
         return all_schemas
     # end utility
 
     all_schemas = schemas and build_schema_map() or dict()
-    if not (resources or methods):
+    if not resources:
         return Context(dict(), dict(), dict(), dict(), all_schemas)
 
-    rta_map, rtc_map, sta_map, fqan_map = dict(), dict(), dict(), dict()
+    rta_map: Dict[str, Any] = {}
+    rtc_map: Dict[str, Any] = {}
+    sta_map: Dict[str, Any] = {}
+    fqan_map: Dict[str, Any] = {}
 
-    sources = list()
-    if bool(resources):
-        sources.append(resources)
-    if bool(methods):
-        sources.append({None : type(methods)({'methods' : methods})})
-
-    for data_source in sources:
-        _sta_map, _fqan_map = build_activity_mappings(data_source)
-        for an in _fqan_map:
-            category, resource, activity = activity_split(an)
-            rta_map.setdefault(resource, list()).append(activity)
-            assert rtc_map.setdefault(resource, category) == category
-        # end for each fqan
-        sta_map.update(_sta_map)
-        fqan_map.update(_fqan_map)
-    # end for each data source
+    _sta_map, _fqan_map = build_activity_mappings(resources)
+    for an in _fqan_map:
+        category, resource, activity = activity_split(an)
+        rta_map.setdefault(resource, list()).append(activity)
+        assert rtc_map.setdefault(resource, category) == category
+    # end for each fqan
+    sta_map.update(_sta_map)
+    fqan_map.update(_fqan_map)
     return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
 
 def _is_special_version(v):
