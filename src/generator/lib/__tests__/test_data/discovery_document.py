@@ -1,3 +1,6 @@
+# Discovery document for photoslibrary, retrieved from:
+# https://photoslibrary.googleapis.com/$discovery/rest?version=v1
+DISCOVERY_DOC = r"""
 {
   "documentationLink": "https://developers.google.com/photos/",
   "id": "photoslibrary:v1",
@@ -1332,3 +1335,4 @@
   "kind": "discovery#restDescription",
   "basePath": ""
 }
+"""

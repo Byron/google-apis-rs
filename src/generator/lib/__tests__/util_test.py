@@ -1,19 +1,11 @@
 #!/usr/bin/env python
 
-import importlib.resources
 import unittest
 import json
 
-from generator.lib.util import to_api_version, library_name, re_find_replacements, to_rust_type, new_context
-import generator.lib.test_data as test_data
+from generator.lib.util import to_api_version, library_name, re_find_replacements, to_rust_type
+from .test_data.discovery_document import DISCOVERY_DOC
 
-
-TEST_JSON_FILE = "photoslibrary-api.json"
-
-
-def read_test_json_file():
-    data = importlib.resources.read_text(test_data, TEST_JSON_FILE)
-    return json.loads(data)
 
 class UtilsTest(unittest.TestCase):
 
@@ -68,7 +60,7 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(ms[0], '{+project}')
 
     def test_to_rust_type(self):
-        full_api_schema = read_test_json_file()
+        full_api_schema = json.loads(DISCOVERY_DOC)
 
         schemas = full_api_schema['schemas']
 
