@@ -4,9 +4,13 @@
 # This module is part of Mako and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 from argparse import ArgumentParser
+from copy import deepcopy
+from importlib import import_module
 from os.path import isfile, dirname
+import json
 import os
 import sys
+import yaml
 from mako.template import Template
 from mako.lookup import TemplateLookup
 from mako import exceptions
@@ -212,27 +216,17 @@ def load_data(datafiles):
     :Returns:   data (dict)
     :Raises:    ImportError, ValueError
     """
-    imported_json = False
     imported_yaml = False
     mydata = {}
 
     for filename, namespace in datafiles:
         data = None
         if filename[-5:].lower() == ".json":
-            if not imported_json:
-                try:
-                    import simplejson as json
-                except ImportError:
-                    import json
-                imported_json = True
             try:
                 data = json.load(open(filename, 'r'))
             except ValueError as err:
                 raise ValueError("Invalid JSON in file '%s'. (%s)" % (filename, str(err)))
         elif filename[-5:].lower() in (".yaml", ".yml"):
-            if not imported_yaml:
-                import yaml
-                imported_yaml = True
             data = yaml.load_all(open(filename, 'r'), Loader=yaml.loader.FullLoader)
             data = list(data)[0]
         else:
@@ -289,7 +283,7 @@ def cmdline(argv=None):
     post_processor = lambda r, of: r
     if options.post_process_python_module:
         fn_name = 'process_template_result'
-        pm = __import__(options.post_process_python_module, globals(), locals(), [])
+        pm = import_module(options.post_process_python_module)
         post_processor = getattr(pm, fn_name, None)
         if post_processor is None:
             raise AssertionError("python module '%s' must have a function called '%s'" 

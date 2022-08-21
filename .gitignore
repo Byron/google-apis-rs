@@ -5,7 +5,7 @@
 gen/doc
 *.go    
 **/target/
-**/docs/
+gen/**/docs/
 **/build_html/
 .*.deps
 **/Cargo.lock

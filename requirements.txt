@@ -3,6 +3,7 @@ pyyaml<6
 mkdocs==0.11
 pytest
 pytest-cov
-importlib_resources
 codecov
 ghp-import
+pyright
+types-PyYAML
